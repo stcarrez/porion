@@ -1,0 +1,21 @@
+<query-mapping package='Porion.Projects.Models'>
+    <description>
+        List of nodes
+    </description>
+
+    <query name='command-node-list'>
+        <comment>Get the list of nodes</comment>
+        <sql>
+            SELECT
+            node.id AS id,
+            node.name AS name
+            FROM porion_node AS node
+        </sql>
+        <sql-count>
+            SELECT
+            count(node.id)
+            FROM porion_node AS node
+        </sql-count>
+    </query>
+
+</query-mapping>

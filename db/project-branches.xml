@@ -1,0 +1,22 @@
+<query-mapping package='Porion.Projects.Models'>
+    <description>
+      Information about branches on a project.
+    </description>
+
+    <query name='project-branches'>
+       <comment>Get a list of project branches.</comment>
+       <sql>
+    SELECT
+      branch.id,
+      branch.name,
+      branch.tag,
+      branch.last_date,
+      build.create_date,
+      (SELECT COUNT(*) FROM porion_build AS build WHERE build.branch_id = branch.id) AS count
+    FROM porion_branch AS branch
+    LEFT JOIN porion_build AS build ON branch.last_build_id = build.id
+    WHERE branch.project_id = :project_id
+       </sql>
+    </query>
+
+</query-mapping>

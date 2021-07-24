@@ -1,6 +1,7 @@
 -- Advanced Resource Embedder 1.1.0
 package Porion.Resources is
 
+   type Content_Access is access constant String;
 
    type Name_Access is access constant String;
 
@@ -18,7 +19,9 @@ private
    K_1             : aliased constant String := "command-nodes.xml";
    K_2             : aliased constant String := "command-projects.xml";
    K_3             : aliased constant String := "project-branches.xml";
+   K_4             : aliased constant String := "project-builds.xml";
 
    Names : constant Name_Array := (
-      K_0'Access, K_1'Access, K_2'Access, K_3'Access);
+      K_0'Access, K_1'Access, K_2'Access, K_3'Access,
+      K_4'Access);
 end Porion.Resources;

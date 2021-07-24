@@ -29,391 +29,6 @@ package body Porion.Projects.Models is
 
    pragma Warnings (Off, "formal parameter * is not referenced");
 
-   function Node_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key is
-      Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
-                                       Of_Class => NODE_DEF'Access);
-   begin
-      ADO.Objects.Set_Value (Result, Id);
-      return Result;
-   end Node_Key;
-
-   function Node_Key (Id : in String) return ADO.Objects.Object_Key is
-      Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
-                                       Of_Class => NODE_DEF'Access);
-   begin
-      ADO.Objects.Set_Value (Result, Id);
-      return Result;
-   end Node_Key;
-
-   function "=" (Left, Right : Node_Ref'Class) return Boolean is
-   begin
-      return ADO.Objects.Object_Ref'Class (Left) = ADO.Objects.Object_Ref'Class (Right);
-   end "=";
-
-   procedure Set_Field (Object : in out Node_Ref'Class;
-                        Impl   : out Node_Access) is
-      Result : ADO.Objects.Object_Record_Access;
-   begin
-      Object.Prepare_Modify (Result);
-      Impl := Node_Impl (Result.all)'Access;
-   end Set_Field;
-
-   --  Internal method to allocate the Object_Record instance
-   procedure Allocate (Object : in out Node_Ref) is
-      Impl : Node_Access;
-   begin
-      Impl := new Node_Impl;
-      Impl.Version := 0;
-      ADO.Objects.Set_Object (Object, Impl.all'Access);
-   end Allocate;
-
-   -- ----------------------------------------
-   --  Data object: Node
-   -- ----------------------------------------
-
-   procedure Set_Id (Object : in out Node_Ref;
-                     Value  : in ADO.Identifier) is
-      Impl : Node_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Key_Value (Impl.all, 1, Value);
-   end Set_Id;
-
-   function Get_Id (Object : in Node_Ref)
-                  return ADO.Identifier is
-      Impl : constant Node_Access
-         := Node_Impl (Object.Get_Object.all)'Access;
-   begin
-      return Impl.Get_Key_Value;
-   end Get_Id;
-
-
-   function Get_Version (Object : in Node_Ref)
-                  return Integer is
-      Impl : constant Node_Access
-         := Node_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Version;
-   end Get_Version;
-
-
-   procedure Set_Name (Object : in out Node_Ref;
-                        Value : in String) is
-      Impl : Node_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Audits.Set_Field_String (Impl.all, 3, Impl.Name, Value);
-   end Set_Name;
-
-   procedure Set_Name (Object : in out Node_Ref;
-                       Value  : in Ada.Strings.Unbounded.Unbounded_String) is
-      Impl : Node_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Audits.Set_Field_Unbounded_String (Impl.all, 3, Impl.Name, Value);
-   end Set_Name;
-
-   function Get_Name (Object : in Node_Ref)
-                 return String is
-   begin
-      return Ada.Strings.Unbounded.To_String (Object.Get_Name);
-   end Get_Name;
-   function Get_Name (Object : in Node_Ref)
-                  return Ada.Strings.Unbounded.Unbounded_String is
-      Impl : constant Node_Access
-         := Node_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Name;
-   end Get_Name;
-
-
-   procedure Set_Login (Object : in out Node_Ref;
-                         Value : in String) is
-      Impl : Node_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Audits.Set_Field_String (Impl.all, 4, Impl.Login, Value);
-   end Set_Login;
-
-   procedure Set_Login (Object : in out Node_Ref;
-                        Value  : in Ada.Strings.Unbounded.Unbounded_String) is
-      Impl : Node_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Audits.Set_Field_Unbounded_String (Impl.all, 4, Impl.Login, Value);
-   end Set_Login;
-
-   function Get_Login (Object : in Node_Ref)
-                 return String is
-   begin
-      return Ada.Strings.Unbounded.To_String (Object.Get_Login);
-   end Get_Login;
-   function Get_Login (Object : in Node_Ref)
-                  return Ada.Strings.Unbounded.Unbounded_String is
-      Impl : constant Node_Access
-         := Node_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Login;
-   end Get_Login;
-
-   --  Copy of the object.
-   procedure Copy (Object : in Node_Ref;
-                   Into   : in out Node_Ref) is
-      Result : Node_Ref;
-   begin
-      if not Object.Is_Null then
-         declare
-            Impl : constant Node_Access
-              := Node_Impl (Object.Get_Load_Object.all)'Access;
-            Copy : constant Node_Access
-              := new Node_Impl;
-         begin
-            ADO.Objects.Set_Object (Result, Copy.all'Access);
-            Copy.Copy (Impl.all);
-            Copy.Version := Impl.Version;
-            Copy.Name := Impl.Name;
-            Copy.Login := Impl.Login;
-         end;
-      end if;
-      Into := Result;
-   end Copy;
-
-   procedure Find (Object  : in out Node_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Query   : in ADO.SQL.Query'Class;
-                   Found   : out Boolean) is
-      Impl  : constant Node_Access := new Node_Impl;
-   begin
-      Impl.Find (Session, Query, Found);
-      if Found then
-         ADO.Objects.Set_Object (Object, Impl.all'Access);
-      else
-         ADO.Objects.Set_Object (Object, null);
-         Destroy (Impl);
-      end if;
-   end Find;
-
-   procedure Load (Object  : in out Node_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Id      : in ADO.Identifier) is
-      Impl  : constant Node_Access := new Node_Impl;
-      Found : Boolean;
-      Query : ADO.SQL.Query;
-   begin
-      Query.Bind_Param (Position => 1, Value => Id);
-      Query.Set_Filter ("id = ?");
-      Impl.Find (Session, Query, Found);
-      if not Found then
-         Destroy (Impl);
-         raise ADO.Objects.NOT_FOUND;
-      end if;
-      ADO.Objects.Set_Object (Object, Impl.all'Access);
-   end Load;
-
-   procedure Load (Object  : in out Node_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Id      : in ADO.Identifier;
-                   Found   : out Boolean) is
-      Impl  : constant Node_Access := new Node_Impl;
-      Query : ADO.SQL.Query;
-   begin
-      Query.Bind_Param (Position => 1, Value => Id);
-      Query.Set_Filter ("id = ?");
-      Impl.Find (Session, Query, Found);
-      if not Found then
-         Destroy (Impl);
-      else
-         ADO.Objects.Set_Object (Object, Impl.all'Access);
-      end if;
-   end Load;
-
-   procedure Save (Object  : in out Node_Ref;
-                   Session : in out ADO.Sessions.Master_Session'Class) is
-      Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;
-   begin
-      if Impl = null then
-         Impl := new Node_Impl;
-         ADO.Objects.Set_Object (Object, Impl);
-      end if;
-      if not ADO.Objects.Is_Created (Impl.all) then
-         Impl.Create (Session);
-      else
-         Impl.Save (Session);
-      end if;
-   end Save;
-
-   procedure Delete (Object  : in out Node_Ref;
-                     Session : in out ADO.Sessions.Master_Session'Class) is
-      Impl : constant ADO.Objects.Object_Record_Access := Object.Get_Object;
-   begin
-      if Impl /= null then
-         Impl.Delete (Session);
-      end if;
-   end Delete;
-
-   --  --------------------
-   --  Free the object
-   --  --------------------
-   procedure Destroy (Object : access Node_Impl) is
-      type Node_Impl_Ptr is access all Node_Impl;
-      procedure Unchecked_Free is new Ada.Unchecked_Deallocation
-              (Node_Impl, Node_Impl_Ptr);
-      pragma Warnings (Off, "*redundant conversion*");
-      Ptr : Node_Impl_Ptr := Node_Impl (Object.all)'Access;
-      pragma Warnings (On, "*redundant conversion*");
-   begin
-      Unchecked_Free (Ptr);
-   end Destroy;
-
-   procedure Find (Object  : in out Node_Impl;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Query   : in ADO.SQL.Query'Class;
-                   Found   : out Boolean) is
-      Stmt : ADO.Statements.Query_Statement
-          := Session.Create_Statement (Query, NODE_DEF'Access);
-   begin
-      Stmt.Execute;
-      if Stmt.Has_Elements then
-         Object.Load (Stmt, Session);
-         Stmt.Next;
-         Found := not Stmt.Has_Elements;
-      else
-         Found := False;
-      end if;
-   end Find;
-
-   overriding
-   procedure Load (Object  : in out Node_Impl;
-                   Session : in out ADO.Sessions.Session'Class) is
-      Found : Boolean;
-      Query : ADO.SQL.Query;
-      Id    : constant ADO.Identifier := Object.Get_Key_Value;
-   begin
-      Query.Bind_Param (Position => 1, Value => Id);
-      Query.Set_Filter ("id = ?");
-      Object.Find (Session, Query, Found);
-      if not Found then
-         raise ADO.Objects.NOT_FOUND;
-      end if;
-   end Load;
-
-   procedure Save (Object  : in out Node_Impl;
-                   Session : in out ADO.Sessions.Master_Session'Class) is
-      Stmt : ADO.Statements.Update_Statement
-         := Session.Create_Statement (NODE_DEF'Access);
-   begin
-      if Object.Is_Modified (1) then
-         Stmt.Save_Field (Name  => COL_0_1_NAME, --  id
-                          Value => Object.Get_Key);
-         Object.Clear_Modified (1);
-      end if;
-      if Object.Is_Modified (3) then
-         Stmt.Save_Field (Name  => COL_2_1_NAME, --  name
-                          Value => Object.Name);
-         Object.Clear_Modified (3);
-      end if;
-      if Object.Is_Modified (4) then
-         Stmt.Save_Field (Name  => COL_3_1_NAME, --  login
-                          Value => Object.Login);
-         Object.Clear_Modified (4);
-      end if;
-      if Stmt.Has_Save_Fields then
-         Object.Version := Object.Version + 1;
-         Stmt.Save_Field (Name  => "version",
-                          Value => Object.Version);
-         Stmt.Set_Filter (Filter => "id = ? and version = ?");
-         Stmt.Add_Param (Value => Object.Get_Key);
-         Stmt.Add_Param (Value => Object.Version - 1);
-         declare
-            Result : Integer;
-         begin
-            Stmt.Execute (Result);
-            if Result /= 1 then
-               if Result /= 0 then
-                  raise ADO.Objects.UPDATE_ERROR;
-               else
-                  raise ADO.Objects.LAZY_LOCK;
-               end if;
-            end if;
-            ADO.Audits.Save (Object, Session);
-         end;
-      end if;
-   end Save;
-
-   procedure Create (Object  : in out Node_Impl;
-                     Session : in out ADO.Sessions.Master_Session'Class) is
-      Query : ADO.Statements.Insert_Statement
-                  := Session.Create_Statement (NODE_DEF'Access);
-      Result : Integer;
-   begin
-      Object.Version := 1;
-      Session.Allocate (Id => Object);
-      Query.Save_Field (Name  => COL_0_1_NAME, --  id
-                        Value => Object.Get_Key);
-      Query.Save_Field (Name  => COL_1_1_NAME, --  version
-                        Value => Object.Version);
-      Query.Save_Field (Name  => COL_2_1_NAME, --  name
-                        Value => Object.Name);
-      Query.Save_Field (Name  => COL_3_1_NAME, --  login
-                        Value => Object.Login);
-      Query.Execute (Result);
-      if Result /= 1 then
-         raise ADO.Objects.INSERT_ERROR;
-      end if;
-      ADO.Objects.Set_Created (Object);
-      ADO.Audits.Save (Object, Session);
-   end Create;
-
-   procedure Delete (Object  : in out Node_Impl;
-                     Session : in out ADO.Sessions.Master_Session'Class) is
-      Stmt : ADO.Statements.Delete_Statement
-         := Session.Create_Statement (NODE_DEF'Access);
-   begin
-      Stmt.Set_Filter (Filter => "id = ?");
-      Stmt.Add_Param (Value => Object.Get_Key);
-      Stmt.Execute;
-   end Delete;
-
-   --  ------------------------------
-   --  Get the bean attribute identified by the name.
-   --  ------------------------------
-   overriding
-   function Get_Value (From : in Node_Ref;
-                       Name : in String) return Util.Beans.Objects.Object is
-      Obj  : ADO.Objects.Object_Record_Access;
-      Impl : access Node_Impl;
-   begin
-      if From.Is_Null then
-         return Util.Beans.Objects.Null_Object;
-      end if;
-      Obj := From.Get_Load_Object;
-      Impl := Node_Impl (Obj.all)'Access;
-      if Name = "id" then
-         return ADO.Objects.To_Object (Impl.Get_Key);
-      elsif Name = "name" then
-         return Util.Beans.Objects.To_Object (Impl.Name);
-      elsif Name = "login" then
-         return Util.Beans.Objects.To_Object (Impl.Login);
-      end if;
-      return Util.Beans.Objects.Null_Object;
-   end Get_Value;
-
-
-
-   --  ------------------------------
-   --  Load the object from current iterator position
-   --  ------------------------------
-   procedure Load (Object  : in out Node_Impl;
-                   Stmt    : in out ADO.Statements.Query_Statement'Class;
-                   Session : in out ADO.Sessions.Session'Class) is
-      pragma Unreferenced (Session);
-   begin
-      Object.Set_Key_Value (Stmt.Get_Identifier (0));
-      Object.Name := Stmt.Get_Unbounded_String (2);
-      Object.Login := Stmt.Get_Unbounded_String (3);
-      Object.Version := Stmt.Get_Integer (1);
-      ADO.Objects.Set_Created (Object);
-   end Load;
    function Project_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key is
       Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
                                        Of_Class => PROJECT_DEF'Access);
@@ -801,37 +416,37 @@ package body Porion.Projects.Models is
          := Session.Create_Statement (PROJECT_DEF'Access);
    begin
       if Object.Is_Modified (1) then
-         Stmt.Save_Field (Name  => COL_0_2_NAME, --  id
+         Stmt.Save_Field (Name  => COL_0_1_NAME, --  id
                           Value => Object.Get_Key);
          Object.Clear_Modified (1);
       end if;
       if Object.Is_Modified (2) then
-         Stmt.Save_Field (Name  => COL_1_2_NAME, --  name
+         Stmt.Save_Field (Name  => COL_1_1_NAME, --  name
                           Value => Object.Name);
          Object.Clear_Modified (2);
       end if;
       if Object.Is_Modified (4) then
-         Stmt.Save_Field (Name  => COL_3_2_NAME, --  description
+         Stmt.Save_Field (Name  => COL_3_1_NAME, --  description
                           Value => Object.Description);
          Object.Clear_Modified (4);
       end if;
       if Object.Is_Modified (6) then
-         Stmt.Save_Field (Name  => COL_5_2_NAME, --  update_date
+         Stmt.Save_Field (Name  => COL_5_1_NAME, --  update_date
                           Value => Object.Update_Date);
          Object.Clear_Modified (6);
       end if;
       if Object.Is_Modified (7) then
-         Stmt.Save_Field (Name  => COL_6_2_NAME, --  status
+         Stmt.Save_Field (Name  => COL_6_1_NAME, --  status
                           Value => Integer (Project_Status_Type'Pos (Object.Status)));
          Object.Clear_Modified (7);
       end if;
       if Object.Is_Modified (8) then
-         Stmt.Save_Field (Name  => COL_7_2_NAME, --  scm
+         Stmt.Save_Field (Name  => COL_7_1_NAME, --  scm
                           Value => Integer (Source_Control_Type'Pos (Object.Scm)));
          Object.Clear_Modified (8);
       end if;
       if Object.Is_Modified (9) then
-         Stmt.Save_Field (Name  => COL_8_2_NAME, --  scm_url
+         Stmt.Save_Field (Name  => COL_8_1_NAME, --  scm_url
                           Value => Object.Scm_Url);
          Object.Clear_Modified (9);
       end if;
@@ -866,23 +481,23 @@ package body Porion.Projects.Models is
    begin
       Object.Version := 1;
       Session.Allocate (Id => Object);
-      Query.Save_Field (Name  => COL_0_2_NAME, --  id
+      Query.Save_Field (Name  => COL_0_1_NAME, --  id
                         Value => Object.Get_Key);
-      Query.Save_Field (Name  => COL_1_2_NAME, --  name
+      Query.Save_Field (Name  => COL_1_1_NAME, --  name
                         Value => Object.Name);
-      Query.Save_Field (Name  => COL_2_2_NAME, --  version
+      Query.Save_Field (Name  => COL_2_1_NAME, --  version
                         Value => Object.Version);
-      Query.Save_Field (Name  => COL_3_2_NAME, --  description
+      Query.Save_Field (Name  => COL_3_1_NAME, --  description
                         Value => Object.Description);
-      Query.Save_Field (Name  => COL_4_2_NAME, --  create_date
+      Query.Save_Field (Name  => COL_4_1_NAME, --  create_date
                         Value => Object.Create_Date);
-      Query.Save_Field (Name  => COL_5_2_NAME, --  update_date
+      Query.Save_Field (Name  => COL_5_1_NAME, --  update_date
                         Value => Object.Update_Date);
-      Query.Save_Field (Name  => COL_6_2_NAME, --  status
+      Query.Save_Field (Name  => COL_6_1_NAME, --  status
                         Value => Integer (Project_Status_Type'Pos (Object.Status)));
-      Query.Save_Field (Name  => COL_7_2_NAME, --  scm
+      Query.Save_Field (Name  => COL_7_1_NAME, --  scm
                         Value => Integer (Source_Control_Type'Pos (Object.Scm)));
-      Query.Save_Field (Name  => COL_8_2_NAME, --  scm_url
+      Query.Save_Field (Name  => COL_8_1_NAME, --  scm_url
                         Value => Object.Scm_Url);
       Query.Execute (Result);
       if Result /= 1 then
@@ -1026,7 +641,7 @@ package body Porion.Projects.Models is
 
 
    procedure Set_Node (Object : in out Build_Config_Ref;
-                       Value  : in Porion.Projects.Models.Node_Ref'Class) is
+                       Value  : in Porion.Nodes.Models.Node_Ref'Class) is
       Impl : Build_Config_Access;
    begin
       Set_Field (Object, Impl);
@@ -1034,7 +649,7 @@ package body Porion.Projects.Models is
    end Set_Node;
 
    function Get_Node (Object : in Build_Config_Ref)
-                  return Porion.Projects.Models.Node_Ref'Class is
+                  return Porion.Nodes.Models.Node_Ref'Class is
       Impl : constant Build_Config_Access
          := Build_Config_Impl (Object.Get_Load_Object.all)'Access;
    begin
@@ -1205,17 +820,17 @@ package body Porion.Projects.Models is
          := Session.Create_Statement (BUILD_CONFIG_DEF'Access);
    begin
       if Object.Is_Modified (1) then
-         Stmt.Save_Field (Name  => COL_0_3_NAME, --  id
+         Stmt.Save_Field (Name  => COL_0_2_NAME, --  id
                           Value => Object.Get_Key);
          Object.Clear_Modified (1);
       end if;
       if Object.Is_Modified (3) then
-         Stmt.Save_Field (Name  => COL_2_3_NAME, --  node_id
+         Stmt.Save_Field (Name  => COL_2_2_NAME, --  node_id
                           Value => Object.Node);
          Object.Clear_Modified (3);
       end if;
       if Object.Is_Modified (4) then
-         Stmt.Save_Field (Name  => COL_3_3_NAME, --  project_id
+         Stmt.Save_Field (Name  => COL_3_2_NAME, --  project_id
                           Value => Object.Project);
          Object.Clear_Modified (4);
       end if;
@@ -1249,13 +864,13 @@ package body Porion.Projects.Models is
    begin
       Object.Version := 1;
       Session.Allocate (Id => Object);
-      Query.Save_Field (Name  => COL_0_3_NAME, --  id
+      Query.Save_Field (Name  => COL_0_2_NAME, --  id
                         Value => Object.Get_Key);
-      Query.Save_Field (Name  => COL_1_3_NAME, --  version
+      Query.Save_Field (Name  => COL_1_2_NAME, --  version
                         Value => Object.Version);
-      Query.Save_Field (Name  => COL_2_3_NAME, --  node_id
+      Query.Save_Field (Name  => COL_2_2_NAME, --  node_id
                         Value => Object.Node);
-      Query.Save_Field (Name  => COL_3_3_NAME, --  project_id
+      Query.Save_Field (Name  => COL_3_2_NAME, --  project_id
                         Value => Object.Project);
       Query.Execute (Result);
       if Result /= 1 then
@@ -1309,6 +924,646 @@ package body Porion.Projects.Models is
       end if;
       if not Stmt.Is_Null (3) then
          Object.Project.Set_Key_Value (Stmt.Get_Identifier (3), Session);
+      end if;
+      Object.Version := Stmt.Get_Integer (1);
+      ADO.Objects.Set_Created (Object);
+   end Load;
+   function Build_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key is
+      Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
+                                       Of_Class => BUILD_DEF'Access);
+   begin
+      ADO.Objects.Set_Value (Result, Id);
+      return Result;
+   end Build_Key;
+
+   function Build_Key (Id : in String) return ADO.Objects.Object_Key is
+      Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
+                                       Of_Class => BUILD_DEF'Access);
+   begin
+      ADO.Objects.Set_Value (Result, Id);
+      return Result;
+   end Build_Key;
+
+   function "=" (Left, Right : Build_Ref'Class) return Boolean is
+   begin
+      return ADO.Objects.Object_Ref'Class (Left) = ADO.Objects.Object_Ref'Class (Right);
+   end "=";
+
+   procedure Set_Field (Object : in out Build_Ref'Class;
+                        Impl   : out Build_Access) is
+      Result : ADO.Objects.Object_Record_Access;
+   begin
+      Object.Prepare_Modify (Result);
+      Impl := Build_Impl (Result.all)'Access;
+   end Set_Field;
+
+   --  Internal method to allocate the Object_Record instance
+   procedure Allocate (Object : in out Build_Ref) is
+      Impl : Build_Access;
+   begin
+      Impl := new Build_Impl;
+      Impl.Version := 0;
+      Impl.Number := 0;
+      Impl.Create_Date := ADO.DEFAULT_TIME;
+      Impl.Finish_Date.Is_Null := True;
+      Impl.Pass_Count := 0;
+      Impl.Fail_Count := 0;
+      Impl.Timeout_Count := 0;
+      Impl.Test_Duration := 0;
+      Impl.Status := Porion.Projects.Models.Build_Status_Type'First;
+      ADO.Objects.Set_Object (Object, Impl.all'Access);
+   end Allocate;
+
+   -- ----------------------------------------
+   --  Data object: Build
+   -- ----------------------------------------
+
+   procedure Set_Id (Object : in out Build_Ref;
+                     Value  : in ADO.Identifier) is
+      Impl : Build_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Key_Value (Impl.all, 1, Value);
+   end Set_Id;
+
+   function Get_Id (Object : in Build_Ref)
+                  return ADO.Identifier is
+      Impl : constant Build_Access
+         := Build_Impl (Object.Get_Object.all)'Access;
+   begin
+      return Impl.Get_Key_Value;
+   end Get_Id;
+
+
+   function Get_Version (Object : in Build_Ref)
+                  return Integer is
+      Impl : constant Build_Access
+         := Build_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Version;
+   end Get_Version;
+
+
+   procedure Set_Number (Object : in out Build_Ref;
+                         Value  : in Integer) is
+      Impl : Build_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Integer (Impl.all, 3, Impl.Number, Value);
+   end Set_Number;
+
+   function Get_Number (Object : in Build_Ref)
+                  return Integer is
+      Impl : constant Build_Access
+         := Build_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Number;
+   end Get_Number;
+
+
+   procedure Set_Create_Date (Object : in out Build_Ref;
+                              Value  : in Ada.Calendar.Time) is
+      Impl : Build_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Time (Impl.all, 4, Impl.Create_Date, Value);
+   end Set_Create_Date;
+
+   function Get_Create_Date (Object : in Build_Ref)
+                  return Ada.Calendar.Time is
+      Impl : constant Build_Access
+         := Build_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Create_Date;
+   end Get_Create_Date;
+
+
+   procedure Set_Finish_Date (Object : in out Build_Ref;
+                              Value  : in ADO.Nullable_Time) is
+      Impl : Build_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Time (Impl.all, 5, Impl.Finish_Date, Value);
+   end Set_Finish_Date;
+
+   function Get_Finish_Date (Object : in Build_Ref)
+                  return ADO.Nullable_Time is
+      Impl : constant Build_Access
+         := Build_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Finish_Date;
+   end Get_Finish_Date;
+
+
+   procedure Set_Pass_Count (Object : in out Build_Ref;
+                             Value  : in Integer) is
+      Impl : Build_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Integer (Impl.all, 6, Impl.Pass_Count, Value);
+   end Set_Pass_Count;
+
+   function Get_Pass_Count (Object : in Build_Ref)
+                  return Integer is
+      Impl : constant Build_Access
+         := Build_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Pass_Count;
+   end Get_Pass_Count;
+
+
+   procedure Set_Fail_Count (Object : in out Build_Ref;
+                             Value  : in Integer) is
+      Impl : Build_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Integer (Impl.all, 7, Impl.Fail_Count, Value);
+   end Set_Fail_Count;
+
+   function Get_Fail_Count (Object : in Build_Ref)
+                  return Integer is
+      Impl : constant Build_Access
+         := Build_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Fail_Count;
+   end Get_Fail_Count;
+
+
+   procedure Set_Timeout_Count (Object : in out Build_Ref;
+                                Value  : in Integer) is
+      Impl : Build_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Integer (Impl.all, 8, Impl.Timeout_Count, Value);
+   end Set_Timeout_Count;
+
+   function Get_Timeout_Count (Object : in Build_Ref)
+                  return Integer is
+      Impl : constant Build_Access
+         := Build_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Timeout_Count;
+   end Get_Timeout_Count;
+
+
+   procedure Set_Test_Duration (Object : in out Build_Ref;
+                                Value  : in Integer) is
+      Impl : Build_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Integer (Impl.all, 9, Impl.Test_Duration, Value);
+   end Set_Test_Duration;
+
+   function Get_Test_Duration (Object : in Build_Ref)
+                  return Integer is
+      Impl : constant Build_Access
+         := Build_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Test_Duration;
+   end Get_Test_Duration;
+
+
+   procedure Set_Status (Object : in out Build_Ref;
+                         Value  : in Porion.Projects.Models.Build_Status_Type) is
+      procedure Set_Field_Enum is
+         new ADO.Objects.Set_Field_Operation (Build_Status_Type);
+      Impl : Build_Access;
+   begin
+      Set_Field (Object, Impl);
+      Set_Field_Enum (Impl.all, 10, Impl.Status, Value);
+   end Set_Status;
+
+   function Get_Status (Object : in Build_Ref)
+                  return Porion.Projects.Models.Build_Status_Type is
+      Impl : constant Build_Access
+         := Build_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Status;
+   end Get_Status;
+
+
+   procedure Set_Build_Config (Object : in out Build_Ref;
+                               Value  : in Porion.Projects.Models.Build_Config_Ref'Class) is
+      Impl : Build_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Object (Impl.all, 11, Impl.Build_Config, Value);
+   end Set_Build_Config;
+
+   function Get_Build_Config (Object : in Build_Ref)
+                  return Porion.Projects.Models.Build_Config_Ref'Class is
+      Impl : constant Build_Access
+         := Build_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Build_Config;
+   end Get_Build_Config;
+
+
+   procedure Set_Node (Object : in out Build_Ref;
+                       Value  : in Porion.Nodes.Models.Node_Ref'Class) is
+      Impl : Build_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Object (Impl.all, 12, Impl.Node, Value);
+   end Set_Node;
+
+   function Get_Node (Object : in Build_Ref)
+                  return Porion.Nodes.Models.Node_Ref'Class is
+      Impl : constant Build_Access
+         := Build_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Node;
+   end Get_Node;
+
+
+   procedure Set_Branch (Object : in out Build_Ref;
+                         Value  : in Porion.Projects.Models.Branch_Ref'Class) is
+      Impl : Build_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Object (Impl.all, 13, Impl.Branch, Value);
+   end Set_Branch;
+
+   function Get_Branch (Object : in Build_Ref)
+                  return Porion.Projects.Models.Branch_Ref'Class is
+      Impl : constant Build_Access
+         := Build_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Branch;
+   end Get_Branch;
+
+
+   procedure Set_Project (Object : in out Build_Ref;
+                          Value  : in Porion.Projects.Models.Project_Ref'Class) is
+      Impl : Build_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Object (Impl.all, 14, Impl.Project, Value);
+   end Set_Project;
+
+   function Get_Project (Object : in Build_Ref)
+                  return Porion.Projects.Models.Project_Ref'Class is
+      Impl : constant Build_Access
+         := Build_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Project;
+   end Get_Project;
+
+   --  Copy of the object.
+   procedure Copy (Object : in Build_Ref;
+                   Into   : in out Build_Ref) is
+      Result : Build_Ref;
+   begin
+      if not Object.Is_Null then
+         declare
+            Impl : constant Build_Access
+              := Build_Impl (Object.Get_Load_Object.all)'Access;
+            Copy : constant Build_Access
+              := new Build_Impl;
+         begin
+            ADO.Objects.Set_Object (Result, Copy.all'Access);
+            Copy.Copy (Impl.all);
+            Copy.Version := Impl.Version;
+            Copy.Number := Impl.Number;
+            Copy.Create_Date := Impl.Create_Date;
+            Copy.Finish_Date := Impl.Finish_Date;
+            Copy.Pass_Count := Impl.Pass_Count;
+            Copy.Fail_Count := Impl.Fail_Count;
+            Copy.Timeout_Count := Impl.Timeout_Count;
+            Copy.Test_Duration := Impl.Test_Duration;
+            Copy.Status := Impl.Status;
+            Copy.Build_Config := Impl.Build_Config;
+            Copy.Node := Impl.Node;
+            Copy.Branch := Impl.Branch;
+            Copy.Project := Impl.Project;
+         end;
+      end if;
+      Into := Result;
+   end Copy;
+
+   procedure Find (Object  : in out Build_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class;
+                   Found   : out Boolean) is
+      Impl  : constant Build_Access := new Build_Impl;
+   begin
+      Impl.Find (Session, Query, Found);
+      if Found then
+         ADO.Objects.Set_Object (Object, Impl.all'Access);
+      else
+         ADO.Objects.Set_Object (Object, null);
+         Destroy (Impl);
+      end if;
+   end Find;
+
+   procedure Load (Object  : in out Build_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Id      : in ADO.Identifier) is
+      Impl  : constant Build_Access := new Build_Impl;
+      Found : Boolean;
+      Query : ADO.SQL.Query;
+   begin
+      Query.Bind_Param (Position => 1, Value => Id);
+      Query.Set_Filter ("id = ?");
+      Impl.Find (Session, Query, Found);
+      if not Found then
+         Destroy (Impl);
+         raise ADO.Objects.NOT_FOUND;
+      end if;
+      ADO.Objects.Set_Object (Object, Impl.all'Access);
+   end Load;
+
+   procedure Load (Object  : in out Build_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Id      : in ADO.Identifier;
+                   Found   : out Boolean) is
+      Impl  : constant Build_Access := new Build_Impl;
+      Query : ADO.SQL.Query;
+   begin
+      Query.Bind_Param (Position => 1, Value => Id);
+      Query.Set_Filter ("id = ?");
+      Impl.Find (Session, Query, Found);
+      if not Found then
+         Destroy (Impl);
+      else
+         ADO.Objects.Set_Object (Object, Impl.all'Access);
+      end if;
+   end Load;
+
+   procedure Save (Object  : in out Build_Ref;
+                   Session : in out ADO.Sessions.Master_Session'Class) is
+      Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;
+   begin
+      if Impl = null then
+         Impl := new Build_Impl;
+         ADO.Objects.Set_Object (Object, Impl);
+      end if;
+      if not ADO.Objects.Is_Created (Impl.all) then
+         Impl.Create (Session);
+      else
+         Impl.Save (Session);
+      end if;
+   end Save;
+
+   procedure Delete (Object  : in out Build_Ref;
+                     Session : in out ADO.Sessions.Master_Session'Class) is
+      Impl : constant ADO.Objects.Object_Record_Access := Object.Get_Object;
+   begin
+      if Impl /= null then
+         Impl.Delete (Session);
+      end if;
+   end Delete;
+
+   --  --------------------
+   --  Free the object
+   --  --------------------
+   procedure Destroy (Object : access Build_Impl) is
+      type Build_Impl_Ptr is access all Build_Impl;
+      procedure Unchecked_Free is new Ada.Unchecked_Deallocation
+              (Build_Impl, Build_Impl_Ptr);
+      pragma Warnings (Off, "*redundant conversion*");
+      Ptr : Build_Impl_Ptr := Build_Impl (Object.all)'Access;
+      pragma Warnings (On, "*redundant conversion*");
+   begin
+      Unchecked_Free (Ptr);
+   end Destroy;
+
+   procedure Find (Object  : in out Build_Impl;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class;
+                   Found   : out Boolean) is
+      Stmt : ADO.Statements.Query_Statement
+          := Session.Create_Statement (Query, BUILD_DEF'Access);
+   begin
+      Stmt.Execute;
+      if Stmt.Has_Elements then
+         Object.Load (Stmt, Session);
+         Stmt.Next;
+         Found := not Stmt.Has_Elements;
+      else
+         Found := False;
+      end if;
+   end Find;
+
+   overriding
+   procedure Load (Object  : in out Build_Impl;
+                   Session : in out ADO.Sessions.Session'Class) is
+      Found : Boolean;
+      Query : ADO.SQL.Query;
+      Id    : constant ADO.Identifier := Object.Get_Key_Value;
+   begin
+      Query.Bind_Param (Position => 1, Value => Id);
+      Query.Set_Filter ("id = ?");
+      Object.Find (Session, Query, Found);
+      if not Found then
+         raise ADO.Objects.NOT_FOUND;
+      end if;
+   end Load;
+
+   procedure Save (Object  : in out Build_Impl;
+                   Session : in out ADO.Sessions.Master_Session'Class) is
+      Stmt : ADO.Statements.Update_Statement
+         := Session.Create_Statement (BUILD_DEF'Access);
+   begin
+      if Object.Is_Modified (1) then
+         Stmt.Save_Field (Name  => COL_0_3_NAME, --  id
+                          Value => Object.Get_Key);
+         Object.Clear_Modified (1);
+      end if;
+      if Object.Is_Modified (5) then
+         Stmt.Save_Field (Name  => COL_4_3_NAME, --  finish_date
+                          Value => Object.Finish_Date);
+         Object.Clear_Modified (5);
+      end if;
+      if Object.Is_Modified (6) then
+         Stmt.Save_Field (Name  => COL_5_3_NAME, --  pass_count
+                          Value => Object.Pass_Count);
+         Object.Clear_Modified (6);
+      end if;
+      if Object.Is_Modified (7) then
+         Stmt.Save_Field (Name  => COL_6_3_NAME, --  fail_count
+                          Value => Object.Fail_Count);
+         Object.Clear_Modified (7);
+      end if;
+      if Object.Is_Modified (8) then
+         Stmt.Save_Field (Name  => COL_7_3_NAME, --  timeout_count
+                          Value => Object.Timeout_Count);
+         Object.Clear_Modified (8);
+      end if;
+      if Object.Is_Modified (9) then
+         Stmt.Save_Field (Name  => COL_8_3_NAME, --  test_duration
+                          Value => Object.Test_Duration);
+         Object.Clear_Modified (9);
+      end if;
+      if Object.Is_Modified (10) then
+         Stmt.Save_Field (Name  => COL_9_3_NAME, --  status
+                          Value => Integer (Build_Status_Type'Pos (Object.Status)));
+         Object.Clear_Modified (10);
+      end if;
+      if Object.Is_Modified (11) then
+         Stmt.Save_Field (Name  => COL_10_3_NAME, --  build_config_id
+                          Value => Object.Build_Config);
+         Object.Clear_Modified (11);
+      end if;
+      if Object.Is_Modified (12) then
+         Stmt.Save_Field (Name  => COL_11_3_NAME, --  node_id
+                          Value => Object.Node);
+         Object.Clear_Modified (12);
+      end if;
+      if Object.Is_Modified (13) then
+         Stmt.Save_Field (Name  => COL_12_3_NAME, --  branch_id
+                          Value => Object.Branch);
+         Object.Clear_Modified (13);
+      end if;
+      if Object.Is_Modified (14) then
+         Stmt.Save_Field (Name  => COL_13_3_NAME, --  project_id
+                          Value => Object.Project);
+         Object.Clear_Modified (14);
+      end if;
+      if Stmt.Has_Save_Fields then
+         Object.Version := Object.Version + 1;
+         Stmt.Save_Field (Name  => "version",
+                          Value => Object.Version);
+         Stmt.Set_Filter (Filter => "id = ? and version = ?");
+         Stmt.Add_Param (Value => Object.Get_Key);
+         Stmt.Add_Param (Value => Object.Version - 1);
+         declare
+            Result : Integer;
+         begin
+            Stmt.Execute (Result);
+            if Result /= 1 then
+               if Result /= 0 then
+                  raise ADO.Objects.UPDATE_ERROR;
+               else
+                  raise ADO.Objects.LAZY_LOCK;
+               end if;
+            end if;
+         end;
+      end if;
+   end Save;
+
+   procedure Create (Object  : in out Build_Impl;
+                     Session : in out ADO.Sessions.Master_Session'Class) is
+      Query : ADO.Statements.Insert_Statement
+                  := Session.Create_Statement (BUILD_DEF'Access);
+      Result : Integer;
+   begin
+      Object.Version := 1;
+      Session.Allocate (Id => Object);
+      Query.Save_Field (Name  => COL_0_3_NAME, --  id
+                        Value => Object.Get_Key);
+      Query.Save_Field (Name  => COL_1_3_NAME, --  version
+                        Value => Object.Version);
+      Query.Save_Field (Name  => COL_2_3_NAME, --  number
+                        Value => Object.Number);
+      Query.Save_Field (Name  => COL_3_3_NAME, --  create_date
+                        Value => Object.Create_Date);
+      Query.Save_Field (Name  => COL_4_3_NAME, --  finish_date
+                        Value => Object.Finish_Date);
+      Query.Save_Field (Name  => COL_5_3_NAME, --  pass_count
+                        Value => Object.Pass_Count);
+      Query.Save_Field (Name  => COL_6_3_NAME, --  fail_count
+                        Value => Object.Fail_Count);
+      Query.Save_Field (Name  => COL_7_3_NAME, --  timeout_count
+                        Value => Object.Timeout_Count);
+      Query.Save_Field (Name  => COL_8_3_NAME, --  test_duration
+                        Value => Object.Test_Duration);
+      Query.Save_Field (Name  => COL_9_3_NAME, --  status
+                        Value => Integer (Build_Status_Type'Pos (Object.Status)));
+      Query.Save_Field (Name  => COL_10_3_NAME, --  build_config_id
+                        Value => Object.Build_Config);
+      Query.Save_Field (Name  => COL_11_3_NAME, --  node_id
+                        Value => Object.Node);
+      Query.Save_Field (Name  => COL_12_3_NAME, --  branch_id
+                        Value => Object.Branch);
+      Query.Save_Field (Name  => COL_13_3_NAME, --  project_id
+                        Value => Object.Project);
+      Query.Execute (Result);
+      if Result /= 1 then
+         raise ADO.Objects.INSERT_ERROR;
+      end if;
+      ADO.Objects.Set_Created (Object);
+   end Create;
+
+   procedure Delete (Object  : in out Build_Impl;
+                     Session : in out ADO.Sessions.Master_Session'Class) is
+      Stmt : ADO.Statements.Delete_Statement
+         := Session.Create_Statement (BUILD_DEF'Access);
+   begin
+      Stmt.Set_Filter (Filter => "id = ?");
+      Stmt.Add_Param (Value => Object.Get_Key);
+      Stmt.Execute;
+   end Delete;
+
+   --  ------------------------------
+   --  Get the bean attribute identified by the name.
+   --  ------------------------------
+   overriding
+   function Get_Value (From : in Build_Ref;
+                       Name : in String) return Util.Beans.Objects.Object is
+      Obj  : ADO.Objects.Object_Record_Access;
+      Impl : access Build_Impl;
+   begin
+      if From.Is_Null then
+         return Util.Beans.Objects.Null_Object;
+      end if;
+      Obj := From.Get_Load_Object;
+      Impl := Build_Impl (Obj.all)'Access;
+      if Name = "id" then
+         return ADO.Objects.To_Object (Impl.Get_Key);
+      elsif Name = "number" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Number));
+      elsif Name = "create_date" then
+         return Util.Beans.Objects.Time.To_Object (Impl.Create_Date);
+      elsif Name = "finish_date" then
+         if Impl.Finish_Date.Is_Null then
+            return Util.Beans.Objects.Null_Object;
+         else
+            return Util.Beans.Objects.Time.To_Object (Impl.Finish_Date.Value);
+         end if;
+      elsif Name = "pass_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Pass_Count));
+      elsif Name = "fail_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Fail_Count));
+      elsif Name = "timeout_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Timeout_Count));
+      elsif Name = "test_duration" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Test_Duration));
+      elsif Name = "status" then
+         return Porion.Projects.Models.Build_Status_Type_Objects.To_Object (Impl.Status);
+      end if;
+      return Util.Beans.Objects.Null_Object;
+   end Get_Value;
+
+
+
+   --  ------------------------------
+   --  Load the object from current iterator position
+   --  ------------------------------
+   procedure Load (Object  : in out Build_Impl;
+                   Stmt    : in out ADO.Statements.Query_Statement'Class;
+                   Session : in out ADO.Sessions.Session'Class) is
+   begin
+      Object.Set_Key_Value (Stmt.Get_Identifier (0));
+      Object.Number := Stmt.Get_Integer (2);
+      Object.Create_Date := Stmt.Get_Time (3);
+      Object.Finish_Date := Stmt.Get_Nullable_Time (4);
+      Object.Pass_Count := Stmt.Get_Integer (5);
+      Object.Fail_Count := Stmt.Get_Integer (6);
+      Object.Timeout_Count := Stmt.Get_Integer (7);
+      Object.Test_Duration := Stmt.Get_Integer (8);
+      Object.Status := Build_Status_Type'Val (Stmt.Get_Integer (9));
+      if not Stmt.Is_Null (10) then
+         Object.Build_Config.Set_Key_Value (Stmt.Get_Identifier (10), Session);
+      end if;
+      if not Stmt.Is_Null (11) then
+         Object.Node.Set_Key_Value (Stmt.Get_Identifier (11), Session);
+      end if;
+      if not Stmt.Is_Null (12) then
+         Object.Branch.Set_Key_Value (Stmt.Get_Identifier (12), Session);
+      end if;
+      if not Stmt.Is_Null (13) then
+         Object.Project.Set_Key_Value (Stmt.Get_Identifier (13), Session);
       end if;
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);
@@ -1515,29 +1770,12 @@ package body Porion.Projects.Models is
    end Get_Status;
 
 
-   procedure Set_Last_Build (Object : in out Branch_Ref;
-                             Value  : in Porion.Projects.Models.Build_Ref'Class) is
-      Impl : Branch_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 9, Impl.Last_Build, Value);
-   end Set_Last_Build;
-
-   function Get_Last_Build (Object : in Branch_Ref)
-                  return Porion.Projects.Models.Build_Ref'Class is
-      Impl : constant Branch_Access
-         := Branch_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Last_Build;
-   end Get_Last_Build;
-
-
    procedure Set_Project (Object : in out Branch_Ref;
                           Value  : in Porion.Projects.Models.Project_Ref'Class) is
       Impl : Branch_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 10, Impl.Project, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 9, Impl.Project, Value);
    end Set_Project;
 
    function Get_Project (Object : in Branch_Ref)
@@ -1547,6 +1785,23 @@ package body Porion.Projects.Models is
    begin
       return Impl.Project;
    end Get_Project;
+
+
+   procedure Set_Last_Build (Object : in out Branch_Ref;
+                             Value  : in Porion.Projects.Models.Build_Ref'Class) is
+      Impl : Branch_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Object (Impl.all, 10, Impl.Last_Build, Value);
+   end Set_Last_Build;
+
+   function Get_Last_Build (Object : in Branch_Ref)
+                  return Porion.Projects.Models.Build_Ref'Class is
+      Impl : constant Branch_Access
+         := Branch_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Last_Build;
+   end Get_Last_Build;
 
    --  Copy of the object.
    procedure Copy (Object : in Branch_Ref;
@@ -1569,8 +1824,8 @@ package body Porion.Projects.Models is
             Copy.Create_Date := Impl.Create_Date;
             Copy.Update_Date := Impl.Update_Date;
             Copy.Status := Impl.Status;
-            Copy.Last_Build := Impl.Last_Build;
             Copy.Project := Impl.Project;
+            Copy.Last_Build := Impl.Last_Build;
          end;
       end if;
       Into := Result;
@@ -1731,13 +1986,13 @@ package body Porion.Projects.Models is
          Object.Clear_Modified (8);
       end if;
       if Object.Is_Modified (9) then
-         Stmt.Save_Field (Name  => COL_8_4_NAME, --  last_build_id
-                          Value => Object.Last_Build);
+         Stmt.Save_Field (Name  => COL_8_4_NAME, --  project_id
+                          Value => Object.Project);
          Object.Clear_Modified (9);
       end if;
       if Object.Is_Modified (10) then
-         Stmt.Save_Field (Name  => COL_9_4_NAME, --  project_id
-                          Value => Object.Project);
+         Stmt.Save_Field (Name  => COL_9_4_NAME, --  last_build_id
+                          Value => Object.Last_Build);
          Object.Clear_Modified (10);
       end if;
       if Stmt.Has_Save_Fields then
@@ -1787,10 +2042,10 @@ package body Porion.Projects.Models is
                         Value => Object.Update_Date);
       Query.Save_Field (Name  => COL_7_4_NAME, --  status
                         Value => Integer (Branch_Status_Type'Pos (Object.Status)));
-      Query.Save_Field (Name  => COL_8_4_NAME, --  last_build_id
-                        Value => Object.Last_Build);
-      Query.Save_Field (Name  => COL_9_4_NAME, --  project_id
+      Query.Save_Field (Name  => COL_8_4_NAME, --  project_id
                         Value => Object.Project);
+      Query.Save_Field (Name  => COL_9_4_NAME, --  last_build_id
+                        Value => Object.Last_Build);
       Query.Execute (Result);
       if Result /= 1 then
          raise ADO.Objects.INSERT_ERROR;
@@ -1862,1343 +2117,12 @@ package body Porion.Projects.Models is
       Object.Update_Date := Stmt.Get_Time (6);
       Object.Status := Branch_Status_Type'Val (Stmt.Get_Integer (7));
       if not Stmt.Is_Null (8) then
-         Object.Last_Build.Set_Key_Value (Stmt.Get_Identifier (8), Session);
+         Object.Project.Set_Key_Value (Stmt.Get_Identifier (8), Session);
       end if;
       if not Stmt.Is_Null (9) then
-         Object.Project.Set_Key_Value (Stmt.Get_Identifier (9), Session);
+         Object.Last_Build.Set_Key_Value (Stmt.Get_Identifier (9), Session);
       end if;
       Object.Version := Stmt.Get_Integer (1);
-      ADO.Objects.Set_Created (Object);
-   end Load;
-   function Build_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key is
-      Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
-                                       Of_Class => BUILD_DEF'Access);
-   begin
-      ADO.Objects.Set_Value (Result, Id);
-      return Result;
-   end Build_Key;
-
-   function Build_Key (Id : in String) return ADO.Objects.Object_Key is
-      Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
-                                       Of_Class => BUILD_DEF'Access);
-   begin
-      ADO.Objects.Set_Value (Result, Id);
-      return Result;
-   end Build_Key;
-
-   function "=" (Left, Right : Build_Ref'Class) return Boolean is
-   begin
-      return ADO.Objects.Object_Ref'Class (Left) = ADO.Objects.Object_Ref'Class (Right);
-   end "=";
-
-   procedure Set_Field (Object : in out Build_Ref'Class;
-                        Impl   : out Build_Access) is
-      Result : ADO.Objects.Object_Record_Access;
-   begin
-      Object.Prepare_Modify (Result);
-      Impl := Build_Impl (Result.all)'Access;
-   end Set_Field;
-
-   --  Internal method to allocate the Object_Record instance
-   procedure Allocate (Object : in out Build_Ref) is
-      Impl : Build_Access;
-   begin
-      Impl := new Build_Impl;
-      Impl.Version := 0;
-      Impl.Number := 0;
-      Impl.Create_Date := ADO.DEFAULT_TIME;
-      Impl.Finish_Date.Is_Null := True;
-      Impl.Pass_Count := 0;
-      Impl.Fail_Count := 0;
-      Impl.Timeout_Count := 0;
-      Impl.Test_Duration := 0;
-      ADO.Objects.Set_Object (Object, Impl.all'Access);
-   end Allocate;
-
-   -- ----------------------------------------
-   --  Data object: Build
-   -- ----------------------------------------
-
-   procedure Set_Id (Object : in out Build_Ref;
-                     Value  : in ADO.Identifier) is
-      Impl : Build_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Key_Value (Impl.all, 1, Value);
-   end Set_Id;
-
-   function Get_Id (Object : in Build_Ref)
-                  return ADO.Identifier is
-      Impl : constant Build_Access
-         := Build_Impl (Object.Get_Object.all)'Access;
-   begin
-      return Impl.Get_Key_Value;
-   end Get_Id;
-
-
-   function Get_Version (Object : in Build_Ref)
-                  return Integer is
-      Impl : constant Build_Access
-         := Build_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Version;
-   end Get_Version;
-
-
-   procedure Set_Number (Object : in out Build_Ref;
-                         Value  : in Integer) is
-      Impl : Build_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Integer (Impl.all, 3, Impl.Number, Value);
-   end Set_Number;
-
-   function Get_Number (Object : in Build_Ref)
-                  return Integer is
-      Impl : constant Build_Access
-         := Build_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Number;
-   end Get_Number;
-
-
-   procedure Set_Create_Date (Object : in out Build_Ref;
-                              Value  : in Ada.Calendar.Time) is
-      Impl : Build_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Time (Impl.all, 4, Impl.Create_Date, Value);
-   end Set_Create_Date;
-
-   function Get_Create_Date (Object : in Build_Ref)
-                  return Ada.Calendar.Time is
-      Impl : constant Build_Access
-         := Build_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Create_Date;
-   end Get_Create_Date;
-
-
-   procedure Set_Finish_Date (Object : in out Build_Ref;
-                              Value  : in ADO.Nullable_Time) is
-      Impl : Build_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Time (Impl.all, 5, Impl.Finish_Date, Value);
-   end Set_Finish_Date;
-
-   function Get_Finish_Date (Object : in Build_Ref)
-                  return ADO.Nullable_Time is
-      Impl : constant Build_Access
-         := Build_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Finish_Date;
-   end Get_Finish_Date;
-
-
-   procedure Set_Pass_Count (Object : in out Build_Ref;
-                             Value  : in Integer) is
-      Impl : Build_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Integer (Impl.all, 6, Impl.Pass_Count, Value);
-   end Set_Pass_Count;
-
-   function Get_Pass_Count (Object : in Build_Ref)
-                  return Integer is
-      Impl : constant Build_Access
-         := Build_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Pass_Count;
-   end Get_Pass_Count;
-
-
-   procedure Set_Fail_Count (Object : in out Build_Ref;
-                             Value  : in Integer) is
-      Impl : Build_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Integer (Impl.all, 7, Impl.Fail_Count, Value);
-   end Set_Fail_Count;
-
-   function Get_Fail_Count (Object : in Build_Ref)
-                  return Integer is
-      Impl : constant Build_Access
-         := Build_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Fail_Count;
-   end Get_Fail_Count;
-
-
-   procedure Set_Timeout_Count (Object : in out Build_Ref;
-                                Value  : in Integer) is
-      Impl : Build_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Integer (Impl.all, 8, Impl.Timeout_Count, Value);
-   end Set_Timeout_Count;
-
-   function Get_Timeout_Count (Object : in Build_Ref)
-                  return Integer is
-      Impl : constant Build_Access
-         := Build_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Timeout_Count;
-   end Get_Timeout_Count;
-
-
-   procedure Set_Test_Duration (Object : in out Build_Ref;
-                                Value  : in Integer) is
-      Impl : Build_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Integer (Impl.all, 9, Impl.Test_Duration, Value);
-   end Set_Test_Duration;
-
-   function Get_Test_Duration (Object : in Build_Ref)
-                  return Integer is
-      Impl : constant Build_Access
-         := Build_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Test_Duration;
-   end Get_Test_Duration;
-
-
-   procedure Set_Build_Config (Object : in out Build_Ref;
-                               Value  : in Porion.Projects.Models.Build_Config_Ref'Class) is
-      Impl : Build_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 10, Impl.Build_Config, Value);
-   end Set_Build_Config;
-
-   function Get_Build_Config (Object : in Build_Ref)
-                  return Porion.Projects.Models.Build_Config_Ref'Class is
-      Impl : constant Build_Access
-         := Build_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Build_Config;
-   end Get_Build_Config;
-
-
-   procedure Set_Node (Object : in out Build_Ref;
-                       Value  : in Porion.Projects.Models.Node_Ref'Class) is
-      Impl : Build_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 11, Impl.Node, Value);
-   end Set_Node;
-
-   function Get_Node (Object : in Build_Ref)
-                  return Porion.Projects.Models.Node_Ref'Class is
-      Impl : constant Build_Access
-         := Build_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Node;
-   end Get_Node;
-
-
-   procedure Set_Project (Object : in out Build_Ref;
-                          Value  : in Porion.Projects.Models.Project_Ref'Class) is
-      Impl : Build_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 12, Impl.Project, Value);
-   end Set_Project;
-
-   function Get_Project (Object : in Build_Ref)
-                  return Porion.Projects.Models.Project_Ref'Class is
-      Impl : constant Build_Access
-         := Build_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Project;
-   end Get_Project;
-
-
-   procedure Set_Branch (Object : in out Build_Ref;
-                         Value  : in Porion.Projects.Models.Branch_Ref'Class) is
-      Impl : Build_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 13, Impl.Branch, Value);
-   end Set_Branch;
-
-   function Get_Branch (Object : in Build_Ref)
-                  return Porion.Projects.Models.Branch_Ref'Class is
-      Impl : constant Build_Access
-         := Build_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Branch;
-   end Get_Branch;
-
-   --  Copy of the object.
-   procedure Copy (Object : in Build_Ref;
-                   Into   : in out Build_Ref) is
-      Result : Build_Ref;
-   begin
-      if not Object.Is_Null then
-         declare
-            Impl : constant Build_Access
-              := Build_Impl (Object.Get_Load_Object.all)'Access;
-            Copy : constant Build_Access
-              := new Build_Impl;
-         begin
-            ADO.Objects.Set_Object (Result, Copy.all'Access);
-            Copy.Copy (Impl.all);
-            Copy.Version := Impl.Version;
-            Copy.Number := Impl.Number;
-            Copy.Create_Date := Impl.Create_Date;
-            Copy.Finish_Date := Impl.Finish_Date;
-            Copy.Pass_Count := Impl.Pass_Count;
-            Copy.Fail_Count := Impl.Fail_Count;
-            Copy.Timeout_Count := Impl.Timeout_Count;
-            Copy.Test_Duration := Impl.Test_Duration;
-            Copy.Build_Config := Impl.Build_Config;
-            Copy.Node := Impl.Node;
-            Copy.Project := Impl.Project;
-            Copy.Branch := Impl.Branch;
-         end;
-      end if;
-      Into := Result;
-   end Copy;
-
-   procedure Find (Object  : in out Build_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Query   : in ADO.SQL.Query'Class;
-                   Found   : out Boolean) is
-      Impl  : constant Build_Access := new Build_Impl;
-   begin
-      Impl.Find (Session, Query, Found);
-      if Found then
-         ADO.Objects.Set_Object (Object, Impl.all'Access);
-      else
-         ADO.Objects.Set_Object (Object, null);
-         Destroy (Impl);
-      end if;
-   end Find;
-
-   procedure Load (Object  : in out Build_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Id      : in ADO.Identifier) is
-      Impl  : constant Build_Access := new Build_Impl;
-      Found : Boolean;
-      Query : ADO.SQL.Query;
-   begin
-      Query.Bind_Param (Position => 1, Value => Id);
-      Query.Set_Filter ("id = ?");
-      Impl.Find (Session, Query, Found);
-      if not Found then
-         Destroy (Impl);
-         raise ADO.Objects.NOT_FOUND;
-      end if;
-      ADO.Objects.Set_Object (Object, Impl.all'Access);
-   end Load;
-
-   procedure Load (Object  : in out Build_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Id      : in ADO.Identifier;
-                   Found   : out Boolean) is
-      Impl  : constant Build_Access := new Build_Impl;
-      Query : ADO.SQL.Query;
-   begin
-      Query.Bind_Param (Position => 1, Value => Id);
-      Query.Set_Filter ("id = ?");
-      Impl.Find (Session, Query, Found);
-      if not Found then
-         Destroy (Impl);
-      else
-         ADO.Objects.Set_Object (Object, Impl.all'Access);
-      end if;
-   end Load;
-
-   procedure Save (Object  : in out Build_Ref;
-                   Session : in out ADO.Sessions.Master_Session'Class) is
-      Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;
-   begin
-      if Impl = null then
-         Impl := new Build_Impl;
-         ADO.Objects.Set_Object (Object, Impl);
-      end if;
-      if not ADO.Objects.Is_Created (Impl.all) then
-         Impl.Create (Session);
-      else
-         Impl.Save (Session);
-      end if;
-   end Save;
-
-   procedure Delete (Object  : in out Build_Ref;
-                     Session : in out ADO.Sessions.Master_Session'Class) is
-      Impl : constant ADO.Objects.Object_Record_Access := Object.Get_Object;
-   begin
-      if Impl /= null then
-         Impl.Delete (Session);
-      end if;
-   end Delete;
-
-   --  --------------------
-   --  Free the object
-   --  --------------------
-   procedure Destroy (Object : access Build_Impl) is
-      type Build_Impl_Ptr is access all Build_Impl;
-      procedure Unchecked_Free is new Ada.Unchecked_Deallocation
-              (Build_Impl, Build_Impl_Ptr);
-      pragma Warnings (Off, "*redundant conversion*");
-      Ptr : Build_Impl_Ptr := Build_Impl (Object.all)'Access;
-      pragma Warnings (On, "*redundant conversion*");
-   begin
-      Unchecked_Free (Ptr);
-   end Destroy;
-
-   procedure Find (Object  : in out Build_Impl;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Query   : in ADO.SQL.Query'Class;
-                   Found   : out Boolean) is
-      Stmt : ADO.Statements.Query_Statement
-          := Session.Create_Statement (Query, BUILD_DEF'Access);
-   begin
-      Stmt.Execute;
-      if Stmt.Has_Elements then
-         Object.Load (Stmt, Session);
-         Stmt.Next;
-         Found := not Stmt.Has_Elements;
-      else
-         Found := False;
-      end if;
-   end Find;
-
-   overriding
-   procedure Load (Object  : in out Build_Impl;
-                   Session : in out ADO.Sessions.Session'Class) is
-      Found : Boolean;
-      Query : ADO.SQL.Query;
-      Id    : constant ADO.Identifier := Object.Get_Key_Value;
-   begin
-      Query.Bind_Param (Position => 1, Value => Id);
-      Query.Set_Filter ("id = ?");
-      Object.Find (Session, Query, Found);
-      if not Found then
-         raise ADO.Objects.NOT_FOUND;
-      end if;
-   end Load;
-
-   procedure Save (Object  : in out Build_Impl;
-                   Session : in out ADO.Sessions.Master_Session'Class) is
-      Stmt : ADO.Statements.Update_Statement
-         := Session.Create_Statement (BUILD_DEF'Access);
-   begin
-      if Object.Is_Modified (1) then
-         Stmt.Save_Field (Name  => COL_0_5_NAME, --  id
-                          Value => Object.Get_Key);
-         Object.Clear_Modified (1);
-      end if;
-      if Object.Is_Modified (5) then
-         Stmt.Save_Field (Name  => COL_4_5_NAME, --  finish_date
-                          Value => Object.Finish_Date);
-         Object.Clear_Modified (5);
-      end if;
-      if Object.Is_Modified (6) then
-         Stmt.Save_Field (Name  => COL_5_5_NAME, --  pass_count
-                          Value => Object.Pass_Count);
-         Object.Clear_Modified (6);
-      end if;
-      if Object.Is_Modified (7) then
-         Stmt.Save_Field (Name  => COL_6_5_NAME, --  fail_count
-                          Value => Object.Fail_Count);
-         Object.Clear_Modified (7);
-      end if;
-      if Object.Is_Modified (8) then
-         Stmt.Save_Field (Name  => COL_7_5_NAME, --  timeout_count
-                          Value => Object.Timeout_Count);
-         Object.Clear_Modified (8);
-      end if;
-      if Object.Is_Modified (9) then
-         Stmt.Save_Field (Name  => COL_8_5_NAME, --  test_duration
-                          Value => Object.Test_Duration);
-         Object.Clear_Modified (9);
-      end if;
-      if Object.Is_Modified (10) then
-         Stmt.Save_Field (Name  => COL_9_5_NAME, --  build_config_id
-                          Value => Object.Build_Config);
-         Object.Clear_Modified (10);
-      end if;
-      if Object.Is_Modified (11) then
-         Stmt.Save_Field (Name  => COL_10_5_NAME, --  node_id
-                          Value => Object.Node);
-         Object.Clear_Modified (11);
-      end if;
-      if Object.Is_Modified (12) then
-         Stmt.Save_Field (Name  => COL_11_5_NAME, --  project_id
-                          Value => Object.Project);
-         Object.Clear_Modified (12);
-      end if;
-      if Object.Is_Modified (13) then
-         Stmt.Save_Field (Name  => COL_12_5_NAME, --  branch_id
-                          Value => Object.Branch);
-         Object.Clear_Modified (13);
-      end if;
-      if Stmt.Has_Save_Fields then
-         Object.Version := Object.Version + 1;
-         Stmt.Save_Field (Name  => "version",
-                          Value => Object.Version);
-         Stmt.Set_Filter (Filter => "id = ? and version = ?");
-         Stmt.Add_Param (Value => Object.Get_Key);
-         Stmt.Add_Param (Value => Object.Version - 1);
-         declare
-            Result : Integer;
-         begin
-            Stmt.Execute (Result);
-            if Result /= 1 then
-               if Result /= 0 then
-                  raise ADO.Objects.UPDATE_ERROR;
-               else
-                  raise ADO.Objects.LAZY_LOCK;
-               end if;
-            end if;
-         end;
-      end if;
-   end Save;
-
-   procedure Create (Object  : in out Build_Impl;
-                     Session : in out ADO.Sessions.Master_Session'Class) is
-      Query : ADO.Statements.Insert_Statement
-                  := Session.Create_Statement (BUILD_DEF'Access);
-      Result : Integer;
-   begin
-      Object.Version := 1;
-      Session.Allocate (Id => Object);
-      Query.Save_Field (Name  => COL_0_5_NAME, --  id
-                        Value => Object.Get_Key);
-      Query.Save_Field (Name  => COL_1_5_NAME, --  version
-                        Value => Object.Version);
-      Query.Save_Field (Name  => COL_2_5_NAME, --  number
-                        Value => Object.Number);
-      Query.Save_Field (Name  => COL_3_5_NAME, --  create_date
-                        Value => Object.Create_Date);
-      Query.Save_Field (Name  => COL_4_5_NAME, --  finish_date
-                        Value => Object.Finish_Date);
-      Query.Save_Field (Name  => COL_5_5_NAME, --  pass_count
-                        Value => Object.Pass_Count);
-      Query.Save_Field (Name  => COL_6_5_NAME, --  fail_count
-                        Value => Object.Fail_Count);
-      Query.Save_Field (Name  => COL_7_5_NAME, --  timeout_count
-                        Value => Object.Timeout_Count);
-      Query.Save_Field (Name  => COL_8_5_NAME, --  test_duration
-                        Value => Object.Test_Duration);
-      Query.Save_Field (Name  => COL_9_5_NAME, --  build_config_id
-                        Value => Object.Build_Config);
-      Query.Save_Field (Name  => COL_10_5_NAME, --  node_id
-                        Value => Object.Node);
-      Query.Save_Field (Name  => COL_11_5_NAME, --  project_id
-                        Value => Object.Project);
-      Query.Save_Field (Name  => COL_12_5_NAME, --  branch_id
-                        Value => Object.Branch);
-      Query.Execute (Result);
-      if Result /= 1 then
-         raise ADO.Objects.INSERT_ERROR;
-      end if;
-      ADO.Objects.Set_Created (Object);
-   end Create;
-
-   procedure Delete (Object  : in out Build_Impl;
-                     Session : in out ADO.Sessions.Master_Session'Class) is
-      Stmt : ADO.Statements.Delete_Statement
-         := Session.Create_Statement (BUILD_DEF'Access);
-   begin
-      Stmt.Set_Filter (Filter => "id = ?");
-      Stmt.Add_Param (Value => Object.Get_Key);
-      Stmt.Execute;
-   end Delete;
-
-   --  ------------------------------
-   --  Get the bean attribute identified by the name.
-   --  ------------------------------
-   overriding
-   function Get_Value (From : in Build_Ref;
-                       Name : in String) return Util.Beans.Objects.Object is
-      Obj  : ADO.Objects.Object_Record_Access;
-      Impl : access Build_Impl;
-   begin
-      if From.Is_Null then
-         return Util.Beans.Objects.Null_Object;
-      end if;
-      Obj := From.Get_Load_Object;
-      Impl := Build_Impl (Obj.all)'Access;
-      if Name = "id" then
-         return ADO.Objects.To_Object (Impl.Get_Key);
-      elsif Name = "number" then
-         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Number));
-      elsif Name = "create_date" then
-         return Util.Beans.Objects.Time.To_Object (Impl.Create_Date);
-      elsif Name = "finish_date" then
-         if Impl.Finish_Date.Is_Null then
-            return Util.Beans.Objects.Null_Object;
-         else
-            return Util.Beans.Objects.Time.To_Object (Impl.Finish_Date.Value);
-         end if;
-      elsif Name = "pass_count" then
-         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Pass_Count));
-      elsif Name = "fail_count" then
-         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Fail_Count));
-      elsif Name = "timeout_count" then
-         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Timeout_Count));
-      elsif Name = "test_duration" then
-         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Test_Duration));
-      end if;
-      return Util.Beans.Objects.Null_Object;
-   end Get_Value;
-
-
-
-   --  ------------------------------
-   --  Load the object from current iterator position
-   --  ------------------------------
-   procedure Load (Object  : in out Build_Impl;
-                   Stmt    : in out ADO.Statements.Query_Statement'Class;
-                   Session : in out ADO.Sessions.Session'Class) is
-   begin
-      Object.Set_Key_Value (Stmt.Get_Identifier (0));
-      Object.Number := Stmt.Get_Integer (2);
-      Object.Create_Date := Stmt.Get_Time (3);
-      Object.Finish_Date := Stmt.Get_Nullable_Time (4);
-      Object.Pass_Count := Stmt.Get_Integer (5);
-      Object.Fail_Count := Stmt.Get_Integer (6);
-      Object.Timeout_Count := Stmt.Get_Integer (7);
-      Object.Test_Duration := Stmt.Get_Integer (8);
-      if not Stmt.Is_Null (9) then
-         Object.Build_Config.Set_Key_Value (Stmt.Get_Identifier (9), Session);
-      end if;
-      if not Stmt.Is_Null (10) then
-         Object.Node.Set_Key_Value (Stmt.Get_Identifier (10), Session);
-      end if;
-      if not Stmt.Is_Null (11) then
-         Object.Project.Set_Key_Value (Stmt.Get_Identifier (11), Session);
-      end if;
-      if not Stmt.Is_Null (12) then
-         Object.Branch.Set_Key_Value (Stmt.Get_Identifier (12), Session);
-      end if;
-      Object.Version := Stmt.Get_Integer (1);
-      ADO.Objects.Set_Created (Object);
-   end Load;
-   function Test_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key is
-      Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
-                                       Of_Class => TEST_DEF'Access);
-   begin
-      ADO.Objects.Set_Value (Result, Id);
-      return Result;
-   end Test_Key;
-
-   function Test_Key (Id : in String) return ADO.Objects.Object_Key is
-      Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
-                                       Of_Class => TEST_DEF'Access);
-   begin
-      ADO.Objects.Set_Value (Result, Id);
-      return Result;
-   end Test_Key;
-
-   function "=" (Left, Right : Test_Ref'Class) return Boolean is
-   begin
-      return ADO.Objects.Object_Ref'Class (Left) = ADO.Objects.Object_Ref'Class (Right);
-   end "=";
-
-   procedure Set_Field (Object : in out Test_Ref'Class;
-                        Impl   : out Test_Access) is
-      Result : ADO.Objects.Object_Record_Access;
-   begin
-      Object.Prepare_Modify (Result);
-      Impl := Test_Impl (Result.all)'Access;
-   end Set_Field;
-
-   --  Internal method to allocate the Object_Record instance
-   procedure Allocate (Object : in out Test_Ref) is
-      Impl : Test_Access;
-   begin
-      Impl := new Test_Impl;
-      ADO.Objects.Set_Object (Object, Impl.all'Access);
-   end Allocate;
-
-   -- ----------------------------------------
-   --  Data object: Test
-   -- ----------------------------------------
-
-   procedure Set_Id (Object : in out Test_Ref;
-                     Value  : in ADO.Identifier) is
-      Impl : Test_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Key_Value (Impl.all, 1, Value);
-   end Set_Id;
-
-   function Get_Id (Object : in Test_Ref)
-                  return ADO.Identifier is
-      Impl : constant Test_Access
-         := Test_Impl (Object.Get_Object.all)'Access;
-   begin
-      return Impl.Get_Key_Value;
-   end Get_Id;
-
-
-   procedure Set_Name (Object : in out Test_Ref;
-                        Value : in String) is
-      Impl : Test_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_String (Impl.all, 2, Impl.Name, Value);
-   end Set_Name;
-
-   procedure Set_Name (Object : in out Test_Ref;
-                       Value  : in Ada.Strings.Unbounded.Unbounded_String) is
-      Impl : Test_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Unbounded_String (Impl.all, 2, Impl.Name, Value);
-   end Set_Name;
-
-   function Get_Name (Object : in Test_Ref)
-                 return String is
-   begin
-      return Ada.Strings.Unbounded.To_String (Object.Get_Name);
-   end Get_Name;
-   function Get_Name (Object : in Test_Ref)
-                  return Ada.Strings.Unbounded.Unbounded_String is
-      Impl : constant Test_Access
-         := Test_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Name;
-   end Get_Name;
-
-   --  Copy of the object.
-   procedure Copy (Object : in Test_Ref;
-                   Into   : in out Test_Ref) is
-      Result : Test_Ref;
-   begin
-      if not Object.Is_Null then
-         declare
-            Impl : constant Test_Access
-              := Test_Impl (Object.Get_Load_Object.all)'Access;
-            Copy : constant Test_Access
-              := new Test_Impl;
-         begin
-            ADO.Objects.Set_Object (Result, Copy.all'Access);
-            Copy.Copy (Impl.all);
-            Copy.Name := Impl.Name;
-         end;
-      end if;
-      Into := Result;
-   end Copy;
-
-   procedure Find (Object  : in out Test_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Query   : in ADO.SQL.Query'Class;
-                   Found   : out Boolean) is
-      Impl  : constant Test_Access := new Test_Impl;
-   begin
-      Impl.Find (Session, Query, Found);
-      if Found then
-         ADO.Objects.Set_Object (Object, Impl.all'Access);
-      else
-         ADO.Objects.Set_Object (Object, null);
-         Destroy (Impl);
-      end if;
-   end Find;
-
-   procedure Load (Object  : in out Test_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Id      : in ADO.Identifier) is
-      Impl  : constant Test_Access := new Test_Impl;
-      Found : Boolean;
-      Query : ADO.SQL.Query;
-   begin
-      Query.Bind_Param (Position => 1, Value => Id);
-      Query.Set_Filter ("id = ?");
-      Impl.Find (Session, Query, Found);
-      if not Found then
-         Destroy (Impl);
-         raise ADO.Objects.NOT_FOUND;
-      end if;
-      ADO.Objects.Set_Object (Object, Impl.all'Access);
-   end Load;
-
-   procedure Load (Object  : in out Test_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Id      : in ADO.Identifier;
-                   Found   : out Boolean) is
-      Impl  : constant Test_Access := new Test_Impl;
-      Query : ADO.SQL.Query;
-   begin
-      Query.Bind_Param (Position => 1, Value => Id);
-      Query.Set_Filter ("id = ?");
-      Impl.Find (Session, Query, Found);
-      if not Found then
-         Destroy (Impl);
-      else
-         ADO.Objects.Set_Object (Object, Impl.all'Access);
-      end if;
-   end Load;
-
-   procedure Save (Object  : in out Test_Ref;
-                   Session : in out ADO.Sessions.Master_Session'Class) is
-      Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;
-   begin
-      if Impl = null then
-         Impl := new Test_Impl;
-         ADO.Objects.Set_Object (Object, Impl);
-      end if;
-      if not ADO.Objects.Is_Created (Impl.all) then
-         Impl.Create (Session);
-      else
-         Impl.Save (Session);
-      end if;
-   end Save;
-
-   procedure Delete (Object  : in out Test_Ref;
-                     Session : in out ADO.Sessions.Master_Session'Class) is
-      Impl : constant ADO.Objects.Object_Record_Access := Object.Get_Object;
-   begin
-      if Impl /= null then
-         Impl.Delete (Session);
-      end if;
-   end Delete;
-
-   --  --------------------
-   --  Free the object
-   --  --------------------
-   procedure Destroy (Object : access Test_Impl) is
-      type Test_Impl_Ptr is access all Test_Impl;
-      procedure Unchecked_Free is new Ada.Unchecked_Deallocation
-              (Test_Impl, Test_Impl_Ptr);
-      pragma Warnings (Off, "*redundant conversion*");
-      Ptr : Test_Impl_Ptr := Test_Impl (Object.all)'Access;
-      pragma Warnings (On, "*redundant conversion*");
-   begin
-      Unchecked_Free (Ptr);
-   end Destroy;
-
-   procedure Find (Object  : in out Test_Impl;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Query   : in ADO.SQL.Query'Class;
-                   Found   : out Boolean) is
-      Stmt : ADO.Statements.Query_Statement
-          := Session.Create_Statement (Query, TEST_DEF'Access);
-   begin
-      Stmt.Execute;
-      if Stmt.Has_Elements then
-         Object.Load (Stmt, Session);
-         Stmt.Next;
-         Found := not Stmt.Has_Elements;
-      else
-         Found := False;
-      end if;
-   end Find;
-
-   overriding
-   procedure Load (Object  : in out Test_Impl;
-                   Session : in out ADO.Sessions.Session'Class) is
-      Found : Boolean;
-      Query : ADO.SQL.Query;
-      Id    : constant ADO.Identifier := Object.Get_Key_Value;
-   begin
-      Query.Bind_Param (Position => 1, Value => Id);
-      Query.Set_Filter ("id = ?");
-      Object.Find (Session, Query, Found);
-      if not Found then
-         raise ADO.Objects.NOT_FOUND;
-      end if;
-   end Load;
-
-   procedure Save (Object  : in out Test_Impl;
-                   Session : in out ADO.Sessions.Master_Session'Class) is
-      Stmt : ADO.Statements.Update_Statement
-         := Session.Create_Statement (TEST_DEF'Access);
-   begin
-      if Object.Is_Modified (1) then
-         Stmt.Save_Field (Name  => COL_0_6_NAME, --  id
-                          Value => Object.Get_Key);
-         Object.Clear_Modified (1);
-      end if;
-      if Stmt.Has_Save_Fields then
-         Stmt.Set_Filter (Filter => "id = ?");
-         Stmt.Add_Param (Value => Object.Get_Key);
-         declare
-            Result : Integer;
-         begin
-            Stmt.Execute (Result);
-            if Result /= 1 then
-               if Result /= 0 then
-                  raise ADO.Objects.UPDATE_ERROR;
-               end if;
-            end if;
-         end;
-      end if;
-   end Save;
-
-   procedure Create (Object  : in out Test_Impl;
-                     Session : in out ADO.Sessions.Master_Session'Class) is
-      Query : ADO.Statements.Insert_Statement
-                  := Session.Create_Statement (TEST_DEF'Access);
-      Result : Integer;
-   begin
-      Session.Allocate (Id => Object);
-      Query.Save_Field (Name  => COL_0_6_NAME, --  id
-                        Value => Object.Get_Key);
-      Query.Save_Field (Name  => COL_1_6_NAME, --  name
-                        Value => Object.Name);
-      Query.Execute (Result);
-      if Result /= 1 then
-         raise ADO.Objects.INSERT_ERROR;
-      end if;
-      ADO.Objects.Set_Created (Object);
-   end Create;
-
-   procedure Delete (Object  : in out Test_Impl;
-                     Session : in out ADO.Sessions.Master_Session'Class) is
-      Stmt : ADO.Statements.Delete_Statement
-         := Session.Create_Statement (TEST_DEF'Access);
-   begin
-      Stmt.Set_Filter (Filter => "id = ?");
-      Stmt.Add_Param (Value => Object.Get_Key);
-      Stmt.Execute;
-   end Delete;
-
-   --  ------------------------------
-   --  Get the bean attribute identified by the name.
-   --  ------------------------------
-   overriding
-   function Get_Value (From : in Test_Ref;
-                       Name : in String) return Util.Beans.Objects.Object is
-      Obj  : ADO.Objects.Object_Record_Access;
-      Impl : access Test_Impl;
-   begin
-      if From.Is_Null then
-         return Util.Beans.Objects.Null_Object;
-      end if;
-      Obj := From.Get_Load_Object;
-      Impl := Test_Impl (Obj.all)'Access;
-      if Name = "id" then
-         return ADO.Objects.To_Object (Impl.Get_Key);
-      elsif Name = "name" then
-         return Util.Beans.Objects.To_Object (Impl.Name);
-      end if;
-      return Util.Beans.Objects.Null_Object;
-   end Get_Value;
-
-
-
-   --  ------------------------------
-   --  Load the object from current iterator position
-   --  ------------------------------
-   procedure Load (Object  : in out Test_Impl;
-                   Stmt    : in out ADO.Statements.Query_Statement'Class;
-                   Session : in out ADO.Sessions.Session'Class) is
-      pragma Unreferenced (Session);
-   begin
-      Object.Set_Key_Value (Stmt.Get_Identifier (0));
-      Object.Name := Stmt.Get_Unbounded_String (1);
-      ADO.Objects.Set_Created (Object);
-   end Load;
-   function Test_Run_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key is
-      Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
-                                       Of_Class => TEST_RUN_DEF'Access);
-   begin
-      ADO.Objects.Set_Value (Result, Id);
-      return Result;
-   end Test_Run_Key;
-
-   function Test_Run_Key (Id : in String) return ADO.Objects.Object_Key is
-      Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
-                                       Of_Class => TEST_RUN_DEF'Access);
-   begin
-      ADO.Objects.Set_Value (Result, Id);
-      return Result;
-   end Test_Run_Key;
-
-   function "=" (Left, Right : Test_Run_Ref'Class) return Boolean is
-   begin
-      return ADO.Objects.Object_Ref'Class (Left) = ADO.Objects.Object_Ref'Class (Right);
-   end "=";
-
-   procedure Set_Field (Object : in out Test_Run_Ref'Class;
-                        Impl   : out Test_Run_Access) is
-      Result : ADO.Objects.Object_Record_Access;
-   begin
-      Object.Prepare_Modify (Result);
-      Impl := Test_Run_Impl (Result.all)'Access;
-   end Set_Field;
-
-   --  Internal method to allocate the Object_Record instance
-   procedure Allocate (Object : in out Test_Run_Ref) is
-      Impl : Test_Run_Access;
-   begin
-      Impl := new Test_Run_Impl;
-      Impl.Version := 0;
-      Impl.Duration := 0;
-      Impl.Status := Porion.Projects.Models.Test_Status_Type'First;
-      ADO.Objects.Set_Object (Object, Impl.all'Access);
-   end Allocate;
-
-   -- ----------------------------------------
-   --  Data object: Test_Run
-   -- ----------------------------------------
-
-   function Get_Version (Object : in Test_Run_Ref)
-                  return Integer is
-      Impl : constant Test_Run_Access
-         := Test_Run_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Version;
-   end Get_Version;
-
-
-   procedure Set_Duration (Object : in out Test_Run_Ref;
-                           Value  : in Integer) is
-      Impl : Test_Run_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Integer (Impl.all, 2, Impl.Duration, Value);
-   end Set_Duration;
-
-   function Get_Duration (Object : in Test_Run_Ref)
-                  return Integer is
-      Impl : constant Test_Run_Access
-         := Test_Run_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Duration;
-   end Get_Duration;
-
-
-   procedure Set_Status (Object : in out Test_Run_Ref;
-                         Value  : in Porion.Projects.Models.Test_Status_Type) is
-      procedure Set_Field_Enum is
-         new ADO.Objects.Set_Field_Operation (Test_Status_Type);
-      Impl : Test_Run_Access;
-   begin
-      Set_Field (Object, Impl);
-      Set_Field_Enum (Impl.all, 3, Impl.Status, Value);
-   end Set_Status;
-
-   function Get_Status (Object : in Test_Run_Ref)
-                  return Porion.Projects.Models.Test_Status_Type is
-      Impl : constant Test_Run_Access
-         := Test_Run_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Status;
-   end Get_Status;
-
-
-   procedure Set_Id (Object : in out Test_Run_Ref;
-                     Value  : in ADO.Identifier) is
-      Impl : Test_Run_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Key_Value (Impl.all, 4, Value);
-   end Set_Id;
-
-   function Get_Id (Object : in Test_Run_Ref)
-                  return ADO.Identifier is
-      Impl : constant Test_Run_Access
-         := Test_Run_Impl (Object.Get_Object.all)'Access;
-   begin
-      return Impl.Get_Key_Value;
-   end Get_Id;
-
-
-   procedure Set_Build (Object : in out Test_Run_Ref;
-                        Value  : in Porion.Projects.Models.Build_Ref'Class) is
-      Impl : Test_Run_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 5, Impl.Build, Value);
-   end Set_Build;
-
-   function Get_Build (Object : in Test_Run_Ref)
-                  return Porion.Projects.Models.Build_Ref'Class is
-      Impl : constant Test_Run_Access
-         := Test_Run_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Build;
-   end Get_Build;
-
-
-   procedure Set_Test (Object : in out Test_Run_Ref;
-                       Value  : in Porion.Projects.Models.Test_Ref'Class) is
-      Impl : Test_Run_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 6, Impl.Test, Value);
-   end Set_Test;
-
-   function Get_Test (Object : in Test_Run_Ref)
-                  return Porion.Projects.Models.Test_Ref'Class is
-      Impl : constant Test_Run_Access
-         := Test_Run_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Test;
-   end Get_Test;
-
-   --  Copy of the object.
-   procedure Copy (Object : in Test_Run_Ref;
-                   Into   : in out Test_Run_Ref) is
-      Result : Test_Run_Ref;
-   begin
-      if not Object.Is_Null then
-         declare
-            Impl : constant Test_Run_Access
-              := Test_Run_Impl (Object.Get_Load_Object.all)'Access;
-            Copy : constant Test_Run_Access
-              := new Test_Run_Impl;
-         begin
-            ADO.Objects.Set_Object (Result, Copy.all'Access);
-            Copy.Copy (Impl.all);
-            Copy.Version := Impl.Version;
-            Copy.Duration := Impl.Duration;
-            Copy.Status := Impl.Status;
-            Copy.Build := Impl.Build;
-            Copy.Test := Impl.Test;
-         end;
-      end if;
-      Into := Result;
-   end Copy;
-
-   procedure Find (Object  : in out Test_Run_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Query   : in ADO.SQL.Query'Class;
-                   Found   : out Boolean) is
-      Impl  : constant Test_Run_Access := new Test_Run_Impl;
-   begin
-      Impl.Find (Session, Query, Found);
-      if Found then
-         ADO.Objects.Set_Object (Object, Impl.all'Access);
-      else
-         ADO.Objects.Set_Object (Object, null);
-         Destroy (Impl);
-      end if;
-   end Find;
-
-   procedure Load (Object  : in out Test_Run_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Id      : in ADO.Identifier) is
-      Impl  : constant Test_Run_Access := new Test_Run_Impl;
-      Found : Boolean;
-      Query : ADO.SQL.Query;
-   begin
-      Query.Bind_Param (Position => 1, Value => Id);
-      Query.Set_Filter ("id = ?");
-      Impl.Find (Session, Query, Found);
-      if not Found then
-         Destroy (Impl);
-         raise ADO.Objects.NOT_FOUND;
-      end if;
-      ADO.Objects.Set_Object (Object, Impl.all'Access);
-   end Load;
-
-   procedure Load (Object  : in out Test_Run_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Id      : in ADO.Identifier;
-                   Found   : out Boolean) is
-      Impl  : constant Test_Run_Access := new Test_Run_Impl;
-      Query : ADO.SQL.Query;
-   begin
-      Query.Bind_Param (Position => 1, Value => Id);
-      Query.Set_Filter ("id = ?");
-      Impl.Find (Session, Query, Found);
-      if not Found then
-         Destroy (Impl);
-      else
-         ADO.Objects.Set_Object (Object, Impl.all'Access);
-      end if;
-   end Load;
-
-   procedure Save (Object  : in out Test_Run_Ref;
-                   Session : in out ADO.Sessions.Master_Session'Class) is
-      Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;
-   begin
-      if Impl = null then
-         Impl := new Test_Run_Impl;
-         ADO.Objects.Set_Object (Object, Impl);
-      end if;
-      if not ADO.Objects.Is_Created (Impl.all) then
-         Impl.Create (Session);
-      else
-         Impl.Save (Session);
-      end if;
-   end Save;
-
-   procedure Delete (Object  : in out Test_Run_Ref;
-                     Session : in out ADO.Sessions.Master_Session'Class) is
-      Impl : constant ADO.Objects.Object_Record_Access := Object.Get_Object;
-   begin
-      if Impl /= null then
-         Impl.Delete (Session);
-      end if;
-   end Delete;
-
-   --  --------------------
-   --  Free the object
-   --  --------------------
-   procedure Destroy (Object : access Test_Run_Impl) is
-      type Test_Run_Impl_Ptr is access all Test_Run_Impl;
-      procedure Unchecked_Free is new Ada.Unchecked_Deallocation
-              (Test_Run_Impl, Test_Run_Impl_Ptr);
-      pragma Warnings (Off, "*redundant conversion*");
-      Ptr : Test_Run_Impl_Ptr := Test_Run_Impl (Object.all)'Access;
-      pragma Warnings (On, "*redundant conversion*");
-   begin
-      Unchecked_Free (Ptr);
-   end Destroy;
-
-   procedure Find (Object  : in out Test_Run_Impl;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Query   : in ADO.SQL.Query'Class;
-                   Found   : out Boolean) is
-      Stmt : ADO.Statements.Query_Statement
-          := Session.Create_Statement (Query, TEST_RUN_DEF'Access);
-   begin
-      Stmt.Execute;
-      if Stmt.Has_Elements then
-         Object.Load (Stmt, Session);
-         Stmt.Next;
-         Found := not Stmt.Has_Elements;
-      else
-         Found := False;
-      end if;
-   end Find;
-
-   overriding
-   procedure Load (Object  : in out Test_Run_Impl;
-                   Session : in out ADO.Sessions.Session'Class) is
-      Found : Boolean;
-      Query : ADO.SQL.Query;
-      Id    : constant ADO.Identifier := Object.Get_Key_Value;
-   begin
-      Query.Bind_Param (Position => 1, Value => Id);
-      Query.Set_Filter ("id = ?");
-      Object.Find (Session, Query, Found);
-      if not Found then
-         raise ADO.Objects.NOT_FOUND;
-      end if;
-   end Load;
-
-   procedure Save (Object  : in out Test_Run_Impl;
-                   Session : in out ADO.Sessions.Master_Session'Class) is
-      Stmt : ADO.Statements.Update_Statement
-         := Session.Create_Statement (TEST_RUN_DEF'Access);
-   begin
-      if Object.Is_Modified (4) then
-         Stmt.Save_Field (Name  => COL_3_7_NAME, --  id
-                          Value => Object.Get_Key);
-         Object.Clear_Modified (4);
-      end if;
-      if Object.Is_Modified (5) then
-         Stmt.Save_Field (Name  => COL_4_7_NAME, --  build_id
-                          Value => Object.Build);
-         Object.Clear_Modified (5);
-      end if;
-      if Object.Is_Modified (6) then
-         Stmt.Save_Field (Name  => COL_5_7_NAME, --  test_id
-                          Value => Object.Test);
-         Object.Clear_Modified (6);
-      end if;
-      if Stmt.Has_Save_Fields then
-         Object.Version := Object.Version + 1;
-         Stmt.Save_Field (Name  => "version",
-                          Value => Object.Version);
-         Stmt.Set_Filter (Filter => "id = ? and version = ?");
-         Stmt.Add_Param (Value => Object.Get_Key);
-         Stmt.Add_Param (Value => Object.Version - 1);
-         declare
-            Result : Integer;
-         begin
-            Stmt.Execute (Result);
-            if Result /= 1 then
-               if Result /= 0 then
-                  raise ADO.Objects.UPDATE_ERROR;
-               else
-                  raise ADO.Objects.LAZY_LOCK;
-               end if;
-            end if;
-         end;
-      end if;
-   end Save;
-
-   procedure Create (Object  : in out Test_Run_Impl;
-                     Session : in out ADO.Sessions.Master_Session'Class) is
-      Query : ADO.Statements.Insert_Statement
-                  := Session.Create_Statement (TEST_RUN_DEF'Access);
-      Result : Integer;
-   begin
-      Object.Version := 1;
-      Query.Save_Field (Name  => COL_0_7_NAME, --  version
-                        Value => Object.Version);
-      Query.Save_Field (Name  => COL_1_7_NAME, --  duration
-                        Value => Object.Duration);
-      Query.Save_Field (Name  => COL_2_7_NAME, --  status
-                        Value => Integer (Test_Status_Type'Pos (Object.Status)));
-      Session.Allocate (Id => Object);
-      Query.Save_Field (Name  => COL_3_7_NAME, --  id
-                        Value => Object.Get_Key);
-      Query.Save_Field (Name  => COL_4_7_NAME, --  build_id
-                        Value => Object.Build);
-      Query.Save_Field (Name  => COL_5_7_NAME, --  test_id
-                        Value => Object.Test);
-      Query.Execute (Result);
-      if Result /= 1 then
-         raise ADO.Objects.INSERT_ERROR;
-      end if;
-      ADO.Objects.Set_Created (Object);
-   end Create;
-
-   procedure Delete (Object  : in out Test_Run_Impl;
-                     Session : in out ADO.Sessions.Master_Session'Class) is
-      Stmt : ADO.Statements.Delete_Statement
-         := Session.Create_Statement (TEST_RUN_DEF'Access);
-   begin
-      Stmt.Set_Filter (Filter => "id = ?");
-      Stmt.Add_Param (Value => Object.Get_Key);
-      Stmt.Execute;
-   end Delete;
-
-   --  ------------------------------
-   --  Get the bean attribute identified by the name.
-   --  ------------------------------
-   overriding
-   function Get_Value (From : in Test_Run_Ref;
-                       Name : in String) return Util.Beans.Objects.Object is
-      Obj  : ADO.Objects.Object_Record_Access;
-      Impl : access Test_Run_Impl;
-   begin
-      if From.Is_Null then
-         return Util.Beans.Objects.Null_Object;
-      end if;
-      Obj := From.Get_Load_Object;
-      Impl := Test_Run_Impl (Obj.all)'Access;
-      if Name = "duration" then
-         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Duration));
-      elsif Name = "status" then
-         return Porion.Projects.Models.Test_Status_Type_Objects.To_Object (Impl.Status);
-      elsif Name = "id" then
-         return ADO.Objects.To_Object (Impl.Get_Key);
-      end if;
-      return Util.Beans.Objects.Null_Object;
-   end Get_Value;
-
-
-
-   --  ------------------------------
-   --  Load the object from current iterator position
-   --  ------------------------------
-   procedure Load (Object  : in out Test_Run_Impl;
-                   Stmt    : in out ADO.Statements.Query_Statement'Class;
-                   Session : in out ADO.Sessions.Session'Class) is
-   begin
-      Object.Duration := Stmt.Get_Integer (1);
-      Object.Status := Test_Status_Type'Val (Stmt.Get_Integer (2));
-      Object.Set_Key_Value (Stmt.Get_Identifier (3));
-      if not Stmt.Is_Null (4) then
-         Object.Build.Set_Key_Value (Stmt.Get_Identifier (4), Session);
-      end if;
-      if not Stmt.Is_Null (5) then
-         Object.Test.Set_Key_Value (Stmt.Get_Identifier (5), Session);
-      end if;
-      Object.Version := Stmt.Get_Integer (0);
       ADO.Objects.Set_Created (Object);
    end Load;
 

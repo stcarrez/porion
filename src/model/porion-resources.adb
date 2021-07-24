@@ -4,17 +4,17 @@ with Interfaces; use Interfaces;
 package body Porion.Resources is
    function Hash (S : String) return Natural;
 
-   P : constant array (0 .. 0) of Natural :=
-     (0 .. 0 => 11);
+   P : constant array (0 .. 1) of Natural :=
+     (1, 11);
 
-   T1 : constant array (0 .. 0) of Unsigned_8 :=
-     (0 .. 0 => 4);
+   T1 : constant array (0 .. 1) of Unsigned_8 :=
+     (10, 7);
 
-   T2 : constant array (0 .. 0) of Unsigned_8 :=
-     (0 .. 0 => 6);
+   T2 : constant array (0 .. 1) of Unsigned_8 :=
+     (5, 5);
 
-   G : constant array (0 .. 8) of Unsigned_8 :=
-     (0, 3, 0, 2, 1, 0, 0, 0, 0);
+   G : constant array (0 .. 11) of Unsigned_8 :=
+     (0, 2, 0, 0, 0, 0, 2, 4, 0, 0, 0, 1);
 
    function Hash (S : String) return Natural is
       F : constant Natural := S'First - 1;
@@ -25,10 +25,10 @@ package body Porion.Resources is
       for K in P'Range loop
          exit when L < P (K);
          J  := Character'Pos (S (P (K) + F));
-         F1 := (F1 + Natural (T1 (K)) * J) mod 9;
-         F2 := (F2 + Natural (T2 (K)) * J) mod 9;
+         F1 := (F1 + Natural (T1 (K)) * J) mod 12;
+         F2 := (F2 + Natural (T2 (K)) * J) mod 12;
       end loop;
-      return (Natural (G (F1)) + Natural (G (F2))) mod 4;
+      return (Natural (G (F1)) + Natural (G (F2))) mod 5;
    end Hash;
 
    C_0 : aliased constant String := "<query-mapping package='Porion.Projects.M"
@@ -63,10 +63,12 @@ package body Porion.Resources is
        & "list'>" & ASCII.LF & "        <comment>Get the list of projects</comment>" & ASCII.LF
        & "        <sql>" & ASCII.LF & "            SELECT" & ASCII.LF & "            project."
        & "id AS id," & ASCII.LF & "            project.name AS name," & ASCII.LF & "         "
-       & "   project.status AS status" & ASCII.LF & "            FROM porion_project AS p"
-       & "roject" & ASCII.LF & "        </sql>" & ASCII.LF & "        <sql-count>" & ASCII.LF
-       & "            SELECT" & ASCII.LF & "            count(project.id)" & ASCII.LF & "    "
-       & "        FROM porion_project AS project" & ASCII.LF & "        </sql-count>" & ASCII.LF
+       & "   project.status AS status," & ASCII.LF & "            COUNT(branch.id) AS bra"
+       & "nch_count" & ASCII.LF & "            FROM porion_project AS project" & ASCII.LF
+       & "            LEFT JOIN porion_branch AS branch ON project.id = branch.projec"
+       & "t_id" & ASCII.LF & "        </sql>" & ASCII.LF & "        <sql-count>" & ASCII.LF & "  "
+       & "          SELECT" & ASCII.LF & "            count(project.id)" & ASCII.LF & "      "
+       & "      FROM porion_project AS project" & ASCII.LF & "        </sql-count>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
    C_3 : aliased constant String := "<query-mapping package='Porion.Projects.M"
@@ -82,10 +84,20 @@ package body Porion.Resources is
        & "    WHERE branch.project_id = :project_id" & ASCII.LF & "       </sql>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
+   C_4 : aliased constant String := "<query-mapping package='Porion.Projects.M"
+       & "odels'>" & ASCII.LF & "    <description>" & ASCII.LF & "      Information about bra"
+       & "nches on a project." & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF & "  "
+       & "  <query name='project-last-build'>" & ASCII.LF & "       <comment>Get a list o"
+       & "f project branches.</comment>" & ASCII.LF & "       <sql>" & ASCII.LF & "    SELECT"
+       & ASCII.LF & "      MAX(build.number)" & ASCII.LF & "    FROM porion_build AS bui"
+       & "ld" & ASCII.LF & "    WHERE build.project_id = :project_id AND build.branch_id "
+       & "= :branch_id" & ASCII.LF & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF
+       & "</query-mapping>" & ASCII.LF;
+
 
    type Content_List_Array is array (Natural range <>) of access constant String;
    Contents : constant Content_List_Array := (
-      C_0'Access, C_1'Access, C_2'Access, C_3'Access);
+      C_0'Access, C_1'Access, C_2'Access, C_3'Access, C_4'Access);
 
    function Get_Content (Name : String) return access constant String is
       H : constant Natural := Hash (Name);

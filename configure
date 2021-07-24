@@ -4683,7 +4683,7 @@ $as_echo "no" >&6; }
 
 
 
-ac_config_files="$ac_config_files Makefile.conf porion.gpr porion_agent.gpr porion_lib.gpr porion_tests.gpr"
+ac_config_files="$ac_config_files Makefile.conf porion_agent.gpr porion_server.gpr porion_lib.gpr porion_tests.gpr"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -5392,8 +5392,8 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "Makefile.conf") CONFIG_FILES="$CONFIG_FILES Makefile.conf" ;;
-    "porion.gpr") CONFIG_FILES="$CONFIG_FILES porion.gpr" ;;
     "porion_agent.gpr") CONFIG_FILES="$CONFIG_FILES porion_agent.gpr" ;;
+    "porion_server.gpr") CONFIG_FILES="$CONFIG_FILES porion_server.gpr" ;;
     "porion_lib.gpr") CONFIG_FILES="$CONFIG_FILES porion_lib.gpr" ;;
     "porion_tests.gpr") CONFIG_FILES="$CONFIG_FILES porion_tests.gpr" ;;
 

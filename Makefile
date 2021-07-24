@@ -12,7 +12,11 @@ ARE=are
 
 # Model generation arguments with Dynamo
 # --package XXX.XXX.Models db uml/xxx.zargo
-DYNAMO_ARGS=--package Porion.Projects.Models db uml/porion.zargo
+DYNAMO_ARGS=\
+  --package Porion.Nodes.Models \
+  --package Porion.XUnit.Models \
+  --package Porion.Projects.Models \
+  db uml/porion.zargo
 
 ROOTDIR=.
 
@@ -23,6 +27,9 @@ build-test::
 build::
 	$(GNATMAKE) -m -p -P "$(GPRPATH_AGENT)" $(MAKE_ARGS)
 	$(GNATMAKE) -m -p -P "$(GPRPATH)" $(MAKE_ARGS)
+
+test:	build
+	bin/porion_harness -xml porion-aunit.xml
 
 generate::
 	mkdir -p db

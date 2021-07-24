@@ -15,15 +15,13 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Util.Properties;
-with Util.Strings.Vectors;
-with EL.Expressions;
-with Porion.Configs;
 with Porion.Projects.Models;
 with Porion.Sources;
 with Porion.Builders;
-with Ado.Statements;
-with Ado.Queries;
+with ADO.Statements;
+with ADO.Queries;
+with ADO.Sessions;
+with Porion.Nodes.Models;
 private with ADO.Sessions.Factory;
 package Porion.Projects.Services is
 
@@ -33,10 +31,22 @@ package Porion.Projects.Services is
 
    function Make_Project_Name (URI : in String) return String;
 
+   --  Add a build node
+   procedure Add_Node (Service   : in out Context_Type;
+                       Hostname  : in String;
+                       Login     : in String);
+
+   --  Load the build node corresponding to the given hostname.
+   procedure Load_Node (Service  : in out Context_Type;
+                        Hostname : in String);
+
    procedure Add_Project (Service   : in out Context_Type;
                           Name      : in String;
                           Mode      : in String;
                           Parameter : in String);
+
+   --  Get the current project id.
+   function Get_Project_Id (Service : in Context_Type) return ADO.Identifier;
 
    procedure Load_Project (Service : in out Context_Type;
                            Name    : in String);
@@ -48,14 +58,23 @@ package Porion.Projects.Services is
                     Branch_Name : in String;
                     Branch      : in Porion.Sources.Branch_Type);
 
+   procedure Start_Build (Service     : in out Context_Type;
+                          Branch_Name : in String;
+                          Branch      : in Porion.Sources.Branch_Type);
+
    procedure Load (Service : in out Context_Type;
                    Path : in String);
 
-   procedure Open (Service : in out Context_Type);
+   procedure Open (Service : in out Context_Type;
+                   Create  : in Boolean := False);
 
    function Create_Query (Service : in out Context_Type;
                           Query   : in ADO.Queries.Context) return Ado.Statements.Query_Statement;
- 
+
+   function Get_Database (Service : in Context_Type) return ADO.Sessions.Master_Session;
+
+   function Get_Build (Service : in Context_Type) return Porion.Projects.Models.Build_Ref;
+
 private
 
    type Context_Type is tagged limited record
@@ -64,6 +83,8 @@ private
       Project           : Porion.Projects.Models.Project_Ref;
       Branch            : Porion.Projects.Models.Branch_Ref;
       Build             : Porion.Projects.Models.Build_Ref;
+      Build_Config      : Porion.Projects.Models.Build_Config_Ref;
+      Build_Node        : Porion.Nodes.Models.Node_Ref;
       Source_Controller : Porion.Sources.Controller_Access;
       Build_Controller  : Porion.Builders.Controller_Access;
    end record;

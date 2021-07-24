@@ -23,7 +23,8 @@ package Porion.Builders.Scripts is
    type Controller_Type is limited new Porion.Builders.Controller_Type with private;
 
    overriding
-   procedure Build (Controller : in out Controller_Type);
+   procedure Build (Controller : in out Controller_Type;
+                    Logger     : in out Porion.Loggers.Logger_Type);
 
    overriding
    procedure Clean (Controller : in out Controller_Type);

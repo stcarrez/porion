@@ -17,20 +17,19 @@
 -----------------------------------------------------------------------
 with Ada.Calendar;
 with Ada.Directories;
-with Util.Properties;
 with Util.Log.Loggers;
-with Util.Strings.Vectors;
 with Util.Files;
-with EL.Expressions;
 with Porion.Configs;
+with Porion.Loggers;
 with Porion.Projects.Models;
 with Porion.Sources.Factories;
 with ADO.Configs;
 with ADO.SQLite;
 with ADO.SQL;
-with ADO.Queries;
 with ADO.Statements;
+with Porion.Projects.Schema;
 with Porion.Builders.Scripts;
+with Porion.Resources;
 with Yaml.Source.Text_IO;
 with Yaml.Source.File;
 with Yaml.Parser;
@@ -38,6 +37,13 @@ package body Porion.Projects.Services is
 
    --  The logger
    Log   : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Projects.Services");
+
+   function Get_Query_Resource (Name : in String) return access constant String is
+   begin
+      Log.Info ("Get query resource {0}", Name);
+
+      return Porion.Resources.Get_Content (Name);
+   end Get_Query_Resource;
 
    function Make_Project_Name (URI : in String) return String is
       Last : Natural := Util.Strings.Rindex (URI, '/');
@@ -69,6 +75,33 @@ package body Porion.Projects.Services is
       end if;
    end Set_Source_Control;
 
+   --  ------------------------------
+   --  Add a build node
+   --  ------------------------------
+   procedure Add_Node (Service   : in out Context_Type;
+                       Hostname  : in String;
+                       Login     : in String) is
+      Query : ADO.SQL.Query;
+      Found : Boolean;
+   begin
+      Log.Debug ("Add build node {0} with {1}", Hostname, Login);
+
+      Service.DB.Begin_Transaction;
+      Query.Bind_Param (1, Hostname);
+      Query.Set_Filter ("o.name = ?");
+      Service.Build_Node.Find (Service.DB, Query, Found);
+      if Found then
+         Log.Warn ("Build node name {0} already used", Hostname);
+         raise Name_Used;
+      end if;
+      Service.Build_Node.Set_Name (Hostname);
+      Service.Build_Node.Set_Login (Login);
+      Service.Build_Node.Save (Service.DB);
+      Service.DB.Commit;
+
+      Log.Info ("Build node {0} added", Hostname);
+   end Add_Node;
+
    procedure Add_Project (Service   : in out Context_Type;
                           Name      : in String;
                           Mode      : in String;
@@ -94,12 +127,21 @@ package body Porion.Projects.Services is
       Set_Source_Control (Service.Project, Mode);
       Service.Project.Save (Service.DB);
 
-      Cfg.Set_Project (Service.Project);
-      Cfg.Save (Service.DB);
+      Service.Build_Config.Set_Project (Service.Project);
+      Service.Build_Config.Set_Node (Service.Build_Node);
+      Service.Build_Config.Save (Service.DB);
       Service.DB.Commit;
 
       Log.Info ("Project {0} added", Name);
    end Add_Project;
+
+   --  ------------------------------
+   --  Get the current project id.
+   --  ------------------------------
+   function Get_Project_Id (Service : in Context_Type) return ADO.Identifier is
+   begin
+      return Service.Project.Get_Id;
+   end Get_Project_Id;
 
    procedure Load_Project (Service : in out Context_Type;
                            Name    : in String) is
@@ -117,6 +159,26 @@ package body Porion.Projects.Services is
       end if;
 
    end Load_Project;
+
+   --  ------------------------------
+   --  Load the build node corresponding to the given hostname.
+   --  ------------------------------
+   procedure Load_Node (Service  : in out Context_Type;
+                        Hostname : in String) is
+      Query : ADO.SQL.Query;
+      Found : Boolean;
+   begin
+      Log.Debug ("Load build node {0}", Hostname);
+
+      Query.Bind_Param (1, Hostname);
+      Query.Set_Filter ("o.name = ?");
+      Service.Build_Node.Find (Service.DB, Query, Found);
+      if not Found then
+         Log.Warn ("Build node {0} does not exist", Hostname);
+         raise Name_Used;
+      end if;
+
+   end Load_Node;
 
    procedure Add_Branch (Service : in out Context_Type;
                          Name    : in String;
@@ -155,6 +217,7 @@ package body Porion.Projects.Services is
 
       Config : Porion.Configs.Config_Type;
       Query  : ADO.Queries.Context;
+      Logger : Porion.Loggers.Logger_Type;
    begin
       if Service.Project.Is_Null then
          raise Name_Used;
@@ -163,7 +226,7 @@ package body Porion.Projects.Services is
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
       Service.Source_Controller := Porion.Sources.Factories.Create ("git", Config);
 
-      Service.Source_Controller.Check (Status);
+      Service.Source_Controller.Check (Status, Logger);
 
       Query.Set_Query (Porion.Projects.Models.Query_Project_Branches);
       Query.Bind_Param ("project_id", Service.Project.Get_Id);
@@ -215,35 +278,93 @@ package body Porion.Projects.Services is
       end loop;
    end Check_Sources;
 
-   procedure Build (Service : in out Context_Type;
+   procedure Start_Build (Service     : in out Context_Type;
+                          Branch_Name : in String;
+                          Branch      : in Porion.Sources.Branch_Type) is
+      Query : ADO.Queries.Context;
+      Found : Boolean;
+      Stmt  : ADO.Statements.Query_Statement;
+   begin
+      if Service.Build_Node.Is_Null then
+         Service.Load_Node ("localhost");
+      end if;
+
+      Add_Branch (Service, Branch_Name, Branch);
+
+      Query.Set_Query (Projects.Models.Query_Project_Last_Build);
+      Query.Bind_Param ("project_id", Service.Project.Get_Id);
+      Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
+      Stmt := Service.DB.Create_Statement (Query);
+      Stmt.Execute;
+
+      Service.Build := Porion.Projects.Models.Null_Build;
+      Service.Build.Set_Number (Stmt.Get_Result_Integer + 1);
+
+      if Service.Build_Config.Is_Null then
+         Query.Clear;
+         Query.Bind_Param (1, Service.Project.Get_Id);
+         Query.Bind_Param (2, Service.Build_Node.Get_Id);
+         Query.Set_Filter ("o.project_id = ? AND o.node_id = ?");
+         Service.Build_Config.Find (Service.DB, Query, Found);
+         if not Found then
+            Service.Build_Config.Set_Node (Service.Build_Node);
+            Service.Build_Config.Set_Project (Service.Project);
+            Service.Build_Config.Save (Service.DB);
+         end if;
+      end if;
+
+      Service.Build.Set_Project (Service.Project);
+      Service.Build.Set_Branch (Service.Branch);
+      Service.Build.Set_Node (Service.Build_Node);
+      Service.Build.Set_Build_Config (Service.Build_Config);
+      Service.Build.Set_Create_Date (Ada.Calendar.Clock);
+      Service.Build.Save (Service.DB);
+
+      Service.Branch.Set_Last_Build (Service.Build);
+      Service.Branch.Save (Service.DB);
+      Service.DB.Commit;
+
+      Log.Info ("Created build{0} for {1}", Natural'Image (Service.Build.Get_Number),
+                Service.Project.Get_Name);
+   end Start_Build;
+
+   procedure Build (Service     : in out Context_Type;
                     Branch_Name : in String;
                     Branch      : in Porion.Sources.Branch_Type) is
    begin
       if Service.Project.Is_Null then
          raise Name_Used;
       end if;
-      if Service.Branch.Is_Null then
-         raise Name_Used;
-      end if;
 
-      Service.Build.Set_Project (Service.Project);
-      Service.Build.Set_Branch (Service.Branch);
-      Service.Build.Set_Create_Date (Ada.Calendar.Clock);
+      Start_Build (Service, Branch_Name, Branch);
+
       declare
-         Name : constant String := Service.Project.Get_Name;
-         Path : constant String := Porion.Configs.Get_Project_Directory (Name);
-         Config : Util.Properties.Manager;
+         Number  : constant Positive := Service.Build.Get_Number;
+         Name    : constant String := Service.Project.Get_Name;
+         Path    : constant String := Configs.Get_Build_Directory (Name, Branch_Name, Number);
+         Log_Dir : constant String := Configs.Get_Build_Log_Directory (Name, Branch_Name, Number);
+         Config  : Util.Properties.Manager;
+         Logger  : Porion.Loggers.Logger_Type;
       begin
          Log.Info ("Build {0} in {1}", Name, Path);
 
          if not Ada.Directories.Exists (Path) then
             Ada.Directories.Create_Path (Path);
          end if;
-         Service.Source_Controller.Checkout (Path);
+         if not Ada.Directories.Exists (Log_Dir) then
+            Ada.Directories.Create_Path (Log_Dir);
+         end if;
 
-         Config.Set ("build_dir", Util.Files.Compose (Path, Name));
+         Logger.Create (Util.Files.Compose (Log_Dir, "build.log"));
+         Service.Source_Controller.Checkout (Path, Logger);
+
+         Config.Set ("build_dir", Path);
          Service.Build_Controller := Porion.Builders.Scripts.Create (Config);
-         Service.Build_Controller.Build;
+         Service.Build_Controller.Build (Logger);
+
+         Service.Build.Set_Finish_Date (ADO.Nullable_Time '(Is_Null => False,
+                                                            Value => Ada.Calendar.Clock));
+         Service.Build.Save (Service.DB);
       end;
    end Build;
 
@@ -260,7 +381,7 @@ package body Porion.Projects.Services is
       P.Set_Input (Input);
       loop
          Cur := P.Next;
-         Log.Error (Yaml.To_String (Cur));
+         --  Log.Error (Yaml.To_String (Cur));
          exit when Cur.Kind = Yaml.Stream_End;
       end loop;
    end Load;
@@ -271,16 +392,53 @@ package body Porion.Projects.Services is
       return Service.DB.Create_Statement (Query);
    end Create_Query;
 
-   procedure Open (Service : in out Context_Type) is
-      Path   : constant String := Porion.Configs.Get_Database_Path;
+   function Get_Database (Service : in Context_Type) return ADO.Sessions.Master_Session is
+   begin
+      return Service.DB;
+   end Get_Database;
+
+   function Get_Build (Service : in Context_Type) return Porion.Projects.Models.Build_Ref is
+   begin
+      return Service.Build;
+   end Get_Build;
+
+   procedure Open (Service : in out Context_Type;
+                   Create  : in Boolean := False) is
+      Path   : constant String := Porion.Configs.Get_Database_Path
+        & (if Create then "?create=true" else "");
       Config : Util.Properties.Manager;
    begin
       Config.Set (ADO.Configs.QUERY_PATHS_CONFIG, "db");
       Config.Set (ADO.Configs.DYNAMIC_DRIVER_LOAD, "false");
       Config.Set (ADO.Configs.QUERY_LOAD_CONFIG, "true");
+      Config.Set (ADO.Configs.NO_ENTITY_LOAD, (if Create then "true" else "false"));
       ADO.SQLite.Initialize (Config);
+      Service.Factory.Set_Query_Loader (Get_Query_Resource'Access);
       Service.Factory.Create (Path);
       Service.DB := Service.Factory.Get_Master_Session;
+
+      if Create then
+         declare
+            use Porion.Projects.Schema;
+
+            List : constant Porion.Projects.Schema.Content_Access
+              := Porion.Projects.Schema.Get_Content ("create-porion-sqlite");
+         begin
+            if List = null then
+               Log.Error ("Cannot find the database schema!");
+               return;
+            end if;
+
+            for Query of List.all loop
+               declare
+                  Stmt : ADO.Statements.Query_Statement
+                    := Service.DB.Create_Statement (Query.all);
+               begin
+                  Stmt.Execute;
+               end;
+            end loop;
+         end;
+      end if;
    end Open;
 
 end Porion.Projects.Services;

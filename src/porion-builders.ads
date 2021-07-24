@@ -15,14 +15,15 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-
+with Porion.Loggers;
 package Porion.Builders is
 
    type Controller_Type is limited Interface;
 
    type Controller_Access is access all Controller_Type'Class;
 
-   procedure Build (Controller : in out Controller_Type) is abstract;
+   procedure Build (Controller : in out Controller_Type;
+                    Logger     : in out Porion.Loggers.Logger_Type) is abstract;
 
    procedure Clean (Controller : in out Controller_Type) is abstract;
 

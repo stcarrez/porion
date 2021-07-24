@@ -20,21 +20,24 @@ private with EL.Expressions;
 package Porion.Sources.Git is
 
    GIT_TEST_COMMAND     : constant String := "git ls-remote -h -- #{repository_url}";
-   GIT_CHECKOUT_COMMAND : constant String := "git -C #{build_dir} clone #{repository_url}";
+   GIT_CHECKOUT_COMMAND : constant String := "git clone #{repository_url} #{build_dir}";
 
    type Controller_Type is limited new Porion.Sources.Controller_Type with private;
 
    overriding
    procedure Check (Controller : in out Controller_Type;
-                    Status     : out Status_Type);
+                    Status     : out Status_Type;
+                    Logger     : in out Porion.Loggers.Logger_Type);
 
    overriding
    procedure Checkout (Controller : in out Controller_Type;
-                       Path       : in String);
+                       Path       : in String;
+                       Logger     : in out Porion.Loggers.Logger_Type);
 
    overriding
    procedure Changes (Controller : in out Controller_Type;
-                      Result     : out Status_Type);
+                      Result     : out Status_Type;
+                      Logger     : in out Porion.Loggers.Logger_Type);
 
    function Create (Config : in Porion.Configs.Config_Type) return Controller_Access;
 

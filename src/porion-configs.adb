@@ -20,19 +20,15 @@ with Ada.Directories;
 with Ada.Strings.Unbounded;
 with Interfaces.C.Strings;
 with Util.Files;
+with Util.Strings;
 with Util.Log.Loggers;
 with Util.Systems.Os;
-with Util.Properties;
 package body Porion.Configs is
 
    use Ada.Strings.Unbounded;
 
    --  The logger
    Log   : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Configs");
-
-   WORKSPACE_DIR_NAME : constant String := "workspace_dir";
-   PROJECT_DIR_NAME   : constant String := "project_dir";
-   DATABASE_NAME      : constant String := "database";
 
    function Get_Default_Path return String;
 
@@ -154,6 +150,30 @@ package body Porion.Configs is
          return Util.Files.Compose (Get_Porion_Directory, Name);
       end if;
    end Get_Project_Directory;
+
+   --  ------------------------------
+   --  Get the directory holding the project sources for the given build.
+   --  ------------------------------
+   function Get_Build_Directory (Name   : in String;
+                                 Branch : in String;
+                                 Number : in Positive) return String is
+      Project_Dir : constant String := Get_Project_Directory (Name);
+   begin
+      return Util.Files.Compose (Project_Dir, Branch);
+   end Get_Build_Directory;
+
+   --  ------------------------------
+   --  Get the directory holding the build log files for the given build.
+   --  ------------------------------
+   function Get_Build_Log_Directory (Name   : in String;
+                                     Branch : in String;
+                                     Number : in Positive) return String is
+      Project_Dir : constant String := Get_Project_Directory (Name);
+      Build_Id    : constant String := Util.Strings.Image (Number);
+      Log_Dir     : constant String := Util.Files.Compose ("builds", Branch & "-" & Build_Id);
+   begin
+      return Util.Files.Compose (Project_Dir, Log_Dir);
+   end Get_Build_Log_Directory;
 
    --  ------------------------------
    --  Get the path of the local database.

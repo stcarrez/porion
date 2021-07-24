@@ -24,7 +24,8 @@ package body Porion.Sources.Git is
 
    overriding
    procedure Check (Controller : in out Controller_Type;
-                    Status     : out Status_Type) is
+                    Status     : out Status_Type;
+                    Logger     : in out Porion.Loggers.Logger_Type) is
 
       REGEX1 : constant String := "^([0-9a-fA-F]+)\srefs/heads/(.*)";
 
@@ -33,6 +34,7 @@ package body Porion.Sources.Git is
       procedure Process (Line : in String) is
          Matches : GNAT.Regpat.Match_Array (0 .. 2);
       begin
+         Logger.Write (Line);
          if GNAT.Regpat.Match (Pattern1, Line) then
             GNAT.Regpat.Match (Pattern1, Line, Matches);
             declare
@@ -51,11 +53,12 @@ package body Porion.Sources.Git is
 
    overriding
    procedure Checkout (Controller : in out Controller_Type;
-                       Path       : in String) is
+                       Path       : in String;
+                       Logger     : in out Porion.Loggers.Logger_Type) is
 
       procedure Process (Line : in String) is
       begin
-         null;
+         Logger.Write (Line);
       end Process;
 
    begin
@@ -65,7 +68,8 @@ package body Porion.Sources.Git is
 
    overriding
    procedure Changes (Controller : in out Controller_Type;
-                      Result     : out Status_Type) is
+                      Result     : out Status_Type;
+                      Logger     : in out Porion.Loggers.Logger_Type) is
    begin
       null;
    end Changes;

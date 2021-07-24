@@ -26,12 +26,14 @@ package body Porion.Builders.Scripts is
    Log   : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Builders.Scripts");
 
    overriding
-   procedure Build (Controller : in out Controller_Type) is
+   procedure Build (Controller : in out Controller_Type;
+                    Logger     : in out Porion.Loggers.Logger_Type) is
       procedure Process (Line : in String) is
       begin
          if Line'First + 1 < Line'Last then
             Log.Info ("{0}", Line (Line'First .. Line'Last - 1));
          end if;
+         Logger.Write (Line (Line'First .. Line'Last - 1));
       end Process;
    begin
       Porion.Tools.Execute (Controller.Configure_Command, Controller.Config, Process'Access);

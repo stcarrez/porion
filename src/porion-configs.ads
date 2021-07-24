@@ -18,10 +18,14 @@
 with Util.Properties;
 package Porion.Configs is
 
-   VERSION   : constant String := "1.3.1";
-   RELEASE   : constant String := "Ada Keystore Tool " & "1.3.1";
-   PREFIX    : constant String := "/build/local-gnat-2020";
+   VERSION   : constant String := "0.1.0";
+   RELEASE   : constant String := "Porion " & "0.1.0";
+   PREFIX    : constant String := "/build/local-gnat-2021";
    RESOURCES : constant String := "/share/akt/resources/";
+
+   WORKSPACE_DIR_NAME : constant String := "workspace_dir";
+   PROJECT_DIR_NAME   : constant String := "project_dir";
+   DATABASE_NAME      : constant String := "database";
 
    --  Initialize the configuration.
    procedure Initialize (Path : in String);
@@ -47,6 +51,16 @@ package Porion.Configs is
 
    --  Get the directory holding the projects.
    function Get_Project_Directory (Name : in String) return String;
+
+   --  Get the directory holding the project sources for the given build.
+   function Get_Build_Directory (Name   : in String;
+                                 Branch : in String;
+                                 Number : in Positive) return String;
+
+   --  Get the directory holding the build log files for the given build.
+   function Get_Build_Log_Directory (Name   : in String;
+                                     Branch : in String;
+                                     Number : in Positive) return String;
 
    --  Get the path of the local database.
    function Get_Database_Path return String;

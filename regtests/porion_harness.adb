@@ -17,11 +17,26 @@
 -----------------------------------------------------------------------
 
 with Util.Tests;
+with Util.Properties;
+with ADO.Sqlite;
 with Porion.Testsuite;
 
 procedure Porion_Harness is
 
-   procedure Harness is new Util.Tests.Harness (Porion.Testsuite.Suite);
+   procedure Initialize (Props : in Util.Properties.Manager);
+
+   procedure Harness is new Util.Tests.Harness (Porion.Testsuite.Suite, Initialize);
+
+   --  ------------------------------
+   --  Initialization procedure: setup the database
+   --  ------------------------------
+   procedure Initialize (Props : in Util.Properties.Manager) is
+      DB : constant String := Props.Get ("test.database",
+                                         "sqlite:///regtests.db");
+   begin
+      ADO.Sqlite.Initialize (Props);
+      Porion.Testsuite.Initialize (DB);
+   end Initialize;
 
 begin
    Harness ("porion-tests.xml");

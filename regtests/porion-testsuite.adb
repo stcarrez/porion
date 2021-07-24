@@ -16,16 +16,39 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Porion.Applications;
+with ADO.Sessions.Sources;
+with ADO.Sessions.Factory;
+
 with Porion.Tools.Tests;
+with Porion.XUnit.Tests;
 package body Porion.Testsuite is
 
-   Tests : aliased Util.Tests.Test_Suite;
+   Tests      : aliased Util.Tests.Test_Suite;
+   Factory    : aliased ADO.Sessions.Factory.Session_Factory;
+   Controller : aliased ADO.Sessions.Sources.Data_Source;
 
    function Suite return Util.Tests.Access_Test_Suite is
    begin
       Porion.Tools.Tests.Add_Tests (Tests'Access);
+      Porion.XUnit.Tests.Add_Tests (Tests'Access);
       return Tests'Access;
    end Suite;
+
+   --  ------------------------------
+   --  Get the writeable connection database to be used for the unit tests
+   --  ------------------------------
+   function Get_Master_Database return ADO.Sessions.Master_Session is
+   begin
+      return Factory.Get_Master_Session;
+   end Get_Master_Database;
+
+   --  ------------------------------
+   --  Initialize the test database
+   --  ------------------------------
+   procedure Initialize (Name : in String) is
+   begin
+      Controller.Set_Connection (Name);
+      --  Factory.Create (Controller);
+   end Initialize;
 
 end Porion.Testsuite;

@@ -18,8 +18,16 @@
 
 with Util.Tests;
 with Util.Properties;
+
+with ADO.Sessions;
 package Porion.Testsuite is
 
    function Suite return Util.Tests.Access_Test_Suite;
+
+   --  Get the writeable connection database to be used for the unit tests
+   function Get_Master_Database return ADO.Sessions.Master_Session;
+
+   --  Initialize the test database
+   procedure Initialize (Name : in String);
 
 end Porion.Testsuite;

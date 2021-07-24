@@ -1,0 +1,34 @@
+-----------------------------------------------------------------------
+--  porion-xunit -- Continuous integration controller
+--  Copyright (C) 2021 Stephane Carrez
+--  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
+--
+--  Licensed under the Apache License, Version 2.0 (the "License");
+--  you may not use this file except in compliance with the License.
+--  You may obtain a copy of the License at
+--
+--      http://www.apache.org/licenses/LICENSE-2.0
+--
+--  Unless required by applicable law or agreed to in writing, software
+--  distributed under the License is distributed on an "AS IS" BASIS,
+--  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+--  See the License for the specific language governing permissions and
+--  limitations under the License.
+-----------------------------------------------------------------------
+with Ada.Strings.Hash;
+with Ada.Calendar;
+with Ada.Containers.Indefinite_Vectors;
+with Ada.Containers.Indefinite_Ordered_Maps;
+with Util.Strings.Vectors;
+with ADO.Queries;
+with ADO.SQL;
+with Porion.Projects.Models;
+with Porion.XUnit.Models;
+package body Porion.XUnit is
+
+   procedure init is
+   begin
+      null;
+   end init;
+
+end Porion.XUnit;

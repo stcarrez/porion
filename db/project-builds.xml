@@ -1,0 +1,16 @@
+<query-mapping package='Porion.Projects.Models'>
+    <description>
+      Information about branches on a project.
+    </description>
+
+    <query name='project-last-build'>
+       <comment>Get a list of project branches.</comment>
+       <sql>
+    SELECT
+      MAX(build.number)
+    FROM porion_build AS build
+    WHERE build.project_id = :project_id AND build.branch_id = :branch_id
+       </sql>
+    </query>
+
+</query-mapping>

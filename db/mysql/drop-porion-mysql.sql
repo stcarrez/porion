@@ -1,17 +1,25 @@
 /* Copied from porion-drop-mysql.sql*/
 /* File generated automatically by dynamo */
+DROP TABLE IF EXISTS `porion_test_run_group`;
 DROP TABLE IF EXISTS `porion_test_run`;
+DROP TABLE IF EXISTS `porion_test_group`;
 DROP TABLE IF EXISTS `porion_test`;
 DROP TABLE IF EXISTS `porion_project`;
-DROP TABLE IF EXISTS `porion_node`;
 DROP TABLE IF EXISTS `porion_build_config`;
 DROP TABLE IF EXISTS `porion_build`;
 DROP TABLE IF EXISTS `porion_branch`;
+DROP TABLE IF EXISTS `porion_node`;
 /* Copied from awa_counters-drop-mysql.sql*/
 /* File generated automatically by dynamo */
 DROP TABLE IF EXISTS `awa_visit`;
 DROP TABLE IF EXISTS `awa_counter_definition`;
 DROP TABLE IF EXISTS `awa_counter`;
+/* Copied from awa-workspaces-drop-mysql.sql*/
+/* File generated automatically by dynamo */
+DROP TABLE IF EXISTS `awa_workspace_member`;
+DROP TABLE IF EXISTS `awa_workspace_feature`;
+DROP TABLE IF EXISTS `awa_workspace`;
+DROP TABLE IF EXISTS `awa_invitation`;
 /* Copied from awa-drop-mysql.sql*/
 /* File generated automatically by dynamo */
 DROP TABLE IF EXISTS `awa_user`;

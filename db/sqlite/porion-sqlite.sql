@@ -1,5 +1,17 @@
 /* File generated automatically by dynamo */
 /*  */
+CREATE TABLE IF NOT EXISTS porion_node (
+  /* the node identifier */
+  `id` BIGINT NOT NULL,
+  /* optimistic lock version */
+  `version` INTEGER NOT NULL,
+  /* the node name. */
+  `name` VARCHAR(255) NOT NULL,
+  /* the login name. */
+  `login` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`)
+);
+/*  */
 CREATE TABLE IF NOT EXISTS porion_branch (
   /* the identifier. */
   `id` BIGINT NOT NULL,
@@ -18,9 +30,9 @@ CREATE TABLE IF NOT EXISTS porion_branch (
   /*  */
   `status`  NOT NULL,
   /*  */
-  `last_build_id` BIGINT ,
-  /*  */
   `project_id` BIGINT NOT NULL,
+  /*  */
+  `last_build_id` BIGINT ,
   PRIMARY KEY (`id`)
 );
 /*  */
@@ -43,14 +55,16 @@ CREATE TABLE IF NOT EXISTS porion_build (
   `timeout_count` INTEGER NOT NULL,
   /* the test total duration in us. */
   `test_duration` INTEGER NOT NULL,
+  /*  */
+  `status`  NOT NULL,
   /* the build configuration. */
   `build_config_id` BIGINT NOT NULL,
   /* the node where the build was made. */
   `node_id` BIGINT NOT NULL,
-  /* the project. */
-  `project_id` BIGINT NOT NULL,
   /*  */
   `branch_id` BIGINT NOT NULL,
+  /* the project. */
+  `project_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`)
 );
 /*  */
@@ -63,18 +77,6 @@ CREATE TABLE IF NOT EXISTS porion_build_config (
   `node_id` BIGINT ,
   /*  */
   `project_id` BIGINT NOT NULL,
-  PRIMARY KEY (`id`)
-);
-/*  */
-CREATE TABLE IF NOT EXISTS porion_node (
-  /* the node identifier */
-  `id` BIGINT NOT NULL,
-  /* optimistic lock version */
-  `version` INTEGER NOT NULL,
-  /* the node name. */
-  `name` VARCHAR(255) NOT NULL,
-  /* the login name. */
-  `login` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`)
 );
 /*  */
@@ -105,39 +107,117 @@ CREATE TABLE IF NOT EXISTS porion_test (
   `id` BIGINT NOT NULL,
   /* the test name. */
   `name` VARCHAR(255) NOT NULL,
+  /*  */
+  `create_date` DATETIME NOT NULL,
+  /* the optimistic lock version */
+  `version` INTEGER NOT NULL,
+  /* the number of pass for this test case. */
+  `total_pass_count` INTEGER NOT NULL,
+  /* the total number of times the test failed. */
+  `total_fail_count` INTEGER NOT NULL,
+  /* the total number of time the test resulted in a timeout. */
+  `total_timeout_count` INTEGER NOT NULL,
+  /* the last date when the test passed. */
+  `last_pass_date` DATETIME ,
+  /* the last date when the test failed. */
+  `last_fail_date` DATETIME ,
+  /* the last date when the test failed with a timeout. */
+  `last_timeout_date` DATETIME ,
+  /* the last build that succeeded. */
+  `last_pass_build` INTEGER ,
+  /* the last build that failed. */
+  `last_fail_build` INTEGER ,
+  /* the last build that resulted in a timeout. */
+  `last_timeout_build` INTEGER ,
+  /*  */
+  `total_skip_count` INTEGER NOT NULL,
+  /*  */
+  `last_skip_date` DATETIME NOT NULL,
+  /*  */
+  `last_skip_build` INTEGER NOT NULL,
+  /*  */
+  `group_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`)
 );
 /*  */
-CREATE TABLE IF NOT EXISTS porion_test_run (
-  /* the optimistic lock. */
+CREATE TABLE IF NOT EXISTS porion_test_group (
+  /* the group identifier. */
+  `id` BIGINT NOT NULL,
+  /* optimistic lock version */
   `version` INTEGER NOT NULL,
+  /* the group name. */
+  `name` VARCHAR(255) NOT NULL,
+  /* the date when this group was created. */
+  `create_date` DATETIME NOT NULL,
+  /*  */
+  `project_id` BIGINT NOT NULL,
+  /*  */
+  `group_id` BIGINT ,
+  PRIMARY KEY (`id`)
+);
+/* Describes the result of execution of the test case. */
+CREATE TABLE IF NOT EXISTS porion_test_run (
   /* the test execution time in us. */
   `duration` INTEGER NOT NULL,
   /* the test execution status. */
   `status` INTEGER NOT NULL,
   /*  */
   `id` BIGINT NOT NULL,
+  /* the number of assertions that have been checked */
+  `assertions` INTEGER NOT NULL,
+  /* the test case information */
+  `test_id` BIGINT NOT NULL,
+  /*  */
+  `group_id` BIGINT NOT NULL,
+  PRIMARY KEY (`id`)
+);
+/*  */
+CREATE TABLE IF NOT EXISTS porion_test_run_group (
+  /* group identifier */
+  `id` BIGINT NOT NULL,
+  /* optimistic locking */
+  `version` INTEGER NOT NULL,
+  /*  */
+  `total_pass_count` INTEGER NOT NULL,
+  /*  */
+  `total_fail_count` INTEGER NOT NULL,
+  /*  */
+  `total_timeout_count` INTEGER NOT NULL,
+  /*  */
+  `total_skip_count` INTEGER NOT NULL,
+  /*  */
+  `diff_pass` INTEGER NOT NULL,
+  /*  */
+  `diff_fail` INTEGER NOT NULL,
+  /*  */
+  `diff_timeout` INTEGER NOT NULL,
+  /*  */
+  `diff_skip` INTEGER NOT NULL,
+  /* total duration for the execution of the test group */
+  `duration` INTEGER NOT NULL,
   /*  */
   `build_id` BIGINT NOT NULL,
   /*  */
-  `test_id` BIGINT NOT NULL,
+  `group_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`)
 );
+INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_node");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_branch");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_config");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_node");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_project");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_test");
+INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_test_group");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_test_run");
-INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "tag");
-INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "last_date");
+INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_test_run_group");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "name");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "login");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "tag");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "last_date");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "name");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)

@@ -37,7 +37,7 @@ package body Porion is
       Log_Config.Set ("log4j.appender.errorConsole.level", "ERROR");
       Log_Config.Set ("log4j.appender.errorConsole.layout", "message");
       Log_Config.Set ("log4j.appender.errorConsole.stderr", "true");
-      Log_Config.Set ("log4j.appender.errorConsole.prefix", "porion");
+      Log_Config.Set ("log4j.appender.errorConsole.prefix", "porion: ");
       Log_Config.Set ("log4j.logger.Util", "FATAL");
       Log_Config.Set ("log4j.logger.Util.Events", "ERROR");
       Log_Config.Set ("log4j.logger.Keystore", "ERROR");

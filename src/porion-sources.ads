@@ -19,6 +19,7 @@ with Ada.Strings.Hash;
 with Ada.Calendar;
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Util.Strings.Maps;
+with Porion.Loggers;
 package Porion.Sources is
 
    type Branch_Type is record
@@ -43,12 +44,15 @@ package Porion.Sources is
    type Controller_Access is access all Controller_Type'Class;
 
    procedure Check (Controller : in out Controller_Type;
-                    Status     : out Status_Type) is abstract;
+                    Status     : out Status_Type;
+                    Logger     : in out Porion.Loggers.Logger_Type) is abstract;
 
    procedure Checkout (Controller : in out Controller_Type;
-                       Path       : in String) is abstract;
+                       Path       : in String;
+                       Logger     : in out Porion.Loggers.Logger_Type) is abstract;
 
    procedure Changes (Controller : in out Controller_Type;
-                      Result     : out Status_Type) is abstract;
+                      Result     : out Status_Type;
+                      Logger     : in out Porion.Loggers.Logger_Type) is abstract;
 
 end Porion.Sources;

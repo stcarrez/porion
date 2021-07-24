@@ -22,6 +22,7 @@ private with GNAT.Command_Line;
 private with GNAT.Strings;
 private with Porion.Projects.Services;
 private with Util.Commands.Consoles.Text;
+private with Util.Strings.Formats;
 package Porion.Commands is
 
    Error : exception;
@@ -94,5 +95,16 @@ private
    --  Setup the command before parsing the arguments and executing it.
    procedure Setup (Config  : in out GC.Command_Line_Configuration;
                     Context : in out Context_Type);
+
+   function Format (Message : in String;
+                    Arg1    : in String) return String
+     renames Util.Strings.Formats.Format;
+
+   function Format (Message : in String;
+                    Arg1    : in String;
+                    Arg2    : in String;
+                    Arg3    : in String := "";
+                    Arg4    : in String := "") return String is
+      (Util.Strings.Formats.Format (Message, Arg1, Arg2, Arg3, Arg4));
 
 end Porion.Commands;

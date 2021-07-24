@@ -15,8 +15,6 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Text_IO;
-with Porion.Configs;
 with Porion.Projects.Services;
 package body Porion.Commands.Add is
 
@@ -38,6 +36,7 @@ package body Porion.Commands.Add is
          Name : constant String := Porion.Projects.Services.Make_Project_Name (URI);
       begin
          Context.Project_Service.Add_Project (Name, URI, URI);
+         Context.Console.Notice (N_INFO, Format (-("Project {0} - {1} added"), Name, URI));
 
       exception
          when Porion.Projects.Services.Name_Used =>

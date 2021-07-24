@@ -28,8 +28,7 @@ with Porion.Commands.Status;
 with Porion.Commands.Add;
 with Porion.Commands.List;
 with Porion.Commands.Config;
-with Porion.Resources;
-with Porion.Projects.Schema;
+with Porion.Commands.Init;
 package body Porion.Commands is
 
    Help_Command            : aliased Porion.Commands.Drivers.Help_Command_Type;
@@ -38,6 +37,7 @@ package body Porion.Commands is
    Config_Command          : aliased Porion.Commands.Config.Command_Type;
    Add_Command             : aliased Porion.Commands.Add.Command_Type;
    List_Command            : aliased Porion.Commands.List.Command_Type;
+   Init_Command            : aliased Porion.Commands.Init.Command_Type;
    Driver                  : Drivers.Driver_Type;
 
    --  ------------------------------
@@ -150,6 +150,9 @@ package body Porion.Commands is
       Driver.Add_Command ("list",
                           -("list the projects, nodes, builds"),
                           List_Command'Access);
+      Driver.Add_Command ("init",
+                          -("setup the build agent node"),
+                          Init_Command'Access);
    end Initialize;
 
    --  ------------------------------

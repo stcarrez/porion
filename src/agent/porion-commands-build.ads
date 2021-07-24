@@ -15,8 +15,6 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Util.Commands.Drivers;
-with Util.Commands.Parsers.GNAT_Parser;
 with Porion.Commands.Drivers;
 private package Porion.Commands.Build is
 

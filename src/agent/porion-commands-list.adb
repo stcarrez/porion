@@ -15,11 +15,9 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Text_IO;
 with Util.Strings;
 with ADO.Queries;
 with ADO.Statements;
-with Porion.Configs;
 with Porion.Projects.Models;
 package body Porion.Commands.List is
 

@@ -16,8 +16,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Text_IO;
-with Util.Commands.Drivers;
-with Util.Commands.Parsers.GNAT_Parser;
 with Porion.Sources;
 package body Porion.Commands.Build is
 

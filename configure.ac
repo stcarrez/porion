@@ -59,5 +59,5 @@ AM_GNAT_FIND_ADA_OPENAPI([porion])
 AM_GNAT_FIND_ADA_AWA([porion])
 
 AC_OUTPUT(
-Makefile.conf porion.gpr porion_agent.gpr porion_lib.gpr porion_tests.gpr
+Makefile.conf porion_agent.gpr porion_server.gpr porion_lib.gpr porion_tests.gpr
 )

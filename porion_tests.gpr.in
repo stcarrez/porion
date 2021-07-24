@@ -9,10 +9,8 @@ with "@AWA_DIR@awa";
 with "@AWA_DIR@awa_unit";
 with "@AWA_DIR@awa_workspaces";
 with "@AWA_DIR@awa_mail";
-with "@AWA_DIR@awa_comments";
-with "@AWA_DIR@awa_blogs";
-with "@AWA_DIR@awa_storages";
-with "porion";
+
+with "porion_lib";
 
 project porion_Tests is
 

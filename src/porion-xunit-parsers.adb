@@ -165,6 +165,12 @@ package body Porion.XUnit.Parsers is
                                   Name     => To_String (N.Name),
                                   Duration => N.Duration,
                                   Status   => Get_Status (N));
+               N.Output := Null_Object;
+               N.Failure := Null_Object;
+               N.Error := Null_Object;
+               N.Assertions := Null_Object;
+               N.Duration := 0;
+               N.Feature := Null_Object;
 
          end case;
       end Set_Member;

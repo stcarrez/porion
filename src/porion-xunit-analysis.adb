@@ -204,8 +204,8 @@ package body Porion.XUnit.Analysis is
                end;
             end loop;
             Group.Run.Set_Total_Pass_Count (Pass_Count + Group.Run.Get_Total_Pass_Count);
-            Group.Run.Set_Total_Fail_Count (Pass_Count + Group.Run.Get_Total_Fail_Count);
-            Group.Run.Set_Total_Timeout_Count (Pass_Count + Group.Run.Get_Total_Timeout_Count);
+            Group.Run.Set_Total_Fail_Count (Fail_Count + Group.Run.Get_Total_Fail_Count);
+            Group.Run.Set_Total_Timeout_Count (Timeout_Count + Group.Run.Get_Total_Timeout_Count);
          end;
       end loop;
 

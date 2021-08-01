@@ -26,3 +26,5 @@ porion_lib.gpr
 porion_agent.gpr
 porion.gpr
 porion_tests.gpr
+.clang-format
+.clangd

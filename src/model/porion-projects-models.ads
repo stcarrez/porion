@@ -89,6 +89,8 @@ package Porion.Projects.Models is
 
    type Branch_Ref is new ADO.Objects.Object_Ref with null record;
 
+   type Dependency_Ref is new ADO.Objects.Object_Ref with null record;
+
    --  Create an object key for Project.
    function Project_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key;
    --  Create an object key for Project from a string.
@@ -609,6 +611,89 @@ package Porion.Projects.Models is
    procedure Copy (Object : in Branch_Ref;
                    Into   : in out Branch_Ref);
 
+   --  Create an object key for Dependency.
+   function Dependency_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key;
+   --  Create an object key for Dependency from a string.
+   --  Raises Constraint_Error if the string cannot be converted into the object key.
+   function Dependency_Key (Id : in String) return ADO.Objects.Object_Key;
+
+   Null_Dependency : constant Dependency_Ref;
+   function "=" (Left, Right : Dependency_Ref'Class) return Boolean;
+
+   --  Set dependency identifier.
+   procedure Set_Id (Object : in out Dependency_Ref;
+                     Value  : in ADO.Identifier);
+
+   --  Get dependency identifier.
+   function Get_Id (Object : in Dependency_Ref)
+                 return ADO.Identifier;
+   --  Get optimistic locking.
+   function Get_Version (Object : in Dependency_Ref)
+                 return Integer;
+
+   --
+   procedure Set_Project (Object : in out Dependency_Ref;
+                          Value  : in Porion.Projects.Models.Project_Ref'Class);
+
+   --
+   function Get_Project (Object : in Dependency_Ref)
+                 return Porion.Projects.Models.Project_Ref'Class;
+
+   --
+   procedure Set_Owner (Object : in out Dependency_Ref;
+                        Value  : in Porion.Projects.Models.Project_Ref'Class);
+
+   --
+   function Get_Owner (Object : in Dependency_Ref)
+                 return Porion.Projects.Models.Project_Ref'Class;
+
+   --  Load the entity identified by 'Id'.
+   --  Raises the NOT_FOUND exception if it does not exist.
+   procedure Load (Object  : in out Dependency_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Id      : in ADO.Identifier);
+
+   --  Load the entity identified by 'Id'.
+   --  Returns True in <b>Found</b> if the object was found and False if it does not exist.
+   procedure Load (Object  : in out Dependency_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Id      : in ADO.Identifier;
+                   Found   : out Boolean);
+
+   --  Find and load the entity.
+   overriding
+   procedure Find (Object  : in out Dependency_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class;
+                   Found   : out Boolean);
+
+   --  Save the entity.  If the entity does not have an identifier, an identifier is allocated
+   --  and it is inserted in the table.  Otherwise, only data fields which have been changed
+   --  are updated.
+   overriding
+   procedure Save (Object  : in out Dependency_Ref;
+                   Session : in out ADO.Sessions.Master_Session'Class);
+
+   --  Delete the entity.
+   overriding
+   procedure Delete (Object  : in out Dependency_Ref;
+                     Session : in out ADO.Sessions.Master_Session'Class);
+
+   overriding
+   function Get_Value (From : in Dependency_Ref;
+                       Name : in String) return Util.Beans.Objects.Object;
+
+   --  Table definition
+   DEPENDENCY_TABLE : constant ADO.Schemas.Class_Mapping_Access;
+
+   --  Internal method to allocate the Object_Record instance
+   overriding
+   procedure Allocate (Object : in out Dependency_Ref);
+
+   --  Copy of the object.
+   procedure Copy (Object : in Dependency_Ref;
+                   Into   : in out Dependency_Ref);
+
 
 
    Query_Command_Project_List : constant ADO.Queries.Query_Definition_Access;
@@ -962,6 +1047,68 @@ private
 
    procedure Set_Field (Object : in out Branch_Ref'Class;
                         Impl   : out Branch_Access);
+   DEPENDENCY_NAME : aliased constant String := "porion_dependency";
+   COL_0_5_NAME : aliased constant String := "id";
+   COL_1_5_NAME : aliased constant String := "version";
+   COL_2_5_NAME : aliased constant String := "project_id";
+   COL_3_5_NAME : aliased constant String := "owner_id";
+
+   DEPENDENCY_DEF : aliased constant ADO.Schemas.Class_Mapping :=
+     (Count   => 4,
+      Table   => DEPENDENCY_NAME'Access,
+      Members => (
+         1 => COL_0_5_NAME'Access,
+         2 => COL_1_5_NAME'Access,
+         3 => COL_2_5_NAME'Access,
+         4 => COL_3_5_NAME'Access)
+     );
+   DEPENDENCY_TABLE : constant ADO.Schemas.Class_Mapping_Access
+      := DEPENDENCY_DEF'Access;
+
+
+   Null_Dependency : constant Dependency_Ref
+      := Dependency_Ref'(ADO.Objects.Object_Ref with null record);
+
+   type Dependency_Impl is
+      new ADO.Objects.Object_Record (Key_Type => ADO.Objects.KEY_INTEGER,
+                                     Of_Class => DEPENDENCY_DEF'Access)
+   with record
+       Version : Integer;
+       Project : Porion.Projects.Models.Project_Ref;
+       Owner : Porion.Projects.Models.Project_Ref;
+   end record;
+
+   type Dependency_Access is access all Dependency_Impl;
+
+   overriding
+   procedure Destroy (Object : access Dependency_Impl);
+
+   overriding
+   procedure Find (Object  : in out Dependency_Impl;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class;
+                   Found   : out Boolean);
+
+   overriding
+   procedure Load (Object  : in out Dependency_Impl;
+                   Session : in out ADO.Sessions.Session'Class);
+   procedure Load (Object  : in out Dependency_Impl;
+                   Stmt    : in out ADO.Statements.Query_Statement'Class;
+                   Session : in out ADO.Sessions.Session'Class);
+
+   overriding
+   procedure Save (Object  : in out Dependency_Impl;
+                   Session : in out ADO.Sessions.Master_Session'Class);
+
+   procedure Create (Object  : in out Dependency_Impl;
+                     Session : in out ADO.Sessions.Master_Session'Class);
+
+   overriding
+   procedure Delete (Object  : in out Dependency_Impl;
+                     Session : in out ADO.Sessions.Master_Session'Class);
+
+   procedure Set_Field (Object : in out Dependency_Ref'Class;
+                        Impl   : out Dependency_Access);
 
    package File_1 is
       new ADO.Queries.Loaders.File (Path => "command-projects.xml",

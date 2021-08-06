@@ -293,77 +293,48 @@ INSERT IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "awa_user"), "country");
 INSERT IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "awa_user"), "name");
-/* Copied from awa-workspaces-mysql.sql*/
+/* Copied from awa_counters-mysql.sql*/
 /* File generated automatically by dynamo */
 /*  */
-CREATE TABLE IF NOT EXISTS awa_invitation (
-  /* the invitation identifier. */
-  `id` BIGINT NOT NULL,
-  /* version optimistic lock. */
-  `version` INTEGER NOT NULL,
-  /* date when the invitation was created and sent. */
-  `create_date` DATETIME NOT NULL,
-  /* the email address to which the invitation was sent. */
-  `email` VARCHAR(255) BINARY NOT NULL,
-  /* the invitation message. */
-  `message` text NOT NULL,
-  /* the date when the invitation was accepted. */
-  `acceptance_date` DATETIME ,
-  /* the workspace where the user is invited. */
-  `workspace_id` BIGINT NOT NULL,
-  /*  */
-  `access_key_id` BIGINT ,
-  /* the user being invited. */
-  `invitee_id` BIGINT ,
-  /*  */
-  `inviter_id` BIGINT NOT NULL,
-  /*  */
-  `member_id` BIGINT NOT NULL,
-  PRIMARY KEY (`id`)
+CREATE TABLE IF NOT EXISTS awa_counter (
+  /* the object associated with the counter. */
+  `object_id` BIGINT NOT NULL,
+  /* the day associated with the counter. */
+  `date` DATE NOT NULL,
+  /* the counter value. */
+  `counter` INTEGER NOT NULL,
+  /* the counter definition identifier. */
+  `definition_id` BIGINT NOT NULL,
+  PRIMARY KEY (`object_id`, `date`, `definition_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/* The workspace controls the features available in the application
-for a set of users: the workspace members.  A user could create
-several workspaces and be part of several workspaces that other
-users have created. */
-CREATE TABLE IF NOT EXISTS awa_workspace (
-  /* the workspace identifier */
-  `id` BIGINT NOT NULL,
-  /*  */
-  `version` INTEGER NOT NULL,
-  /*  */
-  `create_date` DATETIME NOT NULL,
-  /*  */
-  `owner_id` BIGINT NOT NULL,
+/* A counter definition defines what the counter represents. It uniquely identifies
+the counter for the Counter table. A counter may be associated with a database
+table. In that case, the counter definition has a relation to the corresponding Entity_Type. */
+CREATE TABLE IF NOT EXISTS awa_counter_definition (
+  /* the counter name. */
+  `name` VARCHAR(255) BINARY NOT NULL,
+  /* the counter unique id. */
+  `id` INTEGER NOT NULL,
+  /* the optional entity type that identifies the database table. */
+  `entity_type` INTEGER ,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*  */
-CREATE TABLE IF NOT EXISTS awa_workspace_feature (
-  /*  */
-  `id` BIGINT NOT NULL,
-  /*  */
-  `limit` INTEGER NOT NULL,
-  /*  */
-  `workspace_id` BIGINT NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/* The workspace member indicates the users who
-are part of the workspace. The join_date is NULL when
-a user was invited but has not accepted the invitation. */
-CREATE TABLE IF NOT EXISTS awa_workspace_member (
-  /*  */
-  `id` BIGINT NOT NULL,
-  /* the date when the user has joined the workspace. */
-  `join_date` DATETIME ,
-  /* the member role. */
-  `role` VARCHAR(255) BINARY NOT NULL,
-  /*  */
-  `member_id` BIGINT NOT NULL,
-  /*  */
-  `workspace_id` BIGINT NOT NULL,
-  PRIMARY KEY (`id`)
+CREATE TABLE IF NOT EXISTS awa_visit (
+  /* the entity identifier. */
+  `object_id` BIGINT NOT NULL,
+  /* the number of times the entity was visited by the user. */
+  `counter` INTEGER NOT NULL,
+  /* the date and time when the entity was last visited. */
+  `date` DATETIME NOT NULL,
+  /* the user who visited the entity. */
+  `user` BIGINT NOT NULL,
+  /* the counter definition identifier. */
+  `definition_id` BIGINT NOT NULL,
+  PRIMARY KEY (`object_id`, `user`, `definition_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 INSERT IGNORE INTO entity_type (name) VALUES
-("awa_invitation"), ("awa_workspace"), ("awa_workspace_feature"), ("awa_workspace_member");
+("awa_counter"), ("awa_counter_definition"), ("awa_visit");
 /* Copied from porion-mysql.sql*/
 /* File generated automatically by dynamo */
 /*  */
@@ -444,6 +415,18 @@ CREATE TABLE IF NOT EXISTS porion_build_config (
   `node_id` BIGINT ,
   /*  */
   `project_id` BIGINT NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*  */
+CREATE TABLE IF NOT EXISTS porion_dependency (
+  /* dependency identifier. */
+  `id` BIGINT NOT NULL,
+  /* optimistic locking. */
+  `version` INTEGER NOT NULL,
+  /*  */
+  `project_id` BIGINT NOT NULL,
+  /*  */
+  `owner_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*  */
@@ -569,7 +552,7 @@ CREATE TABLE IF NOT EXISTS porion_test_run_group (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 INSERT IGNORE INTO entity_type (name) VALUES
-("porion_node"), ("porion_branch"), ("porion_build"), ("porion_build_config"), ("porion_project"), ("porion_test"), ("porion_test_group"), ("porion_test_run"), ("porion_test_run_group");
+("porion_node"), ("porion_branch"), ("porion_build"), ("porion_build_config"), ("porion_dependency"), ("porion_project"), ("porion_test"), ("porion_test_group"), ("porion_test_run"), ("porion_test_run_group");
 INSERT IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "name");
 INSERT IGNORE INTO awa_audit_field (entity_type, name)
@@ -588,45 +571,3 @@ INSERT IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "scm");
 INSERT IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "scm_url");
-/* Copied from awa_counters-mysql.sql*/
-/* File generated automatically by dynamo */
-/*  */
-CREATE TABLE IF NOT EXISTS awa_counter (
-  /* the object associated with the counter. */
-  `object_id` BIGINT NOT NULL,
-  /* the day associated with the counter. */
-  `date` DATE NOT NULL,
-  /* the counter value. */
-  `counter` INTEGER NOT NULL,
-  /* the counter definition identifier. */
-  `definition_id` BIGINT NOT NULL,
-  PRIMARY KEY (`object_id`, `date`, `definition_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/* A counter definition defines what the counter represents. It uniquely identifies
-the counter for the Counter table. A counter may be associated with a database
-table. In that case, the counter definition has a relation to the corresponding Entity_Type. */
-CREATE TABLE IF NOT EXISTS awa_counter_definition (
-  /* the counter name. */
-  `name` VARCHAR(255) BINARY NOT NULL,
-  /* the counter unique id. */
-  `id` INTEGER NOT NULL,
-  /* the optional entity type that identifies the database table. */
-  `entity_type` INTEGER ,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*  */
-CREATE TABLE IF NOT EXISTS awa_visit (
-  /* the entity identifier. */
-  `object_id` BIGINT NOT NULL,
-  /* the number of times the entity was visited by the user. */
-  `counter` INTEGER NOT NULL,
-  /* the date and time when the entity was last visited. */
-  `date` DATETIME NOT NULL,
-  /* the user who visited the entity. */
-  `user` BIGINT NOT NULL,
-  /* the counter definition identifier. */
-  `definition_id` BIGINT NOT NULL,
-  PRIMARY KEY (`object_id`, `user`, `definition_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-INSERT IGNORE INTO entity_type (name) VALUES
-("awa_counter"), ("awa_counter_definition"), ("awa_visit");

@@ -80,6 +80,18 @@ CREATE TABLE IF NOT EXISTS porion_build_config (
   PRIMARY KEY (`id`)
 );
 /*  */
+CREATE TABLE IF NOT EXISTS porion_dependency (
+  /* dependency identifier. */
+  `id` BIGINT NOT NULL,
+  /* optimistic locking. */
+  `version` INTEGER NOT NULL,
+  /*  */
+  `project_id` BIGINT NOT NULL,
+  /*  */
+  `owner_id` BIGINT NOT NULL,
+  PRIMARY KEY (`id`)
+);
+/*  */
 CREATE TABLE IF NOT EXISTS porion_project (
   /* the project identifier */
   `id` BIGINT NOT NULL,
@@ -205,6 +217,7 @@ INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_node");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_branch");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_config");
+INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_dependency");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_project");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_test");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_test_group");

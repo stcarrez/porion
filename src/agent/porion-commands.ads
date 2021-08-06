@@ -1,5 +1,5 @@
 -----------------------------------------------------------------------
---  porion-commands -- Ada Keystore Tool commands
+--  porion-commands -- Porion agent commands
 --  Copyright (C) 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --

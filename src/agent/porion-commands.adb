@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
---  akt-commands -- Ada Keystore Tool commands
---  Copyright (C) 2019, 2020, 2021 Stephane Carrez
+--  porion-commands -- Porion agent commands
+--  Copyright (C) 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,6 @@
 with System.Multiprocessors;
 with Ada.Command_Line;
 with Ada.Text_IO;
-with Ada.Unchecked_Deallocation;
 with Util.Strings;
 with Util.Commands.Parsers.GNAT_Parser;
 with Porion.Configs;
@@ -100,38 +99,23 @@ package body Porion.Commands is
                         Long_Switch => "--debug-dump",
                         Help   => -("Enable debug dump execution"));
       GC.Define_Switch (Config => Context.Command_Config,
-                        Output => Context.Zero'Access,
-                        Switch => "-z",
-                        Long_Switch => "--zero",
-                        Help   => -("Erase and fill with zeros instead of random values"));
-      GC.Define_Switch (Config => Context.Command_Config,
                         Output => Context.Config_File'Access,
                         Switch => "-c:",
                         Long_Switch => "--config=",
                         Argument => "PATH",
-                        Help   => -("Defines the path for akt global configuration"));
-      GC.Define_Switch (Config => Context.Command_Config,
-                        Output => Context.Worker_Count'Access,
-                        Switch => "-t:",
-                        Long_Switch => "--thread=",
-                        Initial  => Context.Worker_Count,
-                        Argument => "COUNT",
-                        Help   => -("Number of threads for the encryption/decryption process"));
+                        Help   => -("Defines the path for porion global configuration"));
       GC.Initialize_Option_Scan (Stop_At_First_Non_Switch => True);
 
-      Driver.Set_Description (-("porion - tool to store and protect your sensitive data"));
-      Driver.Set_Usage (-("[-V] [-v] [-vv] [-vvv] [-c path] [-t count] [-z] " &
+      Driver.Set_Description (-("porion - continuous build agent"));
+      Driver.Set_Usage (-("[-V] [-v] [-vv] [-vvv] [-c path] " &
                           "<command> [<args>]" & ASCII.LF &
                           "where:" & ASCII.LF &
                           "  -V           Print the tool version" & ASCII.LF &
                           "  -v           Verbose execution mode" & ASCII.LF &
                           "  -vv          Debug execution mode" & ASCII.LF &
                           "  -vvv         Dump execution mode" & ASCII.LF &
-                          "  -c path      Defines the path for akt " &
-                          "global configuration" & ASCII.LF &
-                          "  -t count     Number of threads for the " &
-                          "encryption/decryption process" & ASCII.LF &
-                          "  -z           Erase and fill with zeros instead of random values"));
+                          "  -c path      Defines the path for porion " &
+                          "global configuration" & ASCII.LF));
       Driver.Add_Command ("help",
                           -("print some help"),
                           Help_Command'Access);

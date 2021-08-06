@@ -15,12 +15,24 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with GNAT.Source_Info;
+with Ada.Strings.Unbounded;
 
 with Util.Tests;
 with Util.Properties;
 
 with ADO.Sessions;
 package Porion.Testsuite is
+
+   type Test is new Util.Tests.Test with null record;
+
+   --  Execute the command and get the output in a string.
+   procedure Execute (T       : in out Test;
+                      Command : in String;
+                      Result  : out Ada.Strings.Unbounded.Unbounded_String;
+                      Status  : in Natural := 0;
+                      Source  : in String := GNAT.Source_Info.File;
+                      Line    : in Natural := GNAT.Source_Info.Line);
 
    function Suite return Util.Tests.Access_Test_Suite;
 

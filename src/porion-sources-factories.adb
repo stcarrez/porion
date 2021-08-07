@@ -17,16 +17,21 @@
 -----------------------------------------------------------------------
 with Ada.Unchecked_Deallocation;
 with Porion.Sources.Git;
+with Porion.Sources.Files;
 package body Porion.Sources.Factories is
 
    Names : constant array (Positive range <>) of access constant String :=
-     (1 => Porion.Sources.Git.SOURCE_KIND'Access);
+     (1 => Porion.Sources.Git.SOURCE_KIND'Access,
+      2 => Porion.Sources.Files.SOURCE_KIND'Access);
 
    function Create (Name   : in String;
                     Config : in Porion.Configs.Config_Type) return Controller_Access is
    begin
       if Name = Porion.Sources.Git.SOURCE_KIND then
          return Porion.Sources.Git.Create (Config);
+      end if;
+      if Name = Porion.Sources.Files.SOURCE_KIND then
+         return Porion.Sources.Files.Create (Config);
       end if;
       return null;
    end Create;

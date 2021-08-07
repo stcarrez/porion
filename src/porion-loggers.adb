@@ -15,8 +15,9 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-private with Ada.Finalization;
-private with Ada.Text_IO;
+with Ada.Directories;
+
+with Util.Files;
 package body Porion.Loggers is
 
    --  Create an open the logger to write on the given path.
@@ -28,17 +29,31 @@ package body Porion.Loggers is
                           Name => Path);
    end Create;
 
+   procedure Create (Logger : in out Logger_Type;
+                     Dir    : in String;
+                     Name   : in String) is
+   begin
+      if not Ada.Directories.Exists (Dir) then
+         Ada.Directories.Create_Path (Dir);
+      end if;
+      Logger.Create (Util.Files.Compose (Dir, Name));
+   end Create;
+
    --  Write the line on the logger.
    procedure Write (Logger : in out Logger_Type;
                     Line   : in String) is
    begin
-      Ada.Text_IO.Put_Line (Logger.File, Line);
+      if Ada.Text_IO.Is_Open (Logger.File) then
+         Ada.Text_IO.Put_Line (Logger.File, Line);
+      end if;
    end Write;
 
    overriding
    procedure Finalize (Logger : in out Logger_Type) is
    begin
-      Ada.Text_IO.Close (Logger.File);
+      if Ada.Text_IO.Is_Open (Logger.File) then
+         Ada.Text_IO.Close (Logger.File);
+      end if;
    end Finalize;
 
 end Porion.Loggers;

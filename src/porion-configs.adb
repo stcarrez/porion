@@ -176,6 +176,17 @@ package body Porion.Configs is
    end Get_Build_Log_Directory;
 
    --  ------------------------------
+   --  Get the directory holding the source checkout log files.
+   --  ------------------------------
+   function Get_Source_Log_Directory (Name   : in String;
+                                      Branch : in String) return String is
+      Project_Dir : constant String := Get_Project_Directory (Name);
+      Log_Dir     : constant String := Util.Files.Compose ("scm", Branch);
+   begin
+      return Util.Files.Compose (Project_Dir, Log_Dir);
+   end Get_Source_Log_Directory;
+
+   --  ------------------------------
    --  Get the path of the local database.
    --  ------------------------------
    function Get_Database_Path return String is

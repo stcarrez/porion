@@ -27,12 +27,17 @@ package Porion.Configs is
    PROJECT_DIR_NAME   : constant String := "project_dir";
    DATABASE_NAME      : constant String := "database";
 
+   subtype Config_Type is Util.Properties.Manager;
+
    --  Initialize the configuration.
    procedure Initialize (Path : in String);
 
    --  Get the configuration parameter.
    function Get (Name : in String) return String;
    function Get (Name : in String; Default : in String) return String;
+
+   --  Get a set of configuration parameters.
+   function Get_Config (Name : in String) return Config_Type;
 
    --  Set the configuration parameter.
    procedure Set (Name  : in String;
@@ -43,8 +48,6 @@ package Porion.Configs is
 
    --  Save the configuration.
    procedure Save;
-
-   subtype Config_Type is Util.Properties.Manager;
 
    --  Get the porion installation directory.
    function Get_Porion_Directory return String;

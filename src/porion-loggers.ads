@@ -24,6 +24,9 @@ package Porion.Loggers is
    --  Create an open the logger to write on the given path.
    procedure Create (Logger : in out Logger_Type;
                      Path   : in String);
+   procedure Create (Logger : in out Logger_Type;
+                     Dir    : in String;
+                     Name   : in String);
 
    --  Write the line on the logger.
    procedure Write (Logger : in out Logger_Type;

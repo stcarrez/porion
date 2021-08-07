@@ -32,7 +32,9 @@ package body Porion.Tools is
 
    procedure Execute (Command    : in EL.Expressions.Expression;
                       Parameters : in Util.Properties.Manager;
-                      Process    : not null access procedure (Line : in String)) is
+                      Process    : not null access procedure (Line : in String);
+                      Strip_Crlf : in Boolean := False;
+                      Status     : out Integer) is
       Prop_Resolver : aliased EL.Contexts.Properties.Property_Resolver;
       Ctx           : EL.Contexts.Default.Default_Context;
    begin
@@ -59,13 +61,14 @@ package body Porion.Tools is
             declare
                Line : Ada.Strings.Unbounded.Unbounded_String;
             begin
-               Reader.Read_Line (Line);
+               Reader.Read_Line (Line, Strip_Crlf);
                Process (Ada.Strings.Unbounded.To_String (Line));
             end;
          end loop;
          Util.Processes.Wait (Proc);
-         if Util.Processes.Get_Exit_Status (Proc) /= 0 then
-            Log.Warn ("GPG list command '{0}' terminated with exit code{1}", Command,
+         Status := Util.Processes.Get_Exit_Status (Proc);
+         if Status /= 0 then
+            Log.Warn ("Command '{0}' terminated with exit code{1}", Command,
                       Natural'Image (Util.Processes.Get_Exit_Status (Proc)));
          end if;
       end;

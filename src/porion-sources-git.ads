@@ -1,5 +1,5 @@
 -----------------------------------------------------------------------
---  porion-sources -- Continuous integration controller
+--  porion-sources-git -- Source management with git
 --  Copyright (C) 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
@@ -19,8 +19,10 @@ with Porion.Configs;
 private with EL.Expressions;
 package Porion.Sources.Git is
 
+   SOURCE_KIND          : aliased constant String := "git";
    GIT_TEST_COMMAND     : constant String := "git ls-remote -h -- #{repository_url}";
    GIT_CHECKOUT_COMMAND : constant String := "git clone #{repository_url} #{build_dir}";
+   GIT_GUESS_COMMAND    : constant String := "git -C #{path} config remote.origin.url";
 
    type Controller_Type is limited new Porion.Sources.Controller_Type with private;
 
@@ -39,6 +41,15 @@ package Porion.Sources.Git is
                       Result     : out Status_Type;
                       Logger     : in out Porion.Loggers.Logger_Type);
 
+   --  Guess some information about the sources located in the given directory.
+   --  The source controller tries to find if it can manage the files at the given location
+   --  and provides information on how to manage those files.
+   overriding
+   procedure Guess (Controller : in out Controller_Type;
+                    Path       : in String;
+                    Result     : out Source_Info_Type;
+                    Logger     : in out Porion.Loggers.Logger_Type);
+
    function Create (Config : in Porion.Configs.Config_Type) return Controller_Access;
 
 private
@@ -47,6 +58,7 @@ private
       Config           : Porion.Configs.Config_Type;
       Check_Command    : EL.Expressions.Expression;
       Checkout_Command : EL.Expressions.Expression;
+      Guess_Command    : EL.Expressions.Expression;
    end record;
 
    type Git_Controller_Access is access all Controller_Type'Class;

@@ -1,5 +1,5 @@
 -----------------------------------------------------------------------
---  porion-sources -- Continuous integration controller
+--  porion-sources-git -- Source management with git
 --  Copyright (C) 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
@@ -15,17 +15,20 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Ada.Directories;
 
-with Util.Strings.Vectors;
 with GNAT.Regpat;
 with Porion.Tools;
 with EL.Contexts.Default;
 package body Porion.Sources.Git is
 
+   use Ada.Directories;
+
    overriding
    procedure Check (Controller : in out Controller_Type;
                     Status     : out Status_Type;
                     Logger     : in out Porion.Loggers.Logger_Type) is
+      procedure Process (Line : in String);
 
       REGEX1 : constant String := "^([0-9a-fA-F]+)\srefs/heads/(.*)";
 
@@ -46,24 +49,29 @@ package body Porion.Sources.Git is
          end if;
       end Process;
 
+      Result : Integer;
    begin
       Status.Check_Date := Ada.Calendar.Clock;
-      Porion.Tools.Execute (Controller.Check_Command, Controller.Config, Process'Access);
+      Porion.Tools.Execute (Controller.Check_Command, Controller.Config,
+                            Process'Access, Strip_Crlf => False, Status => Result);
    end Check;
 
    overriding
    procedure Checkout (Controller : in out Controller_Type;
                        Path       : in String;
                        Logger     : in out Porion.Loggers.Logger_Type) is
+      procedure Process (Line : in String);
 
       procedure Process (Line : in String) is
       begin
          Logger.Write (Line);
       end Process;
 
+      Status : Integer;
    begin
       Controller.Config.Set ("build_dir", Path);
-      Porion.Tools.Execute (Controller.Checkout_Command, Controller.Config, Process'Access);
+      Porion.Tools.Execute (Controller.Checkout_Command, Controller.Config,
+                            Process'Access, Strip_Crlf => False, Status => Status);
    end Checkout;
 
    overriding
@@ -74,14 +82,76 @@ package body Porion.Sources.Git is
       null;
    end Changes;
 
+   --  ------------------------------
+   --  Guess some information about the sources located in the given directory.
+   --  The source controller tries to find if it can manage the files at the given location
+   --  and provides information on how to manage those files.
+   --  ------------------------------
+   overriding
+   procedure Guess (Controller : in out Controller_Type;
+                    Path       : in String;
+                    Result     : out Source_Info_Type;
+                    Logger     : in out Porion.Loggers.Logger_Type) is
+      function Make_Project_Name (URI : in String) return String;
+      procedure Process (Line : in String);
+
+      function Make_Project_Name (URI : in String) return String is
+         Last : Natural := Util.Strings.Rindex (URI, '/');
+      begin
+         if Last > 0 then
+            return Make_Project_Name (URI (Last + 1 .. URI'Last));
+         end if;
+
+         Last := Util.Strings.Rindex (URI, '.');
+         if Last > 0 then
+            if Util.Strings.Ends_With (URI, ".git") then
+               return URI (URI'First .. Last - 1);
+            end if;
+
+            return URI (URI'First .. Last - 1);
+         end if;
+
+         return URI;
+      end Make_Project_Name;
+
+      procedure Process (Line : in String) is
+      begin
+         if Line'Length > 0 then
+            Result.URI := To_UString (Line);
+            Result.Name := To_UString (Make_Project_Name (Line));
+         end if;
+         Logger.Write (Line);
+      end Process;
+
+      Status : Integer;
+   begin
+      --  Don't even try to run the git config command if the path is not a directory.
+      if not Ada.Directories.Exists (Path) then
+         return;
+      end if;
+      if Ada.Directories.Kind (Path) /= Ada.Directories.Directory then
+         return;
+      end if;
+
+      --  Run git config remote.origin.url to find out the git repository.
+      Controller.Config.Set ("path", Path);
+      Porion.Tools.Execute (Controller.Guess_Command, Controller.Config,
+                            Process'Access, Strip_Crlf => True, Status => Status);
+      if Status = 0 then
+         Result.Kind := To_UString (SOURCE_KIND);
+      end if;
+   end Guess;
+
    function Create (Config : in Porion.Configs.Config_Type) return Controller_Access is
       Ctx        : EL.Contexts.Default.Default_Context;
-      Check      : constant String := Porion.Configs.Get ("command_check", GIT_TEST_COMMAND);
-      Checkout   : constant String := Porion.Configs.Get ("command_checkout", GIT_CHECKOUT_COMMAND);
+      Check      : constant String := Configs.Get ("command_check", GIT_TEST_COMMAND);
+      Checkout   : constant String := Configs.Get ("command_checkout", GIT_CHECKOUT_COMMAND);
+      Guess      : constant String := Configs.Get ("command_guess", GIT_GUESS_COMMAND);
       Controller : constant Git_Controller_Access := new Controller_Type;
    begin
       Controller.Check_Command := EL.Expressions.Create_Expression (Check, Ctx);
       Controller.Checkout_Command := EL.Expressions.Create_Expression (Checkout, Ctx);
+      Controller.Guess_Command := EL.Expressions.Create_Expression (Guess, Ctx);
       Controller.Config := Config;
       return Controller.all'Access;
    end Create;

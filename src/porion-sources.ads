@@ -1,5 +1,5 @@
 -----------------------------------------------------------------------
---  porion-sources -- Continuous integration controller
+--  porion-sources -- Source management
 --  Copyright (C) 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
@@ -21,6 +21,14 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with Util.Strings.Maps;
 with Porion.Loggers;
 package Porion.Sources is
+
+   Not_Supported : exception;
+
+   type Source_Info_Type is record
+      Kind : UString;
+      Name : UString;
+      URI  : UString;
+   end record;
 
    type Branch_Type is record
       Tag         : UString;
@@ -54,5 +62,13 @@ package Porion.Sources is
    procedure Changes (Controller : in out Controller_Type;
                       Result     : out Status_Type;
                       Logger     : in out Porion.Loggers.Logger_Type) is abstract;
+
+   --  Guess some information about the sources located in the given directory.
+   --  The source controller tries to find if it can manage the files at the given location
+   --  and provides information on how to manage those files.
+   procedure Guess (Controller : in out Controller_Type;
+                    Path       : in String;
+                    Result     : out Source_Info_Type;
+                    Logger     : in out Porion.Loggers.Logger_Type) is abstract;
 
 end Porion.Sources;

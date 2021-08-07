@@ -29,22 +29,49 @@ package body Porion.Tests is
    begin
       Caller.Add_Test (Suite, "Test Porion.Command.Init",
                        Test_Init'Access);
+      Caller.Add_Test (Suite, "Test Porion.Command.Add",
+                       Test_Add'Access);
    end Add_Tests;
 
    procedure Test_Init (T : in out Test) is
       Dir    : constant String := Util.Tests.Get_Test_Path ("init");
+      Config : constant String := Util.Tests.Get_Test_Path ("porion.config");
       Result : Ada.Strings.Unbounded.Unbounded_String;
    begin
       if Ada.Directories.Exists (Dir) then
          Ada.Directories.Delete_Tree (Dir);
       end if;
-      T.Execute (Command => Tool & " init " & Dir,
+      if Ada.Directories.Exists (Config) then
+         Ada.Directories.Delete_File (Config);
+      end if;
+      T.Execute (Command => Tool & " -c " & Config & " init " & Dir,
                  Result  => Result,
                  Status  => 0);
 
       T.Assert (Ada.Directories.Exists (Dir),
                 "Porion directory not created");
+      T.Assert (Ada.Directories.Exists (Config),
+                "Porion config not created");
 
    end Test_Init;
+
+   procedure Test_Add (T : in out Test) is
+      Dir    : constant String := Util.Tests.Get_Test_Path ("init");
+      Config : constant String := Util.Tests.Get_Test_Path ("porion.config");
+      Repo   : constant String := "https://github.com/Ada-France/aflex.git";
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Test_Init;
+
+      T.Execute (Command => Tool & " -c " & Config & " add " & Repo,
+                 Result  => Result,
+                 Status  => 0);
+
+      T.Assert (Ada.Directories.Exists (Dir),
+                "Porion directory not created");
+      T.Assert (Ada.Directories.Exists (Config),
+                "Porion config not created");
+
+   end Test_Add;
 
 end Porion.Tests;

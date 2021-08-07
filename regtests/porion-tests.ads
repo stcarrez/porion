@@ -26,4 +26,6 @@ package Porion.Tests is
 
    procedure Test_Init (T : in out Test);
 
+   procedure Test_Add (T : in out Test);
+
 end Porion.Tests;

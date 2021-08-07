@@ -35,9 +35,13 @@ package body Porion.Builders.Scripts is
          end if;
          Logger.Write (Line (Line'First .. Line'Last - 1));
       end Process;
+
+      Status : Integer;
    begin
-      Porion.Tools.Execute (Controller.Configure_Command, Controller.Config, Process'Access);
-      Porion.Tools.Execute (Controller.Build_Command, Controller.Config, Process'Access);
+      Porion.Tools.Execute (Controller.Configure_Command, Controller.Config,
+                            Process'Access, Strip_Crlf => False, Status => Status);
+      Porion.Tools.Execute (Controller.Build_Command, Controller.Config,
+                            Process'Access, Strip_Crlf => False, Status => Status);
    end Build;
 
    overriding

@@ -30,7 +30,7 @@ with ADO.Statements;
 with Porion.Projects.Schema;
 with Porion.Builders.Scripts;
 with Porion.Resources;
-with Yaml.Source.Text_IO;
+--  with Yaml.Source.Text_IO;
 with Yaml.Source.File;
 with Yaml.Parser;
 package body Porion.Projects.Services is
@@ -223,6 +223,13 @@ package body Porion.Projects.Services is
          raise Name_Used;
       end if;
 
+      declare
+         Name    : constant String := Service.Project.Get_Name;
+         Log_Dir : constant String := Configs.Get_Source_Log_Directory (Name, "master");
+      begin
+         Logger.Create (Log_Dir, "source.log");
+      end;
+
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
       Service.Source_Controller := Porion.Sources.Factories.Create ("git", Config);
 
@@ -351,11 +358,8 @@ package body Porion.Projects.Services is
          if not Ada.Directories.Exists (Path) then
             Ada.Directories.Create_Path (Path);
          end if;
-         if not Ada.Directories.Exists (Log_Dir) then
-            Ada.Directories.Create_Path (Log_Dir);
-         end if;
 
-         Logger.Create (Util.Files.Compose (Log_Dir, "build.log"));
+         Logger.Create (Log_Dir, "build.log");
          Service.Source_Controller.Checkout (Path, Logger);
 
          Config.Set ("build_dir", Path);

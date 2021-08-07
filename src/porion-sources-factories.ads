@@ -21,4 +21,12 @@ package Porion.Sources.Factories is
    function Create (Name   : in String;
                     Config : in Porion.Configs.Config_Type) return Controller_Access;
 
+   --  Guess some information about the sources located in the given directory.
+   --  The source controller tries to find if it can manage the files at the given location
+   --  and provides information on how to manage those files.
+   procedure Guess (Path       : in String;
+                    Config     : in Porion.Configs.Config_Type;
+                    Result     : out Source_Info_Type;
+                    Logger     : in out Porion.Loggers.Logger_Type);
+
 end Porion.Sources.Factories;

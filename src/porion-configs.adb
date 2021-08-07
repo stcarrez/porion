@@ -111,6 +111,14 @@ package body Porion.Configs is
    end Get;
 
    --  ------------------------------
+   --  Get a set of configuration parameters.
+   --  ------------------------------
+   function Get_Config (Name : in String) return Config_Type is
+   begin
+      return Cfg.Get (Name);
+   end Get_Config;
+
+   --  ------------------------------
    --  Set the configuration parameter.
    --  ------------------------------
    procedure Set (Name  : in String;

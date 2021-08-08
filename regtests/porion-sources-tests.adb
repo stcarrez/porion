@@ -20,6 +20,7 @@ with Util.Test_Caller;
 
 with Porion.Configs;
 with Porion.Sources.Git;
+with Porion.Sources.Files;
 with Porion.Sources.Factories;
 package body Porion.Sources.Tests is
 
@@ -27,11 +28,13 @@ package body Porion.Sources.Tests is
 
    procedure Add_Tests (Suite : in Util.Tests.Access_Test_Suite) is
    begin
-      Caller.Add_Test (Suite, "Test Porion.Sources.Guess",
-                       Test_Guess'Access);
+      Caller.Add_Test (Suite, "Test Porion.Sources.Guess (Git)",
+                       Test_Guess_Git'Access);
+      Caller.Add_Test (Suite, "Test Porion.Sources.Guess (Files)",
+                       Test_Guess_Files'Access);
    end Add_Tests;
 
-   procedure Test_Guess (T : in out Test) is
+   procedure Test_Guess_Git (T : in out Test) is
       Logger : Porion.Loggers.Logger_Type;
       Result : Porion.Sources.Source_Info_Type;
       Config : Porion.Configs.Config_Type;
@@ -51,6 +54,21 @@ package body Porion.Sources.Tests is
 
       T.Assert_Equals ("porion", Result.Name, "invalid project name");
       T.Assert_Equals (Porion.Sources.Git.SOURCE_KIND, Result.Kind, "invalid source kind");
-   end Test_Guess;
+   end Test_Guess_Git;
+
+   procedure Test_Guess_Files (T : in out Test) is
+      Path   : constant String := Util.Tests.Get_Path ("regtests/files/hello-1.0.tar.gz");
+      Logger : Porion.Loggers.Logger_Type;
+      Result : Porion.Sources.Source_Info_Type;
+      Config : Porion.Configs.Config_Type;
+   begin
+      Porion.Sources.Factories.Guess (Path   => Path,
+                                      Config => Config,
+                                      Result => Result,
+                                      Logger => Logger);
+
+      T.Assert_Equals ("hello-1.0", Result.Name, "invalid project name");
+      T.Assert_Equals (Porion.Sources.Files.SOURCE_KIND, Result.Kind, "invalid source kind");
+   end Test_Guess_Files;
 
 end Porion.Sources.Tests;

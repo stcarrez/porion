@@ -115,7 +115,11 @@ package body Porion.Configs is
    --  ------------------------------
    function Get_Config (Name : in String) return Config_Type is
    begin
-      return Cfg.Get (Name);
+      if not Cfg.Exists (Name) then
+         return Empty : Config_Type do null; end return;
+      else
+         return Cfg.Get (Name);
+      end if;
    end Get_Config;
 
    --  ------------------------------

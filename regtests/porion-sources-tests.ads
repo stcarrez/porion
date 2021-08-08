@@ -23,6 +23,8 @@ package Porion.Sources.Tests is
 
    type Test is new Util.Tests.Test with null record;
 
-   procedure Test_Guess (T : in out Test);
+   procedure Test_Guess_Git (T : in out Test);
+
+   procedure Test_Guess_Files (T : in out Test);
 
 end Porion.Sources.Tests;

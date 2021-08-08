@@ -18,11 +18,14 @@
 with Ada.Directories;
 
 with GNAT.Regpat;
+with Util.Log.Loggers;
 with Porion.Tools;
 with EL.Contexts.Default;
 package body Porion.Sources.Files is
 
    use Ada.Directories;
+
+   Log   : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Sources.Files");
 
    --  ------------------------------
    --  Guess the file type for the given file based on the file name extension.
@@ -36,24 +39,34 @@ package body Porion.Sources.Files is
             Sep := Pos;
          end if;
       end loop;
-      if Sep > Path'Last then
+      if Sep >= Path'Last then
          return UNKNOWN;
       end if;
-      if Path (Sep .. Path'Last) = ".tar.gz" then
-         return TAR_GZ;
-      end if;
-      if Path (Sep .. Path'Last) = ".tar.xz" then
-         return TAR_XZ;
-      end if;
-      if Path (Sep .. Path'Last) = ".tar.bz2" then
-         return TAR_BZ2;
-      end if;
-      if Path (Sep .. Path'Last) = ".tar" then
-         return TAR;
-      end if;
-      if Path (Sep .. Path'Last) = ".zip" then
-         return ZIP;
-      end if;
+
+      --  Repeat the extension test to handle some '.' in the name (ex: gcc-10.1.2.tar).
+      while Sep < Path'Last loop
+         if Path (Sep .. Path'Last) = ".tar.gz" then
+            return TAR_GZ;
+         end if;
+         if Path (Sep .. Path'Last) = ".tar.xz" then
+            return TAR_XZ;
+         end if;
+         if Path (Sep .. Path'Last) = ".tar.bz2" then
+            return TAR_BZ2;
+         end if;
+         if Path (Sep .. Path'Last) = ".tar" then
+            return TAR;
+         end if;
+         if Path (Sep .. Path'Last) = ".zip" then
+            return ZIP;
+         end if;
+
+         --  Move to the next '.'.
+         Sep := Sep + 1;
+         while Sep < Path'Last and then Path (Sep) /= '.' loop
+            Sep := Sep + 1;
+         end loop;
+      end loop;
       return UNKNOWN;
    end Get_File_Type;
 
@@ -195,6 +208,8 @@ package body Porion.Sources.Files is
       end Get_Command;
 
    begin
+      Log.Info ("configure files source controller for {0}", File_Type'Image (Kind));
+
       case Kind is
          when TAR =>
             Config := Porion.Configs.Get_Config (TAR_CONFIG_NAME);

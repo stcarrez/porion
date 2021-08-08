@@ -70,33 +70,52 @@ package body Porion.Sources.Files is
       return UNKNOWN;
    end Get_File_Type;
 
+   function Make_Project_Name (Path : in String;
+                               Kind : in File_Type) return String is
+      First : Natural := Util.Strings.Rindex (Path, '/');
+      Last  : Natural;
+   begin
+      if First > 0 then
+         First := First + 1;
+      else
+         First := Path'First;
+      end if;
+
+      Last := Util.Strings.Rindex (Path, '.');
+      if Last = 0 then
+         return Path (First .. Path'Last);
+      end if;
+
+      case Kind is
+         when TAR | ZIP =>
+            return Path (First .. Last - 1);
+
+         when TAR_GZ | TAR_BZ2 | TAR_XZ =>
+            Last := Util.Strings.Rindex (Path, '.', Last - 1);
+            return Path (First .. Last - 1);
+
+         when others =>
+            return Path (First .. Last - 1);
+
+      end case;
+   end Make_Project_Name;
+
    overriding
    procedure Check (Controller : in out Controller_Type;
                     Status     : out Status_Type;
                     Logger     : in out Porion.Loggers.Logger_Type) is
-      procedure Process (Line : in String);
-
-      REGEX1 : constant String := "^([0-9a-fA-F]+)\srefs/heads/(.*)";
-
-      Pattern1 : constant GNAT.Regpat.Pattern_Matcher := GNAT.Regpat.Compile (REGEX1);
-
-      procedure Process (Line : in String) is
-         Matches : GNAT.Regpat.Match_Array (0 .. 2);
-      begin
-         Logger.Write (Line);
-         if GNAT.Regpat.Match (Pattern1, Line) then
-            GNAT.Regpat.Match (Pattern1, Line, Matches);
-            declare
-               Info : Branch_Type;
-            begin
-               Info.Tag := To_UString (Line (Matches (1).First .. Matches (1).Last));
-               Status.Changes.Include (Line (Matches (2).First .. Matches (2).Last), Info);
-            end;
-         end if;
-      end Process;
-
-      Result : Integer;
+      Info   : Branch_Type;
+      Path   : constant String := Controller.Config.Get ("repository_url");
    begin
+      Log.Info ("Checking changes on '{0}'", Path);
+
+      if Ada.Directories.Exists (Path) then
+         Info.Last_Date := Ada.Directories.Modification_Time (Path);
+         Info.Tag := To_UString ("main");
+         Status.Changes.Include ("main", Info);
+      else
+         Log.Warn ("Source file '{0}' does not exist anymore", Path);
+      end if;
       Status.Check_Date := Ada.Calendar.Clock;
    end Check;
 
@@ -136,33 +155,13 @@ package body Porion.Sources.Files is
                     Path       : in String;
                     Result     : out Source_Info_Type;
                     Logger     : in out Porion.Loggers.Logger_Type) is
-      function Make_Project_Name (URI : in String) return String;
+
       procedure Process (Line : in String);
-
-      function Make_Project_Name (URI : in String) return String is
-         Last : Natural := Util.Strings.Rindex (URI, '/');
-      begin
-         if Last > 0 then
-            return Make_Project_Name (URI (Last + 1 .. URI'Last));
-         end if;
-
-         Last := Util.Strings.Rindex (URI, '.');
-         if Last > 0 then
-            if Util.Strings.Ends_With (URI, ".git") then
-               return URI (URI'First .. Last - 1);
-            end if;
-
-            return URI (URI'First .. Last - 1);
-         end if;
-
-         return URI;
-      end Make_Project_Name;
 
       procedure Process (Line : in String) is
       begin
          if Line'Length > 0 then
             Result.URI := To_UString (Line);
-            Result.Name := To_UString (Make_Project_Name (Line));
          end if;
          Logger.Write (Line);
       end Process;
@@ -187,6 +186,7 @@ package body Porion.Sources.Files is
                             Process'Access, Strip_Crlf => True, Status => Status);
       if Status = 0 then
          Result.URI := To_UString (Path);
+         Result.Name := To_UString (Make_Project_Name (Path, Kind));
          Result.Kind := To_UString (SOURCE_KIND);
       end if;
    end Guess;

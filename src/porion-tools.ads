@@ -20,10 +20,11 @@ with Util.Strings.Vectors;
 with EL.Expressions;
 package Porion.Tools is
 
-   procedure Execute (Command    : in EL.Expressions.Expression;
-                      Parameters : in Util.Properties.Manager;
-                      Process    : not null access procedure (Line : in String);
-                      Strip_Crlf : in Boolean := False;
-                      Status     : out Integer);
+   procedure Execute (Command     : in EL.Expressions.Expression;
+                      Parameters  : in Util.Properties.Manager;
+                      Process     : not null access procedure (Line : in String);
+                      Working_Dir : in String := "";
+                      Strip_Crlf  : in Boolean := False;
+                      Status      : out Integer);
 
 end Porion.Tools;

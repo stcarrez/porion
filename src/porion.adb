@@ -40,7 +40,7 @@ package body Porion is
       Log_Config.Set ("log4j.appender.errorConsole.prefix", "porion: ");
       Log_Config.Set ("log4j.logger.Util", "FATAL");
       Log_Config.Set ("log4j.logger.Util.Events", "ERROR");
-      Log_Config.Set ("log4j.logger.Keystore", "ERROR");
+      Log_Config.Set ("log4j.logger.ADO", "ERROR");
       Log_Config.Set ("log4j.logger.Porion", "ERROR");
       if Verbose or Debug or Dump then
          Log_Config.Set ("log4j.logger.Util", "WARN");

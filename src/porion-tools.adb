@@ -30,11 +30,12 @@ package body Porion.Tools is
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Tools");
 
-   procedure Execute (Command    : in EL.Expressions.Expression;
-                      Parameters : in Util.Properties.Manager;
-                      Process    : not null access procedure (Line : in String);
-                      Strip_Crlf : in Boolean := False;
-                      Status     : out Integer) is
+   procedure Execute (Command     : in EL.Expressions.Expression;
+                      Parameters  : in Util.Properties.Manager;
+                      Process     : not null access procedure (Line : in String);
+                      Working_Dir : in String := "";
+                      Strip_Crlf  : in Boolean := False;
+                      Status      : out Integer) is
       Prop_Resolver : aliased EL.Contexts.Properties.Property_Resolver;
       Ctx           : EL.Contexts.Default.Default_Context;
    begin
@@ -48,7 +49,12 @@ package body Porion.Tools is
          Input   : Util.Streams.Output_Stream_Access;
          Reader  : Util.Streams.Texts.Reader_Stream;
       begin
-         Log.Info ("Running {0}", Command);
+         if Working_Dir'Length > 0 then
+            Log.Info ("Running '{0}' in '{1}'", Command, Working_Dir);
+            Util.Processes.Set_Working_Directory (Proc, Working_Dir);
+         else
+            Log.Info ("Running '{0}'", Command);
+         end if;
 
          Util.Processes.Spawn (Proc    => Proc,
                                Command => Command,

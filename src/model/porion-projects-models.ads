@@ -36,6 +36,7 @@ with Util.Beans.Objects.Enums;
 with Util.Beans.Basic.Lists;
 with ADO.Audits;
 with Porion.Nodes.Models;
+with Porion.Sources;
 pragma Warnings (On);
 package Porion.Projects.Models is
 
@@ -69,16 +70,6 @@ package Porion.Projects.Models is
    type Nullable_Project_Status_Type is record
       Is_Null : Boolean := True;
       Value   : Project_Status_Type;
-   end record;
-
-   type Source_Control_Type is (SRC_GIT, SRC_FILE);
-   for Source_Control_Type use (SRC_GIT => 0, SRC_FILE => 1);
-   package Source_Control_Type_Objects is
-      new Util.Beans.Objects.Enums (Source_Control_Type);
-
-   type Nullable_Source_Control_Type is record
-      Is_Null : Boolean := True;
-      Value   : Source_Control_Type;
    end record;
 
    type Project_Ref is new ADO.Objects.Object_Ref with null record;
@@ -161,11 +152,11 @@ package Porion.Projects.Models is
 
    --
    procedure Set_Scm (Object : in out Project_Ref;
-                      Value  : in Porion.Projects.Models.Source_Control_Type);
+                      Value  : in Porion.Sources.Source_Control_Type);
 
    --
    function Get_Scm (Object : in Project_Ref)
-                 return Porion.Projects.Models.Source_Control_Type;
+                 return Porion.Sources.Source_Control_Type;
 
    --  Set source control information parameter
    procedure Set_Scm_Url (Object : in out Project_Ref;
@@ -768,7 +759,7 @@ private
        Create_Date : Ada.Calendar.Time;
        Update_Date : Ada.Calendar.Time;
        Status : Porion.Projects.Models.Project_Status_Type;
-       Scm : Porion.Projects.Models.Source_Control_Type;
+       Scm : Porion.Sources.Source_Control_Type;
        Scm_Url : Ada.Strings.Unbounded.Unbounded_String;
    end record;
 

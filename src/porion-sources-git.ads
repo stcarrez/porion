@@ -19,7 +19,6 @@ with Porion.Configs;
 private with EL.Expressions;
 package Porion.Sources.Git is
 
-   SOURCE_KIND          : aliased constant String := "git";
    GIT_TEST_COMMAND     : constant String := "git ls-remote -h -- #{repository_url}";
    GIT_CHECKOUT_COMMAND : constant String := "git clone #{repository_url} #{build_dir}";
    GIT_GUESS_COMMAND    : constant String := "git -C #{path} config remote.origin.url";

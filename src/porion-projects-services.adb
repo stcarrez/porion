@@ -18,19 +18,17 @@
 with Ada.Calendar;
 with Ada.Directories;
 with Util.Log.Loggers;
-with Util.Files;
+with Util.Strings;
+with Util.Properties;
 with Porion.Configs;
 with Porion.Loggers;
-with Porion.Projects.Models;
 with Porion.Sources.Factories;
 with ADO.Configs;
-with ADO.SQLite;
+with ADO.Sqlite;
 with ADO.SQL;
-with ADO.Statements;
 with Porion.Projects.Schema;
 with Porion.Builders.Scripts;
 with Porion.Resources;
---  with Yaml.Source.Text_IO;
 with Yaml.Source.File;
 with Yaml.Parser;
 package body Porion.Projects.Services is
@@ -64,17 +62,6 @@ package body Porion.Projects.Services is
       return URI;
    end Make_Project_Name;
 
-   procedure Set_Source_Control (Project : in out Porion.Projects.Models.Project_Ref;
-                                 Mode    : in String) is
-   begin
-      Project.Set_Scm_Url (Mode);
-      if Util.Strings.Ends_With (Mode, ".git") then
-         Project.Set_Scm (Porion.Projects.Models.SRC_GIT);
-      else
-         Project.Set_Scm (Porion.Projects.Models.SRC_FILE);
-      end if;
-   end Set_Source_Control;
-
    --  ------------------------------
    --  Add a build node
    --  ------------------------------
@@ -103,17 +90,16 @@ package body Porion.Projects.Services is
    end Add_Node;
 
    procedure Add_Project (Service   : in out Context_Type;
-                          Name      : in String;
-                          Mode      : in String;
-                          Parameter : in String) is
+                          Info      : in Porion.Sources.Source_Info_Type) is
+      Name  : constant String := To_String (Info.Name);
       Query : ADO.SQL.Query;
       Cfg   : Projects.Models.Build_Config_Ref;
       Found : Boolean;
    begin
-      Log.Debug ("Add project {0} with {1}", Name, Mode);
+      Log.Debug ("Add project {0}", Name);
 
       Service.DB.Begin_Transaction;
-      Query.Bind_Param (1, Name);
+      Query.Bind_Param (1, Info.Name);
       Query.Set_Filter ("o.name = ?");
       Service.Project.Find (Service.DB, Query, Found);
       if Found then
@@ -124,7 +110,8 @@ package body Porion.Projects.Services is
       Service.Project.Set_Create_Date (Ada.Calendar.Clock);
       Service.Project.Set_Update_Date (Service.Project.Get_Create_Date);
       Service.Project.Set_Status (Projects.Models.PROJECT_ACTIVE);
-      Set_Source_Control (Service.Project, Mode);
+      Service.Project.Set_Scm_Url (Info.URI);
+      Service.Project.Set_Scm (Info.Kind);
       Service.Project.Save (Service.DB);
 
       Service.Build_Config.Set_Project (Service.Project);
@@ -187,7 +174,7 @@ package body Porion.Projects.Services is
 
       Query  : ADO.SQL.Query;
       Found  : Boolean;
-      Now    : Ada.Calendar.Time := Ada.Calendar.Clock;
+      Now    : constant Ada.Calendar.Time := Ada.Calendar.Clock;
    begin
       Query.Set_Filter ("o.name = ? AND o.project_id = ?");
       Query.Bind_Param (1, Name);
@@ -231,7 +218,7 @@ package body Porion.Projects.Services is
       end;
 
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
-      Service.Source_Controller := Porion.Sources.Factories.Create ("git", Config);
+      Service.Source_Controller := Porion.Sources.Factories.Create (Service.Project.Get_Scm, Config);
 
       Service.Source_Controller.Check (Status, Logger);
 

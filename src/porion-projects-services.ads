@@ -41,9 +41,7 @@ package Porion.Projects.Services is
                         Hostname : in String);
 
    procedure Add_Project (Service   : in out Context_Type;
-                          Name      : in String;
-                          Mode      : in String;
-                          Parameter : in String);
+                          Info      : in Porion.Sources.Source_Info_Type);
 
    --  Get the current project id.
    function Get_Project_Id (Service : in Context_Type) return ADO.Identifier;

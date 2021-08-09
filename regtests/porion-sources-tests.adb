@@ -16,13 +16,15 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
+with Util.Assertions;
 with Util.Test_Caller;
 
 with Porion.Configs;
-with Porion.Sources.Git;
-with Porion.Sources.Files;
 with Porion.Sources.Factories;
 package body Porion.Sources.Tests is
+
+   procedure Assert_Equals is
+     new Util.Assertions.Assert_Equals_T (Value_Type => Source_Control_Type);
 
    package Caller is new Util.Test_Caller (Test, "Porion.Sources");
 
@@ -45,7 +47,7 @@ package body Porion.Sources.Tests is
                                       Logger => Logger);
 
       T.Assert_Equals ("porion", Result.Name, "invalid project name");
-      T.Assert_Equals (Porion.Sources.Git.SOURCE_KIND, Result.Kind, "invalid source kind");
+      Assert_Equals (T, Porion.Sources.SRC_GIT, Result.Kind, "invalid source kind");
 
       Porion.Sources.Factories.Guess (Path   => "src/model",
                                       Config => Config,
@@ -53,7 +55,7 @@ package body Porion.Sources.Tests is
                                       Logger => Logger);
 
       T.Assert_Equals ("porion", Result.Name, "invalid project name");
-      T.Assert_Equals (Porion.Sources.Git.SOURCE_KIND, Result.Kind, "invalid source kind");
+      Assert_Equals (T, Porion.Sources.SRC_GIT, Result.Kind, "invalid source kind");
    end Test_Guess_Git;
 
    procedure Test_Guess_Files (T : in out Test) is
@@ -68,7 +70,7 @@ package body Porion.Sources.Tests is
                                       Logger => Logger);
 
       T.Assert_Equals ("hello-1.0", Result.Name, "invalid project name");
-      T.Assert_Equals (Porion.Sources.Files.SOURCE_KIND, Result.Kind, "invalid source kind");
+      Assert_Equals (T, Porion.Sources.SRC_FILE, Result.Kind, "invalid source kind");
    end Test_Guess_Files;
 
 end Porion.Sources.Tests;

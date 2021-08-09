@@ -41,6 +41,7 @@ package body Porion.XUnit.Tests is
       Path      : constant String := "regtests/files/TEST-SQLite-Users.Tests.xml";
       Path2     : constant String := "regtests/files/TEST-Dynamo.xml";
       Service   : Porion.Projects.Services.Context_Type;
+      Info      : Porion.Sources.Source_Info_Type;
       Branch    : Porion.Sources.Branch_Type;
       Build     : Porion.Projects.Models.Build_Ref;
       Session   : ADO.Sessions.Master_Session;
@@ -64,9 +65,10 @@ package body Porion.XUnit.Tests is
 
       exception
          when Porion.Projects.Services.Name_Used =>
-            Service.Add_Project (Name      => "ada-lzma",
-                                 Mode      => "git://github.com/stcarrez/ada-lzma.git",
-                                 Parameter => "git://github.com/stcarrez/ada-lzma.git");
+            Info.Kind := Porion.Sources.SRC_GIT;
+            Info.Name := To_UString ("ada-lzma");
+            Info.URI := To_UString ("git://github.com/stcarrez/ada-lzma.git");
+            Service.Add_Project (Info);
       end;
       Service.Start_Build (Branch_Name => "master",
                            Branch      => Branch);

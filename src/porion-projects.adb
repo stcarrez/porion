@@ -15,9 +15,7 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Util.Properties;
-with Util.Strings.Vectors;
-with EL.Expressions;
+
 with Porion.Configs;
 with Ada.Directories;
 with Util.Log.Loggers;

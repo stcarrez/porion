@@ -20,20 +20,23 @@ with Porion.Sources.Git;
 with Porion.Sources.Files;
 package body Porion.Sources.Factories is
 
-   Names : constant array (Positive range <>) of access constant String :=
-     (1 => Porion.Sources.Git.SOURCE_KIND'Access,
-      2 => Porion.Sources.Files.SOURCE_KIND'Access);
-
-   function Create (Name   : in String;
+   --  ------------------------------
+   --  Create a source controller of the given kind.
+   --  ------------------------------
+   function Create (Kind   : in Source_Control_Type;
                     Config : in Porion.Configs.Config_Type) return Controller_Access is
    begin
-      if Name = Porion.Sources.Git.SOURCE_KIND then
-         return Porion.Sources.Git.Create (Config);
-      end if;
-      if Name = Porion.Sources.Files.SOURCE_KIND then
-         return Porion.Sources.Files.Create (Config);
-      end if;
-      return null;
+      case Kind is
+         when SRC_GIT =>
+            return Porion.Sources.Git.Create (Config);
+
+         when SRC_FILE =>
+            return Porion.Sources.Files.Create (Config);
+
+         when others =>
+            return null;
+
+      end case;
    end Create;
 
    --  ------------------------------
@@ -49,16 +52,16 @@ package body Porion.Sources.Factories is
         new Ada.Unchecked_Deallocation (Object => Controller_Type'Class,
                                         Name   => Controller_Access);
    begin
-      for Name of Names loop
+      for Kind in SRC_GIT .. SRC_FILE loop
          declare
-            C : Controller_Access := Create (Name.all, Config);
+            C : Controller_Access := Create (Kind, Config);
          begin
-            Result.Kind := To_UString ("");
+            Result.Kind := SRC_UNKNOWN;
             C.Guess (Path   => Path,
                      Result => Result,
                      Logger => Logger);
             Free (C);
-            exit when Result.Kind = Name.all;
+            exit when Result.Kind = Kind;
          end;
       end loop;
    end Guess;

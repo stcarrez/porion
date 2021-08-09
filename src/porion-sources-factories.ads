@@ -18,7 +18,8 @@
 with Porion.Configs;
 package Porion.Sources.Factories is
 
-   function Create (Name   : in String;
+   --  Create a source controller of the given kind.
+   function Create (Kind   : in Source_Control_Type;
                     Config : in Porion.Configs.Config_Type) return Controller_Access;
 
    --  Guess some information about the sources located in the given directory.

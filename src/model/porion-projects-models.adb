@@ -198,8 +198,9 @@ package body Porion.Projects.Models is
    procedure Set_Status (Object : in out Project_Ref;
                          Value  : in Porion.Projects.Models.Project_Status_Type) is
       procedure Set_Field_Enum is
-         new ADO.Audits.Set_Field_Operation (Project_Status_Type,
-                                             Project_Status_Type_Objects.To_Object);
+        new ADO.Audits.Set_Field_Operation
+          (Porion.Projects.Models.Project_Status_Type,
+           Porion.Projects.Models.Project_Status_Type_Objects.To_Object);
       Impl : Project_Access;
    begin
       Set_Field (Object, Impl);
@@ -218,8 +219,9 @@ package body Porion.Projects.Models is
    procedure Set_Scm (Object : in out Project_Ref;
                       Value  : in Porion.Sources.Source_Control_Type) is
       procedure Set_Field_Enum is
-         new ADO.Audits.Set_Field_Operation (Porion.Sources.Source_Control_Type,
-                                             Porion.Sources.Source_Control_Type_Objects.To_Object);
+        new ADO.Audits.Set_Field_Operation
+          (Porion.Sources.Source_Control_Type,
+           Porion.Sources.Source_Control_Type_Objects.To_Object);
       Impl : Project_Access;
    begin
       Set_Field (Object, Impl);
@@ -437,7 +439,7 @@ package body Porion.Projects.Models is
       end if;
       if Object.Is_Modified (7) then
          Stmt.Save_Field (Name  => COL_6_1_NAME, --  status
-                          Value => Integer (Project_Status_Type'Pos (Object.Status)));
+                          Value => Integer (Porion.Projects.Models.Project_Status_Type'Pos (Object.Status)));
          Object.Clear_Modified (7);
       end if;
       if Object.Is_Modified (8) then
@@ -494,7 +496,7 @@ package body Porion.Projects.Models is
       Query.Save_Field (Name  => COL_5_1_NAME, --  update_date
                         Value => Object.Update_Date);
       Query.Save_Field (Name  => COL_6_1_NAME, --  status
-                        Value => Integer (Project_Status_Type'Pos (Object.Status)));
+                        Value => Integer (Porion.Projects.Models.Project_Status_Type'Pos (Object.Status)));
       Query.Save_Field (Name  => COL_7_1_NAME, --  scm
                         Value => Integer (Porion.Sources.Source_Control_Type'Pos (Object.Scm)));
       Query.Save_Field (Name  => COL_8_1_NAME, --  scm_url
@@ -566,7 +568,7 @@ package body Porion.Projects.Models is
       Object.Description := Stmt.Get_Unbounded_String (3);
       Object.Create_Date := Stmt.Get_Time (4);
       Object.Update_Date := Stmt.Get_Time (5);
-      Object.Status := Project_Status_Type'Val (Stmt.Get_Integer (6));
+      Object.Status := Porion.Projects.Models.Project_Status_Type'Val (Stmt.Get_Integer (6));
       Object.Scm := Porion.Sources.Source_Control_Type'Val (Stmt.Get_Integer (7));
       Object.Scm_Url := Stmt.Get_Unbounded_String (8);
       Object.Version := Stmt.Get_Integer (2);
@@ -1126,7 +1128,8 @@ package body Porion.Projects.Models is
    procedure Set_Status (Object : in out Build_Ref;
                          Value  : in Porion.Projects.Models.Build_Status_Type) is
       procedure Set_Field_Enum is
-         new ADO.Objects.Set_Field_Operation (Build_Status_Type);
+        new ADO.Objects.Set_Field_Operation
+          (Porion.Projects.Models.Build_Status_Type);
       Impl : Build_Access;
    begin
       Set_Field (Object, Impl);
@@ -1397,7 +1400,7 @@ package body Porion.Projects.Models is
       end if;
       if Object.Is_Modified (10) then
          Stmt.Save_Field (Name  => COL_9_3_NAME, --  status
-                          Value => Integer (Build_Status_Type'Pos (Object.Status)));
+                          Value => Integer (Porion.Projects.Models.Build_Status_Type'Pos (Object.Status)));
          Object.Clear_Modified (10);
       end if;
       if Object.Is_Modified (11) then
@@ -1469,7 +1472,7 @@ package body Porion.Projects.Models is
       Query.Save_Field (Name  => COL_8_3_NAME, --  test_duration
                         Value => Object.Test_Duration);
       Query.Save_Field (Name  => COL_9_3_NAME, --  status
-                        Value => Integer (Build_Status_Type'Pos (Object.Status)));
+                        Value => Integer (Porion.Projects.Models.Build_Status_Type'Pos (Object.Status)));
       Query.Save_Field (Name  => COL_10_3_NAME, --  build_config_id
                         Value => Object.Build_Config);
       Query.Save_Field (Name  => COL_11_3_NAME, --  node_id
@@ -1552,7 +1555,7 @@ package body Porion.Projects.Models is
       Object.Fail_Count := Stmt.Get_Integer (6);
       Object.Timeout_Count := Stmt.Get_Integer (7);
       Object.Test_Duration := Stmt.Get_Integer (8);
-      Object.Status := Build_Status_Type'Val (Stmt.Get_Integer (9));
+      Object.Status := Porion.Projects.Models.Build_Status_Type'Val (Stmt.Get_Integer (9));
       if not Stmt.Is_Null (10) then
          Object.Build_Config.Set_Key_Value (Stmt.Get_Identifier (10), Session);
       end if;
@@ -1754,7 +1757,8 @@ package body Porion.Projects.Models is
    procedure Set_Status (Object : in out Branch_Ref;
                          Value  : in Porion.Projects.Models.Branch_Status_Type) is
       procedure Set_Field_Enum is
-         new ADO.Objects.Set_Field_Operation (Branch_Status_Type);
+        new ADO.Objects.Set_Field_Operation
+          (Porion.Projects.Models.Branch_Status_Type);
       Impl : Branch_Access;
    begin
       Set_Field (Object, Impl);
@@ -1982,7 +1986,7 @@ package body Porion.Projects.Models is
       end if;
       if Object.Is_Modified (8) then
          Stmt.Save_Field (Name  => COL_7_4_NAME, --  status
-                          Value => Integer (Branch_Status_Type'Pos (Object.Status)));
+                          Value => Integer (Porion.Projects.Models.Branch_Status_Type'Pos (Object.Status)));
          Object.Clear_Modified (8);
       end if;
       if Object.Is_Modified (9) then
@@ -2041,7 +2045,7 @@ package body Porion.Projects.Models is
       Query.Save_Field (Name  => COL_6_4_NAME, --  update_date
                         Value => Object.Update_Date);
       Query.Save_Field (Name  => COL_7_4_NAME, --  status
-                        Value => Integer (Branch_Status_Type'Pos (Object.Status)));
+                        Value => Integer (Porion.Projects.Models.Branch_Status_Type'Pos (Object.Status)));
       Query.Save_Field (Name  => COL_8_4_NAME, --  project_id
                         Value => Object.Project);
       Query.Save_Field (Name  => COL_9_4_NAME, --  last_build_id
@@ -2115,7 +2119,7 @@ package body Porion.Projects.Models is
       Object.Last_Date := Stmt.Get_Nullable_Time (4);
       Object.Create_Date := Stmt.Get_Time (5);
       Object.Update_Date := Stmt.Get_Time (6);
-      Object.Status := Branch_Status_Type'Val (Stmt.Get_Integer (7));
+      Object.Status := Porion.Projects.Models.Branch_Status_Type'Val (Stmt.Get_Integer (7));
       if not Stmt.Is_Null (8) then
          Object.Project.Set_Key_Value (Stmt.Get_Identifier (8), Session);
       end if;

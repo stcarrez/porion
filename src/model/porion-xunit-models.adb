@@ -1957,7 +1957,8 @@ package body Porion.Xunit.Models is
    procedure Set_Status (Object : in out Test_Run_Ref;
                          Value  : in Porion.Xunit.Models.Test_Status_Type) is
       procedure Set_Field_Enum is
-         new ADO.Objects.Set_Field_Operation (Test_Status_Type);
+        new ADO.Objects.Set_Field_Operation
+          (Porion.Xunit.Models.Test_Status_Type);
       Impl : Test_Run_Access;
    begin
       Set_Field (Object, Impl);
@@ -2223,7 +2224,7 @@ package body Porion.Xunit.Models is
       Query.Save_Field (Name  => COL_0_4_NAME, --  duration
                         Value => Object.Duration);
       Query.Save_Field (Name  => COL_1_4_NAME, --  status
-                        Value => Integer (Test_Status_Type'Pos (Object.Status)));
+                        Value => Integer (Porion.Xunit.Models.Test_Status_Type'Pos (Object.Status)));
       Session.Allocate (Id => Object);
       Query.Save_Field (Name  => COL_2_4_NAME, --  id
                         Value => Object.Get_Key);
@@ -2286,7 +2287,7 @@ package body Porion.Xunit.Models is
                    Session : in out ADO.Sessions.Session'Class) is
    begin
       Object.Duration := Stmt.Get_Integer (0);
-      Object.Status := Test_Status_Type'Val (Stmt.Get_Integer (1));
+      Object.Status := Porion.Xunit.Models.Test_Status_Type'Val (Stmt.Get_Integer (1));
       Object.Set_Key_Value (Stmt.Get_Identifier (2));
       Object.Assertions := Stmt.Get_Integer (3);
       if not Stmt.Is_Null (4) then

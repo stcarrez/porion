@@ -19,8 +19,6 @@ with Porion.Configs;
 private with EL.Expressions;
 package Porion.Sources.Files is
 
-   SOURCE_KIND             : aliased constant String := "files";
-
    TAR_CONFIG_NAME         : constant String := "files-tar";
    TAR_GZ_CONFIG_NAME      : constant String := "files-tar.gz";
    TAR_BZ2_CONFIG_NAME     : constant String := "files-tar.bz2";

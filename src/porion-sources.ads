@@ -15,17 +15,26 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Strings.Hash;
 with Ada.Calendar;
 with Ada.Containers.Indefinite_Ordered_Maps;
-with Util.Strings.Maps;
+with Util.Beans.Objects.Enums;
 with Porion.Loggers;
 package Porion.Sources is
 
    Not_Supported : exception;
 
+   type Source_Control_Type is (SRC_UNKNOWN, SRC_GIT, SRC_FILE);
+
+   --  Use a fixed enum configuration because the value is stored in database.
+   for Source_Control_Type use (SRC_UNKNOWN => 0,
+                                SRC_GIT => 1,
+                                SRC_FILE => 2);
+
+   package Source_Control_Type_Objects is
+      new Util.Beans.Objects.Enums (Source_Control_Type);
+
    type Source_Info_Type is record
-      Kind : UString;
+      Kind : Source_Control_Type := SRC_UNKNOWN;
       Name : UString;
       URI  : UString;
    end record;

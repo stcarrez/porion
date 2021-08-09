@@ -16,6 +16,9 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Porion.Projects.Services;
+with Porion.Loggers;
+with Porion.Configs;
+with Porion.Sources.Factories;
 package body Porion.Commands.Add is
 
    --  Get a value from the keystore.
@@ -24,6 +27,7 @@ package body Porion.Commands.Add is
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Context   : in out Context_Type) is
+      pragma Unreferenced (Command, Name);
    begin
       if Args.Get_Count = 0 then
          Porion.Commands.Log.Error (-("missing project URL or file to add"));
@@ -32,15 +36,24 @@ package body Porion.Commands.Add is
       Context.Project_Service.Open;
 
       declare
-         URI  : constant String := Args.Get_Argument (1);
-         Name : constant String := Porion.Projects.Services.Make_Project_Name (URI);
+         Logger : Porion.Loggers.Logger_Type;
+         Info   : Porion.Sources.Source_Info_Type;
+         Config : Porion.Configs.Config_Type;
+         URI    : constant String := Args.Get_Argument (1);
       begin
-         Context.Project_Service.Add_Project (Name, URI, URI);
-         Context.Console.Notice (N_INFO, Format (-("Project {0} - {1} added"), Name, URI));
+         Porion.Sources.Factories.Guess (Path   => URI,
+                                         Config => Config,
+                                         Result => Info,
+                                         Logger => Logger);
+
+         Context.Project_Service.Add_Project (Info);
+         Context.Console.Notice (N_INFO, Format (-("Project {0} - {1} added"),
+                                 To_String (Info.Name), URI));
 
       exception
          when Porion.Projects.Services.Name_Used =>
-            Porion.Commands.Log.Error (-("project '{0}' already exists"), Name);
+            Porion.Commands.Log.Error (-("project '{0}' already exists"),
+                                       To_String (Info.Name));
             raise Error;
       end;
 

@@ -15,10 +15,8 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Strings.Hash;
+
 with Ada.Calendar;
-with Ada.Containers.Indefinite_Vectors;
-with Ada.Containers.Indefinite_Ordered_Maps;
 with Util.Strings.Vectors;
 with ADO.Sessions;
 package Porion.XUnit is

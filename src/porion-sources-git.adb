@@ -18,6 +18,7 @@
 with Ada.Directories;
 
 with GNAT.Regpat;
+with Util.Strings;
 with Porion.Tools;
 with EL.Contexts.Default;
 package body Porion.Sources.Git is
@@ -138,7 +139,7 @@ package body Porion.Sources.Git is
       Porion.Tools.Execute (Controller.Guess_Command, Controller.Config,
                             Process'Access, Strip_Crlf => True, Status => Status);
       if Status = 0 then
-         Result.Kind := To_UString (SOURCE_KIND);
+         Result.Kind := SRC_GIT;
       end if;
    end Guess;
 

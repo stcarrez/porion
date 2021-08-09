@@ -16,9 +16,10 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Directories;
-
+with Interfaces.C.Strings;
 with GNAT.Regpat;
 with Util.Log.Loggers;
+with Util.Strings;
 with Porion.Tools;
 with EL.Contexts.Default;
 package body Porion.Sources.Files is
@@ -26,6 +27,27 @@ package body Porion.Sources.Files is
    use Ada.Directories;
 
    Log   : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Sources.Files");
+
+   function Realpath (Path : in String) return String;
+
+   function Realpath (Path : in String) return String is
+      use Interfaces;
+
+      function Sys_Realpath (S : C.Strings.chars_ptr;
+                             R : C.Strings.chars_ptr) return C.Strings.chars_ptr with
+        Import => True, Convention => C, Link_Name => "realpath";
+      P : C.Strings.chars_ptr := C.Strings.New_String (Path);
+      R : C.Strings.chars_ptr;
+   begin
+      R := Sys_Realpath (P, C.Strings.Null_Ptr);
+      C.Strings.Free (P);
+      declare
+         Result : constant String := C.Strings.Value (R);
+      begin
+         C.Strings.Free (R);
+         return Result;
+      end;
+   end Realpath;
 
    --  ------------------------------
    --  Guess the file type for the given file based on the file name extension.
@@ -130,11 +152,19 @@ package body Porion.Sources.Files is
          Logger.Write (Line);
       end Process;
 
-      Status : Integer;
+      Status   : Integer;
+      Src_Path : constant String := Controller.Config.Get ("repository_url");
+      Kind     : constant File_Type := Get_File_Type (Src_Path);
    begin
+      Log.Info ("Extracting files from '{0}' to '{1}'", Src_Path, Path);
+
+      Controller.Setup (Kind);
       Controller.Config.Set ("build_dir", Path);
       Porion.Tools.Execute (Controller.Extract_Command, Controller.Config,
-                            Process'Access, Strip_Crlf => False, Status => Status);
+                            Process'Access,
+                            Working_Dir => Path,
+                            Strip_Crlf => False,
+                            Status => Status);
    end Checkout;
 
    overriding
@@ -185,9 +215,9 @@ package body Porion.Sources.Files is
       Porion.Tools.Execute (Controller.Guess_Command, Controller.Config,
                             Process'Access, Strip_Crlf => True, Status => Status);
       if Status = 0 then
-         Result.URI := To_UString (Path);
+         Result.URI := To_UString (Realpath (Path));
          Result.Name := To_UString (Make_Project_Name (Path, Kind));
-         Result.Kind := To_UString (SOURCE_KIND);
+         Result.Kind := SRC_FILE;
       end if;
    end Guess;
 
@@ -208,7 +238,7 @@ package body Porion.Sources.Files is
       end Get_Command;
 
    begin
-      Log.Info ("configure files source controller for {0}", File_Type'Image (Kind));
+      Log.Info ("Configure files source controller for {0}", File_Type'Image (Kind));
 
       case Kind is
          when TAR =>

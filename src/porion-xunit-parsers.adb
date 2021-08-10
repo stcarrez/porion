@@ -20,7 +20,7 @@ with Ada.Directories;
 with Util.Beans.Objects;
 with Util.Serialize.Mappers.Record_Mapper;
 with Util.Serialize.IO.XML;
-with Util.Beans.Objects.Vectors;
+
 with Porion.XUnit.Models;
 package body Porion.XUnit.Parsers is
 
@@ -61,6 +61,9 @@ package body Porion.XUnit.Parsers is
    end record;
    type XUnit_Config_Access is access all XUnit_Config;
 
+   function Get_Status (Config : in XUnit_Config) return Test_Status_Type;
+   function To_Duration (Value : in Util.Beans.Objects.Object) return Integer;
+
    function To_Duration (Value : in Util.Beans.Objects.Object) return Integer is
    begin
       if Is_Null (Value) then
@@ -68,7 +71,7 @@ package body Porion.XUnit.Parsers is
       else
          declare
             S   : constant String := To_String (Value);
-            Dot : Natural := Util.Strings.Index (S, '.');
+            Dot : constant Natural := Util.Strings.Index (S, '.');
             V1  : Integer;
             V2  : Integer;
             L   : Natural;
@@ -111,12 +114,13 @@ package body Porion.XUnit.Parsers is
 
    procedure Scan (Path    : in String;
                    Results : in out Analysis.Test_Results) is
+      procedure Set_Member (N     : in out XUnit_Config;
+                            Field : in XUnit_Fields;
+                            Value : in Util.Beans.Objects.Object);
 
       procedure Set_Member (N     : in out XUnit_Config;
                             Field : in XUnit_Fields;
                             Value : in Util.Beans.Objects.Object) is
-         use Util.Beans.Objects;
-         use type Ada.Containers.Count_Type;
       begin
          case Field is
             when TESTSUITE_NAME =>

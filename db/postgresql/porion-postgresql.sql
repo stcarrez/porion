@@ -1,5 +1,69 @@
 /* File generated automatically by dynamo */
 /*  */
+CREATE TABLE IF NOT EXISTS porion_build (
+  /* the build global identifier. */
+  "id" BIGINT NOT NULL,
+  /* the optimistic lock. */
+  "version" INTEGER NOT NULL,
+  /* the project build number. */
+  "number" INTEGER NOT NULL,
+  /* the build creation date. */
+  "create_date" TIMESTAMP NOT NULL,
+  /* the date when the build was finished. */
+  "finish_date" TIMESTAMP ,
+  /* the number of tests that passed. */
+  "pass_count" INTEGER NOT NULL,
+  /* the number of tests that failed. */
+  "fail_count" INTEGER NOT NULL,
+  /* the number of tests that timeout. */
+  "timeout_count" INTEGER NOT NULL,
+  /* the test total duration in us. */
+  "test_duration" INTEGER NOT NULL,
+  /*  */
+  "status"  NOT NULL,
+  /* the build configuration. */
+  "build_config_id" BIGINT NOT NULL,
+  /* the node where the build was made. */
+  "node_id" BIGINT NOT NULL,
+  /* the branch associated with the build. */
+  "branch_id" BIGINT NOT NULL,
+  /* the project. */
+  "project_id" BIGINT NOT NULL,
+  PRIMARY KEY ("id")
+);
+/*  */
+CREATE TABLE IF NOT EXISTS porion_build_config (
+  /* identifier */
+  "id" BIGINT NOT NULL,
+  /* optimistic locking */
+  "version" INTEGER NOT NULL,
+  /*  */
+  "node_id" BIGINT ,
+  /*  */
+  "project_id" BIGINT NOT NULL,
+  PRIMARY KEY ("id")
+);
+/*  */
+CREATE TABLE IF NOT EXISTS porion_build_step (
+  /* build step identifier */
+  "id" BIGINT NOT NULL,
+  /* the optimistic locking. */
+  "version" INTEGER NOT NULL,
+  /* the build step command. */
+  "parameters" VARCHAR(65536) NOT NULL,
+  /* the build step number. */
+  "number" INTEGER NOT NULL,
+  /* the builder controller that handles execution of this build step. */
+  "builder" INTEGER NOT NULL,
+  /* the maximum execution time in seconds. */
+  "timeout" INTEGER NOT NULL,
+  /* the step classification type. */
+  "step" INTEGER NOT NULL,
+  /* the build configuration that contains this build step. */
+  "build_config_id" BIGINT NOT NULL,
+  PRIMARY KEY ("id")
+);
+/*  */
 CREATE TABLE IF NOT EXISTS porion_node (
   /* the node identifier */
   "id" BIGINT NOT NULL,
@@ -27,56 +91,12 @@ CREATE TABLE IF NOT EXISTS porion_branch (
   "create_date" TIMESTAMP NOT NULL,
   /* the date when the branch was updated. */
   "update_date" TIMESTAMP NOT NULL,
-  /*  */
-  "status"  NOT NULL,
+  /* the branch status. */
+  "status" INTEGER NOT NULL,
   /*  */
   "project_id" BIGINT NOT NULL,
-  /*  */
+  /* the last build. */
   "last_build_id" BIGINT ,
-  PRIMARY KEY ("id")
-);
-/*  */
-CREATE TABLE IF NOT EXISTS porion_build (
-  /* the build global identifier. */
-  "id" BIGINT NOT NULL,
-  /* the optimistic lock. */
-  "version" INTEGER NOT NULL,
-  /* the project build number. */
-  "number" INTEGER NOT NULL,
-  /* the build creation date. */
-  "create_date" TIMESTAMP NOT NULL,
-  /* the date when the build was finished. */
-  "finish_date" TIMESTAMP ,
-  /* the number of tests that passed. */
-  "pass_count" INTEGER NOT NULL,
-  /* the number of tests that failed. */
-  "fail_count" INTEGER NOT NULL,
-  /* the number of tests that timeout. */
-  "timeout_count" INTEGER NOT NULL,
-  /* the test total duration in us. */
-  "test_duration" INTEGER NOT NULL,
-  /*  */
-  "status"  NOT NULL,
-  /* the build configuration. */
-  "build_config_id" BIGINT NOT NULL,
-  /* the node where the build was made. */
-  "node_id" BIGINT NOT NULL,
-  /*  */
-  "branch_id" BIGINT NOT NULL,
-  /* the project. */
-  "project_id" BIGINT NOT NULL,
-  PRIMARY KEY ("id")
-);
-/*  */
-CREATE TABLE IF NOT EXISTS porion_build_config (
-  /* identifier */
-  "id" BIGINT NOT NULL,
-  /* optimistic locking */
-  "version" INTEGER NOT NULL,
-  /*  */
-  "node_id" BIGINT ,
-  /*  */
-  "project_id" BIGINT NOT NULL,
   PRIMARY KEY ("id")
 );
 /*  */
@@ -214,7 +234,16 @@ CREATE TABLE IF NOT EXISTS porion_test_run_group (
   PRIMARY KEY ("id")
 );
 INSERT INTO entity_type (name) VALUES
-('porion_node'), ('porion_branch'), ('porion_build'), ('porion_build_config'), ('porion_dependency'), ('porion_project'), ('porion_test'), ('porion_test_group'), ('porion_test_run'), ('porion_test_run_group')
+('porion_build'), ('porion_build_config'), ('porion_build_step'), ('porion_node'), ('porion_branch'), ('porion_dependency'), ('porion_project'), ('porion_test'), ('porion_test_group'), ('porion_test_run'), ('porion_test_run_group')
+  ON CONFLICT DO NOTHING;
+INSERT INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = 'porion_build_step'), 'parameters')
+  ON CONFLICT DO NOTHING;
+INSERT INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = 'porion_build_step'), 'number')
+  ON CONFLICT DO NOTHING;
+INSERT INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = 'porion_build_step'), 'timeout')
   ON CONFLICT DO NOTHING;
 INSERT INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = 'porion_node'), 'name')

@@ -14,6 +14,7 @@ ARE=are
 # --package XXX.XXX.Models db uml/xxx.zargo
 DYNAMO_ARGS=\
   --package Porion.Nodes.Models \
+  --package Porion.Builds.Models \
   --package Porion.XUnit.Models \
   --package Porion.Projects.Models \
   db uml/porion.zargo
@@ -29,7 +30,7 @@ build::
 	$(GNATMAKE) -m -p -P "$(GPRPATH)" $(MAKE_ARGS)
 
 test:	build
-	bin/porion_harness -xml porion-aunit.xml
+	bin/porion_harness -v -config test.properties -xml porion-aunit.xml
 
 generate::
 	mkdir -p db

@@ -16,12 +16,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Ada.Calendar;
-with Util.Strings.Vectors;
-with ADO.Queries;
-with ADO.SQL;
-with Porion.Projects.Models;
-with Porion.XUnit.Models;
 package body Porion.XUnit is
 
    procedure init is

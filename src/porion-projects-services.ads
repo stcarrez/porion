@@ -22,6 +22,7 @@ with ADO.Statements;
 with ADO.Queries;
 with ADO.Sessions;
 with Porion.Nodes.Models;
+with Porion.Builds.Models;
 private with ADO.Sessions.Factory;
 package Porion.Projects.Services is
 
@@ -71,7 +72,7 @@ package Porion.Projects.Services is
 
    function Get_Database (Service : in Context_Type) return ADO.Sessions.Master_Session;
 
-   function Get_Build (Service : in Context_Type) return Porion.Projects.Models.Build_Ref;
+   function Get_Build (Service : in Context_Type) return Porion.Builds.Models.Build_Ref;
 
 private
 
@@ -80,8 +81,8 @@ private
       DB                : ADO.Sessions.Master_Session;
       Project           : Porion.Projects.Models.Project_Ref;
       Branch            : Porion.Projects.Models.Branch_Ref;
-      Build             : Porion.Projects.Models.Build_Ref;
-      Build_Config      : Porion.Projects.Models.Build_Config_Ref;
+      Build             : Porion.Builds.Models.Build_Ref;
+      Build_Config      : Porion.Builds.Models.Build_Config_Ref;
       Build_Node        : Porion.Nodes.Models.Node_Ref;
       Source_Controller : Porion.Sources.Controller_Access;
       Build_Controller  : Porion.Builders.Controller_Access;

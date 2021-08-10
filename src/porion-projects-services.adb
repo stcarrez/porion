@@ -33,8 +33,7 @@ with Yaml.Source.File;
 with Yaml.Parser;
 package body Porion.Projects.Services is
 
-   --  The logger
-   Log   : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Projects.Services");
+   Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Projects.Services");
 
    function Get_Query_Resource (Name : in String) return access constant String is
    begin
@@ -93,7 +92,7 @@ package body Porion.Projects.Services is
                           Info      : in Porion.Sources.Source_Info_Type) is
       Name  : constant String := To_String (Info.Name);
       Query : ADO.SQL.Query;
-      Cfg   : Projects.Models.Build_Config_Ref;
+      Cfg   : Porion.Builds.Models.Build_Config_Ref;
       Found : Boolean;
    begin
       Log.Debug ("Add project {0}", Name);
@@ -291,7 +290,7 @@ package body Porion.Projects.Services is
       Stmt := Service.DB.Create_Statement (Query);
       Stmt.Execute;
 
-      Service.Build := Porion.Projects.Models.Null_Build;
+      Service.Build := Porion.Builds.Models.Null_Build;
       Service.Build.Set_Number (Stmt.Get_Result_Integer + 1);
 
       if Service.Build_Config.Is_Null then
@@ -314,7 +313,7 @@ package body Porion.Projects.Services is
       Service.Build.Set_Create_Date (Ada.Calendar.Clock);
       Service.Build.Save (Service.DB);
 
-      Service.Branch.Set_Last_Build (Service.Build);
+      Service.Branch.Set_Last_Build_Id (Service.Build.Get_Id);
       Service.Branch.Save (Service.DB);
       Service.DB.Commit;
 
@@ -388,7 +387,7 @@ package body Porion.Projects.Services is
       return Service.DB;
    end Get_Database;
 
-   function Get_Build (Service : in Context_Type) return Porion.Projects.Models.Build_Ref is
+   function Get_Build (Service : in Context_Type) return Porion.Builds.Models.Build_Ref is
    begin
       return Service.Build;
    end Get_Build;

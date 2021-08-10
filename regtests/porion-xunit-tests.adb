@@ -16,13 +16,13 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Util.Tests;
 with Util.Test_Caller;
+with ADO.Sessions;
 with Porion.Configs;
 with Porion.Sources;
 with Porion.XUnit.Analysis;
 with Porion.XUnit.Parsers;
-with Porion.Projects.Models;
+with Porion.Builds.Models;
 with Porion.Projects.Services;
 package body Porion.XUnit.Tests is
 
@@ -43,7 +43,7 @@ package body Porion.XUnit.Tests is
       Service   : Porion.Projects.Services.Context_Type;
       Info      : Porion.Sources.Source_Info_Type;
       Branch    : Porion.Sources.Branch_Type;
-      Build     : Porion.Projects.Models.Build_Ref;
+      Build     : Porion.Builds.Models.Build_Ref;
       Session   : ADO.Sessions.Master_Session;
    begin
       Branch.Tag := To_Unbounded_String ("master");

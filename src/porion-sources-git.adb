@@ -128,6 +128,12 @@ package body Porion.Sources.Git is
    begin
       --  Don't even try to run the git config command if the path is not a directory.
       if not Ada.Directories.Exists (Path) then
+         if not Util.Strings.Ends_With (Path, ".git") then
+            return;
+         end if;
+         Result.URI := To_UString (Path);
+         Result.Name := To_UString (Make_Project_Name (Path));
+         Result.Kind := SRC_GIT;
          return;
       end if;
       if Ada.Directories.Kind (Path) /= Ada.Directories.Directory then

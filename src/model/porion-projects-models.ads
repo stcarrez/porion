@@ -35,7 +35,6 @@ with Util.Beans.Objects;
 with Util.Beans.Objects.Enums;
 with Util.Beans.Basic.Lists;
 with ADO.Audits;
-with Porion.Nodes.Models;
 with Porion.Sources;
 pragma Warnings (On);
 package Porion.Projects.Models is
@@ -52,16 +51,6 @@ package Porion.Projects.Models is
       Value   : Branch_Status_Type;
    end record;
 
-   type Build_Status_Type is (BUILD_RUNNING, BUILD_FAIL, BUILD_PASS);
-   for Build_Status_Type use (BUILD_RUNNING => 0, BUILD_FAIL => 1, BUILD_PASS => 2);
-   package Build_Status_Type_Objects is
-      new Util.Beans.Objects.Enums (Build_Status_Type);
-
-   type Nullable_Build_Status_Type is record
-      Is_Null : Boolean := True;
-      Value   : Build_Status_Type;
-   end record;
-
    type Project_Status_Type is (PROJECT_ACTIVE, PROJECT_DISABLED, PROJECT_ONHOLD);
    for Project_Status_Type use (PROJECT_ACTIVE => 0, PROJECT_DISABLED => 1, PROJECT_ONHOLD => 2);
    package Project_Status_Type_Objects is
@@ -73,10 +62,6 @@ package Porion.Projects.Models is
    end record;
 
    type Project_Ref is new ADO.Objects.Object_Ref with null record;
-
-   type Build_Config_Ref is new ADO.Objects.Object_Ref with null record;
-
-   type Build_Ref is new ADO.Objects.Object_Ref with null record;
 
    type Branch_Ref is new ADO.Objects.Object_Ref with null record;
 
@@ -217,252 +202,6 @@ package Porion.Projects.Models is
    procedure Copy (Object : in Project_Ref;
                    Into   : in out Project_Ref);
 
-   --  Create an object key for Build_Config.
-   function Build_Config_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key;
-   --  Create an object key for Build_Config from a string.
-   --  Raises Constraint_Error if the string cannot be converted into the object key.
-   function Build_Config_Key (Id : in String) return ADO.Objects.Object_Key;
-
-   Null_Build_Config : constant Build_Config_Ref;
-   function "=" (Left, Right : Build_Config_Ref'Class) return Boolean;
-
-   --  Set identifier
-   procedure Set_Id (Object : in out Build_Config_Ref;
-                     Value  : in ADO.Identifier);
-
-   --  Get identifier
-   function Get_Id (Object : in Build_Config_Ref)
-                 return ADO.Identifier;
-   --  Get optimistic locking
-   function Get_Version (Object : in Build_Config_Ref)
-                 return Integer;
-
-   --
-   procedure Set_Node (Object : in out Build_Config_Ref;
-                       Value  : in Porion.Nodes.Models.Node_Ref'Class);
-
-   --
-   function Get_Node (Object : in Build_Config_Ref)
-                 return Porion.Nodes.Models.Node_Ref'Class;
-
-   --
-   procedure Set_Project (Object : in out Build_Config_Ref;
-                          Value  : in Porion.Projects.Models.Project_Ref'Class);
-
-   --
-   function Get_Project (Object : in Build_Config_Ref)
-                 return Porion.Projects.Models.Project_Ref'Class;
-
-   --  Load the entity identified by 'Id'.
-   --  Raises the NOT_FOUND exception if it does not exist.
-   procedure Load (Object  : in out Build_Config_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Id      : in ADO.Identifier);
-
-   --  Load the entity identified by 'Id'.
-   --  Returns True in <b>Found</b> if the object was found and False if it does not exist.
-   procedure Load (Object  : in out Build_Config_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Id      : in ADO.Identifier;
-                   Found   : out Boolean);
-
-   --  Find and load the entity.
-   overriding
-   procedure Find (Object  : in out Build_Config_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Query   : in ADO.SQL.Query'Class;
-                   Found   : out Boolean);
-
-   --  Save the entity.  If the entity does not have an identifier, an identifier is allocated
-   --  and it is inserted in the table.  Otherwise, only data fields which have been changed
-   --  are updated.
-   overriding
-   procedure Save (Object  : in out Build_Config_Ref;
-                   Session : in out ADO.Sessions.Master_Session'Class);
-
-   --  Delete the entity.
-   overriding
-   procedure Delete (Object  : in out Build_Config_Ref;
-                     Session : in out ADO.Sessions.Master_Session'Class);
-
-   overriding
-   function Get_Value (From : in Build_Config_Ref;
-                       Name : in String) return Util.Beans.Objects.Object;
-
-   --  Table definition
-   BUILD_CONFIG_TABLE : constant ADO.Schemas.Class_Mapping_Access;
-
-   --  Internal method to allocate the Object_Record instance
-   overriding
-   procedure Allocate (Object : in out Build_Config_Ref);
-
-   --  Copy of the object.
-   procedure Copy (Object : in Build_Config_Ref;
-                   Into   : in out Build_Config_Ref);
-
-   --  Create an object key for Build.
-   function Build_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key;
-   --  Create an object key for Build from a string.
-   --  Raises Constraint_Error if the string cannot be converted into the object key.
-   function Build_Key (Id : in String) return ADO.Objects.Object_Key;
-
-   Null_Build : constant Build_Ref;
-   function "=" (Left, Right : Build_Ref'Class) return Boolean;
-
-   --  Set the build global identifier.
-   procedure Set_Id (Object : in out Build_Ref;
-                     Value  : in ADO.Identifier);
-
-   --  Get the build global identifier.
-   function Get_Id (Object : in Build_Ref)
-                 return ADO.Identifier;
-   --  Get the optimistic lock.
-   function Get_Version (Object : in Build_Ref)
-                 return Integer;
-
-   --  Set the project build number.
-   procedure Set_Number (Object : in out Build_Ref;
-                         Value  : in Integer);
-
-   --  Get the project build number.
-   function Get_Number (Object : in Build_Ref)
-                 return Integer;
-
-   --  Set the build creation date.
-   procedure Set_Create_Date (Object : in out Build_Ref;
-                              Value  : in Ada.Calendar.Time);
-
-   --  Get the build creation date.
-   function Get_Create_Date (Object : in Build_Ref)
-                 return Ada.Calendar.Time;
-
-   --  Set the date when the build was finished.
-   procedure Set_Finish_Date (Object : in out Build_Ref;
-                              Value  : in ADO.Nullable_Time);
-
-   --  Get the date when the build was finished.
-   function Get_Finish_Date (Object : in Build_Ref)
-                 return ADO.Nullable_Time;
-
-   --  Set the number of tests that passed.
-   procedure Set_Pass_Count (Object : in out Build_Ref;
-                             Value  : in Integer);
-
-   --  Get the number of tests that passed.
-   function Get_Pass_Count (Object : in Build_Ref)
-                 return Integer;
-
-   --  Set the number of tests that failed.
-   procedure Set_Fail_Count (Object : in out Build_Ref;
-                             Value  : in Integer);
-
-   --  Get the number of tests that failed.
-   function Get_Fail_Count (Object : in Build_Ref)
-                 return Integer;
-
-   --  Set the number of tests that timeout.
-   procedure Set_Timeout_Count (Object : in out Build_Ref;
-                                Value  : in Integer);
-
-   --  Get the number of tests that timeout.
-   function Get_Timeout_Count (Object : in Build_Ref)
-                 return Integer;
-
-   --  Set the test total duration in us.
-   procedure Set_Test_Duration (Object : in out Build_Ref;
-                                Value  : in Integer);
-
-   --  Get the test total duration in us.
-   function Get_Test_Duration (Object : in Build_Ref)
-                 return Integer;
-
-   --
-   procedure Set_Status (Object : in out Build_Ref;
-                         Value  : in Porion.Projects.Models.Build_Status_Type);
-
-   --
-   function Get_Status (Object : in Build_Ref)
-                 return Porion.Projects.Models.Build_Status_Type;
-
-   --  Set the build configuration.
-   procedure Set_Build_Config (Object : in out Build_Ref;
-                               Value  : in Porion.Projects.Models.Build_Config_Ref'Class);
-
-   --  Get the build configuration.
-   function Get_Build_Config (Object : in Build_Ref)
-                 return Porion.Projects.Models.Build_Config_Ref'Class;
-
-   --  Set the node where the build was made.
-   procedure Set_Node (Object : in out Build_Ref;
-                       Value  : in Porion.Nodes.Models.Node_Ref'Class);
-
-   --  Get the node where the build was made.
-   function Get_Node (Object : in Build_Ref)
-                 return Porion.Nodes.Models.Node_Ref'Class;
-
-   --
-   procedure Set_Branch (Object : in out Build_Ref;
-                         Value  : in Porion.Projects.Models.Branch_Ref'Class);
-
-   --
-   function Get_Branch (Object : in Build_Ref)
-                 return Porion.Projects.Models.Branch_Ref'Class;
-
-   --  Set the project.
-   procedure Set_Project (Object : in out Build_Ref;
-                          Value  : in Porion.Projects.Models.Project_Ref'Class);
-
-   --  Get the project.
-   function Get_Project (Object : in Build_Ref)
-                 return Porion.Projects.Models.Project_Ref'Class;
-
-   --  Load the entity identified by 'Id'.
-   --  Raises the NOT_FOUND exception if it does not exist.
-   procedure Load (Object  : in out Build_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Id      : in ADO.Identifier);
-
-   --  Load the entity identified by 'Id'.
-   --  Returns True in <b>Found</b> if the object was found and False if it does not exist.
-   procedure Load (Object  : in out Build_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Id      : in ADO.Identifier;
-                   Found   : out Boolean);
-
-   --  Find and load the entity.
-   overriding
-   procedure Find (Object  : in out Build_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Query   : in ADO.SQL.Query'Class;
-                   Found   : out Boolean);
-
-   --  Save the entity.  If the entity does not have an identifier, an identifier is allocated
-   --  and it is inserted in the table.  Otherwise, only data fields which have been changed
-   --  are updated.
-   overriding
-   procedure Save (Object  : in out Build_Ref;
-                   Session : in out ADO.Sessions.Master_Session'Class);
-
-   --  Delete the entity.
-   overriding
-   procedure Delete (Object  : in out Build_Ref;
-                     Session : in out ADO.Sessions.Master_Session'Class);
-
-   overriding
-   function Get_Value (From : in Build_Ref;
-                       Name : in String) return Util.Beans.Objects.Object;
-
-   --  Table definition
-   BUILD_TABLE : constant ADO.Schemas.Class_Mapping_Access;
-
-   --  Internal method to allocate the Object_Record instance
-   overriding
-   procedure Allocate (Object : in out Build_Ref);
-
-   --  Copy of the object.
-   procedure Copy (Object : in Build_Ref;
-                   Into   : in out Build_Ref);
-
    --  Create an object key for Branch.
    function Branch_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key;
    --  Create an object key for Branch from a string.
@@ -531,11 +270,11 @@ package Porion.Projects.Models is
    function Get_Update_Date (Object : in Branch_Ref)
                  return Ada.Calendar.Time;
 
-   --
+   --  Set the branch status.
    procedure Set_Status (Object : in out Branch_Ref;
                          Value  : in Porion.Projects.Models.Branch_Status_Type);
 
-   --
+   --  Get the branch status.
    function Get_Status (Object : in Branch_Ref)
                  return Porion.Projects.Models.Branch_Status_Type;
 
@@ -547,13 +286,13 @@ package Porion.Projects.Models is
    function Get_Project (Object : in Branch_Ref)
                  return Porion.Projects.Models.Project_Ref'Class;
 
-   --
+   --  Set the last build.
    procedure Set_Last_Build (Object : in out Branch_Ref;
-                             Value  : in Porion.Projects.Models.Build_Ref'Class);
+                             Value  : in ADO.Identifier);
 
-   --
+   --  Get the last build.
    function Get_Last_Build (Object : in Branch_Ref)
-                 return Porion.Projects.Models.Build_Ref'Class;
+                 return ADO.Identifier;
 
    --  Load the entity identified by 'Id'.
    --  Raises the NOT_FOUND exception if it does not exist.
@@ -794,186 +533,32 @@ private
 
    procedure Set_Field (Object : in out Project_Ref'Class;
                         Impl   : out Project_Access);
-   BUILD_CONFIG_NAME : aliased constant String := "porion_build_config";
+   BRANCH_NAME : aliased constant String := "porion_branch";
    COL_0_2_NAME : aliased constant String := "id";
    COL_1_2_NAME : aliased constant String := "version";
-   COL_2_2_NAME : aliased constant String := "node_id";
-   COL_3_2_NAME : aliased constant String := "project_id";
-
-   BUILD_CONFIG_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 4,
-      Table   => BUILD_CONFIG_NAME'Access,
-      Members => (
-         1 => COL_0_2_NAME'Access,
-         2 => COL_1_2_NAME'Access,
-         3 => COL_2_2_NAME'Access,
-         4 => COL_3_2_NAME'Access)
-     );
-   BUILD_CONFIG_TABLE : constant ADO.Schemas.Class_Mapping_Access
-      := BUILD_CONFIG_DEF'Access;
-
-
-   Null_Build_Config : constant Build_Config_Ref
-      := Build_Config_Ref'(ADO.Objects.Object_Ref with null record);
-
-   type Build_Config_Impl is
-      new ADO.Objects.Object_Record (Key_Type => ADO.Objects.KEY_INTEGER,
-                                     Of_Class => BUILD_CONFIG_DEF'Access)
-   with record
-       Version : Integer;
-       Node : Porion.Nodes.Models.Node_Ref;
-       Project : Porion.Projects.Models.Project_Ref;
-   end record;
-
-   type Build_Config_Access is access all Build_Config_Impl;
-
-   overriding
-   procedure Destroy (Object : access Build_Config_Impl);
-
-   overriding
-   procedure Find (Object  : in out Build_Config_Impl;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Query   : in ADO.SQL.Query'Class;
-                   Found   : out Boolean);
-
-   overriding
-   procedure Load (Object  : in out Build_Config_Impl;
-                   Session : in out ADO.Sessions.Session'Class);
-   procedure Load (Object  : in out Build_Config_Impl;
-                   Stmt    : in out ADO.Statements.Query_Statement'Class;
-                   Session : in out ADO.Sessions.Session'Class);
-
-   overriding
-   procedure Save (Object  : in out Build_Config_Impl;
-                   Session : in out ADO.Sessions.Master_Session'Class);
-
-   procedure Create (Object  : in out Build_Config_Impl;
-                     Session : in out ADO.Sessions.Master_Session'Class);
-
-   overriding
-   procedure Delete (Object  : in out Build_Config_Impl;
-                     Session : in out ADO.Sessions.Master_Session'Class);
-
-   procedure Set_Field (Object : in out Build_Config_Ref'Class;
-                        Impl   : out Build_Config_Access);
-   BUILD_NAME : aliased constant String := "porion_build";
-   COL_0_3_NAME : aliased constant String := "id";
-   COL_1_3_NAME : aliased constant String := "version";
-   COL_2_3_NAME : aliased constant String := "number";
-   COL_3_3_NAME : aliased constant String := "create_date";
-   COL_4_3_NAME : aliased constant String := "finish_date";
-   COL_5_3_NAME : aliased constant String := "pass_count";
-   COL_6_3_NAME : aliased constant String := "fail_count";
-   COL_7_3_NAME : aliased constant String := "timeout_count";
-   COL_8_3_NAME : aliased constant String := "test_duration";
-   COL_9_3_NAME : aliased constant String := "status";
-   COL_10_3_NAME : aliased constant String := "build_config_id";
-   COL_11_3_NAME : aliased constant String := "node_id";
-   COL_12_3_NAME : aliased constant String := "branch_id";
-   COL_13_3_NAME : aliased constant String := "project_id";
-
-   BUILD_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 14,
-      Table   => BUILD_NAME'Access,
-      Members => (
-         1 => COL_0_3_NAME'Access,
-         2 => COL_1_3_NAME'Access,
-         3 => COL_2_3_NAME'Access,
-         4 => COL_3_3_NAME'Access,
-         5 => COL_4_3_NAME'Access,
-         6 => COL_5_3_NAME'Access,
-         7 => COL_6_3_NAME'Access,
-         8 => COL_7_3_NAME'Access,
-         9 => COL_8_3_NAME'Access,
-         10 => COL_9_3_NAME'Access,
-         11 => COL_10_3_NAME'Access,
-         12 => COL_11_3_NAME'Access,
-         13 => COL_12_3_NAME'Access,
-         14 => COL_13_3_NAME'Access)
-     );
-   BUILD_TABLE : constant ADO.Schemas.Class_Mapping_Access
-      := BUILD_DEF'Access;
-
-
-   Null_Build : constant Build_Ref
-      := Build_Ref'(ADO.Objects.Object_Ref with null record);
-
-   type Build_Impl is
-      new ADO.Objects.Object_Record (Key_Type => ADO.Objects.KEY_INTEGER,
-                                     Of_Class => BUILD_DEF'Access)
-   with record
-       Version : Integer;
-       Number : Integer;
-       Create_Date : Ada.Calendar.Time;
-       Finish_Date : ADO.Nullable_Time;
-       Pass_Count : Integer;
-       Fail_Count : Integer;
-       Timeout_Count : Integer;
-       Test_Duration : Integer;
-       Status : Porion.Projects.Models.Build_Status_Type;
-       Build_Config : Porion.Projects.Models.Build_Config_Ref;
-       Node : Porion.Nodes.Models.Node_Ref;
-       Branch : Porion.Projects.Models.Branch_Ref;
-       Project : Porion.Projects.Models.Project_Ref;
-   end record;
-
-   type Build_Access is access all Build_Impl;
-
-   overriding
-   procedure Destroy (Object : access Build_Impl);
-
-   overriding
-   procedure Find (Object  : in out Build_Impl;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Query   : in ADO.SQL.Query'Class;
-                   Found   : out Boolean);
-
-   overriding
-   procedure Load (Object  : in out Build_Impl;
-                   Session : in out ADO.Sessions.Session'Class);
-   procedure Load (Object  : in out Build_Impl;
-                   Stmt    : in out ADO.Statements.Query_Statement'Class;
-                   Session : in out ADO.Sessions.Session'Class);
-
-   overriding
-   procedure Save (Object  : in out Build_Impl;
-                   Session : in out ADO.Sessions.Master_Session'Class);
-
-   procedure Create (Object  : in out Build_Impl;
-                     Session : in out ADO.Sessions.Master_Session'Class);
-
-   overriding
-   procedure Delete (Object  : in out Build_Impl;
-                     Session : in out ADO.Sessions.Master_Session'Class);
-
-   procedure Set_Field (Object : in out Build_Ref'Class;
-                        Impl   : out Build_Access);
-   BRANCH_NAME : aliased constant String := "porion_branch";
-   COL_0_4_NAME : aliased constant String := "id";
-   COL_1_4_NAME : aliased constant String := "version";
-   COL_2_4_NAME : aliased constant String := "name";
-   COL_3_4_NAME : aliased constant String := "tag";
-   COL_4_4_NAME : aliased constant String := "last_date";
-   COL_5_4_NAME : aliased constant String := "create_date";
-   COL_6_4_NAME : aliased constant String := "update_date";
-   COL_7_4_NAME : aliased constant String := "status";
-   COL_8_4_NAME : aliased constant String := "project_id";
-   COL_9_4_NAME : aliased constant String := "last_build_id";
+   COL_2_2_NAME : aliased constant String := "name";
+   COL_3_2_NAME : aliased constant String := "tag";
+   COL_4_2_NAME : aliased constant String := "last_date";
+   COL_5_2_NAME : aliased constant String := "create_date";
+   COL_6_2_NAME : aliased constant String := "update_date";
+   COL_7_2_NAME : aliased constant String := "status";
+   COL_8_2_NAME : aliased constant String := "project_id";
+   COL_9_2_NAME : aliased constant String := "last_build";
 
    BRANCH_DEF : aliased constant ADO.Schemas.Class_Mapping :=
      (Count   => 10,
       Table   => BRANCH_NAME'Access,
       Members => (
-         1 => COL_0_4_NAME'Access,
-         2 => COL_1_4_NAME'Access,
-         3 => COL_2_4_NAME'Access,
-         4 => COL_3_4_NAME'Access,
-         5 => COL_4_4_NAME'Access,
-         6 => COL_5_4_NAME'Access,
-         7 => COL_6_4_NAME'Access,
-         8 => COL_7_4_NAME'Access,
-         9 => COL_8_4_NAME'Access,
-         10 => COL_9_4_NAME'Access)
+         1 => COL_0_2_NAME'Access,
+         2 => COL_1_2_NAME'Access,
+         3 => COL_2_2_NAME'Access,
+         4 => COL_3_2_NAME'Access,
+         5 => COL_4_2_NAME'Access,
+         6 => COL_5_2_NAME'Access,
+         7 => COL_6_2_NAME'Access,
+         8 => COL_7_2_NAME'Access,
+         9 => COL_8_2_NAME'Access,
+         10 => COL_9_2_NAME'Access)
      );
    BRANCH_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := BRANCH_DEF'Access;
@@ -1004,7 +589,7 @@ private
        Update_Date : Ada.Calendar.Time;
        Status : Porion.Projects.Models.Branch_Status_Type;
        Project : Porion.Projects.Models.Project_Ref;
-       Last_Build : Porion.Projects.Models.Build_Ref;
+       Last_Build : ADO.Identifier;
    end record;
 
    type Branch_Access is access all Branch_Impl;
@@ -1039,19 +624,19 @@ private
    procedure Set_Field (Object : in out Branch_Ref'Class;
                         Impl   : out Branch_Access);
    DEPENDENCY_NAME : aliased constant String := "porion_dependency";
-   COL_0_5_NAME : aliased constant String := "id";
-   COL_1_5_NAME : aliased constant String := "version";
-   COL_2_5_NAME : aliased constant String := "project_id";
-   COL_3_5_NAME : aliased constant String := "owner_id";
+   COL_0_3_NAME : aliased constant String := "id";
+   COL_1_3_NAME : aliased constant String := "version";
+   COL_2_3_NAME : aliased constant String := "project_id";
+   COL_3_3_NAME : aliased constant String := "owner_id";
 
    DEPENDENCY_DEF : aliased constant ADO.Schemas.Class_Mapping :=
      (Count   => 4,
       Table   => DEPENDENCY_NAME'Access,
       Members => (
-         1 => COL_0_5_NAME'Access,
-         2 => COL_1_5_NAME'Access,
-         3 => COL_2_5_NAME'Access,
-         4 => COL_3_5_NAME'Access)
+         1 => COL_0_3_NAME'Access,
+         2 => COL_1_3_NAME'Access,
+         3 => COL_2_3_NAME'Access,
+         4 => COL_3_3_NAME'Access)
      );
    DEPENDENCY_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := DEPENDENCY_DEF'Access;

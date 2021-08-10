@@ -1487,7 +1487,7 @@ package body Porion.Xunit.Models is
 
 
    procedure Set_Build (Object : in out Test_Run_Group_Ref;
-                        Value  : in Porion.Projects.Models.Build_Ref'Class) is
+                        Value  : in Porion.Builds.Models.Build_Ref'Class) is
       Impl : Test_Run_Group_Access;
    begin
       Set_Field (Object, Impl);
@@ -1495,7 +1495,7 @@ package body Porion.Xunit.Models is
    end Set_Build;
 
    function Get_Build (Object : in Test_Run_Group_Ref)
-                  return Porion.Projects.Models.Build_Ref'Class is
+                  return Porion.Builds.Models.Build_Ref'Class is
       Impl : constant Test_Run_Group_Access
          := Test_Run_Group_Impl (Object.Get_Load_Object.all)'Access;
    begin

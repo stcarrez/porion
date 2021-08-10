@@ -32,7 +32,7 @@ with Ada.Strings.Unbounded;
 with Util.Beans.Objects;
 with Util.Beans.Objects.Enums;
 with Util.Beans.Basic.Lists;
-with Porion.Projects.Models;
+with Porion.Builds.Models;
 pragma Warnings (On);
 package Porion.Xunit.Models is
 
@@ -462,11 +462,11 @@ package Porion.Xunit.Models is
 
    --
    procedure Set_Build (Object : in out Test_Run_Group_Ref;
-                        Value  : in Porion.Projects.Models.Build_Ref'Class);
+                        Value  : in Porion.Builds.Models.Build_Ref'Class);
 
    --
    function Get_Build (Object : in Test_Run_Group_Ref)
-                 return Porion.Projects.Models.Build_Ref'Class;
+                 return Porion.Builds.Models.Build_Ref'Class;
 
    --
    procedure Set_Group (Object : in out Test_Run_Group_Ref;
@@ -866,7 +866,7 @@ private
        Diff_Timeout : Integer;
        Diff_Skip : Integer;
        Duration : Integer;
-       Build : Porion.Projects.Models.Build_Ref;
+       Build : Porion.Builds.Models.Build_Ref;
        Group : Porion.Xunit.Models.Test_Group_Ref;
    end record;
 

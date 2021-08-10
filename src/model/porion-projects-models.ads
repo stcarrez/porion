@@ -287,11 +287,11 @@ package Porion.Projects.Models is
                  return Porion.Projects.Models.Project_Ref'Class;
 
    --  Set the last build.
-   procedure Set_Last_Build (Object : in out Branch_Ref;
-                             Value  : in ADO.Identifier);
+   procedure Set_Last_Build_Id (Object : in out Branch_Ref;
+                                Value  : in ADO.Identifier);
 
    --  Get the last build.
-   function Get_Last_Build (Object : in Branch_Ref)
+   function Get_Last_Build_Id (Object : in Branch_Ref)
                  return ADO.Identifier;
 
    --  Load the entity identified by 'Id'.
@@ -543,7 +543,7 @@ private
    COL_6_2_NAME : aliased constant String := "update_date";
    COL_7_2_NAME : aliased constant String := "status";
    COL_8_2_NAME : aliased constant String := "project_id";
-   COL_9_2_NAME : aliased constant String := "last_build";
+   COL_9_2_NAME : aliased constant String := "last_build_id";
 
    BRANCH_DEF : aliased constant ADO.Schemas.Class_Mapping :=
      (Count   => 10,
@@ -589,7 +589,7 @@ private
        Update_Date : Ada.Calendar.Time;
        Status : Porion.Projects.Models.Branch_Status_Type;
        Project : Porion.Projects.Models.Project_Ref;
-       Last_Build : ADO.Identifier;
+       Last_Build_Id : ADO.Identifier;
    end record;
 
    type Branch_Access is access all Branch_Impl;

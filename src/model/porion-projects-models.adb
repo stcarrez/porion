@@ -613,7 +613,7 @@ package body Porion.Projects.Models is
       Impl.Create_Date := ADO.DEFAULT_TIME;
       Impl.Update_Date := ADO.DEFAULT_TIME;
       Impl.Status := Porion.Projects.Models.Branch_Status_Type'First;
-      Impl.Last_Build := ADO.NO_IDENTIFIER;
+      Impl.Last_Build_Id := ADO.NO_IDENTIFIER;
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Allocate;
 
@@ -795,21 +795,21 @@ package body Porion.Projects.Models is
    end Get_Project;
 
 
-   procedure Set_Last_Build (Object : in out Branch_Ref;
-                             Value  : in ADO.Identifier) is
+   procedure Set_Last_Build_Id (Object : in out Branch_Ref;
+                                Value  : in ADO.Identifier) is
       Impl : Branch_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Identifier (Impl.all, 10, Impl.Last_Build, Value);
-   end Set_Last_Build;
+      ADO.Objects.Set_Field_Identifier (Impl.all, 10, Impl.Last_Build_Id, Value);
+   end Set_Last_Build_Id;
 
-   function Get_Last_Build (Object : in Branch_Ref)
+   function Get_Last_Build_Id (Object : in Branch_Ref)
                   return ADO.Identifier is
       Impl : constant Branch_Access
          := Branch_Impl (Object.Get_Load_Object.all)'Access;
    begin
-      return Impl.Last_Build;
-   end Get_Last_Build;
+      return Impl.Last_Build_Id;
+   end Get_Last_Build_Id;
 
    --  Copy of the object.
    procedure Copy (Object : in Branch_Ref;
@@ -833,7 +833,7 @@ package body Porion.Projects.Models is
             Copy.Update_Date := Impl.Update_Date;
             Copy.Status := Impl.Status;
             Copy.Project := Impl.Project;
-            Copy.Last_Build := Impl.Last_Build;
+            Copy.Last_Build_Id := Impl.Last_Build_Id;
          end;
       end if;
       Into := Result;
@@ -999,8 +999,8 @@ package body Porion.Projects.Models is
          Object.Clear_Modified (9);
       end if;
       if Object.Is_Modified (10) then
-         Stmt.Save_Field (Name  => COL_9_2_NAME, --  last_build
-                          Value => Object.Last_Build);
+         Stmt.Save_Field (Name  => COL_9_2_NAME, --  last_build_id
+                          Value => Object.Last_Build_Id);
          Object.Clear_Modified (10);
       end if;
       if Stmt.Has_Save_Fields then
@@ -1052,8 +1052,8 @@ package body Porion.Projects.Models is
                         Value => Integer (Porion.Projects.Models.Branch_Status_Type'Pos (Object.Status)));
       Query.Save_Field (Name  => COL_8_2_NAME, --  project_id
                         Value => Object.Project);
-      Query.Save_Field (Name  => COL_9_2_NAME, --  last_build
-                        Value => Object.Last_Build);
+      Query.Save_Field (Name  => COL_9_2_NAME, --  last_build_id
+                        Value => Object.Last_Build_Id);
       Query.Execute (Result);
       if Result /= 1 then
          raise ADO.Objects.INSERT_ERROR;
@@ -1104,8 +1104,8 @@ package body Porion.Projects.Models is
          return Util.Beans.Objects.Time.To_Object (Impl.Update_Date);
       elsif Name = "status" then
          return Porion.Projects.Models.Branch_Status_Type_Objects.To_Object (Impl.Status);
-      elsif Name = "last_build" then
-         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Last_Build));
+      elsif Name = "last_build_id" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Last_Build_Id));
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -1129,7 +1129,7 @@ package body Porion.Projects.Models is
       if not Stmt.Is_Null (8) then
          Object.Project.Set_Key_Value (Stmt.Get_Identifier (8), Session);
       end if;
-      Object.Last_Build := Stmt.Get_Identifier (9);
+      Object.Last_Build_Id := Stmt.Get_Identifier (9);
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);
    end Load;

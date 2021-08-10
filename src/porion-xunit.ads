@@ -16,9 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Ada.Calendar;
 with Util.Strings.Vectors;
-with ADO.Sessions;
 package Porion.XUnit is
 
    subtype Group_Path is Util.Strings.Vectors.Vector;

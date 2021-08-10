@@ -19,6 +19,7 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with Util.Strings.Vectors;
 with ADO.Sessions;
 with Porion.Projects.Models;
+with Porion.Builds.Models;
 with Porion.XUnit.Models;
 package Porion.XUnit.Analysis is
 
@@ -72,7 +73,7 @@ package Porion.XUnit.Analysis is
                        Status   : in Porion.XUnit.Models.Test_Status_Type);
 
    procedure Save (Results : in out Test_Results;
-                   Build   : in out Porion.Projects.Models.Build_Ref;
+                   Build   : in out Porion.Builds.Models.Build_Ref;
                    Session : in out ADO.Sessions.Master_Session);
 
 end Porion.XUnit.Analysis;

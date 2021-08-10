@@ -131,7 +131,7 @@ package body Porion.XUnit.Analysis is
 
    procedure Save_Run_Tests (Results  : in out Test_Results;
                              Existing : in out Test_Results;
-                             Build    : in out Porion.Projects.Models.Build_Ref;
+                             Build    : in out Porion.Builds.Models.Build_Ref;
                              Session  : in out ADO.Sessions.Master_Session) is
       Build_Id   : constant ADO.Nullable_Integer := (Is_Null => False, Value => Build.Get_Number);
       Project_Id : constant ADO.Identifier := Build.Get_Project.Get_Id;
@@ -332,7 +332,7 @@ package body Porion.XUnit.Analysis is
    end Load;
 
    procedure Save (Results : in out Test_Results;
-                   Build   : in out Porion.Projects.Models.Build_Ref;
+                   Build   : in out Porion.Builds.Models.Build_Ref;
                    Session : in out ADO.Sessions.Master_Session) is
       Known_Tests : Test_Results;
    begin

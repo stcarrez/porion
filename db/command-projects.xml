@@ -10,9 +10,11 @@
             project.id AS id,
             project.name AS name,
             project.status AS status,
-            COUNT(branch.id) AS branch_count
+            COUNT(branch.id) AS branch_count,
+	    (SELECT COUNT(build.id) FROM porion_build AS build WHERE build.project_id = project.id) AS build_count 
             FROM porion_project AS project
             LEFT JOIN porion_branch AS branch ON project.id = branch.project_id
+            GROUP BY project.id
         </sql>
         <sql-count>
             SELECT

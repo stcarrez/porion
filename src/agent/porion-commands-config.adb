@@ -26,7 +26,7 @@ package body Porion.Commands.Config is
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Context   : in out Context_Type) is
-      pragma Unreferenced (Command);
+      pragma Unreferenced (Command, Name, Context);
    begin
       if Args.Get_Count = 0 then
          Porion.Commands.Log.Error (-("missing configuration variable to get or set"));

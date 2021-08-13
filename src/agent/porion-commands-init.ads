@@ -20,7 +20,7 @@ private package Porion.Commands.Init is
 
    type Command_Type is new Porion.Commands.Drivers.Command_Type with private;
 
-   --  Report the status of the workspace or a project.
+   --  Initialize the Porion workspace to manage and build projects.
    overriding
    procedure Execute (Command   : in out Command_Type;
                       Name      : in String;

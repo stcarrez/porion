@@ -21,7 +21,9 @@ with Porion.Configs;
 with Porion.Sources.Factories;
 package body Porion.Commands.Add is
 
-   --  Get a value from the keystore.
+   --  ------------------------------
+   --  Add a project, identify its source control scheme and build steps.
+   --  ------------------------------
    overriding
    procedure Execute (Command   : in out Command_Type;
                       Name      : in String;
@@ -59,7 +61,9 @@ package body Porion.Commands.Add is
 
    end Execute;
 
+   --  ------------------------------
    --  Setup the command before parsing the arguments and executing it.
+   --  ------------------------------
    overriding
    procedure Setup (Command : in out Command_Type;
                     Config  : in out GNAT.Command_Line.Command_Line_Configuration;
@@ -70,7 +74,9 @@ package body Porion.Commands.Add is
                         "-j", "json", -("Produce a JSON output"));
    end Setup;
 
+   --  ------------------------------
    --  Write the help associated with the command.
+   --  ------------------------------
    overriding
    procedure Help (Command   : in out Command_Type;
                    Name      : in String;

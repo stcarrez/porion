@@ -42,14 +42,14 @@ package body Porion.Commands.Build is
 
          Context.Project_Service.Check_Sources (Source_Status);
 
-         Context.Project_Service.Load ("travis.yml");
+         Context.Build_Service.Open (Context.Project_Service);
 
          for Branch in Source_Status.Changes.Iterate loop
             Ada.Text_IO.Put (Key (Branch));
             Ada.Text_IO.Put (" ");
             Ada.Text_IO.Put_Line (Porion.To_String (Element (Branch).Tag));
 
-            Context.Project_Service.Build (Key (Branch), Element (Branch));
+            Builds.Services.Build (Context.Build_Service, Key (Branch), Element (Branch));
          end loop;
       end;
    end Execute;

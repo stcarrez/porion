@@ -20,7 +20,7 @@ private package Porion.Commands.Add is
 
    type Command_Type is new Porion.Commands.Drivers.Command_Type with private;
 
-   --  Add a project.
+   --  Add a project, identify its source control scheme and build steps.
    overriding
    procedure Execute (Command   : in out Command_Type;
                       Name      : in String;

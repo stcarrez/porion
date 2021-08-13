@@ -19,12 +19,15 @@ with Ada.Directories;
 with Porion.Configs;
 package body Porion.Commands.Init is
 
-   --  Get a value from the keystore.
+   --  ------------------------------
+   --  Initialize the Porion workspace to manage and build projects.
+   --  ------------------------------
    overriding
    procedure Execute (Command   : in out Command_Type;
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Context   : in out Context_Type) is
+      pragma Unreferenced (Command, Name);
    begin
       if Args.Get_Count = 0 then
          Porion.Commands.Log.Error (-("missing directory to setup"));
@@ -48,7 +51,9 @@ package body Porion.Commands.Init is
       end if;
    end Execute;
 
+   --  ------------------------------
    --  Setup the command before parsing the arguments and executing it.
+   --  ------------------------------
    overriding
    procedure Setup (Command : in out Command_Type;
                     Config  : in out GNAT.Command_Line.Command_Line_Configuration;
@@ -59,7 +64,9 @@ package body Porion.Commands.Init is
                         "-j", "json", -("Produce a JSON output"));
    end Setup;
 
+   --  ------------------------------
    --  Write the help associated with the command.
+   --  ------------------------------
    overriding
    procedure Help (Command   : in out Command_Type;
                    Name      : in String;

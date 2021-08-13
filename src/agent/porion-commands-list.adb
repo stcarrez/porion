@@ -32,9 +32,15 @@ package body Porion.Commands.List is
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Context   : in out Context_Type) is
+      pragma Unreferenced (Name, Args);
+
       Query       : ADO.Queries.Context;
    begin
       Context.Project_Service.Open;
+
+      if not Command.List_Projects and not Command.List_Nodes and not Command.List_Builds then
+         Command.List_Projects := True;
+      end if;
 
       if Command.List_Projects then
          Query.Set_Query (Porion.Projects.Models.Query_Command_Project_List);

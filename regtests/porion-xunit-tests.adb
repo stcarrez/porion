@@ -23,6 +23,7 @@ with Porion.Sources;
 with Porion.XUnit.Analysis;
 with Porion.XUnit.Parsers;
 with Porion.Builds.Models;
+with Porion.Builds.Services;
 with Porion.Projects.Services;
 package body Porion.XUnit.Tests is
 
@@ -41,6 +42,7 @@ package body Porion.XUnit.Tests is
       Path      : constant String := "regtests/files/TEST-SQLite-Users.Tests.xml";
       Path2     : constant String := "regtests/files/TEST-Dynamo.xml";
       Service   : Porion.Projects.Services.Context_Type;
+      Builder   : Porion.Builds.Services.Context_Type;
       Info      : Porion.Sources.Source_Info_Type;
       Branch    : Porion.Sources.Branch_Type;
       Build     : Porion.Builds.Models.Build_Ref;
@@ -70,12 +72,14 @@ package body Porion.XUnit.Tests is
             Info.URI := To_UString ("git://github.com/stcarrez/ada-lzma.git");
             Service.Add_Project (Info);
       end;
-      Service.Start_Build (Branch_Name => "master",
+      Service.Add_Branch ("master", Branch);
+      Builder.Open (Service);
+      Builder.Start_Build (Branch_Name => "master",
                            Branch      => Branch);
       Porion.XUnit.Parsers.Scan (Path, Results);
       Porion.XUnit.Parsers.Scan (Path2, Results);
       --  Porion.XUnit.Parsers.Scan ("regtests/files/many", "*.xml", Results);
-      Build := Service.Get_Build;
+      Build := Builder.Get_Build;
       Session := Service.Get_Database;
       Porion.XUnit.Analysis.Save (Results => Results,
                                   Build   => Build,

@@ -64,14 +64,15 @@ package body Porion.Resources is
        & "        <sql>" & ASCII.LF & "            SELECT" & ASCII.LF & "            project."
        & "id AS id," & ASCII.LF & "            project.name AS name," & ASCII.LF & "         "
        & "   project.status AS status," & ASCII.LF & "            COUNT(branch.id) AS bra"
-       & "nch_count," & ASCII.LF & "	    (SELECT COUNT(build.id) FROM porion_build AS bui"
-       & "ld WHERE build.project_id = project.id) AS build_count " & ASCII.LF & "        "
-       & "    FROM porion_project AS project" & ASCII.LF & "            LEFT JOIN porion_"
-       & "branch AS branch ON project.id = branch.project_id" & ASCII.LF & "            G"
-       & "ROUP BY project.id" & ASCII.LF & "        </sql>" & ASCII.LF & "        <sql-count>"
-       & ASCII.LF & "            SELECT" & ASCII.LF & "            count(project.id)" & ASCII.LF
-       & "            FROM porion_project AS project" & ASCII.LF & "        </sql-count>" & ASCII.LF
-       & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+       & "nch_count," & ASCII.LF & "            (SELECT COUNT(build.id) FROM porion_build"
+       & " AS build WHERE build.project_id = project.id) AS build_count " & ASCII.LF & " "
+       & "           FROM porion_project AS project" & ASCII.LF & "            LEFT JOIN "
+       & "porion_branch AS branch ON project.id = branch.project_id" & ASCII.LF & "      "
+       & "      GROUP BY project.id" & ASCII.LF & "        </sql>" & ASCII.LF & "        <sql"
+       & "-count>" & ASCII.LF & "            SELECT" & ASCII.LF & "            count(project."
+       & "id)" & ASCII.LF & "            FROM porion_project AS project" & ASCII.LF & "      "
+       & "  </sql-count>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</query-mappi"
+       & "ng>" & ASCII.LF;
 
    C_3 : aliased constant String := "<query-mapping package='Porion.Projects.M"
        & "odels'>" & ASCII.LF & "    <description>" & ASCII.LF & "      Information about bra"

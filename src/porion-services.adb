@@ -1,0 +1,144 @@
+-----------------------------------------------------------------------
+--  porion-services -- Project information
+--  Copyright (C) 2021 Stephane Carrez
+--  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
+--
+--  Licensed under the Apache License, Version 2.0 (the "License");
+--  you may not use this file except in compliance with the License.
+--  You may obtain a copy of the License at
+--
+--      http://www.apache.org/licenses/LICENSE-2.0
+--
+--  Unless required by applicable law or agreed to in writing, software
+--  distributed under the License is distributed on an "AS IS" BASIS,
+--  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+--  See the License for the specific language governing permissions and
+--  limitations under the License.
+-----------------------------------------------------------------------
+
+with Util.Log.Loggers;
+with Util.Strings;
+with Util.Properties;
+
+with ADO.Configs;
+with ADO.Sqlite;
+with ADO.SQL;
+
+with Porion.Configs;
+with Porion.Projects.Schema;
+with Porion.Resources;
+package body Porion.Services is
+
+   Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Services");
+
+   function Get_Query_Resource (Name : in String) return access constant String is
+   begin
+      Log.Info ("Get query resource {0}", Name);
+
+      return Porion.Resources.Get_Content (Name);
+   end Get_Query_Resource;
+
+   --  ------------------------------
+   --  Get the current project id.
+   --  ------------------------------
+   function Get_Project_Id (Service : in Context_Type) return ADO.Identifier is
+   begin
+      return Service.Project.Get_Id;
+   end Get_Project_Id;
+
+   procedure Load_Project (Service : in out Context_Type;
+                           Name    : in String) is
+      Query : ADO.SQL.Query;
+      Found : Boolean;
+   begin
+      Log.Debug ("Load project {0}", Name);
+
+      Query.Bind_Param (1, Name);
+      Query.Set_Filter ("o.name = ?");
+      Service.Project.Find (Service.DB, Query, Found);
+      if not Found then
+         Log.Warn ("Project name {0} does not exist", Name);
+         raise Name_Used;
+      end if;
+
+   end Load_Project;
+
+   --  ------------------------------
+   --  Load the build node corresponding to the given hostname.
+   --  ------------------------------
+   procedure Load_Node (Service  : in out Context_Type;
+                        Hostname : in String) is
+      Query : ADO.SQL.Query;
+      Found : Boolean;
+   begin
+      Log.Debug ("Load build node {0}", Hostname);
+
+      Query.Bind_Param (1, Hostname);
+      Query.Set_Filter ("o.name = ?");
+      Service.Build_Node.Find (Service.DB, Query, Found);
+      if not Found then
+         Log.Warn ("Build node {0} does not exist", Hostname);
+         raise Name_Used;
+      end if;
+
+   end Load_Node;
+
+   function Create_Query (Service : in out Context_Type;
+                          Query   : in ADO.Queries.Context) return Ado.Statements.Query_Statement is
+   begin
+      return Service.DB.Create_Statement (Query);
+   end Create_Query;
+
+   function Get_Database (Service : in Context_Type) return ADO.Sessions.Master_Session is
+   begin
+      return Service.DB;
+   end Get_Database;
+
+   procedure Open (Service : in out Context_Type;
+                   Create  : in Boolean := False) is
+      Path   : constant String := Porion.Configs.Get_Database_Path
+        & (if Create then "?create=true" else "");
+      Config : Util.Properties.Manager;
+   begin
+      Config.Set (ADO.Configs.QUERY_PATHS_CONFIG, "db");
+      Config.Set (ADO.Configs.DYNAMIC_DRIVER_LOAD, "false");
+      Config.Set (ADO.Configs.QUERY_LOAD_CONFIG, "true");
+      Config.Set (ADO.Configs.NO_ENTITY_LOAD, (if Create then "true" else "false"));
+      ADO.SQLite.Initialize (Config);
+      Service.Factory.Set_Query_Loader (Get_Query_Resource'Access);
+      Service.Factory.Create (Path);
+      Service.DB := Service.Factory.Get_Master_Session;
+
+      if Create then
+         declare
+            use Porion.Projects.Schema;
+
+            List : constant Porion.Projects.Schema.Content_Access
+              := Porion.Projects.Schema.Get_Content ("create-porion-sqlite");
+         begin
+            if List = null then
+               Log.Error ("Cannot find the database schema!");
+               return;
+            end if;
+
+            for Query of List.all loop
+               declare
+                  Stmt : ADO.Statements.Query_Statement
+                    := Service.DB.Create_Statement (Query.all);
+               begin
+                  Stmt.Execute;
+               end;
+            end loop;
+         end;
+      end if;
+   end Open;
+
+   procedure Open (Service : in out Context_Type;
+                   From    : in out Context_Type'Class) is
+   begin
+      Service.DB := From.DB;
+      Service.Project := From.Project;
+      Service.Branch := From.Branch;
+   end Open;
+
+end Porion.Services;

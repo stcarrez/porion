@@ -37,6 +37,9 @@ package Porion.Services is
       Build_Config      : Porion.Builds.Models.Build_Config_Ref;
    end record;
 
+   function Has_Project (Service : in Context_Type) return Boolean is
+      (not Service.Project.Is_Null);
+
    --  Load the build node corresponding to the given hostname.
    procedure Load_Node (Service  : in out Context_Type;
                         Hostname : in String);

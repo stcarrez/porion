@@ -31,7 +31,10 @@ CREATE TABLE IF NOT EXISTS porion_build (
   "project_id" BIGINT NOT NULL,
   PRIMARY KEY ("id")
 );
-/*  */
+/* Describes a configuration to build a project.
+The build configuration can be associated with a build node and
+it is decomposed in several build steps. Each step is managed by
+a specific builder which can perform specific operations. */
 CREATE TABLE IF NOT EXISTS porion_build_config (
   /* identifier */
   "id" BIGINT NOT NULL,
@@ -61,6 +64,25 @@ CREATE TABLE IF NOT EXISTS porion_build_step (
   "step" INTEGER NOT NULL,
   /* the build configuration that contains this build step. */
   "build_config_id" BIGINT NOT NULL,
+  PRIMARY KEY ("id")
+);
+/* Specific environment variables
+can be defined for the build
+configuration or for a specific
+build node. */
+CREATE TABLE IF NOT EXISTS porion_environment (
+  /* the environment identifier. */
+  "id" BIGINT NOT NULL,
+  /* the optimistic lock version. */
+  "version" INTEGER NOT NULL,
+  /* the environment variable name. */
+  "name" VARCHAR(255) NOT NULL,
+  /* the environment variable value. */
+  "value" VARCHAR(4096) NOT NULL,
+  /*  */
+  "node_id" BIGINT ,
+  /*  */
+  "build_config_id" BIGINT ,
   PRIMARY KEY ("id")
 );
 /*  */
@@ -234,7 +256,7 @@ CREATE TABLE IF NOT EXISTS porion_test_run_group (
   PRIMARY KEY ("id")
 );
 INSERT INTO entity_type (name) VALUES
-('porion_build'), ('porion_build_config'), ('porion_build_step'), ('porion_node'), ('porion_branch'), ('porion_dependency'), ('porion_project'), ('porion_test'), ('porion_test_group'), ('porion_test_run'), ('porion_test_run_group')
+('porion_build'), ('porion_build_config'), ('porion_build_step'), ('porion_environment'), ('porion_node'), ('porion_branch'), ('porion_dependency'), ('porion_project'), ('porion_test'), ('porion_test_group'), ('porion_test_run'), ('porion_test_run_group')
   ON CONFLICT DO NOTHING;
 INSERT INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = 'porion_build_step'), 'parameters')
@@ -244,6 +266,9 @@ INSERT INTO awa_audit_field (entity_type, name)
   ON CONFLICT DO NOTHING;
 INSERT INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = 'porion_build_step'), 'timeout')
+  ON CONFLICT DO NOTHING;
+INSERT INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = 'porion_environment'), 'value')
   ON CONFLICT DO NOTHING;
 INSERT INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = 'porion_node'), 'name')

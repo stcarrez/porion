@@ -7,6 +7,7 @@ DROP TABLE IF EXISTS porion_project;
 DROP TABLE IF EXISTS porion_dependency;
 DROP TABLE IF EXISTS porion_branch;
 DROP TABLE IF EXISTS porion_node;
+DROP TABLE IF EXISTS porion_environment;
 DROP TABLE IF EXISTS porion_build_step;
 DROP TABLE IF EXISTS porion_build_config;
 DROP TABLE IF EXISTS porion_build;

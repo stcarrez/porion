@@ -449,6 +449,15 @@ package Porion.Builds.Models is
    procedure Copy (Object : in Build_Step_Ref;
                    Into   : in out Build_Step_Ref);
 
+   package Build_Step_Vectors is
+      new Ada.Containers.Vectors (Index_Type   => Positive,
+                                  Element_Type => Build_Step_Ref,
+                                  "="          => "=");
+   subtype Build_Step_Vector is Build_Step_Vectors.Vector;
+
+   procedure List (Object  : in out Build_Step_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class);
    --  --------------------
    --  Specific environment variables
    --  can be defined for the build
@@ -562,6 +571,15 @@ package Porion.Builds.Models is
    procedure Copy (Object : in Environment_Ref;
                    Into   : in out Environment_Ref);
 
+   package Environment_Vectors is
+      new Ada.Containers.Vectors (Index_Type   => Positive,
+                                  Element_Type => Environment_Ref,
+                                  "="          => "=");
+   subtype Environment_Vector is Environment_Vectors.Vector;
+
+   procedure List (Object  : in out Environment_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class);
 
 
 

@@ -1489,6 +1489,26 @@ package body Porion.Builds.Models is
    end Get_Value;
 
 
+   procedure List (Object  : in out Build_Step_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class) is
+      Stmt : ADO.Statements.Query_Statement
+        := Session.Create_Statement (Query, BUILD_STEP_DEF'Access);
+   begin
+      Stmt.Execute;
+      Build_Step_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         declare
+            Item : Build_Step_Ref;
+            Impl : constant Build_Step_Access := new Build_Step_Impl;
+         begin
+            Impl.Load (Stmt, Session);
+            ADO.Objects.Set_Object (Item, Impl.all'Access);
+            Object.Append (Item);
+         end;
+         Stmt.Next;
+      end loop;
+   end List;
 
    --  ------------------------------
    --  Load the object from current iterator position
@@ -1924,6 +1944,26 @@ package body Porion.Builds.Models is
    end Get_Value;
 
 
+   procedure List (Object  : in out Environment_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class) is
+      Stmt : ADO.Statements.Query_Statement
+        := Session.Create_Statement (Query, ENVIRONMENT_DEF'Access);
+   begin
+      Stmt.Execute;
+      Environment_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         declare
+            Item : Environment_Ref;
+            Impl : constant Environment_Access := new Environment_Impl;
+         begin
+            Impl.Load (Stmt, Session);
+            ADO.Objects.Set_Object (Item, Impl.all'Access);
+            Object.Append (Item);
+         end;
+         Stmt.Next;
+      end loop;
+   end List;
 
    --  ------------------------------
    --  Load the object from current iterator position

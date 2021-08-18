@@ -144,24 +144,28 @@ package body Porion.Projects.Schema is
        & "R(65536) NOT NULL, `number` INTEGER NOT NULL, `builder` INTEGER NOT NULL, `"
        & "timeout` INTEGER NOT NULL, `step` INTEGER NOT NULL, `build_config_id` BIGIN"
        & "T NOT NULL, PRIMARY KEY (`id`))";
-   L_47  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_node ( "
+   L_47  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_environ"
+       & "ment ( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `name` VARCHAR(255"
+       & ") NOT NULL, `value` VARCHAR(4096) NOT NULL, `node_id` BIGINT , `build_confi"
+       & "g_id` BIGINT , PRIMARY KEY (`id`))";
+   L_48  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_node ( "
        & "`id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `name` VARCHAR(255) NOT N"
        & "ULL, `login` VARCHAR(255) NOT NULL, PRIMARY KEY (`id`))";
-   L_48  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_branch "
+   L_49  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_branch "
        & "( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `name` VARCHAR(255) NOT"
        & " NULL, `tag` VARCHAR(255) NOT NULL, `last_date` DATETIME , `create_date` DA"
        & "TETIME NOT NULL, `update_date` DATETIME NOT NULL, `status` INTEGER NOT NULL"
        & ", `project_id` BIGINT NOT NULL, `last_build_id` BIGINT , PRIMARY KEY (`id`)"
        & ")";
-   L_49  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_depende"
+   L_50  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_depende"
        & "ncy ( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `project_id` BIGINT"
        & " NOT NULL, `owner_id` BIGINT NOT NULL, PRIMARY KEY (`id`))";
-   L_50  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_project"
+   L_51  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_project"
        & " ( `id` BIGINT NOT NULL, `name` VARCHAR(255) NOT NULL, `version` INTEGER NO"
        & "T NULL, `description` VARCHAR(255) NOT NULL, `create_date` DATETIME NOT NUL"
        & "L, `update_date` DATETIME NOT NULL, `status` INTEGER NOT NULL, `scm` INTEGE"
        & "R NOT NULL, `scm_url` VARCHAR(255) NOT NULL, PRIMARY KEY (`id`))";
-   L_51  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_test ( "
+   L_52  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_test ( "
        & "`id` BIGINT NOT NULL, `name` VARCHAR(255) NOT NULL, `create_date` DATETIME "
        & "NOT NULL, `version` INTEGER NOT NULL, `total_pass_count` INTEGER NOT NULL, "
        & "`total_fail_count` INTEGER NOT NULL, `total_timeout_count` INTEGER NOT NULL"
@@ -170,77 +174,82 @@ package body Porion.Projects.Schema is
        & "_timeout_build` INTEGER , `total_skip_count` INTEGER NOT NULL, `last_skip_d"
        & "ate` DATETIME NOT NULL, `last_skip_build` INTEGER NOT NULL, `group_id` BIGI"
        & "NT NOT NULL, PRIMARY KEY (`id`))";
-   L_52  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_test_gr"
+   L_53  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_test_gr"
        & "oup ( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `name` VARCHAR(255)"
        & " NOT NULL, `create_date` DATETIME NOT NULL, `project_id` BIGINT NOT NULL, `"
        & "group_id` BIGINT , PRIMARY KEY (`id`))";
-   L_53  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_test_ru"
+   L_54  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_test_ru"
        & "n ( `duration` INTEGER NOT NULL, `status` INTEGER NOT NULL, `id` BIGINT NOT"
        & " NULL, `assertions` INTEGER NOT NULL, `test_id` BIGINT NOT NULL, `group_id`"
        & " BIGINT NOT NULL, PRIMARY KEY (`id`))";
-   L_54  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_test_ru"
+   L_55  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_test_ru"
        & "n_group ( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `total_pass_cou"
        & "nt` INTEGER NOT NULL, `total_fail_count` INTEGER NOT NULL, `total_timeout_c"
        & "ount` INTEGER NOT NULL, `total_skip_count` INTEGER NOT NULL, `diff_pass` IN"
        & "TEGER NOT NULL, `diff_fail` INTEGER NOT NULL, `diff_timeout` INTEGER NOT NU"
        & "LL, `diff_skip` INTEGER NOT NULL, `duration` INTEGER NOT NULL, `build_id` B"
        & "IGINT NOT NULL, `group_id` BIGINT NOT NULL, PRIMARY KEY (`id`))";
-   L_55  : aliased constant String := "INSERT OR IGNORE INTO entity_type (name) "
-       & "VALUES (""porion_build"")";
    L_56  : aliased constant String := "INSERT OR IGNORE INTO entity_type (name) "
-       & "VALUES (""porion_build_config"")";
+       & "VALUES (""porion_build"")";
    L_57  : aliased constant String := "INSERT OR IGNORE INTO entity_type (name) "
-       & "VALUES (""porion_build_step"")";
+       & "VALUES (""porion_build_config"")";
    L_58  : aliased constant String := "INSERT OR IGNORE INTO entity_type (name) "
-       & "VALUES (""porion_node"")";
+       & "VALUES (""porion_build_step"")";
    L_59  : aliased constant String := "INSERT OR IGNORE INTO entity_type (name) "
-       & "VALUES (""porion_branch"")";
+       & "VALUES (""porion_environment"")";
    L_60  : aliased constant String := "INSERT OR IGNORE INTO entity_type (name) "
-       & "VALUES (""porion_dependency"")";
+       & "VALUES (""porion_node"")";
    L_61  : aliased constant String := "INSERT OR IGNORE INTO entity_type (name) "
-       & "VALUES (""porion_project"")";
+       & "VALUES (""porion_branch"")";
    L_62  : aliased constant String := "INSERT OR IGNORE INTO entity_type (name) "
-       & "VALUES (""porion_test"")";
+       & "VALUES (""porion_dependency"")";
    L_63  : aliased constant String := "INSERT OR IGNORE INTO entity_type (name) "
-       & "VALUES (""porion_test_group"")";
+       & "VALUES (""porion_project"")";
    L_64  : aliased constant String := "INSERT OR IGNORE INTO entity_type (name) "
-       & "VALUES (""porion_test_run"")";
+       & "VALUES (""porion_test"")";
    L_65  : aliased constant String := "INSERT OR IGNORE INTO entity_type (name) "
+       & "VALUES (""porion_test_group"")";
+   L_66  : aliased constant String := "INSERT OR IGNORE INTO entity_type (name) "
+       & "VALUES (""porion_test_run"")";
+   L_67  : aliased constant String := "INSERT OR IGNORE INTO entity_type (name) "
        & "VALUES (""porion_test_run_group"")";
-   L_66  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
-       & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""porion_"
-       & "build_step""), ""parameters"")";
-   L_67  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
-       & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""porion_"
-       & "build_step""), ""number"")";
    L_68  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""porion_"
-       & "build_step""), ""timeout"")";
+       & "build_step""), ""parameters"")";
    L_69  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""porion_"
-       & "node""), ""name"")";
+       & "build_step""), ""number"")";
    L_70  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""porion_"
-       & "node""), ""login"")";
+       & "build_step""), ""timeout"")";
    L_71  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""porion_"
-       & "branch""), ""tag"")";
+       & "environment""), ""value"")";
    L_72  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""porion_"
-       & "branch""), ""last_date"")";
+       & "node""), ""name"")";
    L_73  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""porion_"
-       & "project""), ""name"")";
+       & "node""), ""login"")";
    L_74  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""porion_"
-       & "project""), ""description"")";
+       & "branch""), ""tag"")";
    L_75  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""porion_"
-       & "project""), ""status"")";
+       & "branch""), ""last_date"")";
    L_76  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""porion_"
-       & "project""), ""scm"")";
+       & "project""), ""name"")";
    L_77  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
+       & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""porion_"
+       & "project""), ""description"")";
+   L_78  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
+       & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""porion_"
+       & "project""), ""status"")";
+   L_79  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
+       & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""porion_"
+       & "project""), ""scm"")";
+   L_80  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""porion_"
        & "project""), ""scm_url"")";
    C_0 : aliased constant Content_Array :=
@@ -320,7 +329,10 @@ package body Porion.Projects.Schema is
       L_74'Access,
       L_75'Access,
       L_76'Access,
-      L_77'Access);
+      L_77'Access,
+      L_78'Access,
+      L_79'Access,
+      L_80'Access);
 
 
    type Content_List_Array is array (Natural range <>) of Content_Access;

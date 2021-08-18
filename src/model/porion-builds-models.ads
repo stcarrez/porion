@@ -76,6 +76,14 @@ package Porion.Builds.Models is
 
    type Build_Step_Ref is new ADO.Objects.Object_Ref with null record;
 
+   type Environment_Ref is new ADO.Objects.Object_Ref with null record;
+
+   --  --------------------
+   --  Describes a configuration to build a project.
+   --  The build configuration can be associated with a build node and
+   --  it is decomposed in several build steps. Each step is managed by
+   --  a specific builder which can perform specific operations.
+   --  --------------------
    --  Create an object key for Build_Config.
    function Build_Config_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key;
    --  Create an object key for Build_Config from a string.
@@ -441,6 +449,119 @@ package Porion.Builds.Models is
    procedure Copy (Object : in Build_Step_Ref;
                    Into   : in out Build_Step_Ref);
 
+   --  --------------------
+   --  Specific environment variables
+   --  can be defined for the build
+   --  configuration or for a specific
+   --  build node.
+   --  --------------------
+   --  Create an object key for Environment.
+   function Environment_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key;
+   --  Create an object key for Environment from a string.
+   --  Raises Constraint_Error if the string cannot be converted into the object key.
+   function Environment_Key (Id : in String) return ADO.Objects.Object_Key;
+
+   Null_Environment : constant Environment_Ref;
+   function "=" (Left, Right : Environment_Ref'Class) return Boolean;
+
+   --  Set the environment identifier.
+   procedure Set_Id (Object : in out Environment_Ref;
+                     Value  : in ADO.Identifier);
+
+   --  Get the environment identifier.
+   function Get_Id (Object : in Environment_Ref)
+                 return ADO.Identifier;
+   --  Get the optimistic lock version.
+   function Get_Version (Object : in Environment_Ref)
+                 return Integer;
+
+   --  Set the environment variable name.
+   procedure Set_Name (Object : in out Environment_Ref;
+                       Value  : in Ada.Strings.Unbounded.Unbounded_String);
+   procedure Set_Name (Object : in out Environment_Ref;
+                       Value : in String);
+
+   --  Get the environment variable name.
+   function Get_Name (Object : in Environment_Ref)
+                 return Ada.Strings.Unbounded.Unbounded_String;
+   function Get_Name (Object : in Environment_Ref)
+                 return String;
+
+   --  Set the environment variable value.
+   procedure Set_Value (Object : in out Environment_Ref;
+                        Value  : in Ada.Strings.Unbounded.Unbounded_String);
+   procedure Set_Value (Object : in out Environment_Ref;
+                        Value : in String);
+
+   --  Get the environment variable value.
+   function Get_Value (Object : in Environment_Ref)
+                 return Ada.Strings.Unbounded.Unbounded_String;
+   function Get_Value (Object : in Environment_Ref)
+                 return String;
+
+   --
+   procedure Set_Node (Object : in out Environment_Ref;
+                       Value  : in Porion.Nodes.Models.Node_Ref'Class);
+
+   --
+   function Get_Node (Object : in Environment_Ref)
+                 return Porion.Nodes.Models.Node_Ref'Class;
+
+   --
+   procedure Set_Build_Config (Object : in out Environment_Ref;
+                               Value  : in Porion.Builds.Models.Build_Config_Ref'Class);
+
+   --
+   function Get_Build_Config (Object : in Environment_Ref)
+                 return Porion.Builds.Models.Build_Config_Ref'Class;
+
+   --  Load the entity identified by 'Id'.
+   --  Raises the NOT_FOUND exception if it does not exist.
+   procedure Load (Object  : in out Environment_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Id      : in ADO.Identifier);
+
+   --  Load the entity identified by 'Id'.
+   --  Returns True in <b>Found</b> if the object was found and False if it does not exist.
+   procedure Load (Object  : in out Environment_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Id      : in ADO.Identifier;
+                   Found   : out Boolean);
+
+   --  Find and load the entity.
+   overriding
+   procedure Find (Object  : in out Environment_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class;
+                   Found   : out Boolean);
+
+   --  Save the entity.  If the entity does not have an identifier, an identifier is allocated
+   --  and it is inserted in the table.  Otherwise, only data fields which have been changed
+   --  are updated.
+   overriding
+   procedure Save (Object  : in out Environment_Ref;
+                   Session : in out ADO.Sessions.Master_Session'Class);
+
+   --  Delete the entity.
+   overriding
+   procedure Delete (Object  : in out Environment_Ref;
+                     Session : in out ADO.Sessions.Master_Session'Class);
+
+   overriding
+   function Get_Value (From : in Environment_Ref;
+                       Name : in String) return Util.Beans.Objects.Object;
+
+   --  Table definition
+   ENVIRONMENT_TABLE : constant ADO.Schemas.Class_Mapping_Access;
+
+   --  Internal method to allocate the Object_Record instance
+   overriding
+   procedure Allocate (Object : in out Environment_Ref);
+
+   --  Copy of the object.
+   procedure Copy (Object : in Environment_Ref;
+                   Into   : in out Environment_Ref);
+
 
 
 
@@ -684,4 +805,81 @@ private
 
    procedure Set_Field (Object : in out Build_Step_Ref'Class;
                         Impl   : out Build_Step_Access);
+   ENVIRONMENT_NAME : aliased constant String := "porion_environment";
+   COL_0_4_NAME : aliased constant String := "id";
+   COL_1_4_NAME : aliased constant String := "version";
+   COL_2_4_NAME : aliased constant String := "name";
+   COL_3_4_NAME : aliased constant String := "value";
+   COL_4_4_NAME : aliased constant String := "node_id";
+   COL_5_4_NAME : aliased constant String := "build_config_id";
+
+   ENVIRONMENT_DEF : aliased constant ADO.Schemas.Class_Mapping :=
+     (Count   => 6,
+      Table   => ENVIRONMENT_NAME'Access,
+      Members => (
+         1 => COL_0_4_NAME'Access,
+         2 => COL_1_4_NAME'Access,
+         3 => COL_2_4_NAME'Access,
+         4 => COL_3_4_NAME'Access,
+         5 => COL_4_4_NAME'Access,
+         6 => COL_5_4_NAME'Access)
+     );
+   ENVIRONMENT_TABLE : constant ADO.Schemas.Class_Mapping_Access
+      := ENVIRONMENT_DEF'Access;
+
+   ENVIRONMENT_AUDIT_DEF : aliased constant ADO.Audits.Auditable_Mapping :=
+     (Count    => 1,
+      Of_Class => ENVIRONMENT_DEF'Access,
+      Members  => (
+         1 => 3)
+     );
+   ENVIRONMENT_AUDIT_TABLE : constant ADO.Audits.Auditable_Mapping_Access
+      := ENVIRONMENT_AUDIT_DEF'Access;
+
+   Null_Environment : constant Environment_Ref
+      := Environment_Ref'(ADO.Objects.Object_Ref with null record);
+
+   type Environment_Impl is
+      new ADO.Audits.Auditable_Object_Record (Key_Type => ADO.Objects.KEY_INTEGER,
+                                     Of_Class => ENVIRONMENT_DEF'Access,
+                                     With_Audit => ENVIRONMENT_AUDIT_DEF'Access)
+   with record
+       Version : Integer;
+       Name : Ada.Strings.Unbounded.Unbounded_String;
+       Value : Ada.Strings.Unbounded.Unbounded_String;
+       Node : Porion.Nodes.Models.Node_Ref;
+       Build_Config : Porion.Builds.Models.Build_Config_Ref;
+   end record;
+
+   type Environment_Access is access all Environment_Impl;
+
+   overriding
+   procedure Destroy (Object : access Environment_Impl);
+
+   overriding
+   procedure Find (Object  : in out Environment_Impl;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class;
+                   Found   : out Boolean);
+
+   overriding
+   procedure Load (Object  : in out Environment_Impl;
+                   Session : in out ADO.Sessions.Session'Class);
+   procedure Load (Object  : in out Environment_Impl;
+                   Stmt    : in out ADO.Statements.Query_Statement'Class;
+                   Session : in out ADO.Sessions.Session'Class);
+
+   overriding
+   procedure Save (Object  : in out Environment_Impl;
+                   Session : in out ADO.Sessions.Master_Session'Class);
+
+   procedure Create (Object  : in out Environment_Impl;
+                     Session : in out ADO.Sessions.Master_Session'Class);
+
+   overriding
+   procedure Delete (Object  : in out Environment_Impl;
+                     Session : in out ADO.Sessions.Master_Session'Class);
+
+   procedure Set_Field (Object : in out Environment_Ref'Class;
+                        Impl   : out Environment_Access);
 end Porion.Builds.Models;

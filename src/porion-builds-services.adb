@@ -17,18 +17,32 @@
 -----------------------------------------------------------------------
 with Ada.Calendar;
 with Ada.Directories;
+with Ada.Unchecked_Deallocation;
 with Util.Log.Loggers;
 with Util.Strings;
+with Util.Streams;
+with Util.Streams.Texts;
+with Util.Serialize.IO.JSON;
 with Util.Properties;
-with Porion.Configs;
+with Util.Properties.JSON;
 with Porion.Loggers;
-with ADO.Configs;
-with ADO.Sqlite;
-with ADO.SQL;
+with ADO.Statements;
+with ADO.Queries;
+with ADO.Sessions;
+with Porion.Sources.Factories;
+with Porion.Nodes.Models;
+with Porion.Projects.Models;
 with Porion.Builders.Scripts;
+with Porion.Builders.Factories;
 package body Porion.Builds.Services is
 
+   use type Porion.Builders.Controller_Access;
+
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Builds.Services");
+
+   procedure Free is
+     new Ada.Unchecked_Deallocation (Object => Porion.Builders.Controller_Type'Class,
+                                     Name   => Porion.Builders.Controller_Access);
 
    procedure Start_Build (Service     : in out Context_Type;
                           Branch_Name : in String;
@@ -84,11 +98,10 @@ package body Porion.Builds.Services is
                     Branch_Name : in String;
                     Branch      : in Porion.Sources.Branch_Type) is
    begin
-      --   if Service.Project.Is_Null then
-      --   raise Name_Used;
-      --  end if;
-
       Start_Build (Service, Branch_Name, Branch);
+
+      Service.Load_Environment;
+      Service.Load_Build_Steps;
 
       declare
          Number  : constant Positive := Service.Build.Get_Number;
@@ -104,18 +117,161 @@ package body Porion.Builds.Services is
             Ada.Directories.Create_Path (Path);
          end if;
 
+         Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
+         Service.Source_Controller := Sources.Factories.Create (Service.Project.Get_Scm, Config);
+
          Logger.Create (Log_Dir, "build.log");
          Service.Source_Controller.Checkout (Path, Logger);
 
          Config.Set ("build_dir", Path);
          Service.Build_Controller := Porion.Builders.Scripts.Create (Config);
-         Service.Build_Controller.Build (Logger);
+         Service.Build_Controller.Build (Service.Build, Path, Logger);
 
          Service.Build.Set_Finish_Date (ADO.Nullable_Time '(Is_Null => False,
                                                             Value => Ada.Calendar.Clock));
          Service.Build.Save (Service.DB);
       end;
    end Build;
+
+   procedure Load_Config (Service : in out Context_Type) is
+      Query : ADO.Queries.Context;
+      Found : Boolean;
+   begin
+      if Service.Build_Node.Is_Null then
+         Service.Load_Node ("localhost");
+      end if;
+
+      if Service.Build_Config.Is_Null then
+         Query.Bind_Param (1, Service.Project.Get_Id);
+         Query.Bind_Param (2, Service.Build_Node.Get_Id);
+         Query.Set_Filter ("o.project_id = ? AND o.node_id = ?");
+         Service.Build_Config.Find (Service.DB, Query, Found);
+         if not Found then
+            Service.Build_Config.Set_Node (Service.Build_Node);
+            Service.Build_Config.Set_Project (Service.Project);
+            Service.Build_Config.Save (Service.DB);
+         end if;
+      end if;
+
+      Service.Load_Build_Steps;
+      Service.Load_Environment;
+   end Load_Config;
+
+   procedure Load_Environment (Service : in out Context_Type) is
+      Envs  : Porion.Builds.Models.Environment_Vector;
+      Query : ADO.Queries.Context;
+   begin
+      Query.Set_Filter ("(o.build_config_id = :config_id OR o.node_id = :node_id)"
+                        & " OR (o.build_config_id IS NULL AND o.node_id IS NULL)");
+      Query.Bind_Param ("config_id", Service.Build_Config.Get_Id);
+      Query.Bind_Param ("node_id", Service.Build_Node.Get_Id);
+      Porion.Builds.Models.List (Envs, Service.DB, Query);
+
+
+   end Load_Environment;
+
+   procedure Load_Build_Steps (Service : in out Context_Type) is
+      Steps : Porion.Builds.Models.Build_Step_Vector;
+      Query : ADO.Queries.Context;
+   begin
+      Query.Set_Filter ("o.build_config_id = :config_id ORDER BY o.number");
+      Query.Bind_Param ("config_id", Service.Build_Config.Get_Id);
+      Porion.Builds.Models.List (Steps, Service.DB, Query);
+
+      for DB_Step of Steps loop
+         declare
+            Step : Build_Step;
+            Params : constant String := DB_Step.Get_Parameters;
+         begin
+            Step.Step := DB_Step;
+            if Params'Length > 0 then
+               Util.Properties.JSON.Parse_JSON (Step.Config, Params);
+            end if;
+            Service.Steps.Append (Step);
+         end;
+      end loop;
+
+      Log.Info ("Loaded{0} build steps",
+                Ada.Containers.Count_Type'Image (Service.Steps.Length));
+   end Load_Build_Steps;
+
+   --  Delete the build step at the given execution order.
+   procedure Delete_Step (Service  : in out Context_Type;
+                          Position : in Natural) is
+      Last : constant Natural := Natural (Service.Steps.Length);
+   begin
+      if Position > Last then
+         raise Program_Error;
+      end if;
+
+      Service.DB.Begin_Transaction;
+      declare
+         Step : Build_Step := Service.Steps.Element (Position);
+      begin
+         Step.Step.Delete (Service.DB);
+         Service.Steps.Delete (Position);
+      end;
+      for I in Position .. Last - 1 loop
+         declare
+            Step : Build_Step := Service.Steps.Element (I);
+         begin
+            Step.Step.Set_Number (I);
+            Step.Step.Save (Service.DB);
+         end;
+      end loop;
+      Service.DB.Commit;
+   end Delete_Step;
+
+   procedure Insert_Step (Service   : in out Context_Type;
+                          Position  : in Natural;
+                          Kind      : in Porion.Builds.Models.Builder_Type;
+                          Arguments : in Util.Strings.Vectors.Vector) is
+      use Porion.Builds.Models;
+
+      Config     : Porion.Configs.Config_Type;
+      Controller : Porion.Builders.Controller_Access
+        := Porion.Builders.Factories.Create (Kind, Service.DB, Config);
+      Output : aliased Util.Streams.Texts.Print_Stream;
+      Stream : Util.Serialize.IO.JSON.Output_Stream;
+   begin
+      if Controller = null then
+         Log.Error ("No builder for {0}", Builder_Type'Image (Kind));
+         return;
+      end if;
+      Controller.Configure (Arguments);
+
+      Output.Initialize (Size => 10000);
+      Stream.Initialize (Output => Output'Unchecked_Access);
+      Stream.Start_Document;
+      Controller.Print (Stream);
+      Stream.End_Document;
+
+      Free (Controller);
+
+      declare
+         Step : Build_Step;
+         Pos  : Natural := Position;
+      begin
+         if Pos = 0 then
+            Pos := Natural (Service.Steps.Length);
+         end if;
+         Service.Steps.Insert (Pos, Step);
+         Step.Step.Set_Parameters (Util.Streams.Texts.To_String (Output));
+         Step.Step.Set_Builder (Kind);
+         Step.Step.Set_Number (Position);
+         Step.Step.Set_Step (Porion.Builds.Models.STEP_MAKE);
+         Step.Step.Set_Build_Config (Service.Build_Config);
+         Step.Step.Save (Service.DB);
+
+         Pos := Pos + 1;
+         while Pos < Natural (Service.Steps.Length) loop
+            Step := Service.Steps.Element (Pos);
+            Step.Step.Set_Number (Pos);
+            Step.Step.Save (Service.DB);
+            Pos := Pos + 1;
+         end loop;
+      end;
+   end Insert_Step;
 
    function Get_Build (Service : in Context_Type) return Porion.Builds.Models.Build_Ref is
    begin

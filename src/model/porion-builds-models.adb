@@ -367,6 +367,26 @@ package body Porion.Builds.Models is
    end Get_Value;
 
 
+   procedure List (Object  : in out Build_Config_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class) is
+      Stmt : ADO.Statements.Query_Statement
+        := Session.Create_Statement (Query, BUILD_CONFIG_DEF'Access);
+   begin
+      Stmt.Execute;
+      Build_Config_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         declare
+            Item : Build_Config_Ref;
+            Impl : constant Build_Config_Access := new Build_Config_Impl;
+         begin
+            Impl.Load (Stmt, Session);
+            ADO.Objects.Set_Object (Item, Impl.all'Access);
+            Object.Append (Item);
+         end;
+         Stmt.Next;
+      end loop;
+   end List;
 
    --  ------------------------------
    --  Load the object from current iterator position

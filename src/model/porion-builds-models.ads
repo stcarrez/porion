@@ -167,6 +167,15 @@ package Porion.Builds.Models is
    procedure Copy (Object : in Build_Config_Ref;
                    Into   : in out Build_Config_Ref);
 
+   package Build_Config_Vectors is
+      new Ada.Containers.Vectors (Index_Type   => Positive,
+                                  Element_Type => Build_Config_Ref,
+                                  "="          => "=");
+   subtype Build_Config_Vector is Build_Config_Vectors.Vector;
+
+   procedure List (Object  : in out Build_Config_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class);
    --  Create an object key for Build.
    function Build_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key;
    --  Create an object key for Build from a string.

@@ -16,35 +16,19 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Calendar;
-with Ada.Directories;
 with Util.Log.Loggers;
-with Util.Strings;
 with Util.Properties;
 with Porion.Configs;
 with Porion.Loggers;
 with Porion.Sources.Factories;
-with ADO.Configs;
-with ADO.Sqlite;
 with ADO.SQL;
 with ADO.Queries;
 with ADO.Statements;
-with Porion.Projects.Schema;
 with Porion.Builds.Models;
 with Porion.Projects.Models;
-with Porion.Builders.Scripts;
-with Porion.Resources;
-with Yaml.Source.File;
-with Yaml.Parser;
 package body Porion.Projects.Services is
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Projects.Services");
-
-   function Get_Query_Resource (Name : in String) return access constant String is
-   begin
-      Log.Info ("Get query resource {0}", Name);
-
-      return Porion.Resources.Get_Content (Name);
-   end Get_Query_Resource;
 
    --  ------------------------------
    --  Add a build node
@@ -77,7 +61,6 @@ package body Porion.Projects.Services is
                           Info      : in Porion.Sources.Source_Info_Type) is
       Name  : constant String := To_String (Info.Name);
       Query : ADO.SQL.Query;
-      Cfg   : Porion.Builds.Models.Build_Config_Ref;
       Found : Boolean;
    begin
       Log.Debug ("Add project {0}", Name);
@@ -157,7 +140,7 @@ package body Porion.Projects.Services is
       end;
 
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
-      Service.Source_Controller := Porion.Sources.Factories.Create (Service.Project.Get_Scm, Config);
+      Service.Source_Controller := Sources.Factories.Create (Service.Project.Get_Scm, Config);
 
       Service.Source_Controller.Check (Status, Logger);
 
@@ -169,12 +152,12 @@ package body Porion.Projects.Services is
          Stmt.Execute;
          while Stmt.Has_Elements loop
             declare
-               Id    : constant ADO.Identifier := Stmt.Get_Identifier (0);
+               --  Id    : constant ADO.Identifier := Stmt.Get_Identifier (0);
                Name  : constant String := Stmt.Get_String (1);
                Tag   : constant String := Stmt.Get_String (2);
-               Date  : constant ADO.Nullable_Time := Stmt.Get_Nullable_Time (3);
-               Build_Date : constant ADO.Nullable_Time := Stmt.Get_Nullable_Time (4);
-               Count : constant Natural := Stmt.Get_Integer (5);
+               --  Date  : constant ADO.Nullable_Time := Stmt.Get_Nullable_Time (3);
+               --  Build_Date : constant ADO.Nullable_Time := Stmt.Get_Nullable_Time (4);
+               --  Count : constant Natural := Stmt.Get_Integer (5);
 
                procedure Update (Key  : in String;
                                  Item : in out Branch_Type);
@@ -184,8 +167,6 @@ package body Porion.Projects.Services is
                   pragma Unreferenced (Key);
                begin
                   Item.Last_Tag := To_UString (Tag);
-                  --  if Date.Is_Null then
-                  --  end if;
                end Update;
 
                Pos  : constant Maps.Cursor := Status.Changes.Find (Name);
@@ -204,29 +185,8 @@ package body Porion.Projects.Services is
             Branch : constant Maps.Reference_Type := Maps.Reference (Status.Changes, Item);
          begin
             Add_Branch (Service, Name, Branch);
-            if Branch.Tag /= Branch.Last_Tag then
-               null;
-            end if;
          end;
       end loop;
    end Check_Sources;
-
-   procedure Load (Service : in out Context_Type;
-                   Path : in String) is
-      use type Yaml.Source.Pointer;
-      use type Yaml.Event_Kind;
-
-      Input : Yaml.Source.Pointer;
-      P     : Yaml.Parser.Instance;
-      Cur   : Yaml.Event;
-   begin
-      Input := Yaml.Source.File.As_Source (Path);
-      P.Set_Input (Input);
-      loop
-         Cur := P.Next;
-         --  Log.Error (Yaml.To_String (Cur));
-         exit when Cur.Kind = Yaml.Stream_End;
-      end loop;
-   end Load;
 
 end Porion.Projects.Services;

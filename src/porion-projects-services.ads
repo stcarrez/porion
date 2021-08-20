@@ -17,9 +17,7 @@
 -----------------------------------------------------------------------
 
 with Porion.Sources;
-with Porion.Builders;
 with Porion.Services;
-private with ADO.Sessions.Factory;
 package Porion.Projects.Services is
 
    Name_Used : exception;
@@ -31,6 +29,7 @@ package Porion.Projects.Services is
                        Hostname  : in String;
                        Login     : in String);
 
+   --  Add a project with the source information.
    procedure Add_Project (Service   : in out Context_Type;
                           Info      : in Porion.Sources.Source_Info_Type);
 
@@ -40,9 +39,6 @@ package Porion.Projects.Services is
 
    procedure Check_Sources (Service : in out Context_Type;
                             Status  : in out Porion.Sources.Status_Type);
-
-   procedure Load (Service : in out Context_Type;
-                   Path : in String);
 
 private
 

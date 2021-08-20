@@ -16,9 +16,9 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Calendar;
-with ADO.Queries;
 with ADO.SQL;
 with Util.Log.Loggers;
+with Porion.Projects.Models;
 package body Porion.XUnit.Analysis is
 
    --  The logger
@@ -29,6 +29,29 @@ package body Porion.XUnit.Analysis is
 
    use Porion.XUnit.Models;
    use Ada.Strings.Unbounded;
+
+   function Get_Group_Path (Group : in Group_Path;
+                            Last  : in Count_Type) return String;
+
+   procedure Merge (Into : in out Test_Group_Type;
+                    From : in out Test_Group_Type);
+
+   procedure Find_Group (Results : in out Test_Results;
+                         Group   : in Group_Path;
+                         Last    : in Count_Type;
+                         Pos     : out Test_Group_Maps.Cursor);
+
+   function Find_Group (From : in Test_Results;
+                        Path : in String) return Porion.XUnit.Models.Test_Group_Ref;
+
+   procedure Save_Run_Tests (Results  : in out Test_Results;
+                             Existing : in out Test_Results;
+                             Build    : in out Porion.Builds.Models.Build_Ref;
+                             Session  : in out ADO.Sessions.Master_Session);
+
+   procedure Load (Tests      : in out Test_Results;
+                   Project_Id : in ADO.Identifier;
+                   Session    : in out ADO.Sessions.Master_Session);
 
    Group_Separator : constant String := "$";
 
@@ -67,7 +90,8 @@ package body Porion.XUnit.Analysis is
             New_Group.Name := Group_Name;
             if Test_Group_Maps.Has_Element (Pos) then
                declare
-                  Group_Ref : constant Test_Group_Maps.Reference_Type := Results.Groups.Reference (Pos);
+                  Group_Ref : constant Test_Group_Maps.Reference_Type
+                    := Results.Groups.Reference (Pos);
                begin
                   New_Group.Group := Group_Ref.Group;
                end;
@@ -85,7 +109,7 @@ package body Porion.XUnit.Analysis is
                        Status   : in Porion.XUnit.Models.Test_Status_Type) is
       use Util.Strings.Vectors;
 
-      Path : constant String := Get_Group_Path (Group, Group.Length);
+      --  Path : constant String := Get_Group_Path (Group, Group.Length);
       Pos  : Test_Group_Maps.Cursor;
    begin
       Find_Group (Results, Group, Group.Length, Pos);
@@ -104,7 +128,7 @@ package body Porion.XUnit.Analysis is
 
    function Find_Group (From : in Test_Results;
                         Path : in String) return Porion.XUnit.Models.Test_Group_Ref is
-      Pos_Group : Test_Group_Maps.Cursor := From.Groups.Find (Path);
+      Pos_Group : constant Test_Group_Maps.Cursor := From.Groups.Find (Path);
    begin
       if not Test_Group_Maps.Has_Element (Pos_Group) then
          return Porion.XUnit.Models.Null_Test_Group;
@@ -118,8 +142,8 @@ package body Porion.XUnit.Analysis is
       Into.Group := From.Group;
       for Iter in Into.Tests.Iterate loop
          declare
-            Test_Ref : Test_Maps.Reference_Type := Into.Tests.Reference (Iter);
-            Pos      : Test_Maps.Cursor := From.Tests.Find (Test_Ref.Name);
+            Test_Ref : constant Test_Maps.Reference_Type := Into.Tests.Reference (Iter);
+            Pos      : constant Test_Maps.Cursor := From.Tests.Find (Test_Ref.Name);
          begin
             Test_Ref.Group := From.Group;
             if Test_Maps.Has_Element (Pos) then
@@ -142,7 +166,7 @@ package body Porion.XUnit.Analysis is
          declare
             Path : constant String := Test_Group_Maps.Key (Iter);
             Ref  : constant Test_Group_Maps.Reference_Type := Results.Groups.Reference (Iter);
-            Pos  : Test_Group_Maps.Cursor := Existing.Groups.Find (Path);
+            Pos  : constant Test_Group_Maps.Cursor := Existing.Groups.Find (Path);
          begin
             if Test_Group_Maps.Has_Element (Pos) then
                Merge (Ref.Element.all, Existing.Groups.Reference (Pos).Element.all);
@@ -164,14 +188,15 @@ package body Porion.XUnit.Analysis is
       --  Step 2: write the tests
       for Iter in Results.Groups.Iterate loop
          declare
-            Group         : Test_Group_Maps.Reference_Type := Results.Groups.Reference (Iter);
+            Group         : constant Test_Group_Maps.Reference_Type
+              := Results.Groups.Reference (Iter);
             Pass_Count    : Natural := 0;
             Fail_Count    : Natural := 0;
             Timeout_Count : Natural := 0;
          begin
             for Test_Iter in Group.Tests.Iterate loop
                declare
-                  Test : Test_Maps.Reference_Type := Group.Tests.Reference (Test_Iter);
+                  Test : constant Test_Maps.Reference_Type := Group.Tests.Reference (Test_Iter);
                begin
                   if not Test.Test.Is_Loaded then
                      Test.Test.Set_Name (Test.Name);
@@ -223,9 +248,12 @@ package body Porion.XUnit.Analysis is
    procedure Load (Tests      : in out Test_Results;
                    Project_Id : in ADO.Identifier;
                    Session    : in out ADO.Sessions.Master_Session) is
+      function Find_Path (Test  : in Test_Ref) return String;
+      procedure Add_Group (Group : in out Porion.XUnit.Models.Test_Group_Ref);
+      procedure Add_Test (Test : in Porion.XUnit.Models.Test_Ref);
 
       function Find_Path (Test  : in Test_Ref) return String is
-         Group : Porion.XUnit.Models.Test_Group_Ref'Class := Test.Get_Group;
+         Group : constant Porion.XUnit.Models.Test_Group_Ref'Class := Test.Get_Group;
          Pos   : Group_Id_Maps.Cursor;
       begin
          if Group.Is_Null then
@@ -239,18 +267,9 @@ package body Porion.XUnit.Analysis is
          end if;
       end Find_Path;
 
-      procedure Find_Path (Test  : in Test_Ref;
-                           Group : in out Group_Path) is
-         Result  : Ada.Strings.Unbounded.Unbounded_String;
-         Current : Test_Ref := Test;
-         --  Parent  : ADO.Identifier := Test.Get_Test_Group;
-      begin
-         null;
-      end Find_Path;
-
       procedure Add_Group (Group : in out Porion.XUnit.Models.Test_Group_Ref) is
          Name   : constant String := Group.Get_Name;
-         Parent : Porion.XUnit.Models.Test_Group_Ref'Class := Group.Get_Group;
+         Parent : constant Porion.XUnit.Models.Test_Group_Ref'Class := Group.Get_Group;
          Pos    : Group_Id_Maps.Cursor;
          Existing_Group : Test_Group_Type (Length => Name'Length);
       begin
@@ -264,11 +283,12 @@ package body Porion.XUnit.Analysis is
             else
                declare
                   Path : constant String := Group_Id_Maps.Element (Pos);
-                  Pos  : Test_Group_Maps.Cursor := Tests.Groups.Find (Path);
+                  Pos  : constant Test_Group_Maps.Cursor := Tests.Groups.Find (Path);
                begin
                   if Test_Group_Maps.Has_Element (Pos) then
                      declare
-                        Ref : constant Test_Group_Maps.Reference_Type := Tests.Groups.Reference (Pos);
+                        Ref : constant Test_Group_Maps.Reference_Type
+                          := Tests.Groups.Reference (Pos);
                      begin
                         Group.Set_Group (Ref.Group);
                      end;
@@ -279,7 +299,8 @@ package body Porion.XUnit.Analysis is
          Existing_Group.Path.Append (Name);
 
          declare
-            Path  : constant String := Get_Group_Path (Existing_Group.Path, Existing_Group.Path.Length);
+            Path  : constant String
+              := Get_Group_Path (Existing_Group.Path, Existing_Group.Path.Length);
          begin
             Tests.Group_Ids.Insert (Group.Get_Id, Path);
             Tests.Groups.Include (Path, Existing_Group);

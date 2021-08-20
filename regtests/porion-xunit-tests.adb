@@ -23,6 +23,7 @@ with Porion.Sources;
 with Porion.XUnit.Analysis;
 with Porion.XUnit.Parsers;
 with Porion.Builds.Models;
+with Porion.Services;
 with Porion.Builds.Services;
 with Porion.Projects.Services;
 package body Porion.XUnit.Tests is
@@ -57,7 +58,7 @@ package body Porion.XUnit.Tests is
          Service.Load_Node (Hostname => "localhost");
 
       exception
-         when Porion.Projects.Services.Name_Used =>
+         when Porion.Services.Name_Used =>
             Service.Add_Node (Hostname => "localhost",
                               Login    => "porion");
       end;
@@ -66,7 +67,7 @@ package body Porion.XUnit.Tests is
          Service.Load_Project ("ada-lzma");
 
       exception
-         when Porion.Projects.Services.Name_Used =>
+         when Porion.Services.Name_Used =>
             Info.Kind := Porion.Sources.SRC_GIT;
             Info.Name := To_UString ("ada-lzma");
             Info.URI := To_UString ("git://github.com/stcarrez/ada-lzma.git");

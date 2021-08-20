@@ -24,20 +24,28 @@ package Porion.Builders.Scripts is
 
    overriding
    procedure Build (Controller : in out Controller_Type;
+                    Build      : in out Porion.Builds.Models.Build_Ref;
+                    Path       : in String;
                     Logger     : in out Porion.Loggers.Logger_Type);
 
    overriding
+   procedure Configure (Controller : in out Controller_Type;
+                        Parameters : in Util.Strings.Vectors.Vector);
+
+   overriding
    procedure Clean (Controller : in out Controller_Type);
+
+   overriding
+   procedure Print (Controller : in out Controller_Type;
+                    Stream     : in out Util.Serialize.IO.Output_Stream'Class);
 
    function Create (Config : in Porion.Configs.Config_Type) return Controller_Access;
 
 private
 
    type Controller_Type is limited new Porion.Builders.Controller_Type with record
-      Config             : Porion.Configs.Config_Type;
-      Configure_Command  : EL.Expressions.Expression;
-      Build_Command      : EL.Expressions.Expression;
-      Steps              : Util.Strings.Vectors.Vector;
+      Config       : Porion.Configs.Config_Type;
+      Command      : EL.Expressions.Expression;
    end record;
 
    type Script_Controller_Access is access all Controller_Type'Class;

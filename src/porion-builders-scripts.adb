@@ -16,9 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Util.Log.Loggers;
-with Util.Strings.Vectors;
 with Porion.Tools;
-with EL.Expressions;
 with EL.Contexts.Default;
 package body Porion.Builders.Scripts is
 
@@ -27,7 +25,11 @@ package body Porion.Builders.Scripts is
 
    overriding
    procedure Build (Controller : in out Controller_Type;
+                    Build      : in out Porion.Builds.Models.Build_Ref;
+                    Path       : in String;
                     Logger     : in out Porion.Loggers.Logger_Type) is
+      procedure Process (Line : in String);
+
       procedure Process (Line : in String) is
       begin
          if Line'First + 1 < Line'Last then
@@ -38,10 +40,12 @@ package body Porion.Builders.Scripts is
 
       Status : Integer;
    begin
-      Porion.Tools.Execute (Controller.Configure_Command, Controller.Config,
-                            Process'Access, Strip_Crlf => False, Status => Status);
-      Porion.Tools.Execute (Controller.Build_Command, Controller.Config,
-                            Process'Access, Strip_Crlf => False, Status => Status);
+      Porion.Tools.Execute (Command     => Controller.Command,
+                            Parameters  => Controller.Config,
+                            Process     => Process'Access,
+                            Working_Dir => Path,
+                            Strip_Crlf  => False,
+                            Status      => Status);
    end Build;
 
    overriding
@@ -50,14 +54,36 @@ package body Porion.Builders.Scripts is
       null;
    end Clean;
 
+   overriding
+   procedure Configure (Controller : in out Controller_Type;
+                        Parameters : in Util.Strings.Vectors.Vector) is
+      use Ada.Strings.Unbounded;
+
+      Ctx     : EL.Contexts.Default.Default_Context;
+      Command : UString;
+   begin
+      for Param of Parameters loop
+         if Length (Command) > 0 then
+            Append (Command, " ");
+         end if;
+         Append (Command, Param);
+      end loop;
+      Controller.Command := EL.Expressions.Create_Expression (To_String (Command), Ctx);
+   end Configure;
+
+   overriding
+   procedure Print (Controller : in out Controller_Type;
+                    Stream     : in out Util.Serialize.IO.Output_Stream'Class) is
+   begin
+      Stream.Write_Entity ("command", Controller.Command.Get_Expression);
+   end Print;
+
    function Create (Config : in Porion.Configs.Config_Type) return Controller_Access is
       Ctx        : EL.Contexts.Default.Default_Context;
-      Configure  : constant String := Porion.Configs.Get ("command_configure", "cd #{build_dir} && ./configure");
-      Build      : constant String := Porion.Configs.Get ("command_build", "make -C #{build_dir}");
+      Command    : constant String := Config.Get ("command", "");
       Controller : constant Script_Controller_Access := new Controller_Type;
    begin
-      Controller.Configure_Command := EL.Expressions.Create_Expression (Configure, Ctx);
-      Controller.Build_Command := EL.Expressions.Create_Expression (Build, Ctx);
+      Controller.Command := EL.Expressions.Create_Expression (Command, Ctx);
       Controller.Config := Config;
       return Controller.all'Access;
    end Create;

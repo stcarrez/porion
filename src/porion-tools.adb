@@ -17,13 +17,10 @@
 -----------------------------------------------------------------------
 with Ada.Strings.Unbounded;
 with Util.Log.Loggers;
-with Util.Properties;
 with Util.Beans.Objects;
-with Util.Strings.Vectors;
 with Util.Processes;
 with Util.Streams;
 with Util.Streams.Texts;
-with EL.Expressions;
 with EL.Contexts.Default;
 with EL.Contexts.Properties;
 package body Porion.Tools is
@@ -40,7 +37,7 @@ package body Porion.Tools is
       Ctx           : EL.Contexts.Default.Default_Context;
    begin
       Prop_Resolver.Set_Properties (Parameters);
-      Ctx.Set_Resolver (Prop_Resolver'Unchecked_access);
+      Ctx.Set_Resolver (Prop_Resolver'Unchecked_Access);
       declare
          Cmd     : constant Util.Beans.Objects.Object := Command.Get_Value (Ctx);
          Command : constant String := Util.Beans.Objects.To_String (Cmd);
@@ -75,7 +72,7 @@ package body Porion.Tools is
          Status := Util.Processes.Get_Exit_Status (Proc);
          if Status /= 0 then
             Log.Warn ("Command '{0}' terminated with exit code{1}", Command,
-                      Natural'Image (Util.Processes.Get_Exit_Status (Proc)));
+                      Integer'Image (Status));
          end if;
       end;
    end Execute;

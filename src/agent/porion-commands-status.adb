@@ -16,6 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Text_IO;
+with Util.Dates.ISO8601;
 with Porion.Configs;
 with Porion.Projects.Models;
 with ADO.Statements;
@@ -44,6 +45,8 @@ package body Porion.Commands.Status is
             Query     : ADO.Queries.Context;
          begin
             Context.Project_Service.Load_Project (Name);
+            Context.Build_Service.Open (Context.Project_Service);
+            Context.Build_Service.Load_Config;
 
             Console.Start_Row;
             Console.Print_Field (1, Name);
@@ -53,6 +56,8 @@ package body Porion.Commands.Status is
             Console.Print_Title (1, "", 30);
             Console.Print_Title (2, "", 30);
             Console.Print_Title (3, "", 10);
+            Console.Print_Title (4, "", 20);
+            Console.Print_Title (5, "", 20);
             Console.End_Title;
 
             Query.Set_Query (Projects.Models.Query_Project_Branches);
@@ -61,7 +66,6 @@ package body Porion.Commands.Status is
             Statement.Execute;
             while Statement.Has_Elements loop
                declare
-                  Id    : constant ADO.Identifier := Statement.Get_Identifier (0);
                   Name  : constant String := Statement.Get_String (1);
                   Tag   : constant String := Statement.Get_String (2);
                   Date  : constant ADO.Nullable_Time := Statement.Get_Nullable_Time (3);
@@ -72,6 +76,8 @@ package body Porion.Commands.Status is
                   Console.Print_Field (1, Name);
                   Console.Print_Field (2, Tag);
                   Console.Print_Field (3, Count);
+                  Console.Print_Field (4, Util.Dates.ISO8601.Image (Date.Value));
+                  Console.Print_Field (5, Util.Dates.ISO8601.Image (Build_Date.Value));
                   Console.End_Row;
                end;
                Statement.Next;

@@ -219,6 +219,7 @@ package body Porion.XUnit.Parsers is
 
    procedure Scan (Path    : in String;
                    Pattern : in String;
+                   Exclude : in Util.Strings.Vectors.Vector;
                    Results : in out Analysis.Test_Results) is
       use Ada.Directories;
 

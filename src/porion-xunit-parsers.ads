@@ -15,6 +15,7 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Util.Strings.Vectors;
 with Porion.XUnit.Analysis;
 package Porion.XUnit.Parsers is
 
@@ -23,6 +24,7 @@ package Porion.XUnit.Parsers is
 
    procedure Scan (Path    : in String;
                    Pattern : in String;
+                   Exclude : in Util.Strings.Vectors.Vector;
                    Results : in out Porion.XUnit.Analysis.Test_Results);
 
 end Porion.XUnit.Parsers;

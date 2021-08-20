@@ -17,7 +17,6 @@
 -----------------------------------------------------------------------
 
 with Util.Log.Loggers;
-with Util.Strings;
 with Util.Properties;
 
 with ADO.Configs;
@@ -84,7 +83,8 @@ package body Porion.Services is
    end Load_Node;
 
    function Create_Query (Service : in out Context_Type;
-                          Query   : in ADO.Queries.Context) return Ado.Statements.Query_Statement is
+                          Query   : in ADO.Queries.Context)
+                          return Ado.Statements.Query_Statement is
    begin
       return Service.DB.Create_Statement (Query);
    end Create_Query;

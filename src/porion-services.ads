@@ -61,4 +61,6 @@ package Porion.Services is
 
    function Get_Database (Service : in Context_Type) return ADO.Sessions.Master_Session;
 
+   function Get_Query_Resource (Name : in String) return access constant String;
+
 end Porion.Services;

@@ -19,7 +19,6 @@ with GNAT.Source_Info;
 with Ada.Strings.Unbounded;
 
 with Util.Tests;
-with Util.Properties;
 
 with ADO.Sessions;
 package Porion.Testsuite is

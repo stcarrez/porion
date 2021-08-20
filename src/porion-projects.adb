@@ -16,7 +16,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Porion.Configs;
 with Ada.Directories;
 with Util.Log.Loggers;
 with Util.Files;

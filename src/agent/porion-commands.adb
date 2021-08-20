@@ -23,6 +23,7 @@ with Util.Commands.Parsers.GNAT_Parser;
 with Porion.Configs;
 with Porion.Commands.Drivers;
 with Porion.Commands.Build;
+with Porion.Commands.Steps;
 with Porion.Commands.Status;
 with Porion.Commands.Add;
 with Porion.Commands.List;
@@ -37,6 +38,7 @@ package body Porion.Commands is
    Add_Command             : aliased Porion.Commands.Add.Command_Type;
    List_Command            : aliased Porion.Commands.List.Command_Type;
    Init_Command            : aliased Porion.Commands.Init.Command_Type;
+   Step_Command            : aliased Porion.Commands.Steps.Command_Type;
    Driver                  : Drivers.Driver_Type;
 
    --  ------------------------------
@@ -134,6 +136,9 @@ package body Porion.Commands is
       Driver.Add_Command ("list",
                           -("list the projects, nodes, builds"),
                           List_Command'Access);
+      Driver.Add_Command ("step",
+                          -("control the build steps"),
+                          Step_Command'Access);
       Driver.Add_Command ("init",
                           -("setup the build agent node"),
                           Init_Command'Access);

@@ -18,7 +18,6 @@
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Util.Strings.Vectors;
 with ADO.Sessions;
-with Porion.Projects.Models;
 with Porion.Builds.Models;
 with Porion.XUnit.Models;
 package Porion.XUnit.Analysis is

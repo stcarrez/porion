@@ -50,8 +50,8 @@ package Porion.Builds.Models is
       Value   : Build_Status_Type;
    end record;
 
-   type Builder_Type is (BUILDER_SCRIPT, BUILDER_EMPTY, BUILDER_MAKE, BUILDER_MAVEN);
-   for Builder_Type use (BUILDER_SCRIPT => 0, BUILDER_EMPTY => 1, BUILDER_MAKE => 2, BUILDER_MAVEN => 3);
+   type Builder_Type is (BUILDER_SCRIPT, BUILDER_EMPTY, BUILDER_MAKE, BUILDER_MAVEN, BUILDER_XUNIT);
+   for Builder_Type use (BUILDER_SCRIPT => 0, BUILDER_EMPTY => 1, BUILDER_MAKE => 2, BUILDER_MAVEN => 3, BUILDER_XUNIT => 4);
    package Builder_Type_Objects is
       new Util.Beans.Objects.Enums (Builder_Type);
 

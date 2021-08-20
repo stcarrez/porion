@@ -16,10 +16,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Ada.Text_IO;
-with Ada.Finalization;
-with Ada.Calendar;
-with Util.Strings.Builders;
 with Util.Log.Loggers;
 with Util.Properties;
 package body Porion is

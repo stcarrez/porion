@@ -17,7 +17,6 @@
 -----------------------------------------------------------------------
 with Ada.Directories;
 with Interfaces.C.Strings;
-with GNAT.Regpat;
 with Util.Log.Loggers;
 with Util.Strings;
 with Porion.Tools;
@@ -29,6 +28,8 @@ package body Porion.Sources.Files is
    Log   : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Sources.Files");
 
    function Realpath (Path : in String) return String;
+   function Make_Project_Name (Path : in String;
+                               Kind : in File_Type) return String;
 
    function Realpath (Path : in String) return String is
       use Interfaces;
@@ -160,11 +161,15 @@ package body Porion.Sources.Files is
 
       Controller.Setup (Kind);
       Controller.Config.Set ("build_dir", Path);
-      Porion.Tools.Execute (Controller.Extract_Command, Controller.Config,
-                            Process'Access,
+      Porion.Tools.Execute (Command     => Controller.Extract_Command,
+                            Parameters  => Controller.Config,
+                            Process     => Process'Access,
                             Working_Dir => Path,
-                            Strip_Crlf => False,
-                            Status => Status);
+                            Strip_Crlf  => False,
+                            Status      => Status);
+      if Status /= 0 then
+         Logger.Write ("Command exit status:" & Integer'Image (Status) & ASCII.LF);
+      end if;
    end Checkout;
 
    overriding

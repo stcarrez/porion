@@ -56,7 +56,7 @@ package Porion.Sources is
       Changes    : Maps.Map;
    end record;
 
-   type Controller_Type is limited Interface;
+   type Controller_Type is limited interface;
 
    type Controller_Access is access all Controller_Type'Class;
 

@@ -22,7 +22,6 @@ package Porion is
    function "-" (Message : in String) return String is (Intl."-" (Message));
 
    subtype UString is Ada.Strings.Unbounded.Unbounded_String;
-   use type Ada.Strings.Unbounded.Unbounded_String;
 
    function To_UString (Value : in String) return UString
      renames Ada.Strings.Unbounded.To_Unbounded_String;

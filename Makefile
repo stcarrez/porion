@@ -1,6 +1,6 @@
 NAME=porion
 GPRPATH=${NAME}.gpr
-GPRPATH_AGENT=porion_agent.gpr
+#GPRPATH_AGENT=porion_agent.gpr
 
 -include Makefile.conf
 
@@ -23,10 +23,8 @@ ROOTDIR=.
 
 # Build executables for all mains defined by the project.
 build-test::
-	#$(GNATMAKE) $(GPRFLAGS) -p -P$(NAME)_tests $(MAKE_ARGS)
 
 build::
-	$(GNATMAKE) -m -p -P "$(GPRPATH_AGENT)" $(MAKE_ARGS)
 	$(GNATMAKE) -m -p -P "$(GPRPATH)" $(MAKE_ARGS)
 
 test:	build

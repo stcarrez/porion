@@ -16,7 +16,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Util.Properties;
-with Util.Strings.Vectors;
 with EL.Expressions;
 package Porion.Tools is
 

@@ -169,6 +169,8 @@ package body Porion.Configs is
    function Get_Build_Directory (Name   : in String;
                                  Branch : in String;
                                  Number : in Positive) return String is
+      pragma Unreferenced (Number);
+
       Project_Dir : constant String := Get_Project_Directory (Name);
    begin
       return Util.Files.Compose (Project_Dir, Branch);

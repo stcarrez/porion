@@ -40,6 +40,10 @@ CREATE TABLE IF NOT EXISTS porion_build_config (
   `id` BIGINT NOT NULL,
   /* optimistic locking */
   `version` INTEGER NOT NULL,
+  /* the build configuration name. */
+  `name` VARCHAR(255) NOT NULL,
+  /* a description of the build configuration. */
+  `description` VARCHAR(4096) NOT NULL,
   /*  */
   `node_id` BIGINT ,
   /*  */
@@ -267,6 +271,10 @@ INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_test");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_test_group");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_test_run");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_test_run_group");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_config"), "name");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_config"), "description");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_step"), "parameters");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)

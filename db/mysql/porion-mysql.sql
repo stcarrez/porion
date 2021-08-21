@@ -40,6 +40,10 @@ CREATE TABLE IF NOT EXISTS porion_build_config (
   `id` BIGINT NOT NULL,
   /* optimistic locking */
   `version` INTEGER NOT NULL,
+  /* the build configuration name. */
+  `name` VARCHAR(255) BINARY NOT NULL,
+  /* a description of the build configuration. */
+  `description` VARCHAR(4096) BINARY NOT NULL,
   /*  */
   `node_id` BIGINT ,
   /*  */
@@ -257,6 +261,10 @@ CREATE TABLE IF NOT EXISTS porion_test_run_group (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 INSERT IGNORE INTO entity_type (name) VALUES
 ("porion_build"), ("porion_build_config"), ("porion_build_step"), ("porion_environment"), ("porion_node"), ("porion_branch"), ("porion_dependency"), ("porion_project"), ("porion_test"), ("porion_test_group"), ("porion_test_run"), ("porion_test_run_group");
+INSERT IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_config"), "name");
+INSERT IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_config"), "description");
 INSERT IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_step"), "parameters");
 INSERT IGNORE INTO awa_audit_field (entity_type, name)

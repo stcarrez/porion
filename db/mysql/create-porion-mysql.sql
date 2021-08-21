@@ -1,27 +1,3 @@
-/* Copied from ado-mysql.sql*/
-/* File generated automatically by dynamo */
-/* Entity table that enumerates all known database tables */
-CREATE TABLE IF NOT EXISTS entity_type (
-  /* the database table unique entity index */
-  `id` INTEGER  AUTO_INCREMENT,
-  /* the database entity name */
-  `name` VARCHAR(127) BINARY UNIQUE ,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/* Sequence generator */
-CREATE TABLE IF NOT EXISTS sequence (
-  /* the sequence name */
-  `name` VARCHAR(127) UNIQUE NOT NULL,
-  /* the sequence record version */
-  `version` INTEGER NOT NULL,
-  /* the sequence value */
-  `value` BIGINT NOT NULL,
-  /* the sequence block size */
-  `block_size` BIGINT NOT NULL,
-  PRIMARY KEY (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-INSERT IGNORE INTO entity_type (name) VALUES
-("entity_type"), ("sequence");
 /* Copied from awa-mysql.sql*/
 /* File generated automatically by dynamo */
 /* The Audit table records the changes made on database on behalf of a user.
@@ -378,6 +354,10 @@ CREATE TABLE IF NOT EXISTS porion_build_config (
   `id` BIGINT NOT NULL,
   /* optimistic locking */
   `version` INTEGER NOT NULL,
+  /* the build configuration name. */
+  `name` VARCHAR(255) BINARY NOT NULL,
+  /* a description of the build configuration. */
+  `description` VARCHAR(4096) BINARY NOT NULL,
   /*  */
   `node_id` BIGINT ,
   /*  */
@@ -595,6 +575,10 @@ CREATE TABLE IF NOT EXISTS porion_test_run_group (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 INSERT IGNORE INTO entity_type (name) VALUES
 ("porion_build"), ("porion_build_config"), ("porion_build_step"), ("porion_environment"), ("porion_node"), ("porion_branch"), ("porion_dependency"), ("porion_project"), ("porion_test"), ("porion_test_group"), ("porion_test_run"), ("porion_test_run_group");
+INSERT IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_config"), "name");
+INSERT IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_config"), "description");
 INSERT IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_step"), "parameters");
 INSERT IGNORE INTO awa_audit_field (entity_type, name)

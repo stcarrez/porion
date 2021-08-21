@@ -97,12 +97,72 @@ package body Porion.Builds.Models is
    end Get_Version;
 
 
+   procedure Set_Name (Object : in out Build_Config_Ref;
+                        Value : in String) is
+      Impl : Build_Config_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Audits.Set_Field_String (Impl.all, 3, Impl.Name, Value);
+   end Set_Name;
+
+   procedure Set_Name (Object : in out Build_Config_Ref;
+                       Value  : in Ada.Strings.Unbounded.Unbounded_String) is
+      Impl : Build_Config_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Audits.Set_Field_Unbounded_String (Impl.all, 3, Impl.Name, Value);
+   end Set_Name;
+
+   function Get_Name (Object : in Build_Config_Ref)
+                 return String is
+   begin
+      return Ada.Strings.Unbounded.To_String (Object.Get_Name);
+   end Get_Name;
+   function Get_Name (Object : in Build_Config_Ref)
+                  return Ada.Strings.Unbounded.Unbounded_String is
+      Impl : constant Build_Config_Access
+         := Build_Config_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Name;
+   end Get_Name;
+
+
+   procedure Set_Description (Object : in out Build_Config_Ref;
+                               Value : in String) is
+      Impl : Build_Config_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Audits.Set_Field_String (Impl.all, 4, Impl.Description, Value);
+   end Set_Description;
+
+   procedure Set_Description (Object : in out Build_Config_Ref;
+                              Value  : in Ada.Strings.Unbounded.Unbounded_String) is
+      Impl : Build_Config_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Audits.Set_Field_Unbounded_String (Impl.all, 4, Impl.Description, Value);
+   end Set_Description;
+
+   function Get_Description (Object : in Build_Config_Ref)
+                 return String is
+   begin
+      return Ada.Strings.Unbounded.To_String (Object.Get_Description);
+   end Get_Description;
+   function Get_Description (Object : in Build_Config_Ref)
+                  return Ada.Strings.Unbounded.Unbounded_String is
+      Impl : constant Build_Config_Access
+         := Build_Config_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Description;
+   end Get_Description;
+
+
    procedure Set_Node (Object : in out Build_Config_Ref;
                        Value  : in Porion.Nodes.Models.Node_Ref'Class) is
       Impl : Build_Config_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 3, Impl.Node, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 5, Impl.Node, Value);
    end Set_Node;
 
    function Get_Node (Object : in Build_Config_Ref)
@@ -119,7 +179,7 @@ package body Porion.Builds.Models is
       Impl : Build_Config_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 4, Impl.Project, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 6, Impl.Project, Value);
    end Set_Project;
 
    function Get_Project (Object : in Build_Config_Ref)
@@ -145,6 +205,8 @@ package body Porion.Builds.Models is
             ADO.Objects.Set_Object (Result, Copy.all'Access);
             Copy.Copy (Impl.all);
             Copy.Version := Impl.Version;
+            Copy.Name := Impl.Name;
+            Copy.Description := Impl.Description;
             Copy.Node := Impl.Node;
             Copy.Project := Impl.Project;
          end;
@@ -282,14 +344,24 @@ package body Porion.Builds.Models is
          Object.Clear_Modified (1);
       end if;
       if Object.Is_Modified (3) then
-         Stmt.Save_Field (Name  => COL_2_1_NAME, --  node_id
-                          Value => Object.Node);
+         Stmt.Save_Field (Name  => COL_2_1_NAME, --  name
+                          Value => Object.Name);
          Object.Clear_Modified (3);
       end if;
       if Object.Is_Modified (4) then
-         Stmt.Save_Field (Name  => COL_3_1_NAME, --  project_id
-                          Value => Object.Project);
+         Stmt.Save_Field (Name  => COL_3_1_NAME, --  description
+                          Value => Object.Description);
          Object.Clear_Modified (4);
+      end if;
+      if Object.Is_Modified (5) then
+         Stmt.Save_Field (Name  => COL_4_1_NAME, --  node_id
+                          Value => Object.Node);
+         Object.Clear_Modified (5);
+      end if;
+      if Object.Is_Modified (6) then
+         Stmt.Save_Field (Name  => COL_5_1_NAME, --  project_id
+                          Value => Object.Project);
+         Object.Clear_Modified (6);
       end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
@@ -309,6 +381,7 @@ package body Porion.Builds.Models is
                   raise ADO.Objects.LAZY_LOCK;
                end if;
             end if;
+            ADO.Audits.Save (Object, Session);
          end;
       end if;
    end Save;
@@ -325,15 +398,20 @@ package body Porion.Builds.Models is
                         Value => Object.Get_Key);
       Query.Save_Field (Name  => COL_1_1_NAME, --  version
                         Value => Object.Version);
-      Query.Save_Field (Name  => COL_2_1_NAME, --  node_id
+      Query.Save_Field (Name  => COL_2_1_NAME, --  name
+                        Value => Object.Name);
+      Query.Save_Field (Name  => COL_3_1_NAME, --  description
+                        Value => Object.Description);
+      Query.Save_Field (Name  => COL_4_1_NAME, --  node_id
                         Value => Object.Node);
-      Query.Save_Field (Name  => COL_3_1_NAME, --  project_id
+      Query.Save_Field (Name  => COL_5_1_NAME, --  project_id
                         Value => Object.Project);
       Query.Execute (Result);
       if Result /= 1 then
          raise ADO.Objects.INSERT_ERROR;
       end if;
       ADO.Objects.Set_Created (Object);
+      ADO.Audits.Save (Object, Session);
    end Create;
 
    procedure Delete (Object  : in out Build_Config_Impl;
@@ -362,6 +440,10 @@ package body Porion.Builds.Models is
       Impl := Build_Config_Impl (Obj.all)'Access;
       if Name = "id" then
          return ADO.Objects.To_Object (Impl.Get_Key);
+      elsif Name = "name" then
+         return Util.Beans.Objects.To_Object (Impl.Name);
+      elsif Name = "description" then
+         return Util.Beans.Objects.To_Object (Impl.Description);
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -396,11 +478,13 @@ package body Porion.Builds.Models is
                    Session : in out ADO.Sessions.Session'Class) is
    begin
       Object.Set_Key_Value (Stmt.Get_Identifier (0));
-      if not Stmt.Is_Null (2) then
-         Object.Node.Set_Key_Value (Stmt.Get_Identifier (2), Session);
+      Object.Name := Stmt.Get_Unbounded_String (2);
+      Object.Description := Stmt.Get_Unbounded_String (3);
+      if not Stmt.Is_Null (4) then
+         Object.Node.Set_Key_Value (Stmt.Get_Identifier (4), Session);
       end if;
-      if not Stmt.Is_Null (3) then
-         Object.Project.Set_Key_Value (Stmt.Get_Identifier (3), Session);
+      if not Stmt.Is_Null (5) then
+         Object.Project.Set_Key_Value (Stmt.Get_Identifier (5), Session);
       end if;
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);

@@ -104,6 +104,30 @@ package Porion.Builds.Models is
    function Get_Version (Object : in Build_Config_Ref)
                  return Integer;
 
+   --  Set the build configuration name.
+   procedure Set_Name (Object : in out Build_Config_Ref;
+                       Value  : in Ada.Strings.Unbounded.Unbounded_String);
+   procedure Set_Name (Object : in out Build_Config_Ref;
+                       Value : in String);
+
+   --  Get the build configuration name.
+   function Get_Name (Object : in Build_Config_Ref)
+                 return Ada.Strings.Unbounded.Unbounded_String;
+   function Get_Name (Object : in Build_Config_Ref)
+                 return String;
+
+   --  Set a description of the build configuration.
+   procedure Set_Description (Object : in out Build_Config_Ref;
+                              Value  : in Ada.Strings.Unbounded.Unbounded_String);
+   procedure Set_Description (Object : in out Build_Config_Ref;
+                              Value : in String);
+
+   --  Get a description of the build configuration.
+   function Get_Description (Object : in Build_Config_Ref)
+                 return Ada.Strings.Unbounded.Unbounded_String;
+   function Get_Description (Object : in Build_Config_Ref)
+                 return String;
+
    --
    procedure Set_Node (Object : in out Build_Config_Ref;
                        Value  : in Porion.Nodes.Models.Node_Ref'Class);
@@ -596,30 +620,46 @@ private
    BUILD_CONFIG_NAME : aliased constant String := "porion_build_config";
    COL_0_1_NAME : aliased constant String := "id";
    COL_1_1_NAME : aliased constant String := "version";
-   COL_2_1_NAME : aliased constant String := "node_id";
-   COL_3_1_NAME : aliased constant String := "project_id";
+   COL_2_1_NAME : aliased constant String := "name";
+   COL_3_1_NAME : aliased constant String := "description";
+   COL_4_1_NAME : aliased constant String := "node_id";
+   COL_5_1_NAME : aliased constant String := "project_id";
 
    BUILD_CONFIG_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 4,
+     (Count   => 6,
       Table   => BUILD_CONFIG_NAME'Access,
       Members => (
          1 => COL_0_1_NAME'Access,
          2 => COL_1_1_NAME'Access,
          3 => COL_2_1_NAME'Access,
-         4 => COL_3_1_NAME'Access)
+         4 => COL_3_1_NAME'Access,
+         5 => COL_4_1_NAME'Access,
+         6 => COL_5_1_NAME'Access)
      );
    BUILD_CONFIG_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := BUILD_CONFIG_DEF'Access;
 
+   BUILD_CONFIG_AUDIT_DEF : aliased constant ADO.Audits.Auditable_Mapping :=
+     (Count    => 2,
+      Of_Class => BUILD_CONFIG_DEF'Access,
+      Members  => (
+         1 => 2,
+         2 => 3)
+     );
+   BUILD_CONFIG_AUDIT_TABLE : constant ADO.Audits.Auditable_Mapping_Access
+      := BUILD_CONFIG_AUDIT_DEF'Access;
 
    Null_Build_Config : constant Build_Config_Ref
       := Build_Config_Ref'(ADO.Objects.Object_Ref with null record);
 
    type Build_Config_Impl is
-      new ADO.Objects.Object_Record (Key_Type => ADO.Objects.KEY_INTEGER,
-                                     Of_Class => BUILD_CONFIG_DEF'Access)
+      new ADO.Audits.Auditable_Object_Record (Key_Type => ADO.Objects.KEY_INTEGER,
+                                     Of_Class => BUILD_CONFIG_DEF'Access,
+                                     With_Audit => BUILD_CONFIG_AUDIT_DEF'Access)
    with record
        Version : Integer;
+       Name : Ada.Strings.Unbounded.Unbounded_String;
+       Description : Ada.Strings.Unbounded.Unbounded_String;
        Node : Porion.Nodes.Models.Node_Ref;
        Project : Porion.Projects.Models.Project_Ref;
    end record;

@@ -98,8 +98,8 @@ package body Porion.Commands is
       GC.Define_Switch (Config => Context.Command_Config,
                         Output => Context.Dump'Access,
                         Switch => "-vvv",
-                        Long_Switch => "--debug-dump",
-                        Help   => -("Enable debug dump execution"));
+                        Long_Switch => "--debug-sql",
+                        Help   => -("Enable debug SQL execution"));
       GC.Define_Switch (Config => Context.Command_Config,
                         Output => Context.Config_File'Access,
                         Switch => "-c:",

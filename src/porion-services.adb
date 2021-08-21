@@ -139,6 +139,7 @@ package body Porion.Services is
       Service.DB := From.DB;
       Service.Project := From.Project;
       Service.Branch := From.Branch;
+      Service.Build_Node := From.Build_Node;
    end Open;
 
 end Porion.Services;

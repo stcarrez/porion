@@ -1111,6 +1111,26 @@ package body Porion.Projects.Models is
    end Get_Value;
 
 
+   procedure List (Object  : in out Branch_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class) is
+      Stmt : ADO.Statements.Query_Statement
+        := Session.Create_Statement (Query, BRANCH_DEF'Access);
+   begin
+      Stmt.Execute;
+      Branch_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         declare
+            Item : Branch_Ref;
+            Impl : constant Branch_Access := new Branch_Impl;
+         begin
+            Impl.Load (Stmt, Session);
+            ADO.Objects.Set_Object (Item, Impl.all'Access);
+            Object.Append (Item);
+         end;
+         Stmt.Next;
+      end loop;
+   end List;
 
    --  ------------------------------
    --  Load the object from current iterator position

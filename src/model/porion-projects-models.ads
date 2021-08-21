@@ -341,6 +341,15 @@ package Porion.Projects.Models is
    procedure Copy (Object : in Branch_Ref;
                    Into   : in out Branch_Ref);
 
+   package Branch_Vectors is
+      new Ada.Containers.Vectors (Index_Type   => Positive,
+                                  Element_Type => Branch_Ref,
+                                  "="          => "=");
+   subtype Branch_Vector is Branch_Vectors.Vector;
+
+   procedure List (Object  : in out Branch_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class);
    --  Create an object key for Dependency.
    function Dependency_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key;
    --  Create an object key for Dependency from a string.

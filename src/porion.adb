@@ -59,7 +59,7 @@ package body Porion is
          Log_Config.Set ("log4j.appender.debug.layout", "full");
       end if;
       if Dump then
-         Log_Config.Set ("log4j.logger.Keystore.IO", "DEBUG");
+         Log_Config.Set ("log4j.logger.ADO", "DEBUG");
       end if;
 
       Util.Log.Loggers.Initialize (Log_Config);

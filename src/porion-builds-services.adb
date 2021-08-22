@@ -32,7 +32,6 @@ with ADO.Sessions;
 with Porion.Sources.Factories;
 with Porion.Nodes.Models;
 with Porion.Projects.Models;
-with Porion.Builders.Scripts;
 with Porion.Builders.Factories;
 package body Porion.Builds.Services is
 
@@ -124,8 +123,11 @@ package body Porion.Builds.Services is
          Service.Source_Controller.Checkout (Path, Logger);
 
          Config.Set ("build_dir", Path);
-         Service.Build_Controller := Porion.Builders.Scripts.Create (Config);
-         Service.Build_Controller.Build (Service.Build, Path, Logger);
+         for Step of Service.Steps loop
+            Service.Build_Controller
+              := Builders.Factories.Create (Step.Step.Get_Builder, Service.DB, Step.Config);
+            Service.Build_Controller.Build (Service.Build, Path, Logger);
+         end loop;
 
          Service.Build.Set_Finish_Date (ADO.Nullable_Time '(Is_Null => False,
                                                             Value => Ada.Calendar.Clock));
@@ -161,6 +163,7 @@ package body Porion.Builds.Services is
       Envs  : Porion.Builds.Models.Environment_Vector;
       Query : ADO.Queries.Context;
    begin
+      Service.Environments.Clear;
       Query.Set_Filter ("(o.build_config_id = :config_id OR o.node_id = :node_id)"
                         & " OR (o.build_config_id IS NULL AND o.node_id IS NULL)");
       Query.Bind_Param ("config_id", Service.Build_Config.Get_Id);
@@ -174,6 +177,7 @@ package body Porion.Builds.Services is
       Steps : Porion.Builds.Models.Build_Step_Vector;
       Query : ADO.Queries.Context;
    begin
+      Service.Steps.Clear;
       Query.Set_Filter ("o.build_config_id = :config_id ORDER BY o.number");
       Query.Bind_Param ("config_id", Service.Build_Config.Get_Id);
       Porion.Builds.Models.List (Steps, Service.DB, Query);
@@ -258,7 +262,7 @@ package body Porion.Builds.Services is
          Service.Steps.Insert (Pos, Step);
          Step.Step.Set_Parameters (Util.Streams.Texts.To_String (Output));
          Step.Step.Set_Builder (Kind);
-         Step.Step.Set_Number (Position);
+         Step.Step.Set_Number (Pos);
          Step.Step.Set_Step (Porion.Builds.Models.STEP_MAKE);
          Step.Step.Set_Build_Config (Service.Build_Config);
          Step.Step.Save (Service.DB);
@@ -277,5 +281,90 @@ package body Porion.Builds.Services is
    begin
       return Service.Build;
    end Get_Build;
+
+   --  Export some information about the project in the output stream.
+   procedure Export (Service : in out Context_Type;
+                     Stream  : in out Util.Serialize.IO.Output_Stream'Class) is
+      Build_Configs : Porion.Builds.Models.Build_Config_Vector;
+      Query         : ADO.Queries.Context;
+   begin
+      Query.Set_Filter ("o.project_id = :project_id");
+      Query.Bind_Param ("project_id", Service.Project.Get_Id);
+      Porion.Builds.Models.List (Build_Configs, Service.DB, Query);
+
+      Stream.Start_Array ("build_configs");
+      for Build_Config of Build_Configs loop
+         Service.Export (Build_Config, Stream);
+      end loop;
+      Stream.End_Array ("build_configs");
+   end Export;
+
+   --  Export some information about the project in the output stream.
+   procedure Export (Service : in out Context_Type;
+                     Build_Config : in Porion.Builds.Models.Build_Config_Ref;
+                     Stream  : in out Util.Serialize.IO.Output_Stream'Class) is
+   begin
+      Stream.Start_Entity ("build_config");
+      Stream.Write_Attribute ("id", Integer (Build_Config.Get_Id));
+      Stream.Write_Attribute ("version", Build_Config.Get_Version);
+      if not Build_Config.Get_Node.Is_Null then
+         Stream.Start_Entity ("node");
+         Stream.Write_Attribute ("id", Integer (Build_Config.Get_Node.Get_Id));
+         Stream.End_Entity ("node");
+      end if;
+
+      --  Load the build steps.
+      declare
+         Steps : Porion.Builds.Models.Build_Step_Vector;
+         Query : ADO.Queries.Context;
+      begin
+         Query.Set_Filter ("o.build_config_id = :config_id ORDER BY o.number");
+         Query.Bind_Param ("config_id", Build_Config.Get_Id);
+         Porion.Builds.Models.List (Steps, Service.DB, Query);
+
+         if not Steps.Is_Empty then
+            Stream.Start_Array ("steps");
+            for Step of Steps loop
+               Stream.Start_Entity ("step");
+               Stream.Write_Attribute ("id", Integer (Step.Get_Id));
+               Stream.Write_Attribute ("version", Step.Get_Version);
+               Stream.Write_Entity ("number", Step.Get_Number);
+               Stream.Write_Entity ("timeout", Step.Get_Timeout);
+               Stream.Write_Entity ("builder", Step.Get_Builder'Image);
+               Stream.Write_Entity ("step", Step.Get_Step'Image);
+               --  Stream.Start_Entity ("parameters");
+               Stream.Write_Entity ("parameters", String '(Step.Get_Parameters));
+               --  Stream.End_Entity ("parameters");
+               Stream.End_Entity ("step");
+            end loop;
+            Stream.End_Array ("steps");
+         end if;
+      end;
+
+      --  Load the environment variables.
+      declare
+         Envs  : Porion.Builds.Models.Environment_Vector;
+         Query : ADO.Queries.Context;
+      begin
+         Query.Set_Filter ("o.build_config_id = :config_id");
+         Query.Bind_Param ("config_id", Service.Build_Config.Get_Id);
+         Porion.Builds.Models.List (Envs, Service.DB, Query);
+
+         if not Envs.Is_Empty then
+            Stream.Start_Array ("environments");
+            for Env of Envs loop
+               Stream.Start_Entity ("environment");
+               Stream.Write_Attribute ("id", Integer (Env.Get_Id));
+               Stream.Write_Attribute ("version", Env.Get_Version);
+               Stream.Write_Entity ("name", String '(Env.Get_Name));
+               Stream.Write_Entity ("value", String '(Env.Get_Value));
+               Stream.End_Entity ("environment");
+            end loop;
+            Stream.End_Array ("environments");
+         end if;
+      end;
+
+      Stream.End_Entity ("build_config");
+   end Export;
 
 end Porion.Builds.Services;

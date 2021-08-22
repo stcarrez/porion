@@ -16,6 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Porion.Commands.Drivers;
+private with Util.Serialize.IO;
 private package Porion.Commands.Status is
 
    type Command_Type is new Porion.Commands.Drivers.Command_Type with private;
@@ -43,6 +44,11 @@ private
 
    type Command_Type is new Porion.Commands.Drivers.Command_Type with record
       Json : aliased Boolean := False;
+      Xml  : aliased Boolean := False;
    end record;
+
+   procedure Stats (Command : in out Command_Type;
+                    Stream  : in out Util.Serialize.IO.Output_Stream'Class;
+                    Context : in out Context_Type);
 
 end Porion.Commands.Status;

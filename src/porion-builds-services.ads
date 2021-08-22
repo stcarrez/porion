@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 with Ada.Containers.Vectors;
 with Util.Strings.Vectors;
+with Util.Serialize.IO;
 with Porion.Sources;
 with Porion.Builders;
 with Porion.Configs;
@@ -64,6 +65,14 @@ package Porion.Builds.Services is
                           Arguments : in Util.Strings.Vectors.Vector) with
      Pre => Service.Has_Project;
 
+   --  Export some information about the project in the output stream.
+   procedure Export (Service : in out Context_Type;
+                     Stream  : in out Util.Serialize.IO.Output_Stream'Class);
+
+   --  Export some information about the project in the output stream.
+   procedure Export (Service      : in out Context_Type;
+                     Build_Config : in Porion.Builds.Models.Build_Config_Ref;
+                     Stream       : in out Util.Serialize.IO.Output_Stream'Class);
 private
 
    type Context_Type is limited new Porion.Services.Context_Type with record

@@ -18,6 +18,7 @@
 with Ada.Calendar;
 with Util.Log.Loggers;
 with Util.Properties;
+with Util.Dates.ISO8601;
 with Porion.Configs;
 with Porion.Loggers;
 with Porion.Sources.Factories;
@@ -188,5 +189,70 @@ package body Porion.Projects.Services is
          end;
       end loop;
    end Check_Sources;
+
+   procedure Write_Date (Stream : in out Util.Serialize.IO.Output_Stream'Class;
+                         Name   : in String;
+                         Date   : in ADO.Nullable_Time) is
+   begin
+      if Date.Is_Null then
+         Stream.Write_Null_Entity (Name);
+      else
+         Stream.Write_Entity (Name,
+                              Util.Dates.ISO8601.Image (Date.Value, Util.Dates.ISO8601.SECOND));
+      end if;
+   end Write_Date;
+
+   procedure Write_Date (Stream : in out Util.Serialize.IO.Output_Stream'Class;
+                         Name   : in String;
+                         Date   : in Ada.Calendar.Time) is
+   begin
+      Stream.Write_Entity (Name,
+                           Util.Dates.ISO8601.Image (Date, Util.Dates.ISO8601.SECOND));
+   end Write_Date;
+
+   --  Export some information about the project in the output stream.
+   procedure Export (Service : in out Context_Type;
+                     Stream  : in out Util.Serialize.IO.Output_Stream'Class;
+                     Process : access
+                       procedure (Stream : in out Util.Serialize.IO.Output_Stream'Class)) is
+   begin
+      Stream.Start_Entity ("project");
+      Stream.Write_Attribute ("id", Integer (Service.Project.Get_Id));
+      Stream.Write_Attribute ("version", Service.Project.Get_Version);
+      Stream.Write_Entity ("name", String '(Service.Project.Get_Name));
+      Stream.Write_Entity ("description", String '(Service.Project.Get_Description));
+      Write_Date (Stream, "create_date", Service.Project.Get_Create_Date);
+      Write_Date (Stream, "update_date", Service.Project.Get_Update_Date);
+      Stream.Write_Entity ("status", Service.Project.Get_Status'Image);
+      Stream.Write_Entity ("scm", Service.Project.Get_Scm'Image);
+      Stream.Write_Entity ("scm_url", String '(Service.Project.Get_Scm_Url));
+      declare
+         Branches : Porion.Projects.Models.Branch_Vector;
+         Query    : ADO.Queries.Context;
+      begin
+         Query.Set_Filter ("o.project_id = :project_id");
+         Query.Bind_Param ("project_id", Service.Project.Get_Id);
+         Porion.Projects.Models.List (Branches, Service.DB, Query);
+
+         Stream.Start_Array ("branches");
+         for Branch of Branches loop
+            Stream.Start_Entity ("branch");
+            Stream.Write_Attribute ("id", Integer (Branch.Get_Id));
+            Stream.Write_Attribute ("version", Branch.Get_Version);
+            Stream.Write_Entity ("name", String '(Branch.Get_Name));
+            Stream.Write_Entity ("tag", String '(Branch.Get_Tag));
+            Write_Date (Stream, "create_date", Branch.Get_Create_Date);
+            Write_Date (Stream, "update_date", Branch.Get_Update_Date);
+            Write_Date (Stream, "last_date", Branch.Get_Last_Date);
+            Stream.Write_Entity ("status", Branch.Get_Status'Image);
+            Stream.End_Entity ("branch");
+         end loop;
+         Stream.End_Array ("branches");
+      end;
+      if Process /= null then
+         Process (Stream);
+      end if;
+      Stream.End_Entity ("project");
+   end Export;
 
 end Porion.Projects.Services;

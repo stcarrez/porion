@@ -15,7 +15,7 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-
+with Util.Serialize.IO;
 with Porion.Sources;
 with Porion.Services;
 package Porion.Projects.Services is
@@ -39,6 +39,12 @@ package Porion.Projects.Services is
 
    procedure Check_Sources (Service : in out Context_Type;
                             Status  : in out Porion.Sources.Status_Type);
+
+   --  Export some information about the project in the output stream.
+   procedure Export (Service : in out Context_Type;
+                     Stream  : in out Util.Serialize.IO.Output_Stream'Class;
+                     Process : access
+                       procedure (Stream : in out Util.Serialize.IO.Output_Stream'Class));
 
 private
 

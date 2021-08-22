@@ -75,7 +75,9 @@ package body Porion.Builders.Scripts is
    procedure Print (Controller : in out Controller_Type;
                     Stream     : in out Util.Serialize.IO.Output_Stream'Class) is
    begin
+      Stream.Start_Entity ("");
       Stream.Write_Entity ("command", Controller.Command.Get_Expression);
+      Stream.End_Entity ("");
    end Print;
 
    function Create (Config : in Porion.Configs.Config_Type) return Controller_Access is

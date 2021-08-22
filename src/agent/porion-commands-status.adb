@@ -17,6 +17,9 @@
 -----------------------------------------------------------------------
 with Ada.Text_IO;
 with Util.Dates.ISO8601;
+with Util.Streams.Texts;
+with Util.Serialize.IO.XML;
+with Util.Serialize.IO.JSON;
 with Porion.Configs;
 with Porion.Projects.Models;
 with ADO.Statements;
@@ -43,11 +46,13 @@ package body Porion.Commands.Status is
             Name      : constant String := Args.Get_Argument (1);
             Statement : ADO.Statements.Query_Statement;
             Query     : ADO.Queries.Context;
+            Output    : aliased Util.Streams.Texts.Print_Stream;
          begin
             Context.Project_Service.Load_Project (Name);
             Context.Build_Service.Open (Context.Project_Service);
             Context.Build_Service.Load_Config;
 
+            if not Command.Json and not Command.Xml then
             Console.Start_Row;
             Console.Print_Field (1, Name);
             Console.End_Row;
@@ -81,10 +86,45 @@ package body Porion.Commands.Status is
                   Console.End_Row;
                end;
                Statement.Next;
-            end loop;
+               end loop;
+            end if;
+
+            Output.Initialize (Size => 100000);
+            if Command.Json then
+               declare
+                  Stream : Util.Serialize.IO.JSON.Output_Stream;
+               begin
+                  Stream.Initialize (Output => Output'Unchecked_Access);
+                  Command.Stats (Stream, Context);
+               end;
+            else
+               declare
+                  Stream : Util.Serialize.IO.XML.Output_Stream;
+               begin
+                  Stream.Initialize (Output => Output'Unchecked_Access);
+                  Command.Stats (Stream, Context);
+               end;
+            end if;
+            Ada.Text_IO.Put_Line (Util.Streams.Texts.To_String (Output));
          end;
       end loop;
    end Execute;
+
+   procedure Stats (Command : in out Command_Type;
+                    Stream  : in out Util.Serialize.IO.Output_Stream'Class;
+                    Context : in out Context_Type) is
+      procedure Process (Stream : in out Util.Serialize.IO.Output_Stream'Class);
+
+      procedure Process (Stream : in out Util.Serialize.IO.Output_Stream'Class) is
+      begin
+         Context.Build_Service.Export (Stream);
+      end Process;
+
+   begin
+      Stream.Start_Document;
+      Context.Project_Service.Export (Stream, Process'Access);
+      Stream.End_Document;
+   end Stats;
 
    --  Setup the command before parsing the arguments and executing it.
    overriding
@@ -95,6 +135,8 @@ package body Porion.Commands.Status is
       Drivers.Command_Type (Command).Setup (Config, Context);
       GC.Define_Switch (Config, Command.Json'Access,
                         "-j", "json", -("Produce a JSON output"));
+      GC.Define_Switch (Config, Command.Xml'Access,
+                        "-x", "xml", -("Produce a XML output"));
    end Setup;
 
    --  Write the help associated with the command.

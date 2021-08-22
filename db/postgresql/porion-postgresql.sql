@@ -90,6 +90,22 @@ CREATE TABLE IF NOT EXISTS porion_environment (
   PRIMARY KEY ("id")
 );
 /*  */
+CREATE TABLE IF NOT EXISTS porion_last_build (
+  /* the record identifier. */
+  "id" BIGINT NOT NULL,
+  /* the build status. */
+  "status"  NOT NULL,
+  /* the optimistic lock version. */
+  "version" INTEGER NOT NULL,
+  /*  */
+  "build_id" BIGINT NOT NULL,
+  /*  */
+  "branch_id" BIGINT NOT NULL,
+  /*  */
+  "build_config_id" BIGINT NOT NULL,
+  PRIMARY KEY ("id")
+);
+/*  */
 CREATE TABLE IF NOT EXISTS porion_node (
   /* the node identifier */
   "id" BIGINT NOT NULL,
@@ -121,8 +137,6 @@ CREATE TABLE IF NOT EXISTS porion_branch (
   "status" INTEGER NOT NULL,
   /*  */
   "project_id" BIGINT NOT NULL,
-  /* the last build. */
-  "last_build_id" BIGINT ,
   PRIMARY KEY ("id")
 );
 /*  */
@@ -150,7 +164,7 @@ CREATE TABLE IF NOT EXISTS porion_project (
   /* date when the project was created. */
   "create_date" TIMESTAMP NOT NULL,
   /* date when the project was modified. */
-  "update_date" TIMESTAMP NOT NULL,
+  "update_date" TIMESTAMP ,
   /* the project status. */
   "status" INTEGER NOT NULL,
   /*  */
@@ -260,7 +274,7 @@ CREATE TABLE IF NOT EXISTS porion_test_run_group (
   PRIMARY KEY ("id")
 );
 INSERT INTO entity_type (name) VALUES
-('porion_build'), ('porion_build_config'), ('porion_build_step'), ('porion_environment'), ('porion_node'), ('porion_branch'), ('porion_dependency'), ('porion_project'), ('porion_test'), ('porion_test_group'), ('porion_test_run'), ('porion_test_run_group')
+('porion_build'), ('porion_build_config'), ('porion_build_step'), ('porion_environment'), ('porion_last_build'), ('porion_node'), ('porion_branch'), ('porion_dependency'), ('porion_project'), ('porion_test'), ('porion_test_group'), ('porion_test_run'), ('porion_test_run_group')
   ON CONFLICT DO NOTHING;
 INSERT INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = 'porion_build_config'), 'name')

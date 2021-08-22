@@ -438,6 +438,22 @@ CREATE TABLE IF NOT EXISTS porion_environment (
   PRIMARY KEY (`id`)
 );
 /*  */
+CREATE TABLE IF NOT EXISTS porion_last_build (
+  /* the record identifier. */
+  `id` BIGINT NOT NULL,
+  /* the build status. */
+  `status`  NOT NULL,
+  /* the optimistic lock version. */
+  `version` INTEGER NOT NULL,
+  /*  */
+  `build_id` BIGINT NOT NULL,
+  /*  */
+  `branch_id` BIGINT NOT NULL,
+  /*  */
+  `build_config_id` BIGINT NOT NULL,
+  PRIMARY KEY (`id`)
+);
+/*  */
 CREATE TABLE IF NOT EXISTS porion_node (
   /* the node identifier */
   `id` BIGINT NOT NULL,
@@ -469,8 +485,6 @@ CREATE TABLE IF NOT EXISTS porion_branch (
   `status` INTEGER NOT NULL,
   /*  */
   `project_id` BIGINT NOT NULL,
-  /* the last build. */
-  `last_build_id` BIGINT ,
   PRIMARY KEY (`id`)
 );
 /*  */
@@ -498,7 +512,7 @@ CREATE TABLE IF NOT EXISTS porion_project (
   /* date when the project was created. */
   `create_date` DATETIME NOT NULL,
   /* date when the project was modified. */
-  `update_date` DATETIME NOT NULL,
+  `update_date` DATETIME ,
   /* the project status. */
   `status` INTEGER NOT NULL,
   /*  */
@@ -611,6 +625,7 @@ INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_config");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_step");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_environment");
+INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_last_build");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_node");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_branch");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_dependency");

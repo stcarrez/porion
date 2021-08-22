@@ -121,11 +121,11 @@ package Porion.Projects.Models is
 
    --  Set date when the project was modified.
    procedure Set_Update_Date (Object : in out Project_Ref;
-                              Value  : in Ada.Calendar.Time);
+                              Value  : in ADO.Nullable_Time);
 
    --  Get date when the project was modified.
    function Get_Update_Date (Object : in Project_Ref)
-                 return Ada.Calendar.Time;
+                 return ADO.Nullable_Time;
 
    --  Set the project status.
    procedure Set_Status (Object : in out Project_Ref;
@@ -285,14 +285,6 @@ package Porion.Projects.Models is
    --
    function Get_Project (Object : in Branch_Ref)
                  return Porion.Projects.Models.Project_Ref'Class;
-
-   --  Set the last build.
-   procedure Set_Last_Build_Id (Object : in out Branch_Ref;
-                                Value  : in ADO.Identifier);
-
-   --  Get the last build.
-   function Get_Last_Build_Id (Object : in Branch_Ref)
-                 return ADO.Identifier;
 
    --  Load the entity identified by 'Id'.
    --  Raises the NOT_FOUND exception if it does not exist.
@@ -505,7 +497,7 @@ private
        Version : Integer;
        Description : Ada.Strings.Unbounded.Unbounded_String;
        Create_Date : Ada.Calendar.Time;
-       Update_Date : Ada.Calendar.Time;
+       Update_Date : ADO.Nullable_Time;
        Status : Porion.Projects.Models.Project_Status_Type;
        Scm : Porion.Sources.Source_Control_Type;
        Scm_Url : Ada.Strings.Unbounded.Unbounded_String;
@@ -552,10 +544,9 @@ private
    COL_6_2_NAME : aliased constant String := "update_date";
    COL_7_2_NAME : aliased constant String := "status";
    COL_8_2_NAME : aliased constant String := "project_id";
-   COL_9_2_NAME : aliased constant String := "last_build_id";
 
    BRANCH_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 10,
+     (Count   => 9,
       Table   => BRANCH_NAME'Access,
       Members => (
          1 => COL_0_2_NAME'Access,
@@ -566,8 +557,7 @@ private
          6 => COL_5_2_NAME'Access,
          7 => COL_6_2_NAME'Access,
          8 => COL_7_2_NAME'Access,
-         9 => COL_8_2_NAME'Access,
-         10 => COL_9_2_NAME'Access)
+         9 => COL_8_2_NAME'Access)
      );
    BRANCH_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := BRANCH_DEF'Access;
@@ -598,7 +588,6 @@ private
        Update_Date : Ada.Calendar.Time;
        Status : Porion.Projects.Models.Branch_Status_Type;
        Project : Porion.Projects.Models.Project_Ref;
-       Last_Build_Id : ADO.Identifier;
    end record;
 
    type Branch_Access is access all Branch_Impl;

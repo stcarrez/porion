@@ -102,6 +102,7 @@ package body Porion.Commands.Status is
                   Stream : Util.Serialize.IO.XML.Output_Stream;
                begin
                   Stream.Initialize (Output => Output'Unchecked_Access);
+                  Stream.Set_Indentation (2);
                   Command.Stats (Stream, Context);
                end;
             end if;

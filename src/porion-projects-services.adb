@@ -76,7 +76,6 @@ package body Porion.Projects.Services is
       end if;
       Service.Project.Set_Name (Name);
       Service.Project.Set_Create_Date (Ada.Calendar.Clock);
-      Service.Project.Set_Update_Date (Service.Project.Get_Create_Date);
       Service.Project.Set_Status (Projects.Models.PROJECT_ACTIVE);
       Service.Project.Set_Scm_Url (Info.URI);
       Service.Project.Set_Scm (Info.Kind);

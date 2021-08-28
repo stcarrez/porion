@@ -80,6 +80,7 @@ private
       Build_Controller  : Porion.Builders.Controller_Access;
       Environments      : Util.Strings.Maps.Map;
       Steps             : Build_Step_Vector;
+      Last_Build        : Porion.Builds.Models.Last_Build_Ref;
    end record;
 
    procedure Load_Environment (Service : in out Context_Type);

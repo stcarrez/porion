@@ -85,8 +85,11 @@ package body Porion.Builds.Services is
       Service.Build.Set_Create_Date (Ada.Calendar.Clock);
       Service.Build.Save (Service.DB);
 
-      Service.Branch.Set_Last_Build_Id (Service.Build.Get_Id);
-      Service.Branch.Save (Service.DB);
+      Service.Last_Build.Set_Build (Service.Build);
+      Service.Last_Build.Set_Build_Config (Service.Build_Config);
+      Service.Last_Build.Set_Branch (Service.Branch);
+      Service.Last_Build.Set_Status (Porion.Builds.Models.BUILD_RUNNING);
+      Service.Last_Build.Save (Service.DB);
       Service.DB.Commit;
 
       Log.Info ("Created build{0} for {1}", Natural'Image (Service.Build.Get_Number),

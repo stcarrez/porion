@@ -1252,8 +1252,9 @@ package body Porion.Builds.Models is
    procedure Set_Builder (Object : in out Build_Step_Ref;
                           Value  : in Porion.Builds.Models.Builder_Type) is
       procedure Set_Field_Enum is
-        new ADO.Objects.Set_Field_Operation
-          (Porion.Builds.Models.Builder_Type);
+        new ADO.Audits.Set_Field_Operation
+          (Porion.Builds.Models.Builder_Type,
+           Porion.Builds.Models.Builder_Type_Objects.To_Object);
       Impl : Build_Step_Access;
    begin
       Set_Field (Object, Impl);
@@ -1289,8 +1290,9 @@ package body Porion.Builds.Models is
    procedure Set_Step (Object : in out Build_Step_Ref;
                        Value  : in Porion.Builds.Models.Step_Type) is
       procedure Set_Field_Enum is
-        new ADO.Objects.Set_Field_Operation
-          (Porion.Builds.Models.Step_Type);
+        new ADO.Audits.Set_Field_Operation
+          (Porion.Builds.Models.Step_Type,
+           Porion.Builds.Models.Step_Type_Objects.To_Object);
       Impl : Build_Step_Access;
    begin
       Set_Field (Object, Impl);
@@ -1487,10 +1489,20 @@ package body Porion.Builds.Models is
                           Value => Object.Number);
          Object.Clear_Modified (4);
       end if;
+      if Object.Is_Modified (5) then
+         Stmt.Save_Field (Name  => COL_4_3_NAME, --  builder
+                          Value => Integer (Porion.Builds.Models.Builder_Type'Pos (Object.Builder)));
+         Object.Clear_Modified (5);
+      end if;
       if Object.Is_Modified (6) then
          Stmt.Save_Field (Name  => COL_5_3_NAME, --  timeout
                           Value => Object.Timeout);
          Object.Clear_Modified (6);
+      end if;
+      if Object.Is_Modified (7) then
+         Stmt.Save_Field (Name  => COL_6_3_NAME, --  step
+                          Value => Integer (Porion.Builds.Models.Step_Type'Pos (Object.Step)));
+         Object.Clear_Modified (7);
       end if;
       if Object.Is_Modified (8) then
          Stmt.Save_Field (Name  => COL_7_3_NAME, --  build_config_id

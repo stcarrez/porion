@@ -1,4 +1,4 @@
---  Advanced Resource Embedder 1.2.0
+-- Advanced Resource Embedder 1.1.0
 package Porion.Resources is
 
    type Content_Access is access constant String;
@@ -10,8 +10,7 @@ package Porion.Resources is
    Names : constant Name_Array;
 
    --  Returns the data stream with the given name or null.
-   function Get_Content (Name : String) return
-      access constant String;
+   function Get_Content (Name : String) return access constant String;
 
 private
 

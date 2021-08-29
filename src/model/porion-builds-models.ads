@@ -924,12 +924,14 @@ private
       := BUILD_STEP_DEF'Access;
 
    BUILD_STEP_AUDIT_DEF : aliased constant ADO.Audits.Auditable_Mapping :=
-     (Count    => 3,
+     (Count    => 5,
       Of_Class => BUILD_STEP_DEF'Access,
       Members  => (
          1 => 2,
          2 => 3,
-         3 => 5)
+         3 => 4,
+         4 => 5,
+         5 => 6)
      );
    BUILD_STEP_AUDIT_TABLE : constant ADO.Audits.Auditable_Mapping_Access
       := BUILD_STEP_AUDIT_DEF'Access;

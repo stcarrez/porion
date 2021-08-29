@@ -18,6 +18,12 @@ DROP TABLE IF EXISTS `porion_build`;
 DROP TABLE IF EXISTS `awa_visit`;
 DROP TABLE IF EXISTS `awa_counter_definition`;
 DROP TABLE IF EXISTS `awa_counter`;
+/* Copied from awa-workspaces-drop-mysql.sql*/
+/* File generated automatically by dynamo */
+DROP TABLE IF EXISTS `awa_workspace_member`;
+DROP TABLE IF EXISTS `awa_workspace_feature`;
+DROP TABLE IF EXISTS `awa_workspace`;
+DROP TABLE IF EXISTS `awa_invitation`;
 /* Copied from awa-drop-mysql.sql*/
 /* File generated automatically by dynamo */
 DROP TABLE IF EXISTS `awa_user`;
@@ -34,3 +40,7 @@ DROP TABLE IF EXISTS `awa_message_type`;
 DROP TABLE IF EXISTS `awa_message`;
 DROP TABLE IF EXISTS `awa_audit_field`;
 DROP TABLE IF EXISTS `awa_audit`;
+/* Copied from ado-drop-mysql.sql*/
+/* File generated automatically by dynamo */
+DROP TABLE IF EXISTS `sequence`;
+DROP TABLE IF EXISTS `entity_type`;

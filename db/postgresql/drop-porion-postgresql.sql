@@ -18,6 +18,12 @@ DROP TABLE IF EXISTS porion_build;
 DROP TABLE IF EXISTS awa_visit;
 DROP TABLE IF EXISTS awa_counter_definition;
 DROP TABLE IF EXISTS awa_counter;
+/* Copied from awa-workspaces-drop-postgresql.sql*/
+/* File generated automatically by dynamo */
+DROP TABLE IF EXISTS awa_workspace_member;
+DROP TABLE IF EXISTS awa_workspace_feature;
+DROP TABLE IF EXISTS awa_workspace;
+DROP TABLE IF EXISTS awa_invitation;
 /* Copied from awa-drop-postgresql.sql*/
 /* File generated automatically by dynamo */
 DROP TABLE IF EXISTS awa_user;

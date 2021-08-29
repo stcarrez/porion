@@ -116,7 +116,7 @@ package body Porion.Configs is
    function Get_Config (Name : in String) return Config_Type is
    begin
       if not Cfg.Exists (Name) then
-         return Empty : Config_Type do null; end return;
+         return Null_Config;
       else
          return Cfg.Get (Name);
       end if;
@@ -211,5 +211,10 @@ package body Porion.Configs is
          return "sqlite:///" & Util.Files.Compose (Get_Porion_Directory, "porion.db");
       end if;
    end Get_Database_Path;
+
+   function Null_Config return Config_Type is
+   begin
+      return Empty : Config_Type do null; end return;
+   end Null_Config;
 
 end Porion.Configs;

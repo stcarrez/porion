@@ -35,6 +35,7 @@ with Porion.Projects.Models;
 with Porion.Builders.Factories;
 package body Porion.Builds.Services is
 
+   use type ADO.Identifier;
    use type Porion.Builders.Controller_Access;
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Builds.Services");
@@ -335,9 +336,27 @@ package body Porion.Builds.Services is
                Stream.Write_Entity ("timeout", Step.Get_Timeout);
                Stream.Write_Entity ("builder", Step.Get_Builder'Image);
                Stream.Write_Entity ("step", Step.Get_Step'Image);
-               --  Stream.Start_Entity ("parameters");
-               Stream.Write_Entity ("parameters", String '(Step.Get_Parameters));
-               --  Stream.End_Entity ("parameters");
+               Stream.Start_Entity ("parameters");
+               declare
+                  Params : constant String := Step.Get_Parameters;
+                  Config : Porion.Configs.Config_Type;
+
+                  procedure Print (Name : in String;
+                                   Value : Util.Properties.Value) is
+                  begin
+                     Stream.Start_Entity ("parameter");
+                     Stream.Write_Attribute ("name", Name);
+                     Stream.Write_Entity ("value", Value);
+                     Stream.End_Entity ("parameter");
+                  end Print;
+
+               begin
+                  if Params'Length > 0 then
+                     Config := Util.Serialize.IO.JSON.Read (Params);
+                     Config.Iterate (Print'Access);
+                  end if;
+               end;
+               Stream.End_Entity ("parameters");
                Stream.End_Entity ("step");
             end loop;
             Stream.End_Array ("steps");
@@ -369,5 +388,141 @@ package body Porion.Builds.Services is
 
       Stream.End_Entity ("build_config");
    end Export;
+
+   procedure Update_Parameters (Service : in out Context_Type;
+                                Step    : in out Build_Step) is
+      Kind       : constant Models.Builder_Type := Step.Step.Get_Builder;
+      Controller : Porion.Builders.Controller_Access;
+      Output     : aliased Util.Streams.Texts.Print_Stream;
+      Stream     : Util.Serialize.IO.JSON.Output_Stream;
+   begin
+      Controller := Builders.Factories.Create (Kind, Service.DB, Step.Config);
+      if Controller = null then
+         Log.Error ("No builder for {0}", Models.Builder_Type'Image (Kind));
+         return;
+      end if;
+
+      Output.Initialize (Size => 10000);
+      Stream.Initialize (Output => Output'Unchecked_Access);
+      Stream.Start_Document;
+      Controller.Print (Stream);
+      Stream.End_Document;
+
+      Free (Controller);
+
+      Step.Step.Set_Parameters (Util.Streams.Texts.To_String (Output));
+   end Update_Parameters;
+
+   procedure Update (Service : in out Context_Type;
+                     Config  : in out Build_Config) is
+      procedure Remove (List : in out Models.Build_Step_Vector;
+                        Id   : in ADO.Identifier);
+
+      procedure Remove (List : in out Models.Build_Step_Vector;
+                        Id   : in ADO.Identifier) is
+         Iter : Models.Build_Step_Vectors.Cursor := List.First;
+      begin
+         while Models.Build_Step_Vectors.Has_Element (Iter) loop
+            if Models.Build_Step_Vectors.Element (Iter).Get_Id = Id then
+               List.Delete (Iter);
+               return;
+            end if;
+            Models.Build_Step_Vectors.Next (Iter);
+         end loop;
+      end Remove;
+
+      Config_Id : constant ADO.Identifier := Config.Config.Get_Id;
+      Steps     : Models.Build_Step_Vector;
+      Query     : ADO.Queries.Context;
+      Rank      : Natural := 0;
+   begin
+      Log.Info ("Update build config {0}", Config_Id'Image);
+
+      Query.Set_Filter ("o.build_config_id = :config_id ORDER BY o.number");
+      Query.Bind_Param ("config_id", Config_Id);
+      Models.List (Steps, Service.DB, Query);
+
+      --  Step 1: update and insert the build steps.
+      for Pos in Config.Steps.Iterate loop
+         declare
+            Step_Ref : constant Build_Step_Vectors.Reference_Type := Config.Steps.Reference (Pos);
+         begin
+            Rank := Rank + 1;
+            Step_Ref.Step.Set_Number (Rank);
+            Service.Update_Parameters (Step_Ref.Element.all);
+            if Step_Ref.Step.Is_Loaded then
+               if Step_Ref.Step.Is_Modified then
+                  Step_Ref.Step.Save (Service.DB);
+               end if;
+
+               Remove (Steps, Step_Ref.Step.Get_Id);
+            else
+               Step_Ref.Step.Set_Build_Config (Config.Config);
+               Step_Ref.Step.Save (Service.DB);
+            end if;
+         end;
+      end loop;
+
+      --  Step 2: remove the build steps.
+      for To_Delete_Step of Steps loop
+         To_Delete_Step.Delete (Service.DB);
+      end loop;
+   end Update;
+
+   procedure Update (Service : in out Context_Type;
+                     Configs : in out Build_Config_Vector) is
+      procedure Remove (List : in out Models.Build_Config_Vector;
+                        Id   : in ADO.Identifier);
+
+      procedure Remove (List : in out Models.Build_Config_Vector;
+                        Id   : in ADO.Identifier) is
+         Iter : Models.Build_Config_Vectors.Cursor := List.First;
+      begin
+         while Models.Build_Config_Vectors.Has_Element (Iter) loop
+            if Models.Build_Config_Vectors.Element (Iter).Get_Id = Id then
+               List.Delete (Iter);
+               return;
+            end if;
+            Models.Build_Config_Vectors.Next (Iter);
+         end loop;
+      end Remove;
+
+      Project_Id    : constant ADO.Identifier := Service.Project.Get_Id;
+      Build_Configs : Models.Build_Config_Vector;
+      Query         : ADO.Queries.Context;
+   begin
+      Log.Info ("Update build configs for{0}", Project_Id'Image);
+
+      Query.Set_Filter ("o.project_id = :project_id");
+      Query.Bind_Param ("project_id", Project_Id);
+      Porion.Builds.Models.List (Build_Configs, Service.DB, Query);
+
+      Service.DB.Begin_Transaction;
+
+      --  Step 1: update the existing configs and create the new one.
+      for Pos in Configs.Iterate loop
+         declare
+            Config_Ref : constant Build_Config_Vectors.Reference_Type
+              := Configs.Reference (Pos);
+         begin
+            if Config_Ref.Config.Is_Loaded then
+               if Config_Ref.Config.Is_Modified then
+                  Config_Ref.Config.Save (Service.DB);
+               end if;
+
+               Service.Update (Config_Ref.Element.all);
+               Remove (Build_Configs, Config_Ref.Config.Get_Id);
+            else
+               Config_Ref.Config.Save (Service.DB);
+            end if;
+         end;
+      end loop;
+
+      --  Step 2: remove the build configs
+      for To_Delete_Config of Build_Configs loop
+         To_Delete_Config.Delete (Service.DB);
+      end loop;
+      Service.DB.Commit;
+   end Update;
 
 end Porion.Builds.Services;

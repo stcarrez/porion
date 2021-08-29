@@ -37,6 +37,17 @@ package Porion.Builds.Services is
    subtype Build_Step_Vector is Build_Step_Vectors.Vector;
    subtype Build_Step_Cursor is Build_Step_Vectors.Cursor;
 
+   type Build_Config is record
+      Config : Porion.Builds.Models.Build_Config_Ref;
+      Steps  : Build_Step_Vector;
+   end record;
+
+   package Build_Config_Vectors is
+     new Ada.Containers.Vectors (Index_Type   => Positive,
+                                 Element_Type => Build_Config);
+   subtype Build_Config_Vector is Build_Config_Vectors.Vector;
+   subtype Build_Config_Cursor is Build_Config_Vectors.Cursor;
+
    type Context_Type is limited new Porion.Services.Context_Type with private;
 
    procedure Build (Service     : in out Context_Type;
@@ -73,6 +84,16 @@ package Porion.Builds.Services is
    procedure Export (Service      : in out Context_Type;
                      Build_Config : in Porion.Builds.Models.Build_Config_Ref;
                      Stream       : in out Util.Serialize.IO.Output_Stream'Class);
+
+   procedure Update_Parameters (Service : in out Context_Type;
+                                Step    : in out Build_Step);
+
+   procedure Update (Service : in out Context_Type;
+                     Config  : in out Build_Config);
+
+   procedure Update (Service : in out Context_Type;
+                     Configs : in out Build_Config_Vector);
+
 private
 
    type Context_Type is limited new Porion.Services.Context_Type with record

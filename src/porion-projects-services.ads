@@ -18,6 +18,7 @@
 with Util.Serialize.IO;
 with Porion.Sources;
 with Porion.Services;
+with Porion.Projects.Models;
 package Porion.Projects.Services is
 
    Name_Used : exception;
@@ -45,6 +46,9 @@ package Porion.Projects.Services is
                      Stream  : in out Util.Serialize.IO.Output_Stream'Class;
                      Process : access
                        procedure (Stream : in out Util.Serialize.IO.Output_Stream'Class));
+
+   procedure Update (Service : in out Context_Type;
+                     Project : in out Porion.Projects.Models.Project_Ref);
 
 private
 

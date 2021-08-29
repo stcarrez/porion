@@ -26,6 +26,9 @@ with ADO.SQL;
 with Porion.Configs;
 with Porion.Projects.Schema;
 with Porion.Resources;
+with Porion.Services.Parsers;
+with Porion.Builds.Services;
+with Porion.Projects.Services;
 package body Porion.Services is
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Services");
@@ -141,5 +144,24 @@ package body Porion.Services is
       Service.Branch := From.Branch;
       Service.Build_Node := From.Build_Node;
    end Open;
+
+   procedure Import (Service : in out Context_Type;
+                     Path    : in String) is
+      Content : Porion.Services.Parsers.Parser_Type;
+   begin
+      Porion.Services.Parsers.Parse (Service, Path, Content);
+
+      declare
+         Project_Service : Porion.Projects.Services.Context_Type;
+         Build_Service   : Porion.Builds.Services.Context_Type;
+      begin
+         Project_Service.Open (Service);
+
+         Project_Service.Update (Content.Project);
+
+         Build_Service.Open (Project_Service);
+         Build_Service.Update (Content.Build_Configs);
+      end;
+   end Import;
 
 end Porion.Services;

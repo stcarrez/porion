@@ -29,6 +29,8 @@ with Porion.Builds.Models;
 with Porion.Projects.Models;
 package body Porion.Projects.Services is
 
+   use type ADO.Identifier;
+
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Projects.Services");
 
    --  ------------------------------
@@ -253,5 +255,37 @@ package body Porion.Projects.Services is
       end if;
       Stream.End_Entity ("project");
    end Export;
+
+   procedure Update (Service : in out Context_Type;
+                     Project : in out Porion.Projects.Models.Project_Ref) is
+      Id    : constant ADO.Identifier := Project.Get_Id;
+      Query : ADO.SQL.Query;
+      Found : Boolean;
+   begin
+      if Id = ADO.NO_IDENTIFIER then
+         Log.Error ("Cannot load project");
+         return;
+      end if;
+
+      if not Project.Is_Loaded then
+         Service.Project.Load (Session => Service.DB,
+                               Id      => Id,
+                               Found   => Found);
+         if not Found then
+            Log.Error ("Project not found");
+            return;
+         end if;
+      end if;
+
+      Service.DB.Begin_Transaction;
+      Service.Project := Project;
+      if Service.Project.Is_Modified then
+         Service.Project.Set_Update_Date ((Is_Null => False,
+                                           Value   => Ada.Calendar.Clock));
+         Service.Project.Save (Service.DB);
+      end if;
+
+      Service.DB.Commit;
+   end Update;
 
 end Porion.Projects.Services;

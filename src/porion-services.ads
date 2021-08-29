@@ -63,4 +63,7 @@ package Porion.Services is
 
    function Get_Query_Resource (Name : in String) return access constant String;
 
+   procedure Import (Service : in out Context_Type;
+                     Path    : in String);
+
 end Porion.Services;

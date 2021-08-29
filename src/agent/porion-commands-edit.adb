@@ -1,0 +1,212 @@
+-----------------------------------------------------------------------
+--  porion-commands-edit -- Edit project configuration command
+--  Copyright (C) 2021 Stephane Carrez
+--  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
+--
+--  Licensed under the Apache License, Version 2.0 (the "License");
+--  you may not use this file except in compliance with the License.
+--  You may obtain a copy of the License at
+--
+--      http://www.apache.org/licenses/LICENSE-2.0
+--
+--  Unless required by applicable law or agreed to in writing, software
+--  distributed under the License is distributed on an "AS IS" BASIS,
+--  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+--  See the License for the specific language governing permissions and
+--  limitations under the License.
+-----------------------------------------------------------------------
+with Ada.Directories;
+with Ada.Environment_Variables;
+with Ada.Command_Line;
+with Ada.Streams.Stream_IO;
+with Interfaces.C.Strings;
+with Util.Files;
+with Util.Processes;
+with Util.Systems.Os;
+with Util.Streams.Files;
+with Util.Streams.Texts;
+with Util.Serialize.IO.XML;
+with Keystore.Random;
+with Porion.Services.Parsers;
+package body Porion.Commands.Edit is
+
+   use GNAT.Strings;
+
+   procedure Export_Value (Context : in out Context_Type;
+                           Name    : in String;
+                           Path    : in String);
+
+   procedure Import_Value (Context : in out Context_Type;
+                           Name    : in String;
+                           Path    : in String);
+
+   procedure Make_Directory (Path : in String);
+
+   --  ------------------------------
+   --  Export the named value from the wallet to the external file.
+   --  The file is created and given read-write access to the current user only.
+   --  ------------------------------
+   procedure Export_Value (Context : in out Context_Type;
+                           Name    : in String;
+                           Path    : in String) is
+
+      procedure Process (Stream : in out Util.Serialize.IO.Output_Stream'Class);
+
+      procedure Process (Stream : in out Util.Serialize.IO.Output_Stream'Class) is
+      begin
+         Context.Build_Service.Export (Stream);
+      end Process;
+
+      File   : aliased Util.Streams.Files.File_Stream;
+      Buffer : aliased Util.Streams.Texts.Print_Stream;
+      Stream : Util.Serialize.IO.XML.Output_Stream;
+   begin
+      Context.Project_Service.Load_Project (Name);
+      Context.Build_Service.Open (Context.Project_Service);
+      Context.Build_Service.Load_Config;
+
+      Buffer.Initialize (Output => File'Unchecked_Access,
+                         Size   => 4096);
+      Stream.Initialize (Output => Buffer'Unchecked_Access);
+      Stream.Set_Indentation (2);
+
+      File.Create (Mode => Ada.Streams.Stream_IO.Out_File,
+                   Name => Path);
+      Context.Project_Service.Export (Stream, Process'Access);
+      Stream.Flush;
+      File.Close;
+   end Export_Value;
+
+   procedure Import_Value (Context : in out Context_Type;
+                           Name    : in String;
+                           Path    : in String) is
+   begin
+      Context.Project_Service.Import (Path);
+   end Import_Value;
+
+   --  ------------------------------
+   --  Get the editor command to launch.
+   --  ------------------------------
+   function Get_Editor (Command : in Command_Type) return String is
+   begin
+      if Command.Editor /= null and then Command.Editor'Length > 0 then
+         return Command.Editor.all;
+      end if;
+
+      --  Use the $EDITOR if the environment variable defines it.
+      if Ada.Environment_Variables.Exists ("EDITOR") then
+         return Ada.Environment_Variables.Value ("EDITOR");
+      end if;
+
+      --  Use the editor which links to the default system-wide editor
+      --  that can be configured on Ubuntu through /etc/alternatives.
+      return "editor";
+   end Get_Editor;
+
+   --  ------------------------------
+   --  Get the directory where the editor's file can be created.
+   --  ------------------------------
+   function Get_Directory (Command : in Command_Type;
+                           Context : in out Context_Type) return String is
+      pragma Unreferenced (Command, Context);
+
+      Rand : Keystore.Random.Generator;
+      Name : constant String := "porion-" & Rand.Generate (Bits => 32);
+   begin
+      return "/tmp/" & Name;
+   end Get_Directory;
+
+   procedure Make_Directory (Path : in String) is
+      P      : Interfaces.C.Strings.chars_ptr;
+      Result : Integer;
+   begin
+      Ada.Directories.Create_Path (Path);
+      P := Interfaces.C.Strings.New_String (Path);
+      Result := Util.Systems.Os.Sys_Chmod (P, 8#0700#);
+      Interfaces.C.Strings.Free (P);
+      if Result /= 0 then
+         Porion.Commands.Log.Error (-("cannot set the permission of {0}"), Path);
+         raise Error;
+      end if;
+   end Make_Directory;
+
+   --  ------------------------------
+   --  Edit a value from the keystore by using an external editor.
+   --  ------------------------------
+   overriding
+   procedure Execute (Command   : in out Command_Type;
+                      Name      : in String;
+                      Args      : in Argument_List'Class;
+                      Context   : in out Context_Type) is
+   begin
+      Context.Project_Service.Open;
+      if Args.Get_Count /= Context.First_Arg then
+         Porion.Commands.Usage (Args, Context, Name);
+
+      else
+         declare
+            Dir    : constant String := Command.Get_Directory (Context);
+            Path   : constant String := Util.Files.Compose (Dir, "project.xml");
+            Editor : constant String := Command.Get_Editor;
+            Proc   : Util.Processes.Process;
+
+            procedure Cleanup;
+
+            procedure Cleanup is
+            begin
+               if Ada.Directories.Exists (Path) then
+                  Ada.Directories.Delete_File (Path);
+               end if;
+               if Ada.Directories.Exists (Dir) then
+                  Ada.Directories.Delete_Tree (Dir);
+               end if;
+            end Cleanup;
+
+            Name : constant String := Args.Get_Argument (Context.First_Arg);
+         begin
+
+            Make_Directory (Dir);
+            Export_Value (Context, Name, Path);
+            Util.Processes.Spawn (Proc, Editor & " " & Path);
+            Util.Processes.Wait (Proc);
+            if Util.Processes.Get_Exit_Status (Proc) /= 0 then
+               Porion.Commands.Log.Error (-("editor exited with status{0}"),
+                                       Natural'Image (Util.Processes.Get_Exit_Status (Proc)));
+               Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
+            else
+               Import_Value (Context, Args.Get_Argument (Context.First_Arg), Path);
+            end if;
+            Cleanup;
+
+         exception
+            when Util.Processes.Process_Error =>
+               Porion.Commands.Log.Error (-("cannot execute editor '{0}'"), Editor);
+               Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
+               Cleanup;
+
+            when others =>
+               Cleanup;
+               raise;
+
+         end;
+      end if;
+   end Execute;
+
+   --  ------------------------------
+   --  Setup the command before parsing the arguments and executing it.
+   --  ------------------------------
+   procedure Setup (Command : in out Command_Type;
+                    Config  : in out GNAT.Command_Line.Command_Line_Configuration;
+                    Context : in out Context_Type) is
+      package GC renames GNAT.Command_Line;
+   begin
+      Drivers.Command_Type (Command).Setup (Config, Context);
+      GC.Define_Switch (Config => Config,
+                        Output => Command.Editor'Access,
+                        Switch => "-e:",
+                        Long_Switch => "--editor=",
+                        Argument => "EDITOR",
+                        Help => -("Define the editor command to use"));
+   end Setup;
+
+end Porion.Commands.Edit;

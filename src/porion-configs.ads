@@ -72,4 +72,6 @@ package Porion.Configs is
    --  Get the path of the local database.
    function Get_Database_Path return String;
 
+   function Null_Config return Config_Type;
+
 end Porion.Configs;

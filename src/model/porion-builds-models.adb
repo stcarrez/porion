@@ -1130,231 +1130,255 @@ package body Porion.Builds.Models is
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);
    end Load;
-   function Build_Step_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key is
+   function Build_Config_Step_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key is
       Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
-                                       Of_Class => BUILD_STEP_DEF'Access);
+                                       Of_Class => BUILD_CONFIG_STEP_DEF'Access);
    begin
       ADO.Objects.Set_Value (Result, Id);
       return Result;
-   end Build_Step_Key;
+   end Build_Config_Step_Key;
 
-   function Build_Step_Key (Id : in String) return ADO.Objects.Object_Key is
+   function Build_Config_Step_Key (Id : in String) return ADO.Objects.Object_Key is
       Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
-                                       Of_Class => BUILD_STEP_DEF'Access);
+                                       Of_Class => BUILD_CONFIG_STEP_DEF'Access);
    begin
       ADO.Objects.Set_Value (Result, Id);
       return Result;
-   end Build_Step_Key;
+   end Build_Config_Step_Key;
 
-   function "=" (Left, Right : Build_Step_Ref'Class) return Boolean is
+   function "=" (Left, Right : Build_Config_Step_Ref'Class) return Boolean is
    begin
       return ADO.Objects.Object_Ref'Class (Left) = ADO.Objects.Object_Ref'Class (Right);
    end "=";
 
-   procedure Set_Field (Object : in out Build_Step_Ref'Class;
-                        Impl   : out Build_Step_Access) is
+   procedure Set_Field (Object : in out Build_Config_Step_Ref'Class;
+                        Impl   : out Build_Config_Step_Access) is
       Result : ADO.Objects.Object_Record_Access;
    begin
       Object.Prepare_Modify (Result);
-      Impl := Build_Step_Impl (Result.all)'Access;
+      Impl := Build_Config_Step_Impl (Result.all)'Access;
    end Set_Field;
 
    --  Internal method to allocate the Object_Record instance
-   procedure Allocate (Object : in out Build_Step_Ref) is
-      Impl : Build_Step_Access;
+   procedure Allocate (Object : in out Build_Config_Step_Ref) is
+      Impl : Build_Config_Step_Access;
    begin
-      Impl := new Build_Step_Impl;
-      Impl.Version := 0;
+      Impl := new Build_Config_Step_Impl;
       Impl.Number := 0;
       Impl.Builder := Porion.Builds.Models.Builder_Type'First;
       Impl.Timeout := 0;
       Impl.Step := Porion.Builds.Models.Step_Type'First;
+      Impl.Version := 0;
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Allocate;
 
    -- ----------------------------------------
-   --  Data object: Build_Step
+   --  Data object: Build_Config_Step
    -- ----------------------------------------
 
-   procedure Set_Id (Object : in out Build_Step_Ref;
+   procedure Set_Id (Object : in out Build_Config_Step_Ref;
                      Value  : in ADO.Identifier) is
-      Impl : Build_Step_Access;
+      Impl : Build_Config_Step_Access;
    begin
       Set_Field (Object, Impl);
       ADO.Objects.Set_Field_Key_Value (Impl.all, 1, Value);
    end Set_Id;
 
-   function Get_Id (Object : in Build_Step_Ref)
+   function Get_Id (Object : in Build_Config_Step_Ref)
                   return ADO.Identifier is
-      Impl : constant Build_Step_Access
-         := Build_Step_Impl (Object.Get_Object.all)'Access;
+      Impl : constant Build_Config_Step_Access
+         := Build_Config_Step_Impl (Object.Get_Object.all)'Access;
    begin
       return Impl.Get_Key_Value;
    end Get_Id;
 
 
-   function Get_Version (Object : in Build_Step_Ref)
-                  return Integer is
-      Impl : constant Build_Step_Access
-         := Build_Step_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Version;
-   end Get_Version;
-
-
-   procedure Set_Parameters (Object : in out Build_Step_Ref;
+   procedure Set_Parameters (Object : in out Build_Config_Step_Ref;
                               Value : in String) is
-      Impl : Build_Step_Access;
+      Impl : Build_Config_Step_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Audits.Set_Field_String (Impl.all, 3, Impl.Parameters, Value);
+      ADO.Objects.Set_Field_String (Impl.all, 2, Impl.Parameters, Value);
    end Set_Parameters;
 
-   procedure Set_Parameters (Object : in out Build_Step_Ref;
+   procedure Set_Parameters (Object : in out Build_Config_Step_Ref;
                              Value  : in Ada.Strings.Unbounded.Unbounded_String) is
-      Impl : Build_Step_Access;
+      Impl : Build_Config_Step_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Audits.Set_Field_Unbounded_String (Impl.all, 3, Impl.Parameters, Value);
+      ADO.Objects.Set_Field_Unbounded_String (Impl.all, 2, Impl.Parameters, Value);
    end Set_Parameters;
 
-   function Get_Parameters (Object : in Build_Step_Ref)
+   function Get_Parameters (Object : in Build_Config_Step_Ref)
                  return String is
    begin
       return Ada.Strings.Unbounded.To_String (Object.Get_Parameters);
    end Get_Parameters;
-   function Get_Parameters (Object : in Build_Step_Ref)
+   function Get_Parameters (Object : in Build_Config_Step_Ref)
                   return Ada.Strings.Unbounded.Unbounded_String is
-      Impl : constant Build_Step_Access
-         := Build_Step_Impl (Object.Get_Load_Object.all)'Access;
+      Impl : constant Build_Config_Step_Access
+         := Build_Config_Step_Impl (Object.Get_Load_Object.all)'Access;
    begin
       return Impl.Parameters;
    end Get_Parameters;
 
 
-   procedure Set_Number (Object : in out Build_Step_Ref;
+   procedure Set_Number (Object : in out Build_Config_Step_Ref;
                          Value  : in Integer) is
-      Impl : Build_Step_Access;
+      Impl : Build_Config_Step_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Audits.Set_Field_Integer (Impl.all, 4, Impl.Number, Value);
+      ADO.Objects.Set_Field_Integer (Impl.all, 3, Impl.Number, Value);
    end Set_Number;
 
-   function Get_Number (Object : in Build_Step_Ref)
+   function Get_Number (Object : in Build_Config_Step_Ref)
                   return Integer is
-      Impl : constant Build_Step_Access
-         := Build_Step_Impl (Object.Get_Load_Object.all)'Access;
+      Impl : constant Build_Config_Step_Access
+         := Build_Config_Step_Impl (Object.Get_Load_Object.all)'Access;
    begin
       return Impl.Number;
    end Get_Number;
 
 
-   procedure Set_Builder (Object : in out Build_Step_Ref;
+   procedure Set_Builder (Object : in out Build_Config_Step_Ref;
                           Value  : in Porion.Builds.Models.Builder_Type) is
       procedure Set_Field_Enum is
-        new ADO.Audits.Set_Field_Operation
-          (Porion.Builds.Models.Builder_Type,
-           Porion.Builds.Models.Builder_Type_Objects.To_Object);
-      Impl : Build_Step_Access;
+        new ADO.Objects.Set_Field_Operation
+          (Porion.Builds.Models.Builder_Type);
+      Impl : Build_Config_Step_Access;
    begin
       Set_Field (Object, Impl);
-      Set_Field_Enum (Impl.all, 5, Impl.Builder, Value);
+      Set_Field_Enum (Impl.all, 4, Impl.Builder, Value);
    end Set_Builder;
 
-   function Get_Builder (Object : in Build_Step_Ref)
+   function Get_Builder (Object : in Build_Config_Step_Ref)
                   return Porion.Builds.Models.Builder_Type is
-      Impl : constant Build_Step_Access
-         := Build_Step_Impl (Object.Get_Load_Object.all)'Access;
+      Impl : constant Build_Config_Step_Access
+         := Build_Config_Step_Impl (Object.Get_Load_Object.all)'Access;
    begin
       return Impl.Builder;
    end Get_Builder;
 
 
-   procedure Set_Timeout (Object : in out Build_Step_Ref;
+   procedure Set_Timeout (Object : in out Build_Config_Step_Ref;
                           Value  : in Integer) is
-      Impl : Build_Step_Access;
+      Impl : Build_Config_Step_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Audits.Set_Field_Integer (Impl.all, 6, Impl.Timeout, Value);
+      ADO.Objects.Set_Field_Integer (Impl.all, 5, Impl.Timeout, Value);
    end Set_Timeout;
 
-   function Get_Timeout (Object : in Build_Step_Ref)
+   function Get_Timeout (Object : in Build_Config_Step_Ref)
                   return Integer is
-      Impl : constant Build_Step_Access
-         := Build_Step_Impl (Object.Get_Load_Object.all)'Access;
+      Impl : constant Build_Config_Step_Access
+         := Build_Config_Step_Impl (Object.Get_Load_Object.all)'Access;
    begin
       return Impl.Timeout;
    end Get_Timeout;
 
 
-   procedure Set_Step (Object : in out Build_Step_Ref;
+   procedure Set_Step (Object : in out Build_Config_Step_Ref;
                        Value  : in Porion.Builds.Models.Step_Type) is
       procedure Set_Field_Enum is
-        new ADO.Audits.Set_Field_Operation
-          (Porion.Builds.Models.Step_Type,
-           Porion.Builds.Models.Step_Type_Objects.To_Object);
-      Impl : Build_Step_Access;
+        new ADO.Objects.Set_Field_Operation
+          (Porion.Builds.Models.Step_Type);
+      Impl : Build_Config_Step_Access;
    begin
       Set_Field (Object, Impl);
-      Set_Field_Enum (Impl.all, 7, Impl.Step, Value);
+      Set_Field_Enum (Impl.all, 6, Impl.Step, Value);
    end Set_Step;
 
-   function Get_Step (Object : in Build_Step_Ref)
+   function Get_Step (Object : in Build_Config_Step_Ref)
                   return Porion.Builds.Models.Step_Type is
-      Impl : constant Build_Step_Access
-         := Build_Step_Impl (Object.Get_Load_Object.all)'Access;
+      Impl : constant Build_Config_Step_Access
+         := Build_Config_Step_Impl (Object.Get_Load_Object.all)'Access;
    begin
       return Impl.Step;
    end Get_Step;
 
 
-   procedure Set_Build_Config (Object : in out Build_Step_Ref;
+   procedure Set_Version (Object : in out Build_Config_Step_Ref;
+                          Value  : in Integer) is
+      Impl : Build_Config_Step_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Integer (Impl.all, 7, Impl.Version, Value);
+   end Set_Version;
+
+   function Get_Version (Object : in Build_Config_Step_Ref)
+                  return Integer is
+      Impl : constant Build_Config_Step_Access
+         := Build_Config_Step_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Version;
+   end Get_Version;
+
+
+   procedure Set_Build_Config (Object : in out Build_Config_Step_Ref;
                                Value  : in Porion.Builds.Models.Build_Config_Ref'Class) is
-      Impl : Build_Step_Access;
+      Impl : Build_Config_Step_Access;
    begin
       Set_Field (Object, Impl);
       ADO.Objects.Set_Field_Object (Impl.all, 8, Impl.Build_Config, Value);
    end Set_Build_Config;
 
-   function Get_Build_Config (Object : in Build_Step_Ref)
+   function Get_Build_Config (Object : in Build_Config_Step_Ref)
                   return Porion.Builds.Models.Build_Config_Ref'Class is
-      Impl : constant Build_Step_Access
-         := Build_Step_Impl (Object.Get_Load_Object.all)'Access;
+      Impl : constant Build_Config_Step_Access
+         := Build_Config_Step_Impl (Object.Get_Load_Object.all)'Access;
    begin
       return Impl.Build_Config;
    end Get_Build_Config;
 
+
+   procedure Set_Previous_Version (Object : in out Build_Config_Step_Ref;
+                                   Value  : in Porion.Builds.Models.Build_Config_Step_Ref'Class) is
+      Impl : Build_Config_Step_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Object (Impl.all, 9, Impl.Previous_Version, Value);
+   end Set_Previous_Version;
+
+   function Get_Previous_Version (Object : in Build_Config_Step_Ref)
+                  return Porion.Builds.Models.Build_Config_Step_Ref'Class is
+      Impl : constant Build_Config_Step_Access
+         := Build_Config_Step_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Previous_Version;
+   end Get_Previous_Version;
+
    --  Copy of the object.
-   procedure Copy (Object : in Build_Step_Ref;
-                   Into   : in out Build_Step_Ref) is
-      Result : Build_Step_Ref;
+   procedure Copy (Object : in Build_Config_Step_Ref;
+                   Into   : in out Build_Config_Step_Ref) is
+      Result : Build_Config_Step_Ref;
    begin
       if not Object.Is_Null then
          declare
-            Impl : constant Build_Step_Access
-              := Build_Step_Impl (Object.Get_Load_Object.all)'Access;
-            Copy : constant Build_Step_Access
-              := new Build_Step_Impl;
+            Impl : constant Build_Config_Step_Access
+              := Build_Config_Step_Impl (Object.Get_Load_Object.all)'Access;
+            Copy : constant Build_Config_Step_Access
+              := new Build_Config_Step_Impl;
          begin
             ADO.Objects.Set_Object (Result, Copy.all'Access);
             Copy.Copy (Impl.all);
-            Copy.Version := Impl.Version;
             Copy.Parameters := Impl.Parameters;
             Copy.Number := Impl.Number;
             Copy.Builder := Impl.Builder;
             Copy.Timeout := Impl.Timeout;
             Copy.Step := Impl.Step;
+            Copy.Version := Impl.Version;
             Copy.Build_Config := Impl.Build_Config;
+            Copy.Previous_Version := Impl.Previous_Version;
          end;
       end if;
       Into := Result;
    end Copy;
 
-   procedure Find (Object  : in out Build_Step_Ref;
+   procedure Find (Object  : in out Build_Config_Step_Ref;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class;
                    Found   : out Boolean) is
-      Impl  : constant Build_Step_Access := new Build_Step_Impl;
+      Impl  : constant Build_Config_Step_Access := new Build_Config_Step_Impl;
    begin
       Impl.Find (Session, Query, Found);
       if Found then
@@ -1365,10 +1389,10 @@ package body Porion.Builds.Models is
       end if;
    end Find;
 
-   procedure Load (Object  : in out Build_Step_Ref;
+   procedure Load (Object  : in out Build_Config_Step_Ref;
                    Session : in out ADO.Sessions.Session'Class;
                    Id      : in ADO.Identifier) is
-      Impl  : constant Build_Step_Access := new Build_Step_Impl;
+      Impl  : constant Build_Config_Step_Access := new Build_Config_Step_Impl;
       Found : Boolean;
       Query : ADO.SQL.Query;
    begin
@@ -1382,11 +1406,11 @@ package body Porion.Builds.Models is
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Load;
 
-   procedure Load (Object  : in out Build_Step_Ref;
+   procedure Load (Object  : in out Build_Config_Step_Ref;
                    Session : in out ADO.Sessions.Session'Class;
                    Id      : in ADO.Identifier;
                    Found   : out Boolean) is
-      Impl  : constant Build_Step_Access := new Build_Step_Impl;
+      Impl  : constant Build_Config_Step_Access := new Build_Config_Step_Impl;
       Query : ADO.SQL.Query;
    begin
       Query.Bind_Param (Position => 1, Value => Id);
@@ -1399,12 +1423,12 @@ package body Porion.Builds.Models is
       end if;
    end Load;
 
-   procedure Save (Object  : in out Build_Step_Ref;
+   procedure Save (Object  : in out Build_Config_Step_Ref;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;
    begin
       if Impl = null then
-         Impl := new Build_Step_Impl;
+         Impl := new Build_Config_Step_Impl;
          ADO.Objects.Set_Object (Object, Impl);
       end if;
       if not ADO.Objects.Is_Created (Impl.all) then
@@ -1414,7 +1438,7 @@ package body Porion.Builds.Models is
       end if;
    end Save;
 
-   procedure Delete (Object  : in out Build_Step_Ref;
+   procedure Delete (Object  : in out Build_Config_Step_Ref;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : constant ADO.Objects.Object_Record_Access := Object.Get_Object;
    begin
@@ -1426,23 +1450,23 @@ package body Porion.Builds.Models is
    --  --------------------
    --  Free the object
    --  --------------------
-   procedure Destroy (Object : access Build_Step_Impl) is
-      type Build_Step_Impl_Ptr is access all Build_Step_Impl;
+   procedure Destroy (Object : access Build_Config_Step_Impl) is
+      type Build_Config_Step_Impl_Ptr is access all Build_Config_Step_Impl;
       procedure Unchecked_Free is new Ada.Unchecked_Deallocation
-              (Build_Step_Impl, Build_Step_Impl_Ptr);
+              (Build_Config_Step_Impl, Build_Config_Step_Impl_Ptr);
       pragma Warnings (Off, "*redundant conversion*");
-      Ptr : Build_Step_Impl_Ptr := Build_Step_Impl (Object.all)'Access;
+      Ptr : Build_Config_Step_Impl_Ptr := Build_Config_Step_Impl (Object.all)'Access;
       pragma Warnings (On, "*redundant conversion*");
    begin
       Unchecked_Free (Ptr);
    end Destroy;
 
-   procedure Find (Object  : in out Build_Step_Impl;
+   procedure Find (Object  : in out Build_Config_Step_Impl;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class;
                    Found   : out Boolean) is
       Stmt : ADO.Statements.Query_Statement
-          := Session.Create_Statement (Query, BUILD_STEP_DEF'Access);
+          := Session.Create_Statement (Query, BUILD_CONFIG_STEP_DEF'Access);
    begin
       Stmt.Execute;
       if Stmt.Has_Elements then
@@ -1455,7 +1479,7 @@ package body Porion.Builds.Models is
    end Find;
 
    overriding
-   procedure Load (Object  : in out Build_Step_Impl;
+   procedure Load (Object  : in out Build_Config_Step_Impl;
                    Session : in out ADO.Sessions.Session'Class) is
       Found : Boolean;
       Query : ADO.SQL.Query;
@@ -1469,39 +1493,14 @@ package body Porion.Builds.Models is
       end if;
    end Load;
 
-   procedure Save (Object  : in out Build_Step_Impl;
+   procedure Save (Object  : in out Build_Config_Step_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Stmt : ADO.Statements.Update_Statement
-         := Session.Create_Statement (BUILD_STEP_DEF'Access);
+         := Session.Create_Statement (BUILD_CONFIG_STEP_DEF'Access);
    begin
-      if Object.Is_Modified (1) then
-         Stmt.Save_Field (Name  => COL_0_3_NAME, --  id
-                          Value => Object.Get_Key);
-         Object.Clear_Modified (1);
-      end if;
-      if Object.Is_Modified (3) then
-         Stmt.Save_Field (Name  => COL_2_3_NAME, --  parameters
-                          Value => Object.Parameters);
-         Object.Clear_Modified (3);
-      end if;
-      if Object.Is_Modified (4) then
-         Stmt.Save_Field (Name  => COL_3_3_NAME, --  number
-                          Value => Object.Number);
-         Object.Clear_Modified (4);
-      end if;
-      if Object.Is_Modified (5) then
-         Stmt.Save_Field (Name  => COL_4_3_NAME, --  builder
-                          Value => Integer (Porion.Builds.Models.Builder_Type'Pos (Object.Builder)));
-         Object.Clear_Modified (5);
-      end if;
-      if Object.Is_Modified (6) then
-         Stmt.Save_Field (Name  => COL_5_3_NAME, --  timeout
-                          Value => Object.Timeout);
-         Object.Clear_Modified (6);
-      end if;
       if Object.Is_Modified (7) then
-         Stmt.Save_Field (Name  => COL_6_3_NAME, --  step
-                          Value => Integer (Porion.Builds.Models.Step_Type'Pos (Object.Step)));
+         Stmt.Save_Field (Name  => COL_6_3_NAME, --  version
+                          Value => Object.Version);
          Object.Clear_Modified (7);
       end if;
       if Object.Is_Modified (8) then
@@ -1509,13 +1508,14 @@ package body Porion.Builds.Models is
                           Value => Object.Build_Config);
          Object.Clear_Modified (8);
       end if;
+      if Object.Is_Modified (9) then
+         Stmt.Save_Field (Name  => COL_8_3_NAME, --  previous_version_id
+                          Value => Object.Previous_Version);
+         Object.Clear_Modified (9);
+      end if;
       if Stmt.Has_Save_Fields then
-         Object.Version := Object.Version + 1;
-         Stmt.Save_Field (Name  => "version",
-                          Value => Object.Version);
-         Stmt.Set_Filter (Filter => "id = ? and version = ?");
+         Stmt.Set_Filter (Filter => "id = ?");
          Stmt.Add_Param (Value => Object.Get_Key);
-         Stmt.Add_Param (Value => Object.Version - 1);
          declare
             Result : Integer;
          begin
@@ -1523,51 +1523,48 @@ package body Porion.Builds.Models is
             if Result /= 1 then
                if Result /= 0 then
                   raise ADO.Objects.UPDATE_ERROR;
-               else
-                  raise ADO.Objects.LAZY_LOCK;
                end if;
             end if;
-            ADO.Audits.Save (Object, Session);
          end;
       end if;
    end Save;
 
-   procedure Create (Object  : in out Build_Step_Impl;
+   procedure Create (Object  : in out Build_Config_Step_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Query : ADO.Statements.Insert_Statement
-                  := Session.Create_Statement (BUILD_STEP_DEF'Access);
+                  := Session.Create_Statement (BUILD_CONFIG_STEP_DEF'Access);
       Result : Integer;
    begin
-      Object.Version := 1;
       Session.Allocate (Id => Object);
       Query.Save_Field (Name  => COL_0_3_NAME, --  id
                         Value => Object.Get_Key);
-      Query.Save_Field (Name  => COL_1_3_NAME, --  version
-                        Value => Object.Version);
-      Query.Save_Field (Name  => COL_2_3_NAME, --  parameters
+      Query.Save_Field (Name  => COL_1_3_NAME, --  parameters
                         Value => Object.Parameters);
-      Query.Save_Field (Name  => COL_3_3_NAME, --  number
+      Query.Save_Field (Name  => COL_2_3_NAME, --  number
                         Value => Object.Number);
-      Query.Save_Field (Name  => COL_4_3_NAME, --  builder
+      Query.Save_Field (Name  => COL_3_3_NAME, --  builder
                         Value => Integer (Porion.Builds.Models.Builder_Type'Pos (Object.Builder)));
-      Query.Save_Field (Name  => COL_5_3_NAME, --  timeout
+      Query.Save_Field (Name  => COL_4_3_NAME, --  timeout
                         Value => Object.Timeout);
-      Query.Save_Field (Name  => COL_6_3_NAME, --  step
+      Query.Save_Field (Name  => COL_5_3_NAME, --  step
                         Value => Integer (Porion.Builds.Models.Step_Type'Pos (Object.Step)));
+      Query.Save_Field (Name  => COL_6_3_NAME, --  version
+                        Value => Object.Version);
       Query.Save_Field (Name  => COL_7_3_NAME, --  build_config_id
                         Value => Object.Build_Config);
+      Query.Save_Field (Name  => COL_8_3_NAME, --  previous_version_id
+                        Value => Object.Previous_Version);
       Query.Execute (Result);
       if Result /= 1 then
          raise ADO.Objects.INSERT_ERROR;
       end if;
       ADO.Objects.Set_Created (Object);
-      ADO.Audits.Save (Object, Session);
    end Create;
 
-   procedure Delete (Object  : in out Build_Step_Impl;
+   procedure Delete (Object  : in out Build_Config_Step_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Stmt : ADO.Statements.Delete_Statement
-         := Session.Create_Statement (BUILD_STEP_DEF'Access);
+         := Session.Create_Statement (BUILD_CONFIG_STEP_DEF'Access);
    begin
       Stmt.Set_Filter (Filter => "id = ?");
       Stmt.Add_Param (Value => Object.Get_Key);
@@ -1578,16 +1575,16 @@ package body Porion.Builds.Models is
    --  Get the bean attribute identified by the name.
    --  ------------------------------
    overriding
-   function Get_Value (From : in Build_Step_Ref;
+   function Get_Value (From : in Build_Config_Step_Ref;
                        Name : in String) return Util.Beans.Objects.Object is
       Obj  : ADO.Objects.Object_Record_Access;
-      Impl : access Build_Step_Impl;
+      Impl : access Build_Config_Step_Impl;
    begin
       if From.Is_Null then
          return Util.Beans.Objects.Null_Object;
       end if;
       Obj := From.Get_Load_Object;
-      Impl := Build_Step_Impl (Obj.all)'Access;
+      Impl := Build_Config_Step_Impl (Obj.all)'Access;
       if Name = "id" then
          return ADO.Objects.To_Object (Impl.Get_Key);
       elsif Name = "parameters" then
@@ -1600,23 +1597,25 @@ package body Porion.Builds.Models is
          return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Timeout));
       elsif Name = "step" then
          return Porion.Builds.Models.Step_Type_Objects.To_Object (Impl.Step);
+      elsif Name = "version" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Version));
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
 
 
-   procedure List (Object  : in out Build_Step_Vector;
+   procedure List (Object  : in out Build_Config_Step_Vector;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class) is
       Stmt : ADO.Statements.Query_Statement
-        := Session.Create_Statement (Query, BUILD_STEP_DEF'Access);
+        := Session.Create_Statement (Query, BUILD_CONFIG_STEP_DEF'Access);
    begin
       Stmt.Execute;
-      Build_Step_Vectors.Clear (Object);
+      Build_Config_Step_Vectors.Clear (Object);
       while Stmt.Has_Elements loop
          declare
-            Item : Build_Step_Ref;
-            Impl : constant Build_Step_Access := new Build_Step_Impl;
+            Item : Build_Config_Step_Ref;
+            Impl : constant Build_Config_Step_Access := new Build_Config_Step_Impl;
          begin
             Impl.Load (Stmt, Session);
             ADO.Objects.Set_Object (Item, Impl.all'Access);
@@ -1629,20 +1628,23 @@ package body Porion.Builds.Models is
    --  ------------------------------
    --  Load the object from current iterator position
    --  ------------------------------
-   procedure Load (Object  : in out Build_Step_Impl;
+   procedure Load (Object  : in out Build_Config_Step_Impl;
                    Stmt    : in out ADO.Statements.Query_Statement'Class;
                    Session : in out ADO.Sessions.Session'Class) is
    begin
       Object.Set_Key_Value (Stmt.Get_Identifier (0));
-      Object.Parameters := Stmt.Get_Unbounded_String (2);
-      Object.Number := Stmt.Get_Integer (3);
-      Object.Builder := Porion.Builds.Models.Builder_Type'Val (Stmt.Get_Integer (4));
-      Object.Timeout := Stmt.Get_Integer (5);
-      Object.Step := Porion.Builds.Models.Step_Type'Val (Stmt.Get_Integer (6));
+      Object.Parameters := Stmt.Get_Unbounded_String (1);
+      Object.Number := Stmt.Get_Integer (2);
+      Object.Builder := Porion.Builds.Models.Builder_Type'Val (Stmt.Get_Integer (3));
+      Object.Timeout := Stmt.Get_Integer (4);
+      Object.Step := Porion.Builds.Models.Step_Type'Val (Stmt.Get_Integer (5));
+      Object.Version := Stmt.Get_Integer (6);
       if not Stmt.Is_Null (7) then
          Object.Build_Config.Set_Key_Value (Stmt.Get_Identifier (7), Session);
       end if;
-      Object.Version := Stmt.Get_Integer (1);
+      if not Stmt.Is_Null (8) then
+         Object.Previous_Version.Set_Key_Value (Stmt.Get_Identifier (8), Session);
+      end if;
       ADO.Objects.Set_Created (Object);
    end Load;
    function Environment_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key is

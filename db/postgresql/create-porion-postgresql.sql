@@ -449,6 +449,38 @@ CREATE TABLE IF NOT EXISTS porion_build_config_step (
   "previous_version_id" BIGINT ,
   PRIMARY KEY ("id")
 );
+/* Tracks a porion agent that is building something. */
+CREATE TABLE IF NOT EXISTS porion_build_executor (
+  /* the build executor identifier. */
+  "id" BIGINT NOT NULL,
+  /* the optimistic lock version. */
+  "version" INTEGER NOT NULL,
+  /* the process id that is running this build executor. */
+  "pid" INTEGER NOT NULL,
+  /* the date and time when this executor was started. */
+  "start_date" TIMESTAMP NOT NULL,
+  /* the build executor management port. */
+  "port" INTEGER NOT NULL,
+  /* the node where the executor is running its commands. */
+  "node_id" BIGINT NOT NULL,
+  PRIMARY KEY ("id")
+);
+/*  */
+CREATE TABLE IF NOT EXISTS porion_build_step (
+  /* the build step identifier. */
+  "id" BIGINT NOT NULL,
+  /* the date and time when the build step was started. */
+  "start_date" TIMESTAMP NOT NULL,
+  /* the date and time when the build step was finished. */
+  "end_date" TIMESTAMP ,
+  /* the command exit status. */
+  "exit_status" INTEGER NOT NULL,
+  /* the build that used this build step */
+  "build_id" BIGINT NOT NULL,
+  /* the build step configuration that was used. */
+  "config_id" BIGINT NOT NULL,
+  PRIMARY KEY ("id")
+);
 /* Specific environment variables
 can be defined for the build
 configuration or for a specific
@@ -653,7 +685,7 @@ CREATE TABLE IF NOT EXISTS porion_test_run_group (
   PRIMARY KEY ("id")
 );
 INSERT INTO entity_type (name) VALUES
-('porion_build'), ('porion_build_config'), ('porion_build_config_step'), ('porion_environment'), ('porion_last_build'), ('porion_node'), ('porion_branch'), ('porion_dependency'), ('porion_project'), ('porion_test'), ('porion_test_group'), ('porion_test_run'), ('porion_test_run_group')
+('porion_build'), ('porion_build_config'), ('porion_build_config_step'), ('porion_build_executor'), ('porion_build_step'), ('porion_environment'), ('porion_last_build'), ('porion_node'), ('porion_branch'), ('porion_dependency'), ('porion_project'), ('porion_test'), ('porion_test_group'), ('porion_test_run'), ('porion_test_run_group')
   ON CONFLICT DO NOTHING;
 INSERT INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = 'porion_build_config'), 'name')

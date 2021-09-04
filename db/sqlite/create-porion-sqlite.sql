@@ -428,12 +428,13 @@ CREATE TABLE IF NOT EXISTS porion_build_config (
   `project_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`)
 );
-/*  */
-CREATE TABLE IF NOT EXISTS porion_build_step (
+/* Describes a step in the build process.
+Members are fozen to force the creation
+of a new instance when the build configuration
+is modified. */
+CREATE TABLE IF NOT EXISTS porion_build_config_step (
   /* build step identifier */
   `id` BIGINT NOT NULL,
-  /* the optimistic locking. */
-  `version` INTEGER NOT NULL,
   /* the build step command. */
   `parameters` VARCHAR(65536) NOT NULL,
   /* the build step number. */
@@ -444,8 +445,12 @@ CREATE TABLE IF NOT EXISTS porion_build_step (
   `timeout` INTEGER NOT NULL,
   /* the step classification type. */
   `step` INTEGER NOT NULL,
+  /*  */
+  `version` INTEGER NOT NULL,
   /* the build configuration that contains this build step. */
   `build_config_id` BIGINT NOT NULL,
+  /*  */
+  `previous_version_id` BIGINT ,
   PRIMARY KEY (`id`)
 );
 /* Specific environment variables
@@ -653,7 +658,7 @@ CREATE TABLE IF NOT EXISTS porion_test_run_group (
 );
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_config");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_step");
+INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_config_step");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_environment");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_last_build");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_node");
@@ -668,16 +673,6 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_config"), "name");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_config"), "description");
-INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_step"), "parameters");
-INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_step"), "number");
-INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_step"), "builder");
-INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_step"), "timeout");
-INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_step"), "step");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_environment"), "value");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)

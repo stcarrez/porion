@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS porion_branch;
 DROP TABLE IF EXISTS porion_node;
 DROP TABLE IF EXISTS porion_last_build;
 DROP TABLE IF EXISTS porion_environment;
-DROP TABLE IF EXISTS porion_build_step;
+DROP TABLE IF EXISTS porion_build_config_step;
 DROP TABLE IF EXISTS porion_build_config;
 DROP TABLE IF EXISTS porion_build;
 /* Copied from awa_counters-drop-postgresql.sql*/

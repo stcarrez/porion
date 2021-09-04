@@ -169,7 +169,7 @@ package body Porion.Services.Parsers is
 
             when BUILD_STEP_END =>
                N.Config.Steps.Append (N.Step);
-               N.Step.Step := Porion.Builds.Models.Null_Build_Step;
+               N.Step.Step := Porion.Builds.Models.Null_Build_Config_Step;
                N.Step.Config := Porion.Configs.Null_Config;
 
             when BUILD_CONFIG_END =>

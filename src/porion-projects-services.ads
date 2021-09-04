@@ -53,8 +53,6 @@ package Porion.Projects.Services is
 private
 
    type Context_Type is limited new Porion.Services.Context_Type with record
-      --  Build_Node        : Porion.Nodes.Models.Node_Ref;
-      --  Build_Config      : Porion.Builds.Models.Build_Config_Ref;
       Source_Controller : Porion.Sources.Controller_Access;
    end record;
 

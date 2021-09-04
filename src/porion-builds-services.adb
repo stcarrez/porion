@@ -178,7 +178,7 @@ package body Porion.Builds.Services is
    end Load_Environment;
 
    procedure Load_Build_Steps (Service : in out Context_Type) is
-      Steps : Porion.Builds.Models.Build_Step_Vector;
+      Steps : Porion.Builds.Models.Build_Config_Step_Vector;
       Query : ADO.Queries.Context;
    begin
       Service.Steps.Clear;
@@ -319,7 +319,7 @@ package body Porion.Builds.Services is
 
       --  Load the build steps.
       declare
-         Steps : Porion.Builds.Models.Build_Step_Vector;
+         Steps : Porion.Builds.Models.Build_Config_Step_Vector;
          Query : ADO.Queries.Context;
       begin
          Query.Set_Filter ("o.build_config_id = :config_id ORDER BY o.number");
@@ -415,24 +415,24 @@ package body Porion.Builds.Services is
 
    procedure Update (Service : in out Context_Type;
                      Config  : in out Build_Config) is
-      procedure Remove (List : in out Models.Build_Step_Vector;
+      procedure Remove (List : in out Models.Build_Config_Step_Vector;
                         Id   : in ADO.Identifier);
 
-      procedure Remove (List : in out Models.Build_Step_Vector;
+      procedure Remove (List : in out Models.Build_Config_Step_Vector;
                         Id   : in ADO.Identifier) is
-         Iter : Models.Build_Step_Vectors.Cursor := List.First;
+         Iter : Models.Build_Config_Step_Vectors.Cursor := List.First;
       begin
-         while Models.Build_Step_Vectors.Has_Element (Iter) loop
-            if Models.Build_Step_Vectors.Element (Iter).Get_Id = Id then
+         while Models.Build_Config_Step_Vectors.Has_Element (Iter) loop
+            if Models.Build_Config_Step_Vectors.Element (Iter).Get_Id = Id then
                List.Delete (Iter);
                return;
             end if;
-            Models.Build_Step_Vectors.Next (Iter);
+            Models.Build_Config_Step_Vectors.Next (Iter);
          end loop;
       end Remove;
 
       Config_Id : constant ADO.Identifier := Config.Config.Get_Id;
-      Steps     : Models.Build_Step_Vector;
+      Steps     : Models.Build_Config_Step_Vector;
       Query     : ADO.Queries.Context;
       Rank      : Natural := 0;
    begin

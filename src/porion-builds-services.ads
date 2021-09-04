@@ -27,7 +27,7 @@ private with Util.Strings.Maps;
 package Porion.Builds.Services is
 
    type Build_Step is record
-      Step   : Porion.Builds.Models.Build_Step_Ref;
+      Step   : Porion.Builds.Models.Build_Config_Step_Ref;
       Config : Porion.Configs.Config_Type;
    end record;
 

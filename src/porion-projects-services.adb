@@ -122,6 +122,55 @@ package body Porion.Projects.Services is
       end if;
    end Add_Branch;
 
+   --  Remove a project with the given name and all its build data.
+   procedure Remove_Project (Service : in out Context_Type;
+                             Name    : in String) is
+
+      procedure Execute (Definition : in ADO.Queries.Query_Definition_Access) is
+         Query  : ADO.Queries.Context;
+      begin
+         Query.Set_Query (Definition);
+         Query.Bind_Param ("project_id", Service.Project.Get_Id);
+         declare
+            Stmt   : ADO.Statements.Query_Statement := Service.DB.Create_Statement (Query);
+         begin
+            Stmt.Execute;
+         end;
+      end Execute;
+
+      Query : ADO.SQL.Query;
+      Found : Boolean;
+
+   begin
+      Service.DB.Begin_Transaction;
+      Query.Bind_Param (1, Name);
+      Query.Set_Filter ("o.name = ?");
+      Service.Project.Find (Service.DB, Query, Found);
+      if not Found then
+         Log.Warn ("Project name {0} already used", Name);
+         raise Name_Used;
+      end if;
+
+      --  Cleanup unit test data.
+      Execute (Porion.Projects.Models.Query_Cleanup_Project_Test_Run);
+      Execute (Porion.Projects.Models.Query_Cleanup_Project_Test_Run_Group);
+      Execute (Porion.Projects.Models.Query_Cleanup_Project_Test);
+      Execute (Porion.Projects.Models.Query_Cleanup_Project_Test_Group);
+
+      --  Cleanup build data.
+      Execute (Porion.Projects.Models.Query_Cleanup_Project_Build_Step);
+      Execute (Porion.Projects.Models.Query_Cleanup_Project_Last_Build);
+      Execute (Porion.Projects.Models.Query_Cleanup_Project_Build);
+
+      --  Cleanup build config.
+      Execute (Porion.Projects.Models.Query_Cleanup_Project_Environment);
+      Execute (Porion.Projects.Models.Query_Cleanup_Project_Build_Config_Step);
+      Execute (Porion.Projects.Models.Query_Cleanup_Project_Build_Config);
+
+      Service.Project.Delete (Service.DB);
+      Service.DB.Commit;
+   end Remove_Project;
+
    procedure Check_Sources (Service : in out Context_Type;
                             Status  : in out Porion.Sources.Status_Type) is
       use Porion.Sources;

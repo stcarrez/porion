@@ -38,6 +38,10 @@ package Porion.Projects.Services is
                          Name    : in String;
                          Item    : in Porion.Sources.Branch_Type);
 
+   --  Remove a project with the given name and all its build data.
+   procedure Remove_Project (Service : in out Context_Type;
+                             Name    : in String);
+
    procedure Check_Sources (Service : in out Context_Type;
                             Status  : in out Porion.Sources.Status_Type);
 

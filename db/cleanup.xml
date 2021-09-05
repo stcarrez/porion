@@ -1,0 +1,85 @@
+<query-mapping package='Porion.Projects.Models'>
+    <description>
+      Queries to cleanup a project
+    </description>
+
+    <query name='cleanup-project-build-step'>
+       <comment>Cleanup the build steps of a project.</comment>
+       <sql>
+    DELETE FROM porion_build_step WHERE build_id IN
+      (SELECT id FROM porion_build WHERE project_id = :project_id)
+       </sql>
+    </query>
+
+    <query name='cleanup-project-test-run'>
+       <comment>Cleanup the test run of a project.</comment>
+       <sql>
+    DELETE FROM porion_test_run WHERE group_id IN
+      (SELECT porion_test_run_group.id FROM porion_test_run_group INNER JOIN porion_test_group ON
+           porion_test_run_group.group_id = porion_test_group.id
+                WHERE porion_test_group.project_id = :project_id)
+       </sql>
+    </query>
+
+    <query name='cleanup-project-test-run-group'>
+       <comment>Cleanup the test run group of a project.</comment>
+       <sql>
+    DELETE FROM porion_test_run_group WHERE group_id IN
+      (SELECT id FROM porion_test_group WHERE porion_test_group.project_id = :project_id)
+       </sql>
+    </query>
+
+    <query name='cleanup-project-test'>
+       <comment>Cleanup the test of a project.</comment>
+       <sql>
+    DELETE FROM porion_test WHERE group_id IN
+      (SELECT id FROM porion_test_group WHERE porion_test_group.project_id = :project_id)
+       </sql>
+    </query>
+
+    <query name='cleanup-project-test-group'>
+       <comment>Cleanup the test group of a project.</comment>
+       <sql>
+    DELETE FROM porion_test_group WHERE porion_test_group.project_id = :project_id
+       </sql>
+    </query>
+
+    <query name='cleanup-project-last-build'>
+       <comment>Cleanup the project last build references of a project.</comment>
+       <sql>
+    DELETE FROM porion_last_build WHERE build_config_id IN
+      (SELECT id FROM porion_build_config WHERE project_id = :project_id)
+       </sql>
+    </query>
+
+    <query name='cleanup-project-build'>
+       <comment>Cleanup the project builds.</comment>
+       <sql>
+    DELETE FROM porion_build WHERE project_id = :project_id
+       </sql>
+    </query>
+
+    <query name='cleanup-project-environment'>
+       <comment>Cleanup the project specific environment.</comment>
+       <sql>
+    DELETE FROM porion_environment WHERE build_config_id IN
+      (SELECT id FROM porion_build_config WHERE project_id = :project_id)
+       </sql>
+    </query>
+
+    <query name='cleanup-project-build-config-step'>
+       <comment>Cleanup the project build config of a project.</comment>
+       <sql>
+    DELETE FROM porion_build_config_step WHERE build_config_id IN
+      (SELECT id FROM porion_build_config WHERE project_id = :project_id)
+       </sql>
+    </query>
+
+    <query name='cleanup-project-build-config'>
+       <comment>Cleanup the project build config of a project.</comment>
+       <sql>
+    DELETE FROM porion_build_config WHERE project_id = :project_id
+       </sql>
+    </query>
+
+</query-mapping>

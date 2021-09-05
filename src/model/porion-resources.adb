@@ -82,7 +82,11 @@ package body Porion.Resources is
        & "   <comment>Cleanup the project build config of a project.</comment>" & ASCII.LF
        & "       <sql>" & ASCII.LF & "    DELETE FROM porion_build_config WHERE project_i"
        & "d = :project_id" & ASCII.LF & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF
-       & ASCII.LF & "</query-mapping>" & ASCII.LF;
+       & ASCII.LF & "    <query name='cleanup-project-branch'>" & ASCII.LF & "       <co"
+       & "mment>Cleanup the project branch of a project.</comment>" & ASCII.LF & "       "
+       & "<sql>" & ASCII.LF & "    DELETE FROM porion_branch WHERE project_id = :project_"
+       & "id" & ASCII.LF & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF
+       & "</query-mapping>" & ASCII.LF;
 
    C_1 : aliased constant String := "<query-mapping package='Porion.Projects.M"
        & "odels'>" & ASCII.LF & "    <description>" & ASCII.LF & "        List of builds" & ASCII.LF
@@ -136,9 +140,11 @@ package body Porion.Resources is
        & ASCII.LF & "      branch.last_date," & ASCII.LF & "      build.create_date," & ASCII.LF
        & "      (SELECT COUNT(*) FROM porion_build AS build WHERE build.branch_id = b"
        & "ranch.id) AS count" & ASCII.LF & "    FROM porion_branch AS branch" & ASCII.LF & " "
-       & "   LEFT JOIN porion_build AS build ON branch.last_build_id = build.id" & ASCII.LF
-       & "    WHERE branch.project_id = :project_id" & ASCII.LF & "       </sql>" & ASCII.LF
-       & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+       & "   LEFT JOIN porion_last_build AS last_build ON branch.id = last_build.bran"
+       & "ch_id" & ASCII.LF & "    LEFT JOIN porion_build AS build ON last_build.build_id"
+       & " = build.id" & ASCII.LF & "    WHERE branch.project_id = :project_id" & ASCII.LF
+       & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</query-mappin"
+       & "g>" & ASCII.LF;
 
    C_5 : aliased constant String := "<query-mapping package='Porion.Projects.M"
        & "odels'>" & ASCII.LF & "    <description>" & ASCII.LF & "      Information about bra"

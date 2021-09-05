@@ -456,6 +456,8 @@ package Porion.Projects.Models is
 
    Query_Cleanup_Project_Build_Config : constant ADO.Queries.Query_Definition_Access;
 
+   Query_Cleanup_Project_Branch : constant ADO.Queries.Query_Definition_Access;
+
 
    Query_Command_Build_List : constant ADO.Queries.Query_Definition_Access;
 
@@ -798,6 +800,12 @@ private
                                      File => File_4.File'Access);
    Query_Cleanup_Project_Build_Config : constant ADO.Queries.Query_Definition_Access
    := Def_Cleanup_Project_Build_Config.Query'Access;
+
+   package Def_Cleanup_Project_Branch is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-project-branch",
+                                     File => File_4.File'Access);
+   Query_Cleanup_Project_Branch : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Project_Branch.Query'Access;
 
    package File_5 is
       new ADO.Queries.Loaders.File (Path => "command-builds.xml",

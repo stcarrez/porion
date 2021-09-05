@@ -88,9 +88,9 @@ package body Porion.Projects.Services is
       Service.Project.Set_Scm (Info.Kind);
       Service.Project.Save (Service.DB);
 
-      Service.Build_Config.Set_Project (Service.Project);
-      Service.Build_Config.Set_Node (Service.Build_Node);
-      Service.Build_Config.Save (Service.DB);
+      --  Service.Build_Config.Set_Project (Service.Project);
+      --  Service.Build_Config.Set_Node (Service.Build_Node);
+      --  Service.Build_Config.Save (Service.DB);
       Service.DB.Commit;
 
       Log.Info ("Project {0} added", Name);
@@ -171,6 +171,9 @@ package body Porion.Projects.Services is
       Execute (Porion.Projects.Models.Query_Cleanup_Project_Environment);
       Execute (Porion.Projects.Models.Query_Cleanup_Project_Build_Config_Step);
       Execute (Porion.Projects.Models.Query_Cleanup_Project_Build_Config);
+
+      --  Cleanup project branches.
+      Execute (Porion.Projects.Models.Query_Cleanup_Project_Branch);
 
       Service.Project.Delete (Service.DB);
       Service.DB.Commit;

@@ -547,7 +547,12 @@ package body Porion.Builds.Services is
       Logger.Create (Log_Dir, "build.log");
       Service.Source_Controller.Checkout (Path, Logger);
 
+      if Service.Build_Node.Is_Null then
+         Service.Load_Node ("localhost");
+      end if;
+
       Service.Build_Config.Set_Project (Service.Project);
+      Service.Build_Config.Set_Node (Service.Build_Node);
       Service.Build_Config.Save (Service.DB);
       Service.Guess (Path, Logger);
    end Make_Build_Config;

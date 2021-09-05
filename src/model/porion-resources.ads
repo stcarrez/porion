@@ -15,13 +15,14 @@ package Porion.Resources is
 private
 
 
-   K_0             : aliased constant String := "command-builds.xml";
-   K_1             : aliased constant String := "command-nodes.xml";
-   K_2             : aliased constant String := "command-projects.xml";
-   K_3             : aliased constant String := "project-branches.xml";
-   K_4             : aliased constant String := "project-builds.xml";
+   K_0             : aliased constant String := "cleanup.xml";
+   K_1             : aliased constant String := "command-builds.xml";
+   K_2             : aliased constant String := "command-nodes.xml";
+   K_3             : aliased constant String := "command-projects.xml";
+   K_4             : aliased constant String := "project-branches.xml";
+   K_5             : aliased constant String := "project-builds.xml";
 
    Names : constant Name_Array := (
       K_0'Access, K_1'Access, K_2'Access, K_3'Access,
-      K_4'Access);
+      K_4'Access, K_5'Access);
 end Porion.Resources;

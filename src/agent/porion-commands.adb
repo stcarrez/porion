@@ -26,6 +26,7 @@ with Porion.Commands.Build;
 with Porion.Commands.Steps;
 with Porion.Commands.Status;
 with Porion.Commands.Add;
+with Porion.Commands.Remove;
 with Porion.Commands.List;
 with Porion.Commands.Config;
 with Porion.Commands.Init;
@@ -41,6 +42,7 @@ package body Porion.Commands is
    Init_Command            : aliased Porion.Commands.Init.Command_Type;
    Step_Command            : aliased Porion.Commands.Steps.Command_Type;
    Edit_Command            : aliased Porion.Commands.Edit.Command_Type;
+   Remove_Command          : aliased Porion.Commands.Remove.Command_Type;
    Driver                  : Drivers.Driver_Type;
 
    --  ------------------------------
@@ -147,6 +149,9 @@ package body Porion.Commands is
       Driver.Add_Command ("init",
                           -("setup the build agent node"),
                           Init_Command'Access);
+      Driver.Add_Command ("remove",
+                          -("remove a project and its build data"),
+                          Remove_Command'Access);
    end Initialize;
 
    --  ------------------------------

@@ -23,6 +23,7 @@ with Porion.Builders;
 with Porion.Configs;
 with Porion.Builds.Models;
 with Porion.Services;
+with Porion.Loggers;
 private with Util.Strings.Maps;
 package Porion.Builds.Services is
 
@@ -86,13 +87,20 @@ package Porion.Builds.Services is
                      Stream       : in out Util.Serialize.IO.Output_Stream'Class);
 
    procedure Update_Parameters (Service : in out Context_Type;
-                                Step    : in out Build_Step);
+                                Step    : in out Builds.Models.Build_Config_Step_Ref;
+                                Config  : in out Porion.Configs.Config_Type);
 
    procedure Update (Service : in out Context_Type;
                      Config  : in out Build_Config);
 
    procedure Update (Service : in out Context_Type;
                      Configs : in out Build_Config_Vector);
+
+   procedure Make_Build_Config (Service : in out Context_Type);
+
+   procedure Guess (Service : in out Context_Type;
+                    Path    : in String;
+                    Logger  : in out Porion.Loggers.Logger_Type);
 
 private
 

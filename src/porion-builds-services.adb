@@ -20,7 +20,9 @@ with Ada.Directories;
 with Ada.Unchecked_Deallocation;
 with Util.Log.Loggers;
 with Util.Strings;
+with Util.Files;
 with Util.Streams;
+with Util.Strings.Formats;
 with Util.Streams.Texts;
 with Util.Serialize.IO.JSON;
 with Util.Properties;
@@ -390,13 +392,14 @@ package body Porion.Builds.Services is
    end Export;
 
    procedure Update_Parameters (Service : in out Context_Type;
-                                Step    : in out Build_Step) is
-      Kind       : constant Models.Builder_Type := Step.Step.Get_Builder;
+                                Step    : in out Builds.Models.Build_Config_Step_Ref;
+                                Config  : in out Porion.Configs.Config_Type) is
+      Kind       : constant Models.Builder_Type := Step.Get_Builder;
       Controller : Porion.Builders.Controller_Access;
       Output     : aliased Util.Streams.Texts.Print_Stream;
       Stream     : Util.Serialize.IO.JSON.Output_Stream;
    begin
-      Controller := Builders.Factories.Create (Kind, Service.DB, Step.Config);
+      Controller := Builders.Factories.Create (Kind, Service.DB, Config);
       if Controller = null then
          Log.Error ("No builder for {0}", Models.Builder_Type'Image (Kind));
          return;
@@ -410,7 +413,7 @@ package body Porion.Builds.Services is
 
       Free (Controller);
 
-      Step.Step.Set_Parameters (Util.Streams.Texts.To_String (Output));
+      Step.Set_Parameters (Util.Streams.Texts.To_String (Output));
    end Update_Parameters;
 
    procedure Update (Service : in out Context_Type;
@@ -449,7 +452,7 @@ package body Porion.Builds.Services is
          begin
             Rank := Rank + 1;
             Step_Ref.Step.Set_Number (Rank);
-            Service.Update_Parameters (Step_Ref.Element.all);
+            Service.Update_Parameters (Step_Ref.Step, Step_Ref.Config);
             if Step_Ref.Step.Is_Loaded then
                if Step_Ref.Step.Is_Modified then
                   Step_Ref.Step.Save (Service.DB);
@@ -524,5 +527,121 @@ package body Porion.Builds.Services is
       end loop;
       Service.DB.Commit;
    end Update;
+
+   procedure Make_Build_Config (Service : in out Context_Type) is
+      Name    : constant String := Service.Project.Get_Name;
+      Path    : constant String := Configs.Get_Build_Directory (Name, "main", 1);
+      Log_Dir : constant String := Configs.Get_Build_Log_Directory (Name, "main", 1);
+      Config  : Util.Properties.Manager;
+      Logger  : Porion.Loggers.Logger_Type;
+   begin
+      Log.Info ("Build {0} in {1}", Name, Path);
+
+      if not Ada.Directories.Exists (Path) then
+         Ada.Directories.Create_Path (Path);
+      end if;
+
+      Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
+      Service.Source_Controller := Sources.Factories.Create (Service.Project.Get_Scm, Config);
+
+      Logger.Create (Log_Dir, "build.log");
+      Service.Source_Controller.Checkout (Path, Logger);
+
+      Service.Build_Config.Set_Project (Service.Project);
+      Service.Build_Config.Save (Service.DB);
+      Service.Guess (Path, Logger);
+   end Make_Build_Config;
+
+   procedure Guess (Service : in out Context_Type;
+                    Path    : in String;
+                    Logger  : in out Porion.Loggers.Logger_Type) is
+      use Util.Strings.Formats;
+
+      Current_Step : Positive := 1;
+
+      function Check (File    : in String;
+                      Message : in String) return Boolean is
+         File_Path : constant String := Util.Files.Compose (Path, File);
+         Exists    : constant Boolean := Ada.Directories.Exists (File_Path);
+      begin
+         Logger.Write (Format (Message, File, (if Exists then -("yes") else -("no")), "", ""));
+         return Exists;
+      end Check;
+
+      procedure Add_Step (Step    : in out Builds.Models.Build_Config_Step_Ref;
+                          Builder : in Builds.Models.Builder_Type;
+                          Kind    : in Builds.Models.Step_Type) is
+      begin
+         Step.Set_Step (Kind);
+         Step.Set_Builder (Builder);
+         Step.Set_Timeout (10 * 60);
+         Step.Set_Number (Current_Step);
+         Step.Set_Build_Config (Service.Build_Config);
+         Step.Set_Version (1);
+         Step.Save (Service.DB);
+         Current_Step := Current_Step + 1;
+      end Add_Step;
+
+      procedure Add_Step (Kind    : in Builds.Models.Step_Type;
+                          Command : in String) is
+         Step   : Builds.Models.Build_Config_Step_Ref;
+         Config : Porion.Configs.Config_Type;
+      begin
+         Config.Set ("command", Command);
+         Step.Set_Builder (Builds.Models.BUILDER_SCRIPT);
+         Service.Update_Parameters (Step, Config);
+         Add_Step (Step, Builds.Models.BUILDER_SCRIPT, Kind);
+      end Add_Step;
+
+      Has_Autogen     : Boolean;
+      Has_Autoconf    : Boolean;
+      Has_Automake    : Boolean;
+      Has_Configure   : Boolean;
+      Has_Makefile_In : Boolean;
+      Has_CMake       : Boolean;
+      Has_Makefile    : Boolean;
+      Has_Pom_Xml     : Boolean;
+   begin
+      Has_Autogen := Check ("autogen.sh", -("checking for {0}"));
+      Has_Autoconf := Check ("configure.ac", -("checking for {0}"))
+        or else Check ("configure.in", -("checking for {0}"));
+
+      Has_Automake := Check ("Makefile.am", -("checking for {0}"));
+      Has_Makefile_In := Check ("Makefile.in", -("checking for {0}"));
+      Has_Configure := Check ("configure", -("checking for {0}"));
+      Has_CMake := Check ("CMakeLists.txt", -("checking for {0}"));
+      Has_Makefile := Check ("Makefile", -("checking for {0}"))
+        or else Check ("makefile", -("checking for {0}"));
+      Has_Pom_Xml := Check ("pom.xml", -("checking for {0}"));
+
+      if Has_Autogen then
+         Add_Step (Builds.Models.STEP_GENERATE, "./autogen.sh");
+      end if;
+
+      if not Has_Autogen and Has_Autoconf and not Has_Configure then
+         Add_Step (Builds.Models.STEP_GENERATE, "autoconf");
+      end if;
+
+      if not Has_Autogen and Has_Automake and not Has_Makefile_In then
+         Add_Step (Builds.Models.STEP_GENERATE, "automake");
+      end if;
+
+      if Has_Autogen or Has_Autoconf or Has_Configure then
+         Add_Step (Builds.Models.STEP_CONFIGURE, "./configure --prefix=#{install}");
+      end if;
+
+      if Has_CMake then
+         Add_Step (Builds.Models.STEP_CONFIGURE, "cmake");
+      end if;
+
+      if Has_Pom_Xml then
+         Add_Step (Builds.Models.STEP_MAKE, "mvn package");
+      end if;
+
+      if Has_CMake or Has_Makefile_In or Has_Automake or Has_Makefile then
+         Add_Step (Builds.Models.STEP_MAKE, "make");
+      end if;
+
+   end Guess;
 
 end Porion.Builds.Services;

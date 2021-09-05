@@ -23,6 +23,8 @@ package Porion.Projects.Services is
 
    Name_Used : exception;
 
+   Invalid_Name : exception;
+
    type Context_Type is limited new Porion.Services.Context_Type with private;
 
    --  Add a build node

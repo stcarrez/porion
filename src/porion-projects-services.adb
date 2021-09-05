@@ -68,6 +68,11 @@ package body Porion.Projects.Services is
    begin
       Log.Debug ("Add project {0}", Name);
 
+      if Name'Length = 0 then
+         Log.Warn ("Cannot create project with empty name");
+         raise Invalid_Name;
+      end if;
+
       Service.DB.Begin_Transaction;
       Query.Bind_Param (1, Info.Name);
       Query.Set_Filter ("o.name = ?");

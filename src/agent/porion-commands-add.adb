@@ -52,11 +52,20 @@ package body Porion.Commands.Add is
          Context.Console.Notice (N_INFO, Format (-("Project {0} - {1} added"),
                                  To_String (Info.Name), URI));
 
+         Context.Build_Service.Open (Context.Project_Service);
+         Context.Build_Service.Make_Build_Config;
+
       exception
          when Porion.Projects.Services.Name_Used =>
             Porion.Commands.Log.Error (-("project '{0}' already exists"),
                                        To_String (Info.Name));
             raise Error;
+
+         when Porion.Projects.Services.Invalid_Name =>
+            Porion.Commands.Log.Error (-("invalid project name '{0}'"),
+                                       To_String (Info.Name));
+            raise Error;
+
       end;
 
    end Execute;

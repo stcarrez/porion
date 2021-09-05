@@ -38,7 +38,8 @@ package Porion.Projects.Services is
 
    procedure Add_Branch (Service : in out Context_Type;
                          Name    : in String;
-                         Item    : in Porion.Sources.Branch_Type);
+                         Item    : in Porion.Sources.Branch_Type;
+                         Is_Head : in Boolean);
 
    --  Remove a project with the given name and all its build data.
    procedure Remove_Project (Service : in out Context_Type;

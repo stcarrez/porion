@@ -30,10 +30,13 @@ package body Porion.Sources.Git is
                     Status     : out Status_Type;
                     Logger     : in out Porion.Loggers.Logger_Type) is
       procedure Process (Line : in String);
+      procedure Process_Show (Line : in String);
 
       REGEX1 : constant String := "^([0-9a-fA-F]+)\srefs/heads/(.*)";
+      REGEX2 : constant String := "^ +HEAD branch: (.*)";
 
       Pattern1 : constant GNAT.Regpat.Pattern_Matcher := GNAT.Regpat.Compile (REGEX1);
+      Pattern2 : constant GNAT.Regpat.Pattern_Matcher := GNAT.Regpat.Compile (REGEX2);
 
       procedure Process (Line : in String) is
          Matches : GNAT.Regpat.Match_Array (0 .. 2);
@@ -50,11 +53,23 @@ package body Porion.Sources.Git is
          end if;
       end Process;
 
+      procedure Process_Show (Line : in String) is
+         Matches : GNAT.Regpat.Match_Array (0 .. 1);
+      begin
+         Logger.Write (Line);
+         if GNAT.Regpat.Match (Pattern2, Line) then
+            GNAT.Regpat.Match (Pattern2, Line, Matches);
+            Status.Head := To_UString (Line (Matches (1).First .. Matches (1).Last));
+         end if;
+      end Process_Show;
+
       Result : Integer;
    begin
       Status.Check_Date := Ada.Calendar.Clock;
       Porion.Tools.Execute (Controller.Check_Command, Controller.Config,
                             Process'Access, Strip_Crlf => False, Status => Result);
+      Porion.Tools.Execute (Controller.Show_Remote_Command, Controller.Config,
+                            Process_Show'Access, Strip_Crlf => False, Status => Result);
    end Check;
 
    overriding
@@ -154,11 +169,13 @@ package body Porion.Sources.Git is
       Check      : constant String := Configs.Get ("command_check", GIT_TEST_COMMAND);
       Checkout   : constant String := Configs.Get ("command_checkout", GIT_CHECKOUT_COMMAND);
       Guess      : constant String := Configs.Get ("command_guess", GIT_GUESS_COMMAND);
+      Show       : constant String := Configs.Get ("command_show_remote", GIT_SHOW_REMOTE_COMMAND);
       Controller : constant Git_Controller_Access := new Controller_Type;
    begin
       Controller.Check_Command := EL.Expressions.Create_Expression (Check, Ctx);
       Controller.Checkout_Command := EL.Expressions.Create_Expression (Checkout, Ctx);
       Controller.Guess_Command := EL.Expressions.Create_Expression (Guess, Ctx);
+      Controller.Show_Remote_Command := EL.Expressions.Create_Expression (Show, Ctx);
       Controller.Config := Config;
       return Controller.all'Access;
    end Create;

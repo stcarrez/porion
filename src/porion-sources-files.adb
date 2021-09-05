@@ -135,6 +135,7 @@ package body Porion.Sources.Files is
       if Ada.Directories.Exists (Path) then
          Info.Last_Date := Ada.Directories.Modification_Time (Path);
          Info.Tag := To_UString ("main");
+         Status.Head := Info.Tag;
          Status.Changes.Include ("main", Info);
       else
          Log.Warn ("Source file '{0}' does not exist anymore", Path);

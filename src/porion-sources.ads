@@ -53,6 +53,7 @@ package Porion.Sources is
 
    type Status_Type is record
       Check_Date : Ada.Calendar.Time;
+      Head       : UString;
       Changes    : Maps.Map;
    end record;
 

@@ -19,9 +19,10 @@ with Porion.Configs;
 private with EL.Expressions;
 package Porion.Sources.Git is
 
-   GIT_TEST_COMMAND     : constant String := "git ls-remote -h -- #{repository_url}";
-   GIT_CHECKOUT_COMMAND : constant String := "git clone #{repository_url} #{build_dir}";
-   GIT_GUESS_COMMAND    : constant String := "git -C #{path} config remote.origin.url";
+   GIT_TEST_COMMAND        : constant String := "git ls-remote -h -- #{repository_url}";
+   GIT_SHOW_REMOTE_COMMAND : constant String := "git show remote #{repository_url}";
+   GIT_CHECKOUT_COMMAND    : constant String := "git clone #{repository_url} #{build_dir}";
+   GIT_GUESS_COMMAND       : constant String := "git -C #{path} config remote.origin.url";
 
    type Controller_Type is limited new Porion.Sources.Controller_Type with private;
 
@@ -54,10 +55,11 @@ package Porion.Sources.Git is
 private
 
    type Controller_Type is limited new Porion.Sources.Controller_Type with record
-      Config           : Porion.Configs.Config_Type;
-      Check_Command    : EL.Expressions.Expression;
-      Checkout_Command : EL.Expressions.Expression;
-      Guess_Command    : EL.Expressions.Expression;
+      Config              : Porion.Configs.Config_Type;
+      Check_Command       : EL.Expressions.Expression;
+      Checkout_Command    : EL.Expressions.Expression;
+      Guess_Command       : EL.Expressions.Expression;
+      Show_Remote_Command : EL.Expressions.Expression;
    end record;
 
    type Git_Controller_Access is access all Controller_Type'Class;

@@ -25,11 +25,10 @@ with Porion.Sources.Factories;
 with ADO.SQL;
 with ADO.Queries;
 with ADO.Statements;
-with Porion.Builds.Models;
-with Porion.Projects.Models;
 package body Porion.Projects.Services is
 
    use type ADO.Identifier;
+   use type Porion.Projects.Models.Branch_Status_Type;
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Projects.Services");
 
@@ -98,8 +97,8 @@ package body Porion.Projects.Services is
 
    procedure Add_Branch (Service : in out Context_Type;
                          Name    : in String;
-                         Item    : in Porion.Sources.Branch_Type) is
-      use type Porion.Projects.Models.Branch_Status_Type;
+                         Item    : in Porion.Sources.Branch_Type;
+                         Is_Head : in Boolean) is
 
       Query  : ADO.SQL.Query;
       Found  : Boolean;
@@ -113,13 +112,17 @@ package body Porion.Projects.Services is
          Service.Branch.Set_Project (Service.Project);
          Service.Branch.Set_Name (Name);
          Service.Branch.Set_Tag (Item.Tag);
-         Service.Branch.Set_Status (Porion.Projects.Models.BUILD_REQUIRED);
+         if Is_Head then
+            Service.Branch.Set_Status (Models.BUILD_REQUIRED);
+         else
+            Service.Branch.Set_Status (Models.BUILD_DISABLED);
+         end if;
          Service.Branch.Set_Create_Date (Now);
       else
          Service.Branch.Set_Tag (Item.Tag);
       end if;
       if Service.Branch.Is_Modified then
-         if Service.Branch.Get_Status = Projects.Models.BUILD_SUCCEEDED then
+         if Service.Branch.Get_Status /= Models.BUILD_DISABLED then
             Service.Branch.Set_Status (Projects.Models.BUILD_REQUIRED);
          end if;
          Service.Branch.Set_Update_Date (Now);
@@ -183,12 +186,14 @@ package body Porion.Projects.Services is
                             Status  : in out Porion.Sources.Status_Type) is
       use Porion.Sources;
 
-      Config : Porion.Configs.Config_Type;
-      Query  : ADO.Queries.Context;
-      Logger : Porion.Loggers.Logger_Type;
+      Config     : Porion.Configs.Config_Type;
+      Query      : ADO.Queries.Context;
+      Logger     : Porion.Loggers.Logger_Type;
+      Branches   : Porion.Projects.Models.Branch_Vector;
+      Src_Status : Porion.Sources.Status_Type;
    begin
       if Service.Project.Is_Null then
-         raise Name_Used;
+         raise Invalid_Name;
       end if;
 
       declare
@@ -201,50 +206,61 @@ package body Porion.Projects.Services is
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
       Service.Source_Controller := Sources.Factories.Create (Service.Project.Get_Scm, Config);
 
-      Service.Source_Controller.Check (Status, Logger);
+      Service.Source_Controller.Check (Src_Status, Logger);
 
-      Query.Set_Query (Porion.Projects.Models.Query_Project_Branches);
+      --  Get the current known branches.
       Query.Bind_Param ("project_id", Service.Project.Get_Id);
-      declare
-         Stmt   : ADO.Statements.Query_Statement := Service.DB.Create_Statement (Query);
-      begin
-         Stmt.Execute;
-         while Stmt.Has_Elements loop
-            declare
-               --  Id    : constant ADO.Identifier := Stmt.Get_Identifier (0);
-               Name  : constant String := Stmt.Get_String (1);
-               Tag   : constant String := Stmt.Get_String (2);
-               --  Date  : constant ADO.Nullable_Time := Stmt.Get_Nullable_Time (3);
-               --  Build_Date : constant ADO.Nullable_Time := Stmt.Get_Nullable_Time (4);
-               --  Count : constant Natural := Stmt.Get_Integer (5);
+      Projects.Models.List (Branches, Service.DB, Query);
 
-               procedure Update (Key  : in String;
-                                 Item : in out Branch_Type);
-
-               procedure Update (Key  : in String;
-                                 Item : in out Branch_Type) is
-                  pragma Unreferenced (Key);
-               begin
-                  Item.Last_Tag := To_UString (Tag);
-               end Update;
-
-               Pos  : constant Maps.Cursor := Status.Changes.Find (Name);
-            begin
-               if Maps.Has_Element (Pos) then
-                  Status.Changes.Update_Element (Pos, Update'Access);
-               end if;
-            end;
-            Stmt.Next;
-         end loop;
-      end;
-
-      for Item in Status.Changes.Iterate loop
+      Status.Head := Src_Status.Head;
+      for Item in Src_Status.Changes.Iterate loop
          declare
-            Name   : constant String := Maps.Key (Item);
-            Branch : constant Maps.Reference_Type := Maps.Reference (Status.Changes, Item);
+            Name    : constant String := Maps.Key (Item);
+            Branch  : constant Maps.Reference_Type := Maps.Reference (Src_Status.Changes, Item);
+            Is_Head : constant Boolean := Name = To_String (Src_Status.Head);
+            Found   : Boolean := False;
+            --  Iter    : Models.Branch_Vectors.Cursor := Branches.First;
          begin
-            Add_Branch (Service, Name, Branch);
+            for Iter in 1 .. Integer (Branches.Length) loop
+               declare
+                  Existing_Branch : constant Models.Branch_Ref := Branches.Element (Iter);
+               begin
+                  if String '(Existing_Branch.Get_Name) = Name then
+                     Service.Branch := Existing_Branch;
+                     Branch.Last_Tag := Existing_Branch.Get_Tag;
+                     Service.Branch.Set_Tag (Branch.Tag);
+                     if Service.Branch.Is_Modified then
+                        if Service.Branch.Get_Status /= Models.BUILD_DISABLED then
+                           Service.Branch.Set_Status (Projects.Models.BUILD_REQUIRED);
+                        end if;
+                        Service.Branch.Set_Update_Date (Ada.Calendar.Clock);
+                        Service.Branch.Save (Service.DB);
+                     end if;
+                     if Service.Branch.Get_Status = Models.BUILD_REQUIRED then
+                        Status.Changes.Insert (Name, Branch);
+                     end if;
+                     Found := True;
+                     Branches.Delete (Iter);
+                     exit;
+                  end if;
+               end;
+            end loop;
+
+            if not Found then
+               Add_Branch (Service, Name, Branch, Is_Head);
+               if Service.Branch.Get_Status = Models.BUILD_REQUIRED then
+                  Status.Changes.Insert (Name, Branch);
+               end if;
+            end if;
          end;
+      end loop;
+
+      --  Mark disabled the branches that are deleted.
+      for Branch of Branches loop
+         Branch.Set_Status (Models.BUILD_DISABLED);
+         if Branch.Is_Modified then
+            Branch.Save (Service.DB);
+         end if;
       end loop;
    end Check_Sources;
 
@@ -316,7 +332,6 @@ package body Porion.Projects.Services is
    procedure Update (Service : in out Context_Type;
                      Project : in out Porion.Projects.Models.Project_Ref) is
       Id    : constant ADO.Identifier := Project.Get_Id;
-      Query : ADO.SQL.Query;
       Found : Boolean;
    begin
       if Id = ADO.NO_IDENTIFIER then

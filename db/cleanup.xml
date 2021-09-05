@@ -82,4 +82,11 @@
        </sql>
     </query>
 
+    <query name='cleanup-project-branch'>
+       <comment>Cleanup the project branch of a project.</comment>
+       <sql>
+    DELETE FROM porion_branch WHERE project_id = :project_id
+       </sql>
+    </query>
+
 </query-mapping>

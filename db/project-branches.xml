@@ -14,7 +14,8 @@
       build.create_date,
       (SELECT COUNT(*) FROM porion_build AS build WHERE build.branch_id = branch.id) AS count
     FROM porion_branch AS branch
-    LEFT JOIN porion_build AS build ON branch.last_build_id = build.id
+    LEFT JOIN porion_last_build AS last_build ON branch.id = last_build.branch_id
+    LEFT JOIN porion_build AS build ON last_build.build_id = build.id
     WHERE branch.project_id = :project_id
        </sql>
     </query>

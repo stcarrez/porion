@@ -73,7 +73,7 @@ package body Porion.XUnit.Tests is
             Info.URI := To_UString ("git://github.com/stcarrez/ada-lzma.git");
             Service.Add_Project (Info);
       end;
-      Service.Add_Branch ("master", Branch);
+      Service.Add_Branch ("master", Branch, True);
       Builder.Open (Service);
       Builder.Start_Build (Branch_Name => "master",
                            Branch      => Branch);

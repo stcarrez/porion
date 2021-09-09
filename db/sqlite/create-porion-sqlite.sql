@@ -447,6 +447,8 @@ CREATE TABLE IF NOT EXISTS porion_build_config_step (
   `step` INTEGER NOT NULL,
   /*  */
   `version` INTEGER NOT NULL,
+  /*  */
+  `execution`  NOT NULL,
   /* the build configuration that contains this build step. */
   `build_config_id` BIGINT NOT NULL,
   /*  */

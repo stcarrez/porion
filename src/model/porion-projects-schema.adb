@@ -181,8 +181,9 @@ package body Porion.Projects.Schema is
    L_47  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_build_c"
        & "onfig_step ( `id` BIGINT NOT NULL, `parameters` VARCHAR(65536) NOT NULL, `n"
        & "umber` INTEGER NOT NULL, `builder` INTEGER NOT NULL, `timeout` INTEGER NOT "
-       & "NULL, `step` INTEGER NOT NULL, `version` INTEGER NOT NULL, `build_config_id"
-       & "` BIGINT NOT NULL, `previous_version_id` BIGINT , PRIMARY KEY (`id`))";
+       & "NULL, `step` INTEGER NOT NULL, `version` INTEGER NOT NULL, `execution` NOT "
+       & "NULL, `build_config_id` BIGINT NOT NULL, `previous_version_id` BIGINT , PRI"
+       & "MARY KEY (`id`))";
    L_48  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_build_e"
        & "xecutor ( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `pid` INTEGER N"
        & "OT NULL, `start_date` DATETIME NOT NULL, `port` INTEGER NOT NULL, `node_id`"

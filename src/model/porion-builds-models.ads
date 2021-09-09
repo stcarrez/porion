@@ -60,6 +60,16 @@ package Porion.Builds.Models is
       Value   : Builder_Type;
    end record;
 
+   type Execution_Type is (EXEC_DISABLED, EXEC_NO_ERROR, EXEC_IGNORE_ERROR);
+   for Execution_Type use (EXEC_DISABLED => 0, EXEC_NO_ERROR => 1, EXEC_IGNORE_ERROR => 2);
+   package Execution_Type_Objects is
+      new Util.Beans.Objects.Enums (Execution_Type);
+
+   type Nullable_Execution_Type is record
+      Is_Null : Boolean := True;
+      Value   : Execution_Type;
+   end record;
+
    type Step_Type is (STEP_SETUP, STEP_GENERATE, STEP_CONFIGURE, STEP_MAKE, STEP_TEST, STEP_PACKAGE, STEP_INSTALL, STEP_PUBLISH);
    for Step_Type use (STEP_SETUP => 0, STEP_GENERATE => 1, STEP_CONFIGURE => 2, STEP_MAKE => 3, STEP_TEST => 4, STEP_PACKAGE => 5, STEP_INSTALL => 6, STEP_PUBLISH => 7);
    package Step_Type_Objects is
@@ -443,6 +453,14 @@ package Porion.Builds.Models is
    --
    function Get_Version (Object : in Build_Config_Step_Ref)
                  return Integer;
+
+   --
+   procedure Set_Execution (Object : in out Build_Config_Step_Ref;
+                            Value  : in Porion.Builds.Models.Execution_Type);
+
+   --
+   function Get_Execution (Object : in Build_Config_Step_Ref)
+                 return Porion.Builds.Models.Execution_Type;
 
    --  Set the build configuration that contains this build step.
    procedure Set_Build_Config (Object : in out Build_Config_Step_Ref;
@@ -1152,11 +1170,12 @@ private
    COL_4_3_NAME : aliased constant String := "timeout";
    COL_5_3_NAME : aliased constant String := "step";
    COL_6_3_NAME : aliased constant String := "version";
-   COL_7_3_NAME : aliased constant String := "build_config_id";
-   COL_8_3_NAME : aliased constant String := "previous_version_id";
+   COL_7_3_NAME : aliased constant String := "execution";
+   COL_8_3_NAME : aliased constant String := "build_config_id";
+   COL_9_3_NAME : aliased constant String := "previous_version_id";
 
    BUILD_CONFIG_STEP_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 9,
+     (Count   => 10,
       Table   => BUILD_CONFIG_STEP_NAME'Access,
       Members => (
          1 => COL_0_3_NAME'Access,
@@ -1167,7 +1186,8 @@ private
          6 => COL_5_3_NAME'Access,
          7 => COL_6_3_NAME'Access,
          8 => COL_7_3_NAME'Access,
-         9 => COL_8_3_NAME'Access)
+         9 => COL_8_3_NAME'Access,
+         10 => COL_9_3_NAME'Access)
      );
    BUILD_CONFIG_STEP_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := BUILD_CONFIG_STEP_DEF'Access;
@@ -1186,6 +1206,7 @@ private
        Timeout : Integer;
        Step : Porion.Builds.Models.Step_Type;
        Version : Integer;
+       Execution : Porion.Builds.Models.Execution_Type;
        Build_Config : Porion.Builds.Models.Build_Config_Ref;
        Previous_Version : Porion.Builds.Models.Build_Config_Step_Ref;
    end record;

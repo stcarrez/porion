@@ -1169,6 +1169,7 @@ package body Porion.Builds.Models is
       Impl.Timeout := 0;
       Impl.Step := Porion.Builds.Models.Step_Type'First;
       Impl.Version := 0;
+      Impl.Execution := Porion.Builds.Models.Execution_Type'First;
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Allocate;
 
@@ -1314,12 +1315,32 @@ package body Porion.Builds.Models is
    end Get_Version;
 
 
+   procedure Set_Execution (Object : in out Build_Config_Step_Ref;
+                            Value  : in Porion.Builds.Models.Execution_Type) is
+      procedure Set_Field_Enum is
+        new ADO.Objects.Set_Field_Operation
+          (Porion.Builds.Models.Execution_Type);
+      Impl : Build_Config_Step_Access;
+   begin
+      Set_Field (Object, Impl);
+      Set_Field_Enum (Impl.all, 8, Impl.Execution, Value);
+   end Set_Execution;
+
+   function Get_Execution (Object : in Build_Config_Step_Ref)
+                  return Porion.Builds.Models.Execution_Type is
+      Impl : constant Build_Config_Step_Access
+         := Build_Config_Step_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Execution;
+   end Get_Execution;
+
+
    procedure Set_Build_Config (Object : in out Build_Config_Step_Ref;
                                Value  : in Porion.Builds.Models.Build_Config_Ref'Class) is
       Impl : Build_Config_Step_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 8, Impl.Build_Config, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 9, Impl.Build_Config, Value);
    end Set_Build_Config;
 
    function Get_Build_Config (Object : in Build_Config_Step_Ref)
@@ -1336,7 +1357,7 @@ package body Porion.Builds.Models is
       Impl : Build_Config_Step_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 9, Impl.Previous_Version, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 10, Impl.Previous_Version, Value);
    end Set_Previous_Version;
 
    function Get_Previous_Version (Object : in Build_Config_Step_Ref)
@@ -1367,6 +1388,7 @@ package body Porion.Builds.Models is
             Copy.Timeout := Impl.Timeout;
             Copy.Step := Impl.Step;
             Copy.Version := Impl.Version;
+            Copy.Execution := Impl.Execution;
             Copy.Build_Config := Impl.Build_Config;
             Copy.Previous_Version := Impl.Previous_Version;
          end;
@@ -1504,14 +1526,19 @@ package body Porion.Builds.Models is
          Object.Clear_Modified (7);
       end if;
       if Object.Is_Modified (8) then
-         Stmt.Save_Field (Name  => COL_7_3_NAME, --  build_config_id
-                          Value => Object.Build_Config);
+         Stmt.Save_Field (Name  => COL_7_3_NAME, --  execution
+                          Value => Integer (Porion.Builds.Models.Execution_Type'Pos (Object.Execution)));
          Object.Clear_Modified (8);
       end if;
       if Object.Is_Modified (9) then
-         Stmt.Save_Field (Name  => COL_8_3_NAME, --  previous_version_id
-                          Value => Object.Previous_Version);
+         Stmt.Save_Field (Name  => COL_8_3_NAME, --  build_config_id
+                          Value => Object.Build_Config);
          Object.Clear_Modified (9);
+      end if;
+      if Object.Is_Modified (10) then
+         Stmt.Save_Field (Name  => COL_9_3_NAME, --  previous_version_id
+                          Value => Object.Previous_Version);
+         Object.Clear_Modified (10);
       end if;
       if Stmt.Has_Save_Fields then
          Stmt.Set_Filter (Filter => "id = ?");
@@ -1550,9 +1577,11 @@ package body Porion.Builds.Models is
                         Value => Integer (Porion.Builds.Models.Step_Type'Pos (Object.Step)));
       Query.Save_Field (Name  => COL_6_3_NAME, --  version
                         Value => Object.Version);
-      Query.Save_Field (Name  => COL_7_3_NAME, --  build_config_id
+      Query.Save_Field (Name  => COL_7_3_NAME, --  execution
+                        Value => Integer (Porion.Builds.Models.Execution_Type'Pos (Object.Execution)));
+      Query.Save_Field (Name  => COL_8_3_NAME, --  build_config_id
                         Value => Object.Build_Config);
-      Query.Save_Field (Name  => COL_8_3_NAME, --  previous_version_id
+      Query.Save_Field (Name  => COL_9_3_NAME, --  previous_version_id
                         Value => Object.Previous_Version);
       Query.Execute (Result);
       if Result /= 1 then
@@ -1599,6 +1628,8 @@ package body Porion.Builds.Models is
          return Porion.Builds.Models.Step_Type_Objects.To_Object (Impl.Step);
       elsif Name = "version" then
          return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Version));
+      elsif Name = "execution" then
+         return Porion.Builds.Models.Execution_Type_Objects.To_Object (Impl.Execution);
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -1639,11 +1670,12 @@ package body Porion.Builds.Models is
       Object.Timeout := Stmt.Get_Integer (4);
       Object.Step := Porion.Builds.Models.Step_Type'Val (Stmt.Get_Integer (5));
       Object.Version := Stmt.Get_Integer (6);
-      if not Stmt.Is_Null (7) then
-         Object.Build_Config.Set_Key_Value (Stmt.Get_Identifier (7), Session);
-      end if;
+      Object.Execution := Porion.Builds.Models.Execution_Type'Val (Stmt.Get_Integer (7));
       if not Stmt.Is_Null (8) then
-         Object.Previous_Version.Set_Key_Value (Stmt.Get_Identifier (8), Session);
+         Object.Build_Config.Set_Key_Value (Stmt.Get_Identifier (8), Session);
+      end if;
+      if not Stmt.Is_Null (9) then
+         Object.Previous_Version.Set_Key_Value (Stmt.Get_Identifier (9), Session);
       end if;
       ADO.Objects.Set_Created (Object);
    end Load;

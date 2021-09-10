@@ -1,0 +1,7 @@
+aggregate project Porion is
+
+   for Create_Missing_Dirs use "True";
+
+   for Project_Files use ("porion_lib.gpr", "agent/porion_agent.gpr", "porion_tests.gpr");
+
+end Porion;

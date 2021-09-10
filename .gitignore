@@ -14,6 +14,8 @@ ChangeLog
 .settings
 configure.lineno
 autom4te.cache
+gnatinspect.db
+porion-loc.xml
 *.txt
 *.gcov
 *.mat
@@ -23,7 +25,8 @@ lib/
 obj/
 regtests/results
 porion_lib.gpr
-porion_agent.gpr
+agent/porion_agent.gpr
+server/porion_server.gpr
 porion.gpr
 porion_tests.gpr
 .clang-format

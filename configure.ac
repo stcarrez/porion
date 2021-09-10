@@ -60,5 +60,5 @@ AM_GNAT_FIND_ADA_KEYSTORE([porion])
 AM_GNAT_FIND_ADA_AWA([porion])
 
 AC_OUTPUT(
-Makefile.conf porion_agent.gpr porion_server.gpr porion_lib.gpr porion_tests.gpr
+Makefile.conf agent/porion_agent.gpr porion_server.gpr porion_lib.gpr porion_tests.gpr
 )

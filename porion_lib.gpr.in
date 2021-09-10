@@ -1,15 +1,15 @@
-with "@UTIL_DIR@config";
+with "porion_config";
 with "@UTIL_DIR@utilada_sys";
 with "@EL_DIR@elada";
 with "@ADO_DIR@ado";
-with "yaml";
+--  with "yaml";
 with "@ADO_DIR@ado_sqlite";
 
 
 library project Porion_Lib is
 
-   Use_NLS     : Config.Yes_No := "@USE_NLS@";
-   Use_Libintl : Config.Yes_No := "@USE_LIBINTL@";
+   Use_NLS     : Porion_Config.Yes_No := "@USE_NLS@";
+   Use_Libintl : Porion_Config.Yes_No := "@USE_LIBINTL@";
    Library_Dir := "lib";
    Version     := "1.0.0";
 
@@ -19,7 +19,7 @@ library project Porion_Lib is
    for Library_Kind use "static";
    for Library_Version use "lib" & Project'Library_Name & ".so." & Version;
 
-   for Source_Dirs use ("src", "src/model");
+   for Source_Dirs use ("src", "src/model", "src/yaml");
 
    for Library_Dir use "lib/porion/" & Project'Library_Kind;
    for Object_Dir use "obj/porion/" & Project'Library_Kind;
@@ -38,7 +38,7 @@ library project Porion_Lib is
    end Naming;
 
    package binder is
-      case Config.Mode is
+      case Porion_Config.Mode is
          when "debug" =>
             for Default_Switches ("Ada") use ("-E");
 
@@ -48,6 +48,6 @@ library project Porion_Lib is
       end case;
    end binder;
 
-   package Compiler renames Config.Compiler;
+   package Compiler renames Porion_Config.Compiler;
 
 end Porion_Lib;

@@ -15,11 +15,6 @@ DROP TABLE IF EXISTS `porion_build_executor`;
 DROP TABLE IF EXISTS `porion_build_config_step`;
 DROP TABLE IF EXISTS `porion_build_config`;
 DROP TABLE IF EXISTS `porion_build`;
-/* Copied from awa_counters-drop-mysql.sql*/
-/* File generated automatically by dynamo */
-DROP TABLE IF EXISTS `awa_visit`;
-DROP TABLE IF EXISTS `awa_counter_definition`;
-DROP TABLE IF EXISTS `awa_counter`;
 /* Copied from awa-workspaces-drop-mysql.sql*/
 /* File generated automatically by dynamo */
 DROP TABLE IF EXISTS `awa_workspace_member`;

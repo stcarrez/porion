@@ -1,5 +1,5 @@
 -----------------------------------------------------------------------
---  porion-commands-init -- Setup command
+--  porion-commands-build -- Build command
 --  Copyright (C) 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
@@ -15,58 +15,59 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Directories;
-with Porion.Configs;
-package body Porion.Commands.Init is
+with Ada.Text_IO;
+with Porion.Sources;
+package body Porion.Commands.Build is
 
-   --  ------------------------------
-   --  Initialize the Porion workspace to manage and build projects.
-   --  ------------------------------
+   --  Get a value from the keystore.
    overriding
    procedure Execute (Command   : in out Command_Type;
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Context   : in out Context_Type) is
-      pragma Unreferenced (Command, Name);
    begin
       if Args.Get_Count = 0 then
-         Porion.Commands.Log.Error (-("missing directory to setup"));
-
-      elsif Args.Get_Count = 1 then
-         declare
-            Path  : constant String := Args.Get_Argument (1);
-         begin
-            if Ada.Directories.Exists (Path) then
-               Porion.Commands.Log.Error (-("directory {0} exists"), Path);
-               return;
-            end if;
-
-            Ada.Directories.Create_Path (Path);
-            Porion.Configs.Set (Porion.Configs.WORKSPACE_DIR_NAME, Path);
-            Porion.Configs.Save;
-         end;
-         Context.Project_Service.Open (Create => True);
-         Context.Project_Service.Add_Node (Hostname => "localhost",
-                                           Login    => "");
+         Porion.Commands.Log.Error (-("missing project name"));
+         raise Error;
       end if;
+      Context.Open;
+
+      declare
+         use Porion.Sources.Maps;
+
+         Name          : constant String := Args.Get_Argument (1);
+         Source_Status : Porion.Sources.Status_Type;
+      begin
+         Context.Project_Service.Load_Project (Name);
+
+         Context.Project_Service.Check_Sources (Source_Status);
+
+         Context.Build_Service.Open (Context.Project_Service);
+
+         for Branch in Source_Status.Changes.Iterate loop
+            Ada.Text_IO.Put (Key (Branch));
+            Ada.Text_IO.Put (" ");
+            Ada.Text_IO.Put_Line (Porion.To_String (Element (Branch).Tag));
+
+            Builds.Services.Build (Context.Build_Service, Key (Branch), Element (Branch));
+         end loop;
+      end;
    end Execute;
 
-   --  ------------------------------
    --  Setup the command before parsing the arguments and executing it.
-   --  ------------------------------
    overriding
    procedure Setup (Command : in out Command_Type;
                     Config  : in out GNAT.Command_Line.Command_Line_Configuration;
                     Context : in out Context_Type) is
    begin
       Drivers.Command_Type (Command).Setup (Config, Context);
-      GC.Define_Switch (Config, Command.Json'Access,
-                        "-j", "json", -("Produce a JSON output"));
+      GC.Define_Switch (Config, Command.Force'Access,
+                        "-f", "force", -("Force the build"));
+      GC.Define_Switch (Config, Command.Clean'Access,
+                        "-c", "clean", -("Clean before building"));
    end Setup;
 
-   --  ------------------------------
    --  Write the help associated with the command.
-   --  ------------------------------
    overriding
    procedure Help (Command   : in out Command_Type;
                    Name      : in String;
@@ -75,4 +76,4 @@ package body Porion.Commands.Init is
       null;
    end Help;
 
-end Porion.Commands.Init;
+end Porion.Commands.Build;

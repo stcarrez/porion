@@ -1,7 +1,7 @@
 -- Advanced Resource Embedder 1.1.0
 with Interfaces; use Interfaces;
 
-package body Porion.Resources is
+package body Porion.Resources.Queries is
    function Hash (S : String) return Natural;
 
    P : constant array (0 .. 1) of Natural :=
@@ -167,4 +167,4 @@ package body Porion.Resources is
       return (if Names (H).all = Name then Contents (H) else null);
    end Get_Content;
 
-end Porion.Resources;
+end Porion.Resources.Queries;

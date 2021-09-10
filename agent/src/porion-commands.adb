@@ -21,6 +21,7 @@ with Ada.Text_IO;
 with Util.Strings;
 with Util.Commands.Parsers.GNAT_Parser;
 with Porion.Configs;
+with Porion.Resources.Queries;
 with Porion.Commands.Drivers;
 with Porion.Commands.Build;
 with Porion.Commands.Steps;
@@ -251,6 +252,12 @@ package body Porion.Commands is
       end;
 
    end Parse;
+
+   --  Open the database.
+   procedure Open (Context : in out Context_Type) is
+   begin
+      Context.Project_Service.Open (Porion.Resources.Queries.Get_Content'Access, null);
+   end Open;
 
    overriding
    procedure Finalize (Context : in out Context_Type) is

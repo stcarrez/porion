@@ -36,7 +36,7 @@ package body Porion.Commands.Steps is
          Porion.Commands.Log.Error (-("use only one of --insert, --update or --delete option"));
          raise Error;
       end if;
-      Context.Project_Service.Open;
+      Context.Open;
 
       declare
          Name          : constant String := Args.Get_Argument (1);

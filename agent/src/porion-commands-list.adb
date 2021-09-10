@@ -36,7 +36,7 @@ package body Porion.Commands.List is
 
       Query       : ADO.Queries.Context;
    begin
-      Context.Project_Service.Open;
+      Context.Open;
 
       if not Command.List_Projects and not Command.List_Nodes and not Command.List_Builds then
          Command.List_Projects := True;

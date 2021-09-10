@@ -38,7 +38,7 @@ package body Porion.Commands.Status is
          Ada.Text_IO.Put_Line (Porion.Configs.Get_Porion_Directory);
          return;
       end if;
-      Context.Project_Service.Open;
+      Context.Open;
 
       for I in 1 .. Args.Get_Count loop
          declare

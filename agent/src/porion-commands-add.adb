@@ -35,7 +35,7 @@ package body Porion.Commands.Add is
          Porion.Commands.Log.Error (-("missing project URL or file to add"));
          raise Error;
       end if;
-      Context.Project_Service.Open;
+      Context.Open;
 
       declare
          Logger : Porion.Loggers.Logger_Type;

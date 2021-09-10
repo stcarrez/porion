@@ -24,7 +24,6 @@ with ADO.Sqlite;
 with ADO.SQL;
 
 with Porion.Configs;
-with Porion.Projects.Schema;
 with Porion.Resources;
 with Porion.Services.Parsers;
 with Porion.Builds.Services;
@@ -33,12 +32,12 @@ package body Porion.Services is
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Services");
 
-   function Get_Query_Resource (Name : in String) return access constant String is
-   begin
-      Log.Info ("Get query resource {0}", Name);
+   --function Get_Query_Resource (Name : in String) return access constant String is
+   --begin
+   --   Log.Info ("Get query resource {0}", Name);
 
-      return Porion.Resources.Get_Content (Name);
-   end Get_Query_Resource;
+   --   return Porion.Resources.Get_Content (Name);
+   --end Get_Query_Resource;
 
    --  ------------------------------
    --  Get the current project id.
@@ -97,8 +96,12 @@ package body Porion.Services is
       return Service.DB;
    end Get_Database;
 
-   procedure Open (Service : in out Context_Type;
-                   Create  : in Boolean := False) is
+   procedure Open (Service  : in out Context_Type;
+                   Resource : in Resources.Get_Resource_Access;
+                   Schema   : in Resources.Content_Access) is
+      use type Resources.Content_Access;
+
+      Create : constant Boolean := Schema /= null;
       Path   : constant String := Porion.Configs.Get_Database_Path
         & (if Create then "?create=true" else "");
       Config : Util.Properties.Manager;
@@ -108,31 +111,19 @@ package body Porion.Services is
       Config.Set (ADO.Configs.QUERY_LOAD_CONFIG, "true");
       Config.Set (ADO.Configs.NO_ENTITY_LOAD, (if Create then "true" else "false"));
       ADO.SQLite.Initialize (Config);
-      Service.Factory.Set_Query_Loader (Get_Query_Resource'Access);
+      Service.Factory.Set_Query_Loader (Resource.all'Access);
       Service.Factory.Create (Path);
       Service.DB := Service.Factory.Get_Master_Session;
 
-      if Create then
-         declare
-            use Porion.Projects.Schema;
-
-            List : constant Porion.Projects.Schema.Content_Access
-              := Porion.Projects.Schema.Get_Content ("create-porion-sqlite");
-         begin
-            if List = null then
-               Log.Error ("Cannot find the database schema!");
-               return;
-            end if;
-
-            for Query of List.all loop
-               declare
-                  Stmt : ADO.Statements.Query_Statement
-                    := Service.DB.Create_Statement (Query.all);
-               begin
-                  Stmt.Execute;
-               end;
-            end loop;
-         end;
+      if Schema /= null then
+         for Query of Schema.all loop
+            declare
+               Stmt : ADO.Statements.Query_Statement
+                 := Service.DB.Create_Statement (Query.all);
+            begin
+               Stmt.Execute;
+            end;
+         end loop;
       end if;
    end Open;
 

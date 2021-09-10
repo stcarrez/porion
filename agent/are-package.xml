@@ -1,6 +1,6 @@
 <package>
 
-  <resource name='Porion.Resources'
+  <resource name='Porion.Resources.Queries'
             format='string'
             type='access constant String'>
     <install mode='copy'>
@@ -10,7 +10,7 @@
     </install>
   </resource>
 
-  <resource name='Porion.Projects.Schema'
+  <resource name='Porion.Resources.Schema'
             format='lines'>
     <line-separator>;</line-separator>
 
@@ -25,7 +25,7 @@
     
     <install mode='copy' strip-extension='yes'>
       <fileset dir="db/sqlite">
-        <include name="create-porion-sqlite.sql"/>
+        <include name="create-porion_agent-sqlite.sql"/>
       </fileset>
     </install>
   </resource>

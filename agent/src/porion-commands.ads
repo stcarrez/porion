@@ -94,6 +94,9 @@ private
    overriding
    procedure Finalize (Context : in out Context_Type);
 
+   --  Open the database.
+   procedure Open (Context : in out Context_Type);
+
    --  Setup the command before parsing the arguments and executing it.
    procedure Setup (Config  : in out GC.Command_Line_Configuration;
                     Context : in out Context_Type);

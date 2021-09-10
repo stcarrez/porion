@@ -1,11 +1,5 @@
 -- Advanced Resource Embedder 1.1.0
-package Porion.Resources is
-
-   type Content_Access is access constant String;
-
-   type Name_Access is access constant String;
-
-   type Name_Array is array (Natural range <>) of Name_Access;
+package Porion.Resources.Queries is
 
    Names : constant Name_Array;
 
@@ -25,4 +19,4 @@ private
    Names : constant Name_Array := (
       K_0'Access, K_1'Access, K_2'Access, K_3'Access,
       K_4'Access, K_5'Access);
-end Porion.Resources;
+end Porion.Resources.Queries;

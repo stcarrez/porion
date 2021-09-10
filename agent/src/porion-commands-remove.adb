@@ -35,7 +35,7 @@ package body Porion.Commands.Remove is
          Porion.Commands.Log.Error (-("missing project name"));
          raise Error;
       end if;
-      Context.Project_Service.Open;
+      Context.Open;
 
       declare
          Logger : Porion.Loggers.Logger_Type;

@@ -23,6 +23,7 @@ with ADO.Sessions.Factory;
 with Porion.Nodes.Models;
 with Porion.Projects.Models;
 with Porion.Builds.Models;
+with Porion.Resources;
 package Porion.Services is
 
    Name_Used : exception;
@@ -50,8 +51,9 @@ package Porion.Services is
    procedure Load_Project (Service : in out Context_Type;
                            Name    : in String);
 
-   procedure Open (Service : in out Context_Type;
-                   Create  : in Boolean := False);
+   procedure Open (Service  : in out Context_Type;
+                   Resource : in Resources.Get_Resource_Access;
+                   Schema   : in Resources.Content_Access);
 
    procedure Open (Service : in out Context_Type;
                    From    : in out Context_Type'Class);
@@ -61,7 +63,7 @@ package Porion.Services is
 
    function Get_Database (Service : in Context_Type) return ADO.Sessions.Master_Session;
 
-   function Get_Query_Resource (Name : in String) return access constant String;
+   -- function Get_Query_Resource (Name : in String) return access constant String;
 
    procedure Import (Service : in out Context_Type;
                      Path    : in String);

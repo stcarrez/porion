@@ -139,7 +139,7 @@ package body Porion.Commands.Edit is
                       Args      : in Argument_List'Class;
                       Context   : in out Context_Type) is
    begin
-      Context.Project_Service.Open;
+      Context.Open;
       if Args.Get_Count /= Context.First_Arg then
          Porion.Commands.Usage (Args, Context, Name);
 

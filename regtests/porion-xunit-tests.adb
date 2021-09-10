@@ -24,6 +24,8 @@ with Porion.XUnit.Analysis;
 with Porion.XUnit.Parsers;
 with Porion.Builds.Models;
 with Porion.Services;
+with Porion.Resources.Queries;
+with Porion.Resources.Schema;
 with Porion.Builds.Services;
 with Porion.Projects.Services;
 package body Porion.XUnit.Tests is
@@ -53,7 +55,7 @@ package body Porion.XUnit.Tests is
       Branch.Build_Count := 0;
       Branch.Last_Tag := To_Unbounded_String ("123");
       Porion.Configs.Initialize ("regtests/files/porion.properties");
-      Service.Open (Create => True);
+      Service.Open (Porion.Resources.Queries.Get_Content'Access, null);
       begin
          Service.Load_Node (Hostname => "localhost");
 

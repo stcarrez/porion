@@ -19,6 +19,9 @@ DYNAMO_ARGS=\
   --package Porion.Projects.Models \
   db uml/porion.zargo
 
+AGENT_DYNAMO_ARGS=\
+  db
+
 ROOTDIR=.
 
 # Build executables for all mains defined by the project.
@@ -31,6 +34,7 @@ test:	build
 	bin/porion_harness -v -config test.properties -xml porion-aunit.xml
 
 generate::
-	mkdir -p db
+	mkdir -p db agent/db
 	$(DYNAMO) generate $(DYNAMO_ARGS)
-	$(ARE) -o src/model --rule=are-package.xml --list-access --content-only --name-access .
+	cd agent && $(DYNAMO) generate $(AGENT_DYNAMO_ARGS)
+	cd agent && $(ARE) -o src/model --rule=are-package.xml --no-type-declaration --list-access --content-only --name-access .. .

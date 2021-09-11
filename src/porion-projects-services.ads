@@ -21,9 +21,11 @@ with Porion.Services;
 with Porion.Projects.Models;
 package Porion.Projects.Services is
 
-   Name_Used : exception;
+   Name_Used    : exception;
 
    Invalid_Name : exception;
+
+   Not_Found    : exception renames Porion.Services.Not_Found;
 
    type Context_Type is limited new Porion.Services.Context_Type with private;
 

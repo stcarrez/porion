@@ -49,7 +49,7 @@ package body Porion.Projects.Services is
       Service.Build_Node.Find (Service.DB, Query, Found);
       if Found then
          Log.Warn ("Build node name {0} already used", Hostname);
-         raise Name_Used;
+         raise Not_Found;
       end if;
       Service.Build_Node.Set_Name (Hostname);
       Service.Build_Node.Set_Login (Login);
@@ -156,7 +156,7 @@ package body Porion.Projects.Services is
       Service.Project.Find (Service.DB, Query, Found);
       if not Found then
          Log.Warn ("Project name {0} already used", Name);
-         raise Name_Used;
+         raise Not_Found;
       end if;
 
       --  Cleanup unit test data.

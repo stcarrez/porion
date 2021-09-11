@@ -26,7 +26,7 @@ with Porion.Builds.Models;
 with Porion.Resources;
 package Porion.Services is
 
-   Name_Used : exception;
+   Not_Found : exception;
 
    type Context_Type is tagged limited record
       Factory           : ADO.Sessions.Factory.Session_Factory;

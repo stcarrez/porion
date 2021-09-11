@@ -59,7 +59,7 @@ package body Porion.Services is
       Service.Project.Find (Service.DB, Query, Found);
       if not Found then
          Log.Warn ("Project name {0} does not exist", Name);
-         raise Name_Used;
+         raise Not_Found;
       end if;
 
    end Load_Project;
@@ -79,7 +79,7 @@ package body Porion.Services is
       Service.Build_Node.Find (Service.DB, Query, Found);
       if not Found then
          Log.Warn ("Build node {0} does not exist", Hostname);
-         raise Name_Used;
+         raise Not_Found;
       end if;
 
    end Load_Node;

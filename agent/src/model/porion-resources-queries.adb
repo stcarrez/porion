@@ -119,17 +119,21 @@ package body Porion.Resources.Queries is
        & "    </description>" & ASCII.LF & ASCII.LF & "    <query name='command-project-"
        & "list'>" & ASCII.LF & "        <comment>Get the list of projects</comment>" & ASCII.LF
        & "        <sql>" & ASCII.LF & "            SELECT" & ASCII.LF & "            project."
-       & "id AS id," & ASCII.LF & "            project.name AS name," & ASCII.LF & "         "
-       & "   project.status AS status," & ASCII.LF & "            COUNT(branch.id) AS bra"
-       & "nch_count," & ASCII.LF & "            (SELECT COUNT(build.id) FROM porion_build"
-       & " AS build WHERE build.project_id = project.id) AS build_count " & ASCII.LF & " "
-       & "           FROM porion_project AS project" & ASCII.LF & "            LEFT JOIN "
-       & "porion_branch AS branch ON project.id = branch.project_id" & ASCII.LF & "      "
-       & "      GROUP BY project.id" & ASCII.LF & "        </sql>" & ASCII.LF & "        <sql"
-       & "-count>" & ASCII.LF & "            SELECT" & ASCII.LF & "            count(project."
-       & "id)" & ASCII.LF & "            FROM porion_project AS project" & ASCII.LF & "      "
-       & "  </sql-count>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</query-mappi"
-       & "ng>" & ASCII.LF;
+       & "name AS name," & ASCII.LF & "            project.status AS status," & ASCII.LF & " "
+       & "           branch.name AS branch_name," & ASCII.LF & "            branch.tag AS"
+       & " branch_tag," & ASCII.LF & "            build.finish_date AS build_date," & ASCII.LF
+       & "            build.status AS build_status," & ASCII.LF & "            build.pass"
+       & "_count AS pass_count," & ASCII.LF & "            build.fail_count AS fail_count"
+       & "," & ASCII.LF & "            build.timeout_count AS timeout_count" & ASCII.LF & "  "
+       & "          FROM porion_project AS project" & ASCII.LF & "            LEFT JOIN p"
+       & "orion_branch AS branch ON project.id = branch.project_id AND branch.status "
+       & "!= 0" & ASCII.LF & "            LEFT JOIN porion_last_build AS last_build ON la"
+       & "st_build.branch_id = branch.id" & ASCII.LF & "            LEFT JOIN porion_buil"
+       & "d AS build ON last_build.build_id = build.id" & ASCII.LF & "        </sql>" & ASCII.LF
+       & "        <sql-count>" & ASCII.LF & "            SELECT" & ASCII.LF & "            co"
+       & "unt(project.id)" & ASCII.LF & "            FROM porion_project AS project" & ASCII.LF
+       & "        </sql-count>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</query"
+       & "-mapping>" & ASCII.LF;
 
    C_4 : aliased constant String := "<query-mapping package='Porion.Projects.M"
        & "odels'>" & ASCII.LF & "    <description>" & ASCII.LF & "      Information about bra"

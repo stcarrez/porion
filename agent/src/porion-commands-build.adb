@@ -46,7 +46,7 @@ package body Porion.Commands.Build is
          begin
             Context.Project_Service.Load_Project (Name);
 
-            Context.Project_Service.Check_Sources (Source_Status, Executor);
+            Context.Project_Service.Check_Sources (Command.Force, Source_Status, Executor);
 
             Context.Build_Service.Open (Context.Project_Service);
 
@@ -54,10 +54,6 @@ package body Porion.Commands.Build is
                Executor.Enable_Dry_Run;
             end if;
             for Branch in Source_Status.Changes.Iterate loop
-               Ada.Text_IO.Put (Key (Branch));
-               Ada.Text_IO.Put (" ");
-               Ada.Text_IO.Put_Line (Porion.To_String (Element (Branch).Tag));
-
                Builds.Services.Build (Context.Build_Service, Key (Branch), Element (Branch), Executor);
                if Command.Dry_Run then
                   declare

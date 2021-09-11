@@ -60,7 +60,7 @@ package body Porion.XUnit.Tests is
          Service.Load_Node (Hostname => "localhost");
 
       exception
-         when Porion.Services.Name_Used =>
+         when Porion.Services.Not_Found =>
             Service.Add_Node (Hostname => "localhost",
                               Login    => "porion");
       end;
@@ -69,7 +69,7 @@ package body Porion.XUnit.Tests is
          Service.Load_Project ("ada-lzma");
 
       exception
-         when Porion.Services.Name_Used =>
+         when Porion.Services.Not_Found =>
             Info.Kind := Porion.Sources.SRC_GIT;
             Info.Name := To_UString ("ada-lzma");
             Info.URI := To_UString ("git://github.com/stcarrez/ada-lzma.git");

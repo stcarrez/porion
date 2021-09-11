@@ -16,9 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Porion.Projects.Services;
-with Porion.Loggers;
-with Porion.Configs;
-with Porion.Sources.Factories;
+with Porion.Services;
 package body Porion.Commands.Remove is
 
    --  ------------------------------
@@ -29,31 +27,36 @@ package body Porion.Commands.Remove is
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Context   : in out Context_Type) is
-      pragma Unreferenced (Command, Name);
+      pragma Unreferenced (Name);
    begin
       if Args.Get_Count = 0 then
-         Porion.Commands.Log.Error (-("missing project name"));
-         raise Error;
+         Porion.Commands.Error (-("missing project name"));
+         return;
       end if;
       Context.Open;
 
-      declare
-         Logger : Porion.Loggers.Logger_Type;
-         Info   : Porion.Sources.Source_Info_Type;
-         Config : Porion.Configs.Config_Type;
-         Project_Name : constant String := Args.Get_Argument (1);
-      begin
-         Context.Project_Service.Remove_Project (Project_Name);
-         Context.Console.Notice (N_INFO, Format (-("Project {0} is removed"),
-                                 Project_Name));
+      for I in 1 .. Args.Get_Count loop
+         declare
+            Project_Name : constant String := Args.Get_Argument (I);
+         begin
+            if not Command.Interactive
+              or else Command.Force
+              or else Confirm (Format (-("remove project '{0}'?"), Project_Name))
+            then
+               Context.Project_Service.Load_Project (Project_Name);
+               Context.Project_Service.Remove_Project (Project_Name);
+               Context.Console.Notice (N_INFO, Format (-("Project {0} is removed"),
+                                       Project_Name));
+            end if;
 
-      exception
-         when Porion.Projects.Services.Name_Used =>
-            Porion.Commands.Log.Error (-("project '{0}' already exists"),
-                                       Project_Name);
-            raise Error;
-      end;
-
+         exception
+            when Porion.Services.Not_Found =>
+               if not Command.Force then
+                  Porion.Commands.Error (-("project '{0}' already exists"),
+                                         Project_Name);
+               end if;
+         end;
+      end loop;
    end Execute;
 
    --  ------------------------------
@@ -65,19 +68,10 @@ package body Porion.Commands.Remove is
                     Context : in out Context_Type) is
    begin
       Drivers.Command_Type (Command).Setup (Config, Context);
-      GC.Define_Switch (Config, Command.Json'Access,
-                        "-j", "json", -("Produce a JSON output"));
+      GC.Define_Switch (Config, Command.Force'Access,
+                        "-f", "--force", -("ignore nonexistent projects, never prompt"));
+      GC.Define_Switch (Config, Command.Interactive'Access,
+                        "-i", "--interactive", -("prompt before every removal"));
    end Setup;
-
-   --  ------------------------------
-   --  Write the help associated with the command.
-   --  ------------------------------
-   overriding
-   procedure Help (Command   : in out Command_Type;
-                   Name      : in String;
-                   Context   : in out Context_Type) is
-   begin
-      null;
-   end Help;
 
 end Porion.Commands.Remove;

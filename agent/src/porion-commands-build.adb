@@ -27,8 +27,8 @@ package body Porion.Commands.Build is
                       Context   : in out Context_Type) is
    begin
       if Args.Get_Count = 0 then
-         Porion.Commands.Log.Error (-("missing project name"));
-         raise Error;
+         Porion.Commands.Error (-("missing project name"));
+         return;
       end if;
       Context.Open;
 
@@ -66,14 +66,5 @@ package body Porion.Commands.Build is
       GC.Define_Switch (Config, Command.Clean'Access,
                         "-c", "clean", -("Clean before building"));
    end Setup;
-
-   --  Write the help associated with the command.
-   overriding
-   procedure Help (Command   : in out Command_Type;
-                   Name      : in String;
-                   Context   : in out Context_Type) is
-   begin
-      null;
-   end Help;
 
 end Porion.Commands.Build;

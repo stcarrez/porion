@@ -131,13 +131,4 @@ package body Porion.Commands.List is
                         Help => -("List the builds"));
    end Setup;
 
-   --  Write the help associated with the command.
-   overriding
-   procedure Help (Command   : in out Command_Type;
-                   Name      : in String;
-                   Context   : in out Context_Type) is
-   begin
-      null;
-   end Help;
-
 end Porion.Commands.List;

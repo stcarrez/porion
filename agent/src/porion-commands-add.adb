@@ -32,8 +32,8 @@ package body Porion.Commands.Add is
       pragma Unreferenced (Command, Name);
    begin
       if Args.Get_Count = 0 then
-         Porion.Commands.Log.Error (-("missing project URL or file to add"));
-         raise Error;
+         Porion.Commands.Error (-("missing project URL or file to add"));
+         return;
       end if;
       Context.Open;
 
@@ -57,14 +57,12 @@ package body Porion.Commands.Add is
 
       exception
          when Porion.Projects.Services.Name_Used =>
-            Porion.Commands.Log.Error (-("project '{0}' already exists"),
-                                       To_String (Info.Name));
-            raise Error;
+            Porion.Commands.Error (-("project '{0}' already exists"),
+                                   To_String (Info.Name));
 
          when Porion.Projects.Services.Invalid_Name =>
-            Porion.Commands.Log.Error (-("invalid project name '{0}'"),
-                                       To_String (Info.Name));
-            raise Error;
+            Porion.Commands.Error (-("invalid project name '{0}'"),
+                                   To_String (Info.Name));
 
       end;
 
@@ -82,16 +80,5 @@ package body Porion.Commands.Add is
       GC.Define_Switch (Config, Command.Json'Access,
                         "-j", "json", -("Produce a JSON output"));
    end Setup;
-
-   --  ------------------------------
-   --  Write the help associated with the command.
-   --  ------------------------------
-   overriding
-   procedure Help (Command   : in out Command_Type;
-                   Name      : in String;
-                   Context   : in out Context_Type) is
-   begin
-      null;
-   end Help;
 
 end Porion.Commands.Add;

@@ -33,12 +33,6 @@ private package Porion.Commands.Build is
                     Config  : in out GNAT.Command_Line.Command_Line_Configuration;
                     Context : in out Context_Type);
 
-   --  Write the help associated with the command.
-   overriding
-   procedure Help (Command   : in out Command_Type;
-                   Name      : in String;
-                   Context   : in out Context_Type);
-
 private
 
    type Command_Type is new Porion.Commands.Drivers.Command_Type with record

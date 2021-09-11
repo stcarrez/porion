@@ -27,7 +27,6 @@ with Util.Streams.Files;
 with Util.Streams.Texts;
 with Util.Serialize.IO.XML;
 with Keystore.Random;
-with Porion.Services.Parsers;
 package body Porion.Commands.Edit is
 
    use GNAT.Strings;
@@ -125,8 +124,8 @@ package body Porion.Commands.Edit is
       Result := Util.Systems.Os.Sys_Chmod (P, 8#0700#);
       Interfaces.C.Strings.Free (P);
       if Result /= 0 then
-         Porion.Commands.Log.Error (-("cannot set the permission of {0}"), Path);
-         raise Error;
+         Porion.Commands.Error (-("cannot set the permission of {0}"), Path);
+         raise Command_Error;
       end if;
    end Make_Directory;
 
@@ -180,8 +179,7 @@ package body Porion.Commands.Edit is
 
          exception
             when Util.Processes.Process_Error =>
-               Porion.Commands.Log.Error (-("cannot execute editor '{0}'"), Editor);
-               Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
+               Porion.Commands.Error (-("cannot execute editor '{0}'"), Editor);
                Cleanup;
 
             when others =>

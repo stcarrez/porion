@@ -168,12 +168,6 @@ package body Porion.Commands is
                         Argument => "PATH",
                         Help   => -("Defines the path for the keystore file"));
       GC.Define_Switch (Config => Config,
-                        Output => Context.Data_Path'Access,
-                        Switch => "-d:",
-                        Long_Switch => "--data-path=",
-                        Argument => "PATH",
-                        Help   => -("The directory which contains the keystore data blocks"));
-      GC.Define_Switch (Config => Config,
                         Output => Context.Password_File'Access,
                         Long_Switch => "--passfile=",
                         Argument => "PATH",
@@ -247,11 +241,23 @@ package body Porion.Commands is
 
       exception
          when GNAT.Command_Line.Invalid_Parameter =>
-            Porion.Commands.Log.Error (-("missing option parameter"));
-            raise Error;
+            Porion.Commands.Error (-("missing option parameter"));
+            raise Command_Error;
       end;
 
    end Parse;
+
+   --  ------------------------------
+   --  Report an error message and set exit status for a failure.
+   --  ------------------------------
+   procedure Error (Message : in String;
+                    Arg1    : in String := "";
+                    Arg2    : in String := "";
+                    Arg3    : in String := "") is
+   begin
+      Log.Error (Message, Arg1, Arg2, Arg3);
+      Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
+   end Error;
 
    --  Open the database.
    procedure Open (Context : in out Context_Type) is
@@ -264,5 +270,36 @@ package body Porion.Commands is
    begin
       GC.Free (Context.Command_Config);
    end Finalize;
+
+   procedure Flush_Input is
+      C         : Character;
+      Available : Boolean;
+   begin
+      loop
+         Ada.Text_IO.Get_Immediate (C, Available);
+         exit when not Available;
+      end loop;
+
+   exception
+      when Ada.Text_IO.End_Error =>
+         null;
+   end Flush_Input;
+
+   function Confirm (Message : in String) return Boolean is
+   begin
+      Flush_Input;
+      Ada.Text_IO.Put ("porion: ");
+      Ada.Text_IO.Put (Message);
+      Ada.Text_IO.Put (" ");
+      declare
+         Answer : constant String := Ada.Text_IO.Get_Line;
+      begin
+         return Answer = "Y" or Answer = "y";
+      end;
+
+   exception
+      when Ada.Text_IO.End_Error =>
+         return False;
+   end Confirm;
 
 end Porion.Commands;

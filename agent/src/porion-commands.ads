@@ -26,7 +26,7 @@ private with Util.Commands.Consoles.Text;
 private with Util.Strings.Formats;
 package Porion.Commands is
 
-   Error : exception;
+   Command_Error : exception;
 
    subtype Argument_List is Util.Commands.Argument_List;
 
@@ -72,7 +72,6 @@ private
       Zero              : aliased Boolean := False;
       Config_File       : aliased GNAT.Strings.String_Access;
       Wallet_File       : aliased GNAT.Strings.String_Access;
-      Data_Path         : aliased GNAT.Strings.String_Access;
       Wallet_Key_File   : aliased GNAT.Strings.String_Access;
       Password_File     : aliased GNAT.Strings.String_Access;
       Password_Env      : aliased GNAT.Strings.String_Access;
@@ -101,6 +100,12 @@ private
    procedure Setup (Config  : in out GC.Command_Line_Configuration;
                     Context : in out Context_Type);
 
+   --  Report an error message and set exit status for a failure.
+   procedure Error (Message : in String;
+                    Arg1    : in String := "";
+                    Arg2    : in String := "";
+                    Arg3    : in String := "");
+
    function Format (Message : in String;
                     Arg1    : in String) return String
      renames Util.Strings.Formats.Format;
@@ -111,5 +116,7 @@ private
                     Arg3    : in String := "";
                     Arg4    : in String := "") return String is
       (Util.Strings.Formats.Format (Message, Arg1, Arg2, Arg3, Arg4));
+
+   function Confirm (Message : in String) return Boolean;
 
 end Porion.Commands;

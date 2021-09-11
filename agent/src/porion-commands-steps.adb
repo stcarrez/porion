@@ -29,12 +29,12 @@ package body Porion.Commands.Steps is
                       Context   : in out Context_Type) is
    begin
       if Args.Get_Count = 0 then
-         Porion.Commands.Log.Error (-("missing project name"));
-         raise Error;
+         Porion.Commands.Error (-("missing project name"));
+         return;
       end if;
       if Command.Has_Several_Actions then
          Porion.Commands.Log.Error (-("use only one of --insert, --update or --delete option"));
-         raise Error;
+         return;
       end if;
       Context.Open;
 
@@ -98,14 +98,5 @@ package body Porion.Commands.Steps is
                         Argument => "POSITION",
                         Help => -("Update the build step"));
    end Setup;
-
-   --  Write the help associated with the command.
-   overriding
-   procedure Help (Command   : in out Command_Type;
-                   Name      : in String;
-                   Context   : in out Context_Type) is
-   begin
-      null;
-   end Help;
 
 end Porion.Commands.Steps;

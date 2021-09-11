@@ -31,18 +31,20 @@ package body Porion.Commands.Init is
                       Context   : in out Context_Type) is
       pragma Unreferenced (Command, Name);
 
-      Schema : Porion.Resources.Content_Access
+      Schema : constant Porion.Resources.Content_Access
         := Porion.Resources.Schema.Get_Content ("create-porion_agent-sqlite");
    begin
       if Args.Get_Count = 0 then
-         Porion.Commands.Log.Error (-("missing directory to setup"));
+         Porion.Commands.Error (-("missing directory to setup"));
 
-      elsif Args.Get_Count = 1 then
+      elsif Args.Get_Count /= 1 then
+         Porion.Commands.Error (-("too many arguments for the command"));
+      else
          declare
             Path  : constant String := Args.Get_Argument (1);
          begin
             if Ada.Directories.Exists (Path) then
-               Porion.Commands.Log.Error (-("directory {0} exists"), Path);
+               Porion.Commands.Error (-("directory {0} exists"), Path);
                return;
             end if;
 
@@ -65,19 +67,6 @@ package body Porion.Commands.Init is
                     Context : in out Context_Type) is
    begin
       Drivers.Command_Type (Command).Setup (Config, Context);
-      GC.Define_Switch (Config, Command.Json'Access,
-                        "-j", "json", -("Produce a JSON output"));
    end Setup;
-
-   --  ------------------------------
-   --  Write the help associated with the command.
-   --  ------------------------------
-   overriding
-   procedure Help (Command   : in out Command_Type;
-                   Name      : in String;
-                   Context   : in out Context_Type) is
-   begin
-      null;
-   end Help;
 
 end Porion.Commands.Init;

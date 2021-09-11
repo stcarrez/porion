@@ -40,7 +40,7 @@ exception
    when GNAT.Command_Line.Exit_From_Command_Line | GNAT.Command_Line.Invalid_Switch =>
       Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
 
-   when Porion.Commands.Error | Util.Commands.Not_Found =>
+   when Porion.Commands.Command_Error | Util.Commands.Not_Found =>
       Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
 
    when E : Ada.IO_Exceptions.Name_Error =>

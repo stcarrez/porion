@@ -1,0 +1,3 @@
+[submodule "ansi-ada"]
+	path = ansi-ada
+	url = https://github.com/mosteo/ansi-ada

@@ -20,6 +20,7 @@ with Util.Assertions;
 with Util.Test_Caller;
 
 with Porion.Configs;
+with Porion.Executors;
 with Porion.Sources.Factories;
 package body Porion.Sources.Tests is
 
@@ -37,37 +38,37 @@ package body Porion.Sources.Tests is
    end Add_Tests;
 
    procedure Test_Guess_Git (T : in out Test) is
-      Logger : Porion.Loggers.Logger_Type;
-      Result : Porion.Sources.Source_Info_Type;
-      Config : Porion.Configs.Config_Type;
+      Executor : Porion.Executors.Executor_Type;
+      Result   : Porion.Sources.Source_Info_Type;
+      Config   : Porion.Configs.Config_Type;
    begin
-      Porion.Sources.Factories.Guess (Path   => ".",
-                                      Config => Config,
-                                      Result => Result,
-                                      Logger => Logger);
+      Porion.Sources.Factories.Guess (Path     => ".",
+                                      Config   => Config,
+                                      Result   => Result,
+                                      Executor => Executor);
 
       T.Assert_Equals ("porion", Result.Name, "invalid project name");
       Assert_Equals (T, Porion.Sources.SRC_GIT, Result.Kind, "invalid source kind");
 
-      Porion.Sources.Factories.Guess (Path   => "src/model",
-                                      Config => Config,
-                                      Result => Result,
-                                      Logger => Logger);
+      Porion.Sources.Factories.Guess (Path     => "src/model",
+                                      Config   => Config,
+                                      Result   => Result,
+                                      Executor => Executor);
 
       T.Assert_Equals ("porion", Result.Name, "invalid project name");
       Assert_Equals (T, Porion.Sources.SRC_GIT, Result.Kind, "invalid source kind");
    end Test_Guess_Git;
 
    procedure Test_Guess_Files (T : in out Test) is
-      Path   : constant String := Util.Tests.Get_Path ("regtests/files/hello-1.0.tar.gz");
-      Logger : Porion.Loggers.Logger_Type;
-      Result : Porion.Sources.Source_Info_Type;
-      Config : Porion.Configs.Config_Type;
+      Path     : constant String := Util.Tests.Get_Path ("regtests/files/hello-1.0.tar.gz");
+      Executor : Porion.Executors.Executor_Type;
+      Result   : Porion.Sources.Source_Info_Type;
+      Config   : Porion.Configs.Config_Type;
    begin
-      Porion.Sources.Factories.Guess (Path   => Path,
-                                      Config => Config,
-                                      Result => Result,
-                                      Logger => Logger);
+      Porion.Sources.Factories.Guess (Path     => Path,
+                                      Config   => Config,
+                                      Result   => Result,
+                                      Executor => Executor);
 
       T.Assert_Equals ("hello-1.0", Result.Name, "invalid project name");
       Assert_Equals (T, Porion.Sources.SRC_FILE, Result.Kind, "invalid source kind");

@@ -50,12 +50,14 @@ package body Porion.XUnit.Tests is
       Branch    : Porion.Sources.Branch_Type;
       Build     : Porion.Builds.Models.Build_Ref;
       Session   : ADO.Sessions.Master_Session;
+      Schema : constant Porion.Resources.Content_Access
+        := Porion.Resources.Schema.Get_Content ("create-porion_agent-sqlite");
    begin
       Branch.Tag := To_Unbounded_String ("master");
       Branch.Build_Count := 0;
       Branch.Last_Tag := To_Unbounded_String ("123");
       Porion.Configs.Initialize ("regtests/files/porion.properties");
-      Service.Open (Porion.Resources.Queries.Get_Content'Access, null);
+      Service.Open (Porion.Resources.Queries.Get_Content'Access, Schema);
       begin
          Service.Load_Node (Hostname => "localhost");
 

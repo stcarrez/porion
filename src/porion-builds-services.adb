@@ -42,6 +42,7 @@ package body Porion.Builds.Services is
    use type ADO.Identifier;
    use type Porion.Builders.Controller_Access;
    use type Porion.Builds.Models.Execution_Type;
+   use type Porion.Builds.Models.Build_Status_Type;
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Builds.Services");
 
@@ -51,7 +52,8 @@ package body Porion.Builds.Services is
 
    procedure Start_Build (Service     : in out Context_Type;
                           Branch_Name : in String;
-                          Branch      : in Porion.Sources.Branch_Type) is
+                          Branch      : in Porion.Sources.Branch_Type;
+                          Executor    : in out Porion.Executors.Executor_Type'Class) is
       Query : ADO.Queries.Context;
       Found : Boolean;
       Stmt  : ADO.Statements.Query_Statement;
@@ -89,14 +91,8 @@ package body Porion.Builds.Services is
       Service.Build.Set_Node (Service.Build_Node);
       Service.Build.Set_Build_Config (Service.Build_Config);
       Service.Build.Set_Create_Date (Ada.Calendar.Clock);
-      if not Service.Dry_Run then
+      if not Executor.Is_Dry_Run then
          Service.Build.Save (Service.DB);
-
-         Service.Last_Build.Set_Build (Service.Build);
-         Service.Last_Build.Set_Build_Config (Service.Build_Config);
-         Service.Last_Build.Set_Branch (Service.Branch);
-         Service.Last_Build.Set_Status (Porion.Builds.Models.BUILD_RUNNING);
-         Service.Last_Build.Save (Service.DB);
          Service.DB.Commit;
       else
          Service.DB.Rollback;
@@ -111,7 +107,7 @@ package body Porion.Builds.Services is
                     Branch      : in Porion.Sources.Branch_Type;
                     Executor    : in out Porion.Executors.Executor_Type'Class) is
    begin
-      Start_Build (Service, Branch_Name, Branch);
+      Start_Build (Service, Branch_Name, Branch, Executor);
 
       Service.Load_Environment;
       Service.Load_Build_Steps;
@@ -128,6 +124,7 @@ package body Porion.Builds.Services is
       Log_Dir : constant String := Configs.Get_Build_Log_Directory (Name, Branch_Name, Number);
       Config  : Util.Properties.Manager;
       Logger  : Porion.Loggers.Logger_Type;
+      Status  : Builds.Models.Build_Status_Type := Builds.Models.BUILD_RUNNING;
    begin
       Log.Info ("Build {0} in {1}", Name, Path);
 
@@ -144,18 +141,102 @@ package body Porion.Builds.Services is
       Config.Set ("build_dir", Path);
       for Step of Service.Steps loop
          if Step.Step.Get_Execution /= Builds.Models.EXEC_DISABLED then
-            Service.Build_Controller
-              := Builders.Factories.Create (Step.Step.Get_Builder, Service.DB, Step.Config);
-            Service.Build_Controller.Build (Service.Build, Path, Executor);
+            declare
+               Exec_Step   : Builds.Models.Build_Step_Ref;
+               Step_Status : Integer;
+            begin
+               if not Executor.Is_Dry_Run then
+                  Exec_Step.Set_Start_Date (Ada.Calendar.Clock);
+                  Exec_Step.Set_Build (Service.Build);
+                  Exec_Step.Set_Config (Step.Step);
+                  Exec_Step.Save (Service.DB);
+               end if;
+               Executor.Set_Status (0);
+               Service.Build_Controller
+                 := Builders.Factories.Create (Step.Step.Get_Builder, Service.DB, Step.Config);
+               Service.Build_Controller.Build (Service.Build, Path, Executor);
+
+               if not Executor.Is_Dry_Run then
+                  Step_Status := Executor.Get_Status;
+                  Exec_Step.Set_Exit_Status (Step_Status);
+                  Exec_Step.Set_End_Date ((Is_Null => False,
+                                           Value => Ada.Calendar.Clock));
+                  Exec_Step.Save (Service.DB);
+                  if Step_Status /= 0 and Step.Step.Get_Execution = Builds.Models.EXEC_NO_ERROR then
+                     Status := Porion.Builds.Models.BUILD_FAIL;
+                     exit;
+                  end if;
+               end if;
+            end;
          end if;
       end loop;
 
-      Service.Build.Set_Finish_Date (ADO.Nullable_Time '(Is_Null => False,
-                                                         Value => Ada.Calendar.Clock));
-      if not Service.Dry_Run then
-         Service.Build.Save (Service.DB);
+      if not Executor.Is_Dry_Run then
+         if Status = Builds.Models.BUILD_RUNNING then
+            Status := Builds.Models.BUILD_PASS;
+         end if;
+         Service.Update_Build (Status);
       end if;
    end Build;
+
+   procedure Update_Build (Service : in out Context_Type;
+                           Status  : in Builds.Models.Build_Status_Type) is
+      Last_Builds : Builds.Models.Last_Build_Vector;
+      Query       : ADO.Queries.Context;
+
+      procedure Update_Last is
+      begin
+         for Iter in Last_Builds.Iterate loop
+            declare
+               Last_Build : Models.Last_Build_Vectors.Reference_Type
+                 := Models.Last_Build_Vectors.Reference (Last_Builds, Iter);
+            begin
+               if Last_Build.Get_Status = Status then
+                  Last_Build.Set_Build (Service.Build);
+                  Last_Build.Save (Service.DB);
+                  return;
+               end if;
+            end;
+         end loop;
+         declare
+            Last_Build : Models.Last_Build_Ref;
+         begin
+            Last_Build.Set_Status (Status);
+            Last_Build.Set_Build (Service.Build);
+            Last_Build.Set_Build_Config (Service.Build_Config);
+            Last_Build.Set_Branch (Service.Branch);
+            Last_Build.Save (Service.DB);
+         end;
+      end Update_Last;
+
+   begin
+      Service.Build.Set_Status (Status);
+      Service.Build.Set_Finish_Date ((Is_Null => False,
+                                      Value => Ada.Calendar.Clock));
+      Service.Build.Save (Service.DB);
+
+      Query.Set_Filter ("o.build_config_id = :config_id"
+                        & " AND o.branch_id = :branch_id");
+      Query.Bind_Param ("config_id", Service.Build_Config.Get_Id);
+      Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
+      Porion.Builds.Models.List (Last_Builds, Service.DB, Query);
+
+      Update_Last;
+
+      case Status is
+         when Builds.Models.BUILD_PASS =>
+            Service.Branch.Set_Status (Projects.Models.BUILD_SUCCEEDED);
+            Service.Branch.Save (Service.DB);
+
+         when Builds.Models.BUILD_FAIL =>
+            Service.Branch.Set_Status (Projects.Models.BUILD_FAILED);
+            Service.Branch.Save (Service.DB);
+
+         when others =>
+            null;
+
+      end case;
+   end Update_Build;
 
    procedure Load_Config (Service : in out Context_Type) is
       Query : ADO.Queries.Context;

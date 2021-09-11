@@ -29,6 +29,13 @@ package Porion.Executors is
    --  Enable the dry run execution mode.
    procedure Enable_Dry_Run (Executor : in out Executor_Type);
 
+   --  Get the execution status.
+   function Get_Status (Executor : in Executor_Type) return Integer;
+
+   --  Set the execution status.
+   procedure Set_Status (Executor : in out Executor_Type;
+                         Status   : in Integer);
+
    procedure Execute (Executor    : in out Executor_Type;
                       Command     : in EL.Expressions.Expression;
                       Parameters  : in Util.Properties.Manager;
@@ -64,6 +71,7 @@ private
    type Executor_Type is limited new Ada.Finalization.Limited_Controlled with record
       Dry_Run  : Boolean := False;
       Commands : Util.Strings.Vectors.Vector;
+      Status   : Integer := 0;
    end record;
 
 end Porion.Executors;

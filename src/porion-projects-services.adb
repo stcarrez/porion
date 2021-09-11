@@ -183,6 +183,7 @@ package body Porion.Projects.Services is
    end Remove_Project;
 
    procedure Check_Sources (Service  : in out Context_Type;
+                            Force    : in Boolean;
                             Status   : in out Porion.Sources.Status_Type;
                             Executor : in out Porion.Executors.Executor_Type'Class) is
       use Porion.Sources;
@@ -237,7 +238,33 @@ package body Porion.Projects.Services is
                         Service.Branch.Set_Update_Date (Ada.Calendar.Clock);
                         Service.Branch.Save (Service.DB);
                      end if;
+                     case Service.Branch.Get_Status is
+                        when Models.BUILD_REQUIRED =>
+                           Log.Info ("Build required for branch {0}", Name);
+                           Status.Changes.Insert (Name, Branch);
+
+                        when Models.BUILD_SUCCEEDED =>
+                           if Force then
+                              Log.Info ("Build succeed but forced for branch {0}", Name);
+                              Status.Changes.Insert (Name, Branch);
+                           else
+                              Log.Info ("Build already succeed for branch {0}", Name);
+                           end if;
+
+                        when Models.BUILD_FAILED =>
+                           if Force then
+                              Log.Info ("Build failed but forced for branch {0}", Name);
+                              Status.Changes.Insert (Name, Branch);
+                           else
+                              Log.Info ("Build failed for branch {0}", Name);
+                           end if;
+
+                        when Models.BUILD_DISABLED =>
+                           Log.Info ("Build disabled for branch {0}", Name);
+
+                     end case;
                      if Service.Branch.Get_Status = Models.BUILD_REQUIRED then
+                        Log.Info ("Build required for branch {0}", Name);
                         Status.Changes.Insert (Name, Branch);
                      end if;
                      Found := True;
@@ -250,6 +277,7 @@ package body Porion.Projects.Services is
             if not Found then
                Add_Branch (Service, Name, Branch, Is_Head);
                if Service.Branch.Get_Status = Models.BUILD_REQUIRED then
+                  Log.Info ("Build required for new branch {0}", Name);
                   Status.Changes.Insert (Name, Branch);
                end if;
             end if;

@@ -49,6 +49,7 @@ package Porion.Projects.Services is
                              Name    : in String);
 
    procedure Check_Sources (Service  : in out Context_Type;
+                            Force    : in Boolean;
                             Status   : in out Porion.Sources.Status_Type;
                             Executor : in out Porion.Executors.Executor_Type'Class);
 

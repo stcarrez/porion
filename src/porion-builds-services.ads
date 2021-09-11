@@ -59,7 +59,8 @@ package Porion.Builds.Services is
 
    procedure Start_Build (Service     : in out Context_Type;
                           Branch_Name : in String;
-                          Branch      : in Porion.Sources.Branch_Type) with
+                          Branch      : in Porion.Sources.Branch_Type;
+                          Executor    : in out Porion.Executors.Executor_Type'Class) with
      Pre => Service.Has_Project;
 
    function Get_Build (Service : in Context_Type) return Porion.Builds.Models.Build_Ref;
@@ -111,12 +112,15 @@ private
       Build_Controller  : Porion.Builders.Controller_Access;
       Environments      : Util.Strings.Maps.Map;
       Steps             : Build_Step_Vector;
-      Last_Build        : Porion.Builds.Models.Last_Build_Ref;
+      -- Last_Build        : Porion.Builds.Models.Last_Build_Ref;
    end record;
 
    procedure Build (Service     : in out Context_Type;
                     Branch_Name : in String;
                     Executor    : in out Porion.Executors.Executor_Type'Class);
+
+   procedure Update_Build (Service : in out Context_Type;
+                           Status  : in Builds.Models.Build_Status_Type);
 
    procedure Load_Environment (Service : in out Context_Type);
 

@@ -42,6 +42,23 @@ package body Porion.Executors is
       Executor.Dry_Run := True;
    end Enable_Dry_Run;
 
+   --  ------------------------------
+   --  Get the execution status.
+   --  ------------------------------
+   function Get_Status (Executor : in Executor_Type) return Integer is
+   begin
+      return Executor.Status;
+   end Get_Status;
+
+   --  ------------------------------
+   --  Set the execution status.
+   --  ------------------------------
+   procedure Set_Status (Executor : in out Executor_Type;
+                         Status   : in Integer) is
+   begin
+      Executor.Status := Status;
+   end Set_Status;
+
    procedure Execute (Executor    : in out Executor_Type;
                       Command     : in EL.Expressions.Expression;
                       Parameters  : in Util.Properties.Manager;
@@ -128,6 +145,7 @@ package body Porion.Executors is
          Glog.Warn ("Command '{0}' terminated with exit code{1}", Command,
                     Integer'Image (Status));
          Executor.Log ("Command exit status:" & Integer'Image (Status) & ASCII.LF);
+         Executor.Status := Status;
       end if;
    end Execute;
 

@@ -31,14 +31,17 @@ with Porion.Loggers;
 with ADO.Statements;
 with ADO.Queries;
 with ADO.Sessions;
+with Porion.Loggers;
 with Porion.Sources.Factories;
 with Porion.Nodes.Models;
 with Porion.Projects.Models;
+with Porion.Executors;
 with Porion.Builders.Factories;
 package body Porion.Builds.Services is
 
    use type ADO.Identifier;
    use type Porion.Builders.Controller_Access;
+   use type Porion.Builds.Models.Execution_Type;
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Builds.Services");
 
@@ -86,14 +89,18 @@ package body Porion.Builds.Services is
       Service.Build.Set_Node (Service.Build_Node);
       Service.Build.Set_Build_Config (Service.Build_Config);
       Service.Build.Set_Create_Date (Ada.Calendar.Clock);
-      Service.Build.Save (Service.DB);
+      if not Service.Dry_Run then
+         Service.Build.Save (Service.DB);
 
-      Service.Last_Build.Set_Build (Service.Build);
-      Service.Last_Build.Set_Build_Config (Service.Build_Config);
-      Service.Last_Build.Set_Branch (Service.Branch);
-      Service.Last_Build.Set_Status (Porion.Builds.Models.BUILD_RUNNING);
-      Service.Last_Build.Save (Service.DB);
-      Service.DB.Commit;
+         Service.Last_Build.Set_Build (Service.Build);
+         Service.Last_Build.Set_Build_Config (Service.Build_Config);
+         Service.Last_Build.Set_Branch (Service.Branch);
+         Service.Last_Build.Set_Status (Porion.Builds.Models.BUILD_RUNNING);
+         Service.Last_Build.Save (Service.DB);
+         Service.DB.Commit;
+      else
+         Service.DB.Rollback;
+      end if;
 
       Log.Info ("Created build{0} for {1}", Natural'Image (Service.Build.Get_Number),
                 Service.Project.Get_Name);
@@ -101,44 +108,53 @@ package body Porion.Builds.Services is
 
    procedure Build (Service     : in out Context_Type;
                     Branch_Name : in String;
-                    Branch      : in Porion.Sources.Branch_Type) is
+                    Branch      : in Porion.Sources.Branch_Type;
+                    Executor    : in out Porion.Executors.Executor_Type'Class) is
    begin
       Start_Build (Service, Branch_Name, Branch);
 
       Service.Load_Environment;
       Service.Load_Build_Steps;
 
-      declare
-         Number  : constant Positive := Service.Build.Get_Number;
-         Name    : constant String := Service.Project.Get_Name;
-         Path    : constant String := Configs.Get_Build_Directory (Name, Branch_Name, Number);
-         Log_Dir : constant String := Configs.Get_Build_Log_Directory (Name, Branch_Name, Number);
-         Config  : Util.Properties.Manager;
-         Logger  : Porion.Loggers.Logger_Type;
-      begin
-         Log.Info ("Build {0} in {1}", Name, Path);
+      Build (Service, Branch_Name, Executor);
+   end Build;
 
-         if not Ada.Directories.Exists (Path) then
-            Ada.Directories.Create_Path (Path);
-         end if;
+   procedure Build (Service     : in out Context_Type;
+                    Branch_Name : in String;
+                    Executor    : in out Porion.Executors.Executor_Type'Class) is
+      Number  : constant Positive := Service.Build.Get_Number;
+      Name    : constant String := Service.Project.Get_Name;
+      Path    : constant String := Configs.Get_Build_Directory (Name, Branch_Name, Number);
+      Log_Dir : constant String := Configs.Get_Build_Log_Directory (Name, Branch_Name, Number);
+      Config  : Util.Properties.Manager;
+      Logger  : Porion.Loggers.Logger_Type;
+   begin
+      Log.Info ("Build {0} in {1}", Name, Path);
 
-         Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
-         Service.Source_Controller := Sources.Factories.Create (Service.Project.Get_Scm, Config);
+      if not Executor.Is_Dry_Run and then not Ada.Directories.Exists (Path) then
+         Ada.Directories.Create_Path (Path);
+      end if;
 
-         Logger.Create (Log_Dir, "build.log");
-         Service.Source_Controller.Checkout (Path, Logger);
+      Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
+      Service.Source_Controller := Sources.Factories.Create (Service.Project.Get_Scm, Config);
 
-         Config.Set ("build_dir", Path);
-         for Step of Service.Steps loop
+      Logger.Create (Log_Dir, "build.log");
+      Service.Source_Controller.Checkout (Path, Executor);
+
+      Config.Set ("build_dir", Path);
+      for Step of Service.Steps loop
+         if Step.Step.Get_Execution /= Builds.Models.EXEC_DISABLED then
             Service.Build_Controller
               := Builders.Factories.Create (Step.Step.Get_Builder, Service.DB, Step.Config);
-            Service.Build_Controller.Build (Service.Build, Path, Logger);
-         end loop;
+            Service.Build_Controller.Build (Service.Build, Path, Executor);
+         end if;
+      end loop;
 
-         Service.Build.Set_Finish_Date (ADO.Nullable_Time '(Is_Null => False,
-                                                            Value => Ada.Calendar.Clock));
+      Service.Build.Set_Finish_Date (ADO.Nullable_Time '(Is_Null => False,
+                                                         Value => Ada.Calendar.Clock));
+      if not Service.Dry_Run then
          Service.Build.Save (Service.DB);
-      end;
+      end if;
    end Build;
 
    procedure Load_Config (Service : in out Context_Type) is
@@ -530,24 +546,24 @@ package body Porion.Builds.Services is
       Service.DB.Commit;
    end Update;
 
-   procedure Make_Build_Config (Service : in out Context_Type) is
+   procedure Make_Build_Config (Service  : in out Context_Type;
+                                Executor : in out Porion.Executors.Executor_Type'Class) is
       Name    : constant String := Service.Project.Get_Name;
       Path    : constant String := Configs.Get_Build_Directory (Name, "main", 1);
       Log_Dir : constant String := Configs.Get_Build_Log_Directory (Name, "main", 1);
       Config  : Util.Properties.Manager;
-      Logger  : Porion.Loggers.Logger_Type;
    begin
       Log.Info ("Build {0} in {1}", Name, Path);
 
-      if not Ada.Directories.Exists (Path) then
+      if not Executor.Is_Dry_Run and then not Ada.Directories.Exists (Path) then
          Ada.Directories.Create_Path (Path);
       end if;
 
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
       Service.Source_Controller := Sources.Factories.Create (Service.Project.Get_Scm, Config);
 
-      Logger.Create (Log_Dir, "build.log");
-      Service.Source_Controller.Checkout (Path, Logger);
+      --  Logger.Create (Log_Dir, "build.log");
+      Service.Source_Controller.Checkout (Path, Executor);
 
       if Service.Build_Node.Is_Null then
          Service.Load_Node ("localhost");
@@ -556,12 +572,12 @@ package body Porion.Builds.Services is
       Service.Build_Config.Set_Project (Service.Project);
       Service.Build_Config.Set_Node (Service.Build_Node);
       Service.Build_Config.Save (Service.DB);
-      Service.Guess (Path, Logger);
+      Service.Guess (Path, Executor);
    end Make_Build_Config;
 
-   procedure Guess (Service : in out Context_Type;
-                    Path    : in String;
-                    Logger  : in out Porion.Loggers.Logger_Type) is
+   procedure Guess (Service  : in out Context_Type;
+                    Path     : in String;
+                    Executor : in out Porion.Executors.Executor_Type'Class) is
       use Util.Strings.Formats;
 
       Current_Step : Positive := 1;
@@ -571,7 +587,7 @@ package body Porion.Builds.Services is
          File_Path : constant String := Util.Files.Compose (Path, File);
          Exists    : constant Boolean := Ada.Directories.Exists (File_Path);
       begin
-         Logger.Write (Format (Message, File, (if Exists then -("yes") else -("no")), "", ""));
+         --  Logger.Write (Format (Message, File, (if Exists then -("yes") else -("no")), "", ""));
          return Exists;
       end Check;
 

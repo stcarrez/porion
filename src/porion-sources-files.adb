@@ -19,7 +19,6 @@ with Ada.Directories;
 with Interfaces.C.Strings;
 with Util.Log.Loggers;
 with Util.Strings;
-with Porion.Tools;
 with EL.Contexts.Default;
 package body Porion.Sources.Files is
 
@@ -126,7 +125,7 @@ package body Porion.Sources.Files is
    overriding
    procedure Check (Controller : in out Controller_Type;
                     Status     : out Status_Type;
-                    Logger     : in out Porion.Loggers.Logger_Type) is
+                    Executor   : in out Porion.Executors.Executor_Type'Class) is
       Info   : Branch_Type;
       Path   : constant String := Controller.Config.Get ("repository_url");
    begin
@@ -146,14 +145,7 @@ package body Porion.Sources.Files is
    overriding
    procedure Checkout (Controller : in out Controller_Type;
                        Path       : in String;
-                       Logger     : in out Porion.Loggers.Logger_Type) is
-      procedure Process (Line : in String);
-
-      procedure Process (Line : in String) is
-      begin
-         Logger.Write (Line);
-      end Process;
-
+                       Executor   : in out Porion.Executors.Executor_Type'Class) is
       Status   : Integer;
       Src_Path : constant String := Controller.Config.Get ("repository_url");
       Kind     : constant File_Type := Get_File_Type (Src_Path);
@@ -162,21 +154,17 @@ package body Porion.Sources.Files is
 
       Controller.Setup (Kind);
       Controller.Config.Set ("build_dir", Path);
-      Porion.Tools.Execute (Command     => Controller.Extract_Command,
-                            Parameters  => Controller.Config,
-                            Process     => Process'Access,
-                            Working_Dir => Path,
-                            Strip_Crlf  => False,
-                            Status      => Status);
-      if Status /= 0 then
-         Logger.Write ("Command exit status:" & Integer'Image (Status) & ASCII.LF);
-      end if;
+      Executor.Execute (Command     => Controller.Extract_Command,
+                        Parameters  => Controller.Config,
+                        Working_Dir => Path,
+                        Strip_Crlf  => False,
+                        Status      => Status);
    end Checkout;
 
    overriding
    procedure Changes (Controller : in out Controller_Type;
                       Result     : out Status_Type;
-                      Logger     : in out Porion.Loggers.Logger_Type) is
+                      Executor   : in out Porion.Executors.Executor_Type'Class) is
    begin
       null;
    end Changes;
@@ -190,7 +178,7 @@ package body Porion.Sources.Files is
    procedure Guess (Controller : in out Controller_Type;
                     Path       : in String;
                     Result     : out Source_Info_Type;
-                    Logger     : in out Porion.Loggers.Logger_Type) is
+                    Executor   : in out Porion.Executors.Executor_Type'Class) is
 
       procedure Process (Line : in String);
 
@@ -199,7 +187,7 @@ package body Porion.Sources.Files is
          if Line'Length > 0 then
             Result.URI := To_UString (Line);
          end if;
-         Logger.Write (Line);
+         Executor.Log (Line);
       end Process;
 
       Status : Integer;
@@ -218,8 +206,8 @@ package body Porion.Sources.Files is
       --  Run git config remote.origin.url to find out the git repository.
       Controller.Config.Set ("path", Path);
       Controller.Setup (Kind);
-      Porion.Tools.Execute (Controller.Guess_Command, Controller.Config,
-                            Process'Access, Strip_Crlf => True, Status => Status);
+      Executor.Execute (Controller.Guess_Command, Controller.Config,
+                        Process'Access, Strip_Crlf => True, Status => Status);
       if Status = 0 then
          Result.URI := To_UString (Realpath (Path));
          Result.Name := To_UString (Make_Project_Name (Path, Kind));

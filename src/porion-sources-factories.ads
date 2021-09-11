@@ -28,6 +28,6 @@ package Porion.Sources.Factories is
    procedure Guess (Path       : in String;
                     Config     : in Porion.Configs.Config_Type;
                     Result     : out Source_Info_Type;
-                    Logger     : in out Porion.Loggers.Logger_Type);
+                    Executor   : in out Porion.Executors.Executor_Type'Class);
 
 end Porion.Sources.Factories;

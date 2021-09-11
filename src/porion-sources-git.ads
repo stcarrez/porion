@@ -29,17 +29,17 @@ package Porion.Sources.Git is
    overriding
    procedure Check (Controller : in out Controller_Type;
                     Status     : out Status_Type;
-                    Logger     : in out Porion.Loggers.Logger_Type);
+                    Executor   : in out Porion.Executors.Executor_Type'Class);
 
    overriding
    procedure Checkout (Controller : in out Controller_Type;
                        Path       : in String;
-                       Logger     : in out Porion.Loggers.Logger_Type);
+                       Executor   : in out Porion.Executors.Executor_Type'Class);
 
    overriding
    procedure Changes (Controller : in out Controller_Type;
                       Result     : out Status_Type;
-                      Logger     : in out Porion.Loggers.Logger_Type);
+                      Executor   : in out Porion.Executors.Executor_Type'Class);
 
    --  Guess some information about the sources located in the given directory.
    --  The source controller tries to find if it can manage the files at the given location
@@ -48,7 +48,7 @@ package Porion.Sources.Git is
    procedure Guess (Controller : in out Controller_Type;
                     Path       : in String;
                     Result     : out Source_Info_Type;
-                    Logger     : in out Porion.Loggers.Logger_Type);
+                    Executor   : in out Porion.Executors.Executor_Type'Class);
 
    function Create (Config : in Porion.Configs.Config_Type) return Controller_Access;
 

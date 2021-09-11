@@ -23,7 +23,7 @@ with Porion.Builders;
 with Porion.Configs;
 with Porion.Builds.Models;
 with Porion.Services;
-with Porion.Loggers;
+with Porion.Executors;
 private with Util.Strings.Maps;
 package Porion.Builds.Services is
 
@@ -53,7 +53,8 @@ package Porion.Builds.Services is
 
    procedure Build (Service     : in out Context_Type;
                     Branch_Name : in String;
-                    Branch      : in Porion.Sources.Branch_Type) with
+                    Branch      : in Porion.Sources.Branch_Type;
+                    Executor    : in out Porion.Executors.Executor_Type'Class) with
      Pre => Service.Has_Project;
 
    procedure Start_Build (Service     : in out Context_Type;
@@ -96,11 +97,12 @@ package Porion.Builds.Services is
    procedure Update (Service : in out Context_Type;
                      Configs : in out Build_Config_Vector);
 
-   procedure Make_Build_Config (Service : in out Context_Type);
+   procedure Make_Build_Config (Service  : in out Context_Type;
+                                Executor : in out Porion.Executors.Executor_Type'Class);
 
-   procedure Guess (Service : in out Context_Type;
-                    Path    : in String;
-                    Logger  : in out Porion.Loggers.Logger_Type);
+   procedure Guess (Service  : in out Context_Type;
+                    Path     : in String;
+                    Executor : in out Porion.Executors.Executor_Type'Class);
 
 private
 
@@ -111,6 +113,10 @@ private
       Steps             : Build_Step_Vector;
       Last_Build        : Porion.Builds.Models.Last_Build_Ref;
    end record;
+
+   procedure Build (Service     : in out Context_Type;
+                    Branch_Name : in String;
+                    Executor    : in out Porion.Executors.Executor_Type'Class);
 
    procedure Load_Environment (Service : in out Context_Type);
 

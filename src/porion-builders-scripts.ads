@@ -1,5 +1,5 @@
 -----------------------------------------------------------------------
---  porion-builders -- Continuous integration controller
+--  porion-builders-scripts -- Run a configurable script for a build step
 --  Copyright (C) 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
@@ -26,7 +26,7 @@ package Porion.Builders.Scripts is
    procedure Build (Controller : in out Controller_Type;
                     Build      : in out Porion.Builds.Models.Build_Ref;
                     Path       : in String;
-                    Logger     : in out Porion.Loggers.Logger_Type);
+                    Executor   : in out Porion.Executors.Executor_Type'Class);
 
    overriding
    procedure Configure (Controller : in out Controller_Type;

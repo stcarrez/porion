@@ -20,7 +20,7 @@ with Util.Strings.Vectors;
 with Util.Serialize.IO;
 with Porion.Loggers;
 with Porion.Builds.Models;
---  with Porion.Builds.Services;
+with Porion.Executors;
 package Porion.Builders is
 
    --  The builder priority is used when several builders are identified.
@@ -62,7 +62,7 @@ package Porion.Builders is
    procedure Build (Controller : in out Controller_Type;
                     Build      : in out Porion.Builds.Models.Build_Ref;
                     Path       : in String;
-                    Logger     : in out Porion.Loggers.Logger_Type) is abstract;
+                    Executor   : in out Porion.Executors.Executor_Type'Class) is abstract;
 
    procedure Clean (Controller : in out Controller_Type) is abstract;
 

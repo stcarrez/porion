@@ -47,7 +47,7 @@ package body Porion.Sources.Factories is
    procedure Guess (Path       : in String;
                     Config     : in Porion.Configs.Config_Type;
                     Result     : out Source_Info_Type;
-                    Logger     : in out Porion.Loggers.Logger_Type) is
+                    Executor   : in out Porion.Executors.Executor_Type'Class) is
       procedure Free is
         new Ada.Unchecked_Deallocation (Object => Controller_Type'Class,
                                         Name   => Controller_Access);
@@ -57,9 +57,9 @@ package body Porion.Sources.Factories is
             C : Controller_Access := Create (Kind, Config);
          begin
             Result.Kind := SRC_UNKNOWN;
-            C.Guess (Path   => Path,
-                     Result => Result,
-                     Logger => Logger);
+            C.Guess (Path     => Path,
+                     Result   => Result,
+                     Executor => Executor);
             Free (C);
             exit when Result.Kind = Kind;
          end;

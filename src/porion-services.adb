@@ -24,20 +24,12 @@ with ADO.Sqlite;
 with ADO.SQL;
 
 with Porion.Configs;
-with Porion.Resources;
 with Porion.Services.Parsers;
 with Porion.Builds.Services;
 with Porion.Projects.Services;
 package body Porion.Services is
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Services");
-
-   --function Get_Query_Resource (Name : in String) return access constant String is
-   --begin
-   --   Log.Info ("Get query resource {0}", Name);
-
-   --   return Porion.Resources.Get_Content (Name);
-   --end Get_Query_Resource;
 
    --  ------------------------------
    --  Get the current project id.
@@ -134,6 +126,7 @@ package body Porion.Services is
       Service.Project := From.Project;
       Service.Branch := From.Branch;
       Service.Build_Node := From.Build_Node;
+      Service.Dry_Run := From.Dry_Run;
    end Open;
 
    procedure Import (Service : in out Context_Type;

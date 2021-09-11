@@ -182,8 +182,9 @@ package body Porion.Projects.Services is
       Service.DB.Commit;
    end Remove_Project;
 
-   procedure Check_Sources (Service : in out Context_Type;
-                            Status  : in out Porion.Sources.Status_Type) is
+   procedure Check_Sources (Service  : in out Context_Type;
+                            Status   : in out Porion.Sources.Status_Type;
+                            Executor : in out Porion.Executors.Executor_Type'Class) is
       use Porion.Sources;
 
       Config     : Porion.Configs.Config_Type;
@@ -206,7 +207,7 @@ package body Porion.Projects.Services is
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
       Service.Source_Controller := Sources.Factories.Create (Service.Project.Get_Scm, Config);
 
-      Service.Source_Controller.Check (Src_Status, Logger);
+      Service.Source_Controller.Check (Src_Status, Executor);
 
       --  Get the current known branches.
       Query.Bind_Param ("project_id", Service.Project.Get_Id);

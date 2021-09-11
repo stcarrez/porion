@@ -36,6 +36,7 @@ package Porion.Services is
       Build             : Porion.Builds.Models.Build_Ref;
       Build_Node        : Porion.Nodes.Models.Node_Ref;
       Build_Config      : Porion.Builds.Models.Build_Config_Ref;
+      Dry_Run           : Boolean := False;
    end record;
 
    function Has_Project (Service : in Context_Type) return Boolean is
@@ -62,8 +63,6 @@ package Porion.Services is
                           Query   : in ADO.Queries.Context) return Ado.Statements.Query_Statement;
 
    function Get_Database (Service : in Context_Type) return ADO.Sessions.Master_Session;
-
-   -- function Get_Query_Resource (Name : in String) return access constant String;
 
    procedure Import (Service : in out Context_Type;
                      Path    : in String);

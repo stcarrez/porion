@@ -27,7 +27,7 @@ package body Porion.Builders.XUnit is
    procedure Build (Controller : in out Controller_Type;
                     Build      : in out Porion.Builds.Models.Build_Ref;
                     Path       : in String;
-                    Logger     : in out Porion.Loggers.Logger_Type) is
+                    Executor   : in out Porion.Executors.Executor_Type'Class) is
       Results : Porion.XUnit.Analysis.Test_Results;
    begin
       Log.Info ("XUnit scan and analyze tests in {0}", Path);

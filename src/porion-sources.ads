@@ -18,7 +18,7 @@
 with Ada.Calendar;
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Util.Beans.Objects.Enums;
-with Porion.Loggers;
+with Porion.Executors;
 package Porion.Sources is
 
    Not_Supported : exception;
@@ -63,15 +63,15 @@ package Porion.Sources is
 
    procedure Check (Controller : in out Controller_Type;
                     Status     : out Status_Type;
-                    Logger     : in out Porion.Loggers.Logger_Type) is abstract;
+                    Executor   : in out Porion.Executors.Executor_Type'Class) is abstract;
 
    procedure Checkout (Controller : in out Controller_Type;
                        Path       : in String;
-                       Logger     : in out Porion.Loggers.Logger_Type) is abstract;
+                       Executor   : in out Porion.Executors.Executor_Type'Class) is abstract;
 
    procedure Changes (Controller : in out Controller_Type;
                       Result     : out Status_Type;
-                      Logger     : in out Porion.Loggers.Logger_Type) is abstract;
+                      Executor   : in out Porion.Executors.Executor_Type'Class) is abstract;
 
    --  Guess some information about the sources located in the given directory.
    --  The source controller tries to find if it can manage the files at the given location
@@ -79,6 +79,6 @@ package Porion.Sources is
    procedure Guess (Controller : in out Controller_Type;
                     Path       : in String;
                     Result     : out Source_Info_Type;
-                    Logger     : in out Porion.Loggers.Logger_Type) is abstract;
+                    Executor   : in out Porion.Executors.Executor_Type'Class) is abstract;
 
 end Porion.Sources;

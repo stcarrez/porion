@@ -1,5 +1,5 @@
 -----------------------------------------------------------------------
---  porion-builders -- Continuous integration controller
+--  porion-builders-scripts -- Run a configurable script for a build step
 --  Copyright (C) 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
@@ -16,7 +16,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Util.Log.Loggers;
-with Porion.Tools;
 with EL.Contexts.Default;
 package body Porion.Builders.Scripts is
 
@@ -27,25 +26,14 @@ package body Porion.Builders.Scripts is
    procedure Build (Controller : in out Controller_Type;
                     Build      : in out Porion.Builds.Models.Build_Ref;
                     Path       : in String;
-                    Logger     : in out Porion.Loggers.Logger_Type) is
-      procedure Process (Line : in String);
-
-      procedure Process (Line : in String) is
-      begin
-         if Line'First + 1 < Line'Last then
-            Log.Info ("{0}", Line (Line'First .. Line'Last - 1));
-         end if;
-         Logger.Write (Line (Line'First .. Line'Last - 1));
-      end Process;
-
+                    Executor   : in out Porion.Executors.Executor_Type'Class) is
       Status : Integer;
    begin
-      Porion.Tools.Execute (Command     => Controller.Command,
-                            Parameters  => Controller.Config,
-                            Process     => Process'Access,
-                            Working_Dir => Path,
-                            Strip_Crlf  => False,
-                            Status      => Status);
+      Executor.Execute (Command     => Controller.Command,
+                        Parameters  => Controller.Config,
+                        Working_Dir => Path,
+                        Strip_Crlf  => False,
+                        Status      => Status);
    end Build;
 
    overriding

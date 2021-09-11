@@ -19,7 +19,6 @@ with Ada.Directories;
 
 with GNAT.Regpat;
 with Util.Strings;
-with Porion.Tools;
 with EL.Contexts.Default;
 package body Porion.Sources.Git is
 
@@ -28,7 +27,7 @@ package body Porion.Sources.Git is
    overriding
    procedure Check (Controller : in out Controller_Type;
                     Status     : out Status_Type;
-                    Logger     : in out Porion.Loggers.Logger_Type) is
+                    Executor   : in out Porion.Executors.Executor_Type'Class) is
       procedure Process (Line : in String);
       procedure Process_Show (Line : in String);
 
@@ -41,7 +40,7 @@ package body Porion.Sources.Git is
       procedure Process (Line : in String) is
          Matches : GNAT.Regpat.Match_Array (0 .. 2);
       begin
-         Logger.Write (Line);
+         Executor.Log (Line);
          if GNAT.Regpat.Match (Pattern1, Line) then
             GNAT.Regpat.Match (Pattern1, Line, Matches);
             declare
@@ -56,7 +55,7 @@ package body Porion.Sources.Git is
       procedure Process_Show (Line : in String) is
          Matches : GNAT.Regpat.Match_Array (0 .. 1);
       begin
-         Logger.Write (Line);
+         Executor.Log (Line);
          if GNAT.Regpat.Match (Pattern2, Line) then
             GNAT.Regpat.Match (Pattern2, Line, Matches);
             Status.Head := To_UString (Line (Matches (1).First .. Matches (1).Last));
@@ -66,34 +65,27 @@ package body Porion.Sources.Git is
       Result : Integer;
    begin
       Status.Check_Date := Ada.Calendar.Clock;
-      Porion.Tools.Execute (Controller.Check_Command, Controller.Config,
-                            Process'Access, Strip_Crlf => False, Status => Result);
-      Porion.Tools.Execute (Controller.Show_Remote_Command, Controller.Config,
-                            Process_Show'Access, Strip_Crlf => False, Status => Result);
+      Executor.Execute (Controller.Check_Command, Controller.Config,
+                        Process'Access, Strip_Crlf => False, Status => Result);
+      Executor.Execute (Controller.Show_Remote_Command, Controller.Config,
+                        Process_Show'Access, Strip_Crlf => False, Status => Result);
    end Check;
 
    overriding
    procedure Checkout (Controller : in out Controller_Type;
                        Path       : in String;
-                       Logger     : in out Porion.Loggers.Logger_Type) is
-      procedure Process (Line : in String);
-
-      procedure Process (Line : in String) is
-      begin
-         Logger.Write (Line);
-      end Process;
-
+                       Executor   : in out Porion.Executors.Executor_Type'Class) is
       Status : Integer;
    begin
       Controller.Config.Set ("build_dir", Path);
-      Porion.Tools.Execute (Controller.Checkout_Command, Controller.Config,
-                            Process'Access, Strip_Crlf => False, Status => Status);
+      Executor.Execute (Controller.Checkout_Command, Controller.Config,
+                        Strip_Crlf => False, Status => Status);
    end Checkout;
 
    overriding
    procedure Changes (Controller : in out Controller_Type;
                       Result     : out Status_Type;
-                      Logger     : in out Porion.Loggers.Logger_Type) is
+                      Executor   : in out Porion.Executors.Executor_Type'Class) is
    begin
       null;
    end Changes;
@@ -107,7 +99,7 @@ package body Porion.Sources.Git is
    procedure Guess (Controller : in out Controller_Type;
                     Path       : in String;
                     Result     : out Source_Info_Type;
-                    Logger     : in out Porion.Loggers.Logger_Type) is
+                    Executor   : in out Porion.Executors.Executor_Type'Class) is
       function Make_Project_Name (URI : in String) return String;
       procedure Process (Line : in String);
 
@@ -136,7 +128,7 @@ package body Porion.Sources.Git is
             Result.URI := To_UString (Line);
             Result.Name := To_UString (Make_Project_Name (Line));
          end if;
-         Logger.Write (Line);
+         Executor.Log (Line);
       end Process;
 
       Status : Integer;
@@ -157,8 +149,8 @@ package body Porion.Sources.Git is
 
       --  Run git config remote.origin.url to find out the git repository.
       Controller.Config.Set ("path", Path);
-      Porion.Tools.Execute (Controller.Guess_Command, Controller.Config,
-                            Process'Access, Strip_Crlf => True, Status => Status);
+      Executor.Execute (Controller.Guess_Command, Controller.Config,
+                        Process'Access, Strip_Crlf => True, Status => Status);
       if Status = 0 then
          Result.Kind := SRC_GIT;
       end if;

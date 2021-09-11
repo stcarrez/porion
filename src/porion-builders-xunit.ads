@@ -29,7 +29,7 @@ package Porion.Builders.XUnit is
    procedure Build (Controller : in out Controller_Type;
                     Build      : in out Porion.Builds.Models.Build_Ref;
                     Path       : in String;
-                    Logger     : in out Porion.Loggers.Logger_Type);
+                    Executor   : in out Porion.Executors.Executor_Type'Class);
 
    overriding
    procedure Clean (Controller : in out Controller_Type);

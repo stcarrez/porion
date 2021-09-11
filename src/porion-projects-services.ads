@@ -18,6 +18,7 @@
 with Util.Serialize.IO;
 with Porion.Sources;
 with Porion.Services;
+with Porion.Executors;
 with Porion.Projects.Models;
 package Porion.Projects.Services is
 
@@ -47,8 +48,9 @@ package Porion.Projects.Services is
    procedure Remove_Project (Service : in out Context_Type;
                              Name    : in String);
 
-   procedure Check_Sources (Service : in out Context_Type;
-                            Status  : in out Porion.Sources.Status_Type);
+   procedure Check_Sources (Service  : in out Context_Type;
+                            Status   : in out Porion.Sources.Status_Type;
+                            Executor : in out Porion.Executors.Executor_Type'Class);
 
    --  Export some information about the project in the output stream.
    procedure Export (Service : in out Context_Type;

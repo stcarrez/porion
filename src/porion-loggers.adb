@@ -20,7 +20,7 @@ with Ada.Directories;
 with Util.Files;
 package body Porion.Loggers is
 
-   --  Create an open the logger to write on the given path.
+   --  Create and open the logger to write on the given path.
    procedure Create (Logger : in out Logger_Type;
                      Path   : in String) is
    begin

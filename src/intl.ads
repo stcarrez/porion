@@ -16,7 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-package Intl is
+package Intl with Preelaborate is
 
    function Gettext (Message : in String) return String;
 

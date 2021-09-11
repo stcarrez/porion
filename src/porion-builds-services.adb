@@ -270,6 +270,7 @@ package body Porion.Builds.Services is
          Step.Step.Set_Builder (Kind);
          Step.Step.Set_Number (Pos);
          Step.Step.Set_Step (Porion.Builds.Models.STEP_MAKE);
+         Step.Step.Set_Execution (Builds.Models.EXEC_NO_ERROR);
          Step.Step.Set_Build_Config (Service.Build_Config);
          Step.Step.Save (Service.DB);
 
@@ -338,6 +339,7 @@ package body Porion.Builds.Services is
                Stream.Write_Entity ("timeout", Step.Get_Timeout);
                Stream.Write_Entity ("builder", Step.Get_Builder'Image);
                Stream.Write_Entity ("step", Step.Get_Step'Image);
+               Stream.Write_Entity ("execution", Step.Get_Execution'Image);
                Stream.Start_Entity ("parameters");
                declare
                   Params : constant String := Step.Get_Parameters;
@@ -578,6 +580,7 @@ package body Porion.Builds.Services is
                           Kind    : in Builds.Models.Step_Type) is
       begin
          Step.Set_Step (Kind);
+         Step.Set_Execution (Builds.Models.EXEC_NO_ERROR);
          Step.Set_Builder (Builder);
          Step.Set_Timeout (10 * 60);
          Step.Set_Number (Current_Step);

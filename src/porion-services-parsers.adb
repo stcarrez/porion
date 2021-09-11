@@ -52,6 +52,7 @@ package body Porion.Services.Parsers is
                            BUILD_STEP_BUILDER,
                            BUILD_STEP_TIMEOUT,
                            BUILD_STEP_STEP,
+                           BUILD_STEP_EXECUTION,
                            BUILD_STEP_END,
                            BUILD_PARAM_NAME,
                            BUILD_PARAM_VALUE,
@@ -145,6 +146,9 @@ package body Porion.Services.Parsers is
             when BUILD_STEP_BUILDER =>
                N.Step.Step.Set_Builder (Builds.Models.Builder_Type_Objects.To_Value (Value));
 
+            when BUILD_STEP_EXECUTION =>
+               N.Step.Step.Set_Execution (Builds.Models.Execution_Type_Objects.To_Value (Value));
+
             when BUILD_PARAM_NAME =>
                N.Param_Name := Value;
 
@@ -207,6 +211,7 @@ package body Porion.Services.Parsers is
       Mapper.Add_Mapping ("build_config/step/number", BUILD_STEP_NUMBER);
       Mapper.Add_Mapping ("build_config/step/timeout", BUILD_STEP_TIMEOUT);
       Mapper.Add_Mapping ("build_config/step/builder", BUILD_STEP_BUILDER);
+      Mapper.Add_Mapping ("build_config/step/execution", BUILD_STEP_EXECUTION);
       Mapper.Add_Mapping ("build_config/step/step", BUILD_STEP_STEP);
       Mapper.Add_Mapping ("build_config/step/parameters/parameter/@name", BUILD_PARAM_NAME);
       Mapper.Add_Mapping ("build_config/step/parameters/parameter/value", BUILD_PARAM_VALUE);

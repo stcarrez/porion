@@ -21,7 +21,7 @@ package Porion.Loggers is
 
    type Logger_Type is tagged limited private;
 
-   --  Create an open the logger to write on the given path.
+   --  Create and open the logger to write on the given path.
    procedure Create (Logger : in out Logger_Type;
                      Path   : in String);
    procedure Create (Logger : in out Logger_Type;

@@ -16,42 +16,65 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Text_IO;
+with Util.Strings.Vectors;
+with Porion.Executors;
 with Porion.Sources;
 package body Porion.Commands.Build is
 
-   --  Get a value from the keystore.
+   --  Build a project.
    overriding
    procedure Execute (Command   : in out Command_Type;
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Context   : in out Context_Type) is
+      Count : constant Natural := Args.Get_Count;
    begin
-      if Args.Get_Count = 0 then
+      if Count = 0 then
          Porion.Commands.Error (-("missing project name"));
          return;
       end if;
+
       Context.Open;
 
-      declare
-         use Porion.Sources.Maps;
+      for I in 1 .. Count loop
+         declare
+            use Porion.Sources.Maps;
 
-         Name          : constant String := Args.Get_Argument (1);
-         Source_Status : Porion.Sources.Status_Type;
-      begin
-         Context.Project_Service.Load_Project (Name);
+            Name          : constant String := Args.Get_Argument (Count);
+            Source_Status : Porion.Sources.Status_Type;
+            Executor      : Porion.Executors.Executor_Type;
+         begin
+            Context.Project_Service.Load_Project (Name);
 
-         Context.Project_Service.Check_Sources (Source_Status);
+            Context.Project_Service.Check_Sources (Source_Status, Executor);
 
-         Context.Build_Service.Open (Context.Project_Service);
+            Context.Build_Service.Open (Context.Project_Service);
 
-         for Branch in Source_Status.Changes.Iterate loop
-            Ada.Text_IO.Put (Key (Branch));
-            Ada.Text_IO.Put (" ");
-            Ada.Text_IO.Put_Line (Porion.To_String (Element (Branch).Tag));
+            if Command.Dry_Run then
+               Executor.Enable_Dry_Run;
+            end if;
+            for Branch in Source_Status.Changes.Iterate loop
+               Ada.Text_IO.Put (Key (Branch));
+               Ada.Text_IO.Put (" ");
+               Ada.Text_IO.Put_Line (Porion.To_String (Element (Branch).Tag));
 
-            Builds.Services.Build (Context.Build_Service, Key (Branch), Element (Branch));
-         end loop;
-      end;
+               Builds.Services.Build (Context.Build_Service, Key (Branch), Element (Branch), Executor);
+               if Command.Dry_Run then
+                  declare
+                     Commands : Util.Strings.Vectors.Vector;
+                     Step     : Natural := 0;
+                  begin
+                     Executor.Fetch_Commands (Commands);
+                     for Cmd of Commands loop
+                        Step := Step + 1;
+                        Context.Console.Notice (N_INFO, Util.Strings.Image (Step)
+                                                  & ". " & Cmd);
+                     end loop;
+                  end;
+               end if;
+            end loop;
+         end;
+      end loop;
    end Execute;
 
    --  Setup the command before parsing the arguments and executing it.
@@ -62,9 +85,11 @@ package body Porion.Commands.Build is
    begin
       Drivers.Command_Type (Command).Setup (Config, Context);
       GC.Define_Switch (Config, Command.Force'Access,
-                        "-f", "force", -("Force the build"));
+                        "-f", "--force", -("Force the build"));
       GC.Define_Switch (Config, Command.Clean'Access,
-                        "-c", "clean", -("Clean before building"));
+                        "-c", "--clean", -("Clean before building"));
+      GC.Define_Switch (Config, Command.Dry_Run'Access,
+                        "-n", "--dry-run", -("Don't build but print commands for building"));
    end Setup;
 
 end Porion.Commands.Build;

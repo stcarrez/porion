@@ -16,8 +16,8 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Porion.Projects.Services;
-with Porion.Loggers;
 with Porion.Configs;
+with Porion.Executors;
 with Porion.Sources.Factories;
 package body Porion.Commands.Add is
 
@@ -38,22 +38,22 @@ package body Porion.Commands.Add is
       Context.Open;
 
       declare
-         Logger : Porion.Loggers.Logger_Type;
-         Info   : Porion.Sources.Source_Info_Type;
-         Config : Porion.Configs.Config_Type;
-         URI    : constant String := Args.Get_Argument (1);
+         Executor : Porion.Executors.Executor_Type;
+         Info     : Porion.Sources.Source_Info_Type;
+         Config   : Porion.Configs.Config_Type;
+         URI      : constant String := Args.Get_Argument (1);
       begin
-         Porion.Sources.Factories.Guess (Path   => URI,
-                                         Config => Config,
-                                         Result => Info,
-                                         Logger => Logger);
+         Porion.Sources.Factories.Guess (Path     => URI,
+                                         Config   => Config,
+                                         Result   => Info,
+                                         Executor => Executor);
 
          Context.Project_Service.Add_Project (Info);
          Context.Console.Notice (N_INFO, Format (-("Project {0} - {1} added"),
                                  To_String (Info.Name), URI));
 
          Context.Build_Service.Open (Context.Project_Service);
-         Context.Build_Service.Make_Build_Config;
+         Context.Build_Service.Make_Build_Config (Executor);
 
       exception
          when Porion.Projects.Services.Name_Used =>

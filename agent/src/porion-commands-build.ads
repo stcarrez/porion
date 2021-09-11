@@ -20,7 +20,7 @@ private package Porion.Commands.Build is
 
    type Command_Type is new Porion.Commands.Drivers.Command_Type with private;
 
-   --  Get a value from the keystore.
+   --  Build a project.
    overriding
    procedure Execute (Command   : in out Command_Type;
                       Name      : in String;
@@ -36,8 +36,9 @@ private package Porion.Commands.Build is
 private
 
    type Command_Type is new Porion.Commands.Drivers.Command_Type with record
-      Force : aliased Boolean := False;
-      Clean : aliased Boolean := False;
+      Force   : aliased Boolean := False;
+      Clean   : aliased Boolean := False;
+      Dry_Run : aliased Boolean := False;
    end record;
 
 end Porion.Commands.Build;

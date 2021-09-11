@@ -2,6 +2,7 @@ with "../porion_config";
 with "@UTIL_DIR@utilada_sys";
 with "@KEYSTOREADA_DIR@keystoreada";
 
+with "../ansi-ada/ansi";
 with "../porion_lib";
 
 project Porion_Agent is

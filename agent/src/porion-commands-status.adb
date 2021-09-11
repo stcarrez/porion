@@ -53,39 +53,39 @@ package body Porion.Commands.Status is
             Context.Build_Service.Load_Config;
 
             if not Command.Json and not Command.Xml then
-            Console.Start_Row;
-            Console.Print_Field (1, Name);
-            Console.End_Row;
+               Console.Start_Row;
+               Console.Print_Field (1, Name);
+               Console.End_Row;
 
-            Console.Start_Title;
-            Console.Print_Title (1, "", 30);
-            Console.Print_Title (2, "", 30);
-            Console.Print_Title (3, "", 10);
-            Console.Print_Title (4, "", 20);
-            Console.Print_Title (5, "", 20);
-            Console.End_Title;
+               Console.Start_Title;
+               Console.Print_Title (1, "", 30);
+               Console.Print_Title (2, "", 30);
+               Console.Print_Title (3, "", 10);
+               Console.Print_Title (4, "", 20);
+               Console.Print_Title (5, "", 20);
+               Console.End_Title;
 
-            Query.Set_Query (Projects.Models.Query_Project_Branches);
-            Query.Bind_Param ("project_id", Context.Project_Service.Get_Project_Id);
-            Statement := Context.Project_Service.Create_Query (Query);
-            Statement.Execute;
-            while Statement.Has_Elements loop
-               declare
-                  Name  : constant String := Statement.Get_String (1);
-                  Tag   : constant String := Statement.Get_String (2);
-                  Date  : constant ADO.Nullable_Time := Statement.Get_Nullable_Time (3);
-                  Build_Date : constant ADO.Nullable_Time := Statement.Get_Nullable_Time (4);
-                  Count : constant Natural := Statement.Get_Integer (5);
-               begin
-                  Console.Start_Row;
-                  Console.Print_Field (1, Name);
-                  Console.Print_Field (2, Tag);
-                  Console.Print_Field (3, Count);
-                  Console.Print_Field (4, Util.Dates.ISO8601.Image (Date.Value));
-                  Console.Print_Field (5, Util.Dates.ISO8601.Image (Build_Date.Value));
-                  Console.End_Row;
-               end;
-               Statement.Next;
+               Query.Set_Query (Projects.Models.Query_Project_Branches);
+               Query.Bind_Param ("project_id", Context.Project_Service.Get_Project_Id);
+               Statement := Context.Project_Service.Create_Query (Query);
+               Statement.Execute;
+               while Statement.Has_Elements loop
+                  declare
+                     Name  : constant String := Statement.Get_String (1);
+                     Tag   : constant String := Statement.Get_String (2);
+                     Date  : constant ADO.Nullable_Time := Statement.Get_Nullable_Time (3);
+                     Build_Date : constant ADO.Nullable_Time := Statement.Get_Nullable_Time (4);
+                     Count : constant Natural := Statement.Get_Integer (5);
+                  begin
+                     Console.Start_Row;
+                     Console.Print_Field (1, Name);
+                     Console.Print_Field (2, Tag);
+                     Console.Print_Field (3, Count);
+                     Console.Print_Field (4, Util.Dates.ISO8601.Image (Date.Value));
+                     Console.Print_Field (5, Util.Dates.ISO8601.Image (Build_Date.Value));
+                     Console.End_Row;
+                  end;
+                  Statement.Next;
                end loop;
             end if;
 

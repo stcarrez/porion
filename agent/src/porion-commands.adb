@@ -46,6 +46,8 @@ package body Porion.Commands is
    Remove_Command          : aliased Porion.Commands.Remove.Command_Type;
    Driver                  : Drivers.Driver_Type;
 
+   procedure Flush_Input;
+
    --  ------------------------------
    --  Print the command usage.
    --  ------------------------------

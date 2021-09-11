@@ -24,6 +24,7 @@ with Porion.XUnit.Analysis;
 with Porion.XUnit.Parsers;
 with Porion.Builds.Models;
 with Porion.Services;
+with Porion.Executors;
 with Porion.Resources.Queries;
 with Porion.Resources.Schema;
 with Porion.Builds.Services;
@@ -50,6 +51,7 @@ package body Porion.XUnit.Tests is
       Branch    : Porion.Sources.Branch_Type;
       Build     : Porion.Builds.Models.Build_Ref;
       Session   : ADO.Sessions.Master_Session;
+      Executor  : Porion.Executors.Executor_Type;
       Schema : constant Porion.Resources.Content_Access
         := Porion.Resources.Schema.Get_Content ("create-porion_agent-sqlite");
    begin
@@ -80,7 +82,8 @@ package body Porion.XUnit.Tests is
       Service.Add_Branch ("master", Branch, True);
       Builder.Open (Service);
       Builder.Start_Build (Branch_Name => "master",
-                           Branch      => Branch);
+                           Branch      => Branch,
+                           Executor    => Executor);
       Porion.XUnit.Parsers.Scan (Path, Results);
       Porion.XUnit.Parsers.Scan (Path2, Results);
       --  Porion.XUnit.Parsers.Scan ("regtests/files/many", "*.xml", Results);

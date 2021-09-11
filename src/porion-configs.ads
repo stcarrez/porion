@@ -21,7 +21,7 @@ package Porion.Configs is
    VERSION   : constant String := "0.1.0";
    RELEASE   : constant String := "Porion " & "0.1.0";
    PREFIX    : constant String := "/build/local-gnat-2021";
-   RESOURCES : constant String := "/share/akt/resources/";
+   RESOURCES : constant String := "/share/porion/resources/";
 
    WORKSPACE_DIR_NAME : constant String := "workspace_dir";
    PROJECT_DIR_NAME   : constant String := "project_dir";

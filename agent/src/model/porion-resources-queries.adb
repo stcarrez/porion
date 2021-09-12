@@ -134,7 +134,9 @@ package body Porion.Resources.Queries is
        & "ate.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <property "
        & "type='Porion.Builds.Models.Build_Status_Type' name=""build_status"">" & ASCII.LF
        & "            <comment>the last build status.</comment>" & ASCII.LF & "        </"
-       & "property>" & ASCII.LF & "        <property type='Integer' name=""pass_count"">" & ASCII.LF
+       & "property>" & ASCII.LF & "        <property type='String' name=""build_tag"">" & ASCII.LF
+       & "            <comment>the build tag.</comment>" & ASCII.LF & "        </property"
+       & ">" & ASCII.LF & "        <property type='Integer' name=""pass_count"">" & ASCII.LF
        & "            <comment>the number of tests that succeeded.</comment>" & ASCII.LF
        & "        </property>" & ASCII.LF & "        <property type='Integer' name=""fail"
        & "_count"">" & ASCII.LF & "            <comment>the number of tests that failed.<"
@@ -149,18 +151,18 @@ package body Porion.Resources.Queries is
        & "anch.tag, '') AS branch_tag," & ASCII.LF & "            COALESCE(branch.status,"
        & " 0) AS branch_status," & ASCII.LF & "            build.finish_date AS build_dat"
        & "e," & ASCII.LF & "            COALESCE(build.status, 0) AS build_status," & ASCII.LF
-       & "            COALESCE(build.pass_count, 0) AS pass_count," & ASCII.LF & "       "
-       & "     COALESCE(build.fail_count, 0) AS fail_count," & ASCII.LF & "            CO"
-       & "ALESCE(build.timeout_count, 0) AS timeout_count" & ASCII.LF & "            FROM"
-       & " porion_project AS project" & ASCII.LF & "            LEFT JOIN porion_branch A"
-       & "S branch ON project.id = branch.project_id AND branch.status != 0" & ASCII.LF
-       & "            LEFT JOIN porion_last_build AS last_build ON last_build.branch_"
-       & "id = branch.id" & ASCII.LF & "            LEFT JOIN porion_build AS build ON la"
-       & "st_build.build_id = build.id" & ASCII.LF & "        </sql>" & ASCII.LF & "        <"
-       & "sql-count>" & ASCII.LF & "            SELECT" & ASCII.LF & "            count(proje"
-       & "ct.id)" & ASCII.LF & "            FROM porion_project AS project" & ASCII.LF & "   "
-       & "     </sql-count>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</query-ma"
-       & "pping>" & ASCII.LF;
+       & "            COALESCE(build.tag, '') AS build_tag," & ASCII.LF & "            CO"
+       & "ALESCE(build.pass_count, 0) AS pass_count," & ASCII.LF & "            COALESCE("
+       & "build.fail_count, 0) AS fail_count," & ASCII.LF & "            COALESCE(build.t"
+       & "imeout_count, 0) AS timeout_count" & ASCII.LF & "            FROM porion_projec"
+       & "t AS project" & ASCII.LF & "            LEFT JOIN porion_branch AS branch ON pr"
+       & "oject.id = branch.project_id AND branch.status != 0" & ASCII.LF & "            "
+       & "LEFT JOIN porion_last_build AS last_build ON last_build.branch_id = branch."
+       & "id" & ASCII.LF & "            LEFT JOIN porion_build AS build ON last_build.bui"
+       & "ld_id = build.id" & ASCII.LF & "        </sql>" & ASCII.LF & "        <sql-count>" & ASCII.LF
+       & "            SELECT" & ASCII.LF & "            count(project.id)" & ASCII.LF & "    "
+       & "        FROM porion_project AS project" & ASCII.LF & "        </sql-count>" & ASCII.LF
+       & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
    C_4 : aliased constant String := "<query-mapping package='Porion.Projects.M"
        & "odels'>" & ASCII.LF & "    <description>" & ASCII.LF & "      Information about bra"

@@ -48,9 +48,10 @@ package body Porion.Resources.Schema is
        & " `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `number` INTEGER NOT NUL"
        & "L, `create_date` DATETIME NOT NULL, `finish_date` DATETIME , `pass_count` I"
        & "NTEGER NOT NULL, `fail_count` INTEGER NOT NULL, `timeout_count` INTEGER NOT"
-       & " NULL, `test_duration` INTEGER NOT NULL, `status` NOT NULL, `build_config_i"
-       & "d` BIGINT NOT NULL, `node_id` BIGINT NOT NULL, `branch_id` BIGINT NOT NULL,"
-       & " `project_id` BIGINT NOT NULL, PRIMARY KEY (`id`))";
+       & " NULL, `test_duration` INTEGER NOT NULL, `status` NOT NULL, `tag` VARCHAR(2"
+       & "55) NOT NULL, `build_config_id` BIGINT NOT NULL, `node_id` BIGINT NOT NULL,"
+       & " `branch_id` BIGINT NOT NULL, `project_id` BIGINT NOT NULL, PRIMARY KEY (`i"
+       & "d`))";
    L_7   : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_build_c"
        & "onfig ( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `name` VARCHAR(25"
        & "5) NOT NULL, `description` VARCHAR(4096) NOT NULL, `status` INTEGER NOT NUL"

@@ -44,6 +44,8 @@ CREATE TABLE IF NOT EXISTS porion_build_config (
   `name` VARCHAR(255) BINARY NOT NULL,
   /* a description of the build configuration. */
   `description` VARCHAR(4096) BINARY NOT NULL,
+  /* the build configuration status. */
+  `status` INTEGER NOT NULL,
   /*  */
   `node_id` BIGINT ,
   /*  */
@@ -318,6 +320,8 @@ INSERT IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_config"), "name");
 INSERT IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_config"), "description");
+INSERT IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_config"), "status");
 INSERT IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_environment"), "value");
 INSERT IGNORE INTO awa_audit_field (entity_type, name)

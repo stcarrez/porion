@@ -26,6 +26,9 @@
         <property type='Porion.Builds.Models.Build_Status_Type' name="build_status">
             <comment>the last build status.</comment>
         </property>
+        <property type='String' name="build_tag">
+            <comment>the build tag.</comment>
+        </property>
         <property type='Integer' name="pass_count">
             <comment>the number of tests that succeeded.</comment>
         </property>
@@ -48,6 +51,7 @@
             COALESCE(branch.status, 0) AS branch_status,
             build.finish_date AS build_date,
             COALESCE(build.status, 0) AS build_status,
+            COALESCE(build.tag, '') AS build_tag,
             COALESCE(build.pass_count, 0) AS pass_count,
             COALESCE(build.fail_count, 0) AS fail_count,
             COALESCE(build.timeout_count, 0) AS timeout_count

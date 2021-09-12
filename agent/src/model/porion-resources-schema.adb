@@ -54,7 +54,8 @@ package body Porion.Resources.Schema is
    L_7   : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_build_c"
        & "onfig ( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `name` VARCHAR(25"
        & "5) NOT NULL, `description` VARCHAR(4096) NOT NULL, `status` INTEGER NOT NUL"
-       & "L, `node_id` BIGINT , `project_id` BIGINT NOT NULL, PRIMARY KEY (`id`))";
+       & "L, `node_id` BIGINT , `project_id` BIGINT NOT NULL, `branch_id` BIGINT NOT "
+       & "NULL, PRIMARY KEY (`id`))";
    L_8   : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_build_c"
        & "onfig_step ( `id` BIGINT NOT NULL, `parameters` VARCHAR(65536) NOT NULL, `n"
        & "umber` INTEGER NOT NULL, `builder` INTEGER NOT NULL, `timeout` INTEGER NOT "

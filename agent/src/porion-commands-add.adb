@@ -38,11 +38,15 @@ package body Porion.Commands.Add is
       Context.Open;
 
       declare
+         use Porion.Sources.Maps;
+
          Executor : Porion.Executors.Executor_Type;
          Info     : Porion.Sources.Source_Info_Type;
          Config   : Porion.Configs.Config_Type;
          URI      : constant String := Args.Get_Argument (1);
+         Source_Status : Porion.Sources.Status_Type;
       begin
+         --  Step 1: guess the source manager to be used with project info.
          Porion.Sources.Factories.Guess (Path     => URI,
                                          Config   => Config,
                                          Result   => Info,
@@ -52,8 +56,13 @@ package body Porion.Commands.Add is
          Context.Console.Notice (N_INFO, Format (-("Project {0} - {1} added"),
                                  To_String (Info.Name), URI));
 
+         --  Step 2: identify the branches of the project (only the main branch is enabled).
+         Context.Project_Service.Check_Sources (Source_Status, Executor);
+
          Context.Build_Service.Open (Context.Project_Service);
-         Context.Build_Service.Make_Build_Config (Executor);
+
+         --  Step 3: make a default build config for the branch.
+         Context.Build_Service.Make_Build_Config (To_String (Source_Status.Head), Executor);
 
       exception
          when Porion.Projects.Services.Name_Used =>

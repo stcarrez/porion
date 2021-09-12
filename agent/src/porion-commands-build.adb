@@ -19,6 +19,7 @@ with Ada.Text_IO;
 with Util.Strings.Vectors;
 with Porion.Executors;
 with Porion.Sources;
+with Porion.Builds.Models;
 package body Porion.Commands.Build is
 
    --  Build a project.
@@ -43,18 +44,21 @@ package body Porion.Commands.Build is
             Name          : constant String := Args.Get_Argument (Count);
             Source_Status : Porion.Sources.Status_Type;
             Executor      : Porion.Executors.Executor_Type;
+            Build_Configs : Porion.Builds.Models.Build_Config_Vector;
          begin
             Context.Project_Service.Load_Project (Name);
 
-            Context.Project_Service.Check_Sources (Command.Force, Source_Status, Executor);
+            Context.Project_Service.Check_Sources (Source_Status, Executor);
 
             Context.Build_Service.Open (Context.Project_Service);
 
             if Command.Dry_Run then
                Executor.Enable_Dry_Run;
             end if;
-            for Branch in Source_Status.Changes.Iterate loop
-               Builds.Services.Build (Context.Build_Service, Key (Branch), Element (Branch), Executor);
+
+            Context.Build_Service.Find_Build_Configs (Command.Force, Build_Configs);
+            for Build_Config of Build_Configs loop
+               Porion.Builds.Services.Build (Context.Build_Service, Build_Config, Executor);
                if Command.Dry_Run then
                   declare
                      Commands : Util.Strings.Vectors.Vector;

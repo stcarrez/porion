@@ -82,6 +82,8 @@ CREATE TABLE IF NOT EXISTS porion_build_config (
   `node_id` BIGINT ,
   /*  */
   `project_id` BIGINT NOT NULL,
+  /*  */
+  `branch_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`)
 );
 /* Describes a step in the build process.

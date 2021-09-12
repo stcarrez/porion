@@ -75,6 +75,7 @@ package body Porion.Builds.Services is
       Service.Build.Set_Branch (Service.Branch);
       Service.Build.Set_Node (Service.Build_Node);
       Service.Build.Set_Build_Config (Service.Build_Config);
+      Service.Build.Set_Tag (String '(Service.Branch.Get_Tag));
       Service.Build.Set_Create_Date (Ada.Calendar.Clock);
       if not Executor.Is_Dry_Run then
          Service.Build.Save (Service.DB);

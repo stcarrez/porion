@@ -33,6 +33,7 @@ with Util.Beans.Objects;
 with Util.Beans.Objects.Enums;
 with Util.Beans.Basic.Lists;
 with ADO.Audits;
+with Porion.Builds;
 with Porion.Nodes.Models;
 with Porion.Projects.Models;
 pragma Warnings (On);
@@ -78,16 +79,6 @@ package Porion.Builds.Models is
    type Nullable_Execution_Type is record
       Is_Null : Boolean := True;
       Value   : Execution_Type;
-   end record;
-
-   type Step_Type is (STEP_SETUP, STEP_GENERATE, STEP_CONFIGURE, STEP_MAKE, STEP_TEST, STEP_PACKAGE, STEP_INSTALL, STEP_PUBLISH);
-   for Step_Type use (STEP_SETUP => 0, STEP_GENERATE => 1, STEP_CONFIGURE => 2, STEP_MAKE => 3, STEP_TEST => 4, STEP_PACKAGE => 5, STEP_INSTALL => 6, STEP_PUBLISH => 7);
-   package Step_Type_Objects is
-      new Util.Beans.Objects.Enums (Step_Type);
-
-   type Nullable_Step_Type is record
-      Is_Null : Boolean := True;
-      Value   : Step_Type;
    end record;
 
    type Build_Config_Ref is new ADO.Objects.Object_Ref with null record;
@@ -177,6 +168,14 @@ package Porion.Builds.Models is
    --
    function Get_Project (Object : in Build_Config_Ref)
                  return Porion.Projects.Models.Project_Ref'Class;
+
+   --
+   procedure Set_Branch (Object : in out Build_Config_Ref;
+                         Value  : in Porion.Projects.Models.Branch_Ref'Class);
+
+   --
+   function Get_Branch (Object : in Build_Config_Ref)
+                 return Porion.Projects.Models.Branch_Ref'Class;
 
    --  Load the entity identified by 'Id'.
    --  Raises the NOT_FOUND exception if it does not exist.
@@ -458,11 +457,11 @@ package Porion.Builds.Models is
 
    --  Set the step classification type.
    procedure Set_Step (Object : in out Build_Config_Step_Ref;
-                       Value  : in Porion.Builds.Models.Step_Type);
+                       Value  : in Porion.Builds.Step_Type);
 
    --  Get the step classification type.
    function Get_Step (Object : in Build_Config_Step_Ref)
-                 return Porion.Builds.Models.Step_Type;
+                 return Porion.Builds.Step_Type;
 
    --
    procedure Set_Version (Object : in out Build_Config_Step_Ref;
@@ -1018,9 +1017,10 @@ private
    COL_4_1_NAME : aliased constant String := "status";
    COL_5_1_NAME : aliased constant String := "node_id";
    COL_6_1_NAME : aliased constant String := "project_id";
+   COL_7_1_NAME : aliased constant String := "branch_id";
 
    BUILD_CONFIG_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 7,
+     (Count   => 8,
       Table   => BUILD_CONFIG_NAME'Access,
       Members => (
          1 => COL_0_1_NAME'Access,
@@ -1029,7 +1029,8 @@ private
          4 => COL_3_1_NAME'Access,
          5 => COL_4_1_NAME'Access,
          6 => COL_5_1_NAME'Access,
-         7 => COL_6_1_NAME'Access)
+         7 => COL_6_1_NAME'Access,
+         8 => COL_7_1_NAME'Access)
      );
    BUILD_CONFIG_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := BUILD_CONFIG_DEF'Access;
@@ -1059,6 +1060,7 @@ private
        Status : Porion.Builds.Models.Config_Status_Type;
        Node : Porion.Nodes.Models.Node_Ref;
        Project : Porion.Projects.Models.Project_Ref;
+       Branch : Porion.Projects.Models.Branch_Ref;
    end record;
 
    type Build_Config_Access is access all Build_Config_Impl;
@@ -1226,7 +1228,7 @@ private
        Number : Integer;
        Builder : Porion.Builds.Models.Builder_Type;
        Timeout : Integer;
-       Step : Porion.Builds.Models.Step_Type;
+       Step : Porion.Builds.Step_Type;
        Version : Integer;
        Execution : Porion.Builds.Models.Execution_Type;
        Build_Config : Porion.Builds.Models.Build_Config_Ref;

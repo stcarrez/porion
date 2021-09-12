@@ -212,6 +212,23 @@ package body Porion.Builds.Models is
       return Impl.Project;
    end Get_Project;
 
+
+   procedure Set_Branch (Object : in out Build_Config_Ref;
+                         Value  : in Porion.Projects.Models.Branch_Ref'Class) is
+      Impl : Build_Config_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Object (Impl.all, 8, Impl.Branch, Value);
+   end Set_Branch;
+
+   function Get_Branch (Object : in Build_Config_Ref)
+                  return Porion.Projects.Models.Branch_Ref'Class is
+      Impl : constant Build_Config_Access
+         := Build_Config_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Branch;
+   end Get_Branch;
+
    --  Copy of the object.
    procedure Copy (Object : in Build_Config_Ref;
                    Into   : in out Build_Config_Ref) is
@@ -232,6 +249,7 @@ package body Porion.Builds.Models is
             Copy.Status := Impl.Status;
             Copy.Node := Impl.Node;
             Copy.Project := Impl.Project;
+            Copy.Branch := Impl.Branch;
          end;
       end if;
       Into := Result;
@@ -391,6 +409,11 @@ package body Porion.Builds.Models is
                           Value => Object.Project);
          Object.Clear_Modified (7);
       end if;
+      if Object.Is_Modified (8) then
+         Stmt.Save_Field (Name  => COL_7_1_NAME, --  branch_id
+                          Value => Object.Branch);
+         Object.Clear_Modified (8);
+      end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
          Stmt.Save_Field (Name  => "version",
@@ -436,6 +459,8 @@ package body Porion.Builds.Models is
                         Value => Object.Node);
       Query.Save_Field (Name  => COL_6_1_NAME, --  project_id
                         Value => Object.Project);
+      Query.Save_Field (Name  => COL_7_1_NAME, --  branch_id
+                        Value => Object.Branch);
       Query.Execute (Result);
       if Result /= 1 then
          raise ADO.Objects.INSERT_ERROR;
@@ -518,6 +543,9 @@ package body Porion.Builds.Models is
       end if;
       if not Stmt.Is_Null (6) then
          Object.Project.Set_Key_Value (Stmt.Get_Identifier (6), Session);
+      end if;
+      if not Stmt.Is_Null (7) then
+         Object.Branch.Set_Key_Value (Stmt.Get_Identifier (7), Session);
       end if;
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);
@@ -1200,7 +1228,7 @@ package body Porion.Builds.Models is
       Impl.Number := 0;
       Impl.Builder := Porion.Builds.Models.Builder_Type'First;
       Impl.Timeout := 0;
-      Impl.Step := Porion.Builds.Models.Step_Type'First;
+      Impl.Step := Porion.Builds.Step_Type'First;
       Impl.Version := 0;
       Impl.Execution := Porion.Builds.Models.Execution_Type'First;
       ADO.Objects.Set_Object (Object, Impl.all'Access);
@@ -1312,10 +1340,10 @@ package body Porion.Builds.Models is
 
 
    procedure Set_Step (Object : in out Build_Config_Step_Ref;
-                       Value  : in Porion.Builds.Models.Step_Type) is
+                       Value  : in Porion.Builds.Step_Type) is
       procedure Set_Field_Enum is
         new ADO.Objects.Set_Field_Operation
-          (Porion.Builds.Models.Step_Type);
+          (Porion.Builds.Step_Type);
       Impl : Build_Config_Step_Access;
    begin
       Set_Field (Object, Impl);
@@ -1323,7 +1351,7 @@ package body Porion.Builds.Models is
    end Set_Step;
 
    function Get_Step (Object : in Build_Config_Step_Ref)
-                  return Porion.Builds.Models.Step_Type is
+                  return Porion.Builds.Step_Type is
       Impl : constant Build_Config_Step_Access
          := Build_Config_Step_Impl (Object.Get_Load_Object.all)'Access;
    begin
@@ -1607,7 +1635,7 @@ package body Porion.Builds.Models is
       Query.Save_Field (Name  => COL_4_3_NAME, --  timeout
                         Value => Object.Timeout);
       Query.Save_Field (Name  => COL_5_3_NAME, --  step
-                        Value => Integer (Porion.Builds.Models.Step_Type'Pos (Object.Step)));
+                        Value => Integer (Porion.Builds.Step_Type'Pos (Object.Step)));
       Query.Save_Field (Name  => COL_6_3_NAME, --  version
                         Value => Object.Version);
       Query.Save_Field (Name  => COL_7_3_NAME, --  execution
@@ -1658,7 +1686,7 @@ package body Porion.Builds.Models is
       elsif Name = "timeout" then
          return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Timeout));
       elsif Name = "step" then
-         return Porion.Builds.Models.Step_Type_Objects.To_Object (Impl.Step);
+         return Porion.Builds.Step_Type_Objects.To_Object (Impl.Step);
       elsif Name = "version" then
          return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Version));
       elsif Name = "execution" then
@@ -1701,7 +1729,7 @@ package body Porion.Builds.Models is
       Object.Number := Stmt.Get_Integer (2);
       Object.Builder := Porion.Builds.Models.Builder_Type'Val (Stmt.Get_Integer (3));
       Object.Timeout := Stmt.Get_Integer (4);
-      Object.Step := Porion.Builds.Models.Step_Type'Val (Stmt.Get_Integer (5));
+      Object.Step := Porion.Builds.Step_Type'Val (Stmt.Get_Integer (5));
       Object.Version := Stmt.Get_Integer (6);
       Object.Execution := Porion.Builds.Models.Execution_Type'Val (Stmt.Get_Integer (7));
       if not Stmt.Is_Null (8) then

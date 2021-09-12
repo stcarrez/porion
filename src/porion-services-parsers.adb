@@ -138,7 +138,7 @@ package body Porion.Services.Parsers is
                N.Step.Step.Set_Number (UBO.To_Integer (Value));
 
             when BUILD_STEP_STEP =>
-               N.Step.Step.Set_Step (Builds.Models.Step_Type_Objects.To_Value (Value));
+               N.Step.Step.Set_Step (Builds.Step_Type_Objects.To_Value (Value));
 
             when BUILD_STEP_TIMEOUT =>
                N.Step.Step.Set_Timeout (UBO.To_Integer (Value));

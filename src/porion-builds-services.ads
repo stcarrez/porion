@@ -18,10 +18,12 @@
 with Ada.Containers.Vectors;
 with Util.Strings.Vectors;
 with Util.Serialize.IO;
+with ADO.Sessions;
 with Porion.Sources;
 with Porion.Builders;
 with Porion.Configs;
 with Porion.Builds.Models;
+with Porion.Projects.Models;
 with Porion.Services;
 with Porion.Executors;
 private with Util.Strings.Maps;
@@ -52,14 +54,12 @@ package Porion.Builds.Services is
    type Context_Type is limited new Porion.Services.Context_Type with private;
 
    procedure Build (Service     : in out Context_Type;
-                    Branch_Name : in String;
-                    Branch      : in Porion.Sources.Branch_Type;
+                    Config      : in Porion.Builds.Models.Build_Config_Ref;
                     Executor    : in out Porion.Executors.Executor_Type'Class) with
-     Pre => Service.Has_Project;
+     Pre => Service.Has_Project and Config.Is_Loaded;
 
    procedure Start_Build (Service     : in out Context_Type;
-                          Branch_Name : in String;
-                          Branch      : in Porion.Sources.Branch_Type;
+                          Config      : in Porion.Builds.Models.Build_Config_Ref;
                           Executor    : in out Porion.Executors.Executor_Type'Class) with
      Pre => Service.Has_Project;
 
@@ -99,11 +99,20 @@ package Porion.Builds.Services is
                      Configs : in out Build_Config_Vector);
 
    procedure Make_Build_Config (Service  : in out Context_Type;
+                                Branch   : in String;
                                 Executor : in out Porion.Executors.Executor_Type'Class);
 
    procedure Guess (Service  : in out Context_Type;
                     Path     : in String;
                     Executor : in out Porion.Executors.Executor_Type'Class);
+
+   procedure Find_Build_Configs (Service : in out Context_Type;
+                                 Force   : in Boolean;
+                                 List    : in out Porion.Builds.Models.Build_Config_Vector);
+
+   procedure Update_Branch_Config (Branch  : in Porion.Projects.Models.Branch_Ref;
+                                   Status  : in Porion.Builds.Models.Config_Status_Type;
+                                   Session : in out ADO.Sessions.Master_Session);
 
 private
 
@@ -116,7 +125,6 @@ private
    end record;
 
    procedure Build (Service     : in out Context_Type;
-                    Branch_Name : in String;
                     Executor    : in out Porion.Executors.Executor_Type'Class);
 
    procedure Update_Build (Service : in out Context_Type;

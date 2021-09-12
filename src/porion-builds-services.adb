@@ -22,20 +22,18 @@ with Util.Log.Loggers;
 with Util.Strings;
 with Util.Files;
 with Util.Streams;
-with Util.Strings.Formats;
 with Util.Streams.Texts;
 with Util.Serialize.IO.JSON;
 with Util.Properties;
 with Util.Properties.JSON;
-with Porion.Loggers;
+with Util.Strings.Formats;
 with ADO.Statements;
 with ADO.Queries;
+with ADO.SQL;
 with ADO.Sessions;
-with Porion.Loggers;
 with Porion.Sources.Factories;
 with Porion.Nodes.Models;
 with Porion.Projects.Models;
-with Porion.Executors;
 with Porion.Builders.Factories;
 package body Porion.Builds.Services is
 
@@ -51,18 +49,18 @@ package body Porion.Builds.Services is
                                      Name   => Porion.Builders.Controller_Access);
 
    procedure Start_Build (Service     : in out Context_Type;
-                          Branch_Name : in String;
-                          Branch      : in Porion.Sources.Branch_Type;
+                          Config      : in Porion.Builds.Models.Build_Config_Ref;
                           Executor    : in out Porion.Executors.Executor_Type'Class) is
       Query : ADO.Queries.Context;
       Found : Boolean;
       Stmt  : ADO.Statements.Query_Statement;
    begin
+      Service.Build_Config := Config;
+      Service.Build_Node := Porion.Nodes.Models.Node_Ref (Config.Get_Node);
+      Service.Branch := Porion.Projects.Models.Branch_Ref (Config.Get_Branch);
       if Service.Build_Node.Is_Null then
          Service.Load_Node ("localhost");
       end if;
-
-      --  Add_Branch (Service, Branch_Name, Branch);
 
       Query.Set_Query (Projects.Models.Query_Project_Last_Build);
       Query.Bind_Param ("project_id", Service.Project.Get_Id);
@@ -72,20 +70,6 @@ package body Porion.Builds.Services is
 
       Service.Build := Porion.Builds.Models.Null_Build;
       Service.Build.Set_Number (Stmt.Get_Result_Integer + 1);
-
-      if Service.Build_Config.Is_Null then
-         Query.Clear;
-         Query.Bind_Param (1, Service.Project.Get_Id);
-         Query.Bind_Param (2, Service.Build_Node.Get_Id);
-         Query.Set_Filter ("o.project_id = ? AND o.node_id = ?");
-         Service.Build_Config.Find (Service.DB, Query, Found);
-         if not Found then
-            Service.Build_Config.Set_Node (Service.Build_Node);
-            Service.Build_Config.Set_Project (Service.Project);
-            Service.Build_Config.Set_Status (Builds.Models.CONFIG_BUILD_REQUIRED);
-            Service.Build_Config.Save (Service.DB);
-         end if;
-      end if;
 
       Service.Build.Set_Project (Service.Project);
       Service.Build.Set_Branch (Service.Branch);
@@ -104,31 +88,30 @@ package body Porion.Builds.Services is
    end Start_Build;
 
    procedure Build (Service     : in out Context_Type;
-                    Branch_Name : in String;
-                    Branch      : in Porion.Sources.Branch_Type;
+                    Config      : in Porion.Builds.Models.Build_Config_Ref;
                     Executor    : in out Porion.Executors.Executor_Type'Class) is
    begin
-      Start_Build (Service, Branch_Name, Branch, Executor);
+      Start_Build (Service, Config, Executor);
 
       Service.Load_Environment;
       Service.Load_Build_Steps;
 
-      Build (Service, Branch_Name, Executor);
+      Build (Service, Executor);
    end Build;
 
    procedure Build (Service     : in out Context_Type;
-                    Branch_Name : in String;
                     Executor    : in out Porion.Executors.Executor_Type'Class) is
       Number  : constant Positive := Service.Build.Get_Number;
       Name    : constant String := Service.Project.Get_Name;
+      Branch_Name : constant String := Service.Branch.Get_Name;
       Path    : constant String := Configs.Get_Build_Directory (Name, Branch_Name, Number);
       Log_Dir : constant String := Configs.Get_Build_Log_Directory (Name, Branch_Name, Number);
       Config  : Util.Properties.Manager;
-      Logger  : Porion.Loggers.Logger_Type;
       Status  : Builds.Models.Build_Status_Type := Builds.Models.BUILD_RUNNING;
    begin
       Log.Info ("Build {0} in {1}", Name, Path);
 
+      Executor.Set_Step (Builds.STEP_CHECKOUT);
       if not Executor.Is_Dry_Run and then not Ada.Directories.Exists (Path) then
          Ada.Directories.Create_Path (Path);
       end if;
@@ -136,7 +119,7 @@ package body Porion.Builds.Services is
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
       Service.Source_Controller := Sources.Factories.Create (Service.Project.Get_Scm, Config);
 
-      Logger.Create (Log_Dir, "build.log");
+      Executor.Create_Logger (Log_Dir, "build.log");
       Service.Source_Controller.Checkout (Path, Executor);
 
       Config.Set ("build_dir", Path);
@@ -152,6 +135,7 @@ package body Porion.Builds.Services is
                   Exec_Step.Set_Config (Step.Step);
                   Exec_Step.Save (Service.DB);
                end if;
+               Executor.Set_Step (Step.Step.Get_Step);
                Executor.Set_Status (0);
                Service.Build_Controller
                  := Builders.Factories.Create (Step.Step.Get_Builder, Service.DB, Step.Config);
@@ -226,12 +210,12 @@ package body Porion.Builds.Services is
 
       case Status is
          when Builds.Models.BUILD_PASS =>
-            Service.Branch.Set_Status (Projects.Models.BUILD_SUCCEEDED);
-            Service.Branch.Save (Service.DB);
+            Service.Build_Config.Set_Status (Builds.Models.CONFIG_BUILD_PASS);
+            Service.Build_Config.Save (Service.DB);
 
          when Builds.Models.BUILD_FAIL =>
-            Service.Branch.Set_Status (Projects.Models.BUILD_FAILED);
-            Service.Branch.Save (Service.DB);
+            Service.Build_Config.Set_Status (Builds.Models.CONFIG_BUILD_FAIL);
+            Service.Build_Config.Save (Service.DB);
 
          when others =>
             null;
@@ -367,7 +351,7 @@ package body Porion.Builds.Services is
          Step.Step.Set_Parameters (Util.Streams.Texts.To_String (Output));
          Step.Step.Set_Builder (Kind);
          Step.Step.Set_Number (Pos);
-         Step.Step.Set_Step (Porion.Builds.Models.STEP_MAKE);
+         Step.Step.Set_Step (Porion.Builds.STEP_MAKE);
          Step.Step.Set_Execution (Builds.Models.EXEC_NO_ERROR);
          Step.Step.Set_Build_Config (Service.Build_Config);
          Step.Step.Save (Service.DB);
@@ -516,6 +500,43 @@ package body Porion.Builds.Services is
       Step.Set_Parameters (Util.Streams.Texts.To_String (Output));
    end Update_Parameters;
 
+   procedure Find_Build_Configs (Service : in out Context_Type;
+                                 Force   : in Boolean;
+                                 List    : in out Porion.Builds.Models.Build_Config_Vector) is
+      Query         : ADO.Queries.Context;
+   begin
+      if Force then
+         Query.Set_Filter ("o.branch_id = :branch_id AND o.status != 0");
+      else
+         Query.Set_Filter ("o.branch_id = :branch_id AND o.status = 3");
+      end if;
+      Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
+      Porion.Builds.Models.List (List, Service.DB, Query);
+   end Find_Build_Configs;
+
+   procedure Update_Branch_Config (Branch  : in Porion.Projects.Models.Branch_Ref;
+                                   Status  : in Porion.Builds.Models.Config_Status_Type;
+                                   Session : in out ADO.Sessions.Master_Session) is
+      use Porion.Builds.Models;
+      Build_Configs : Porion.Builds.Models.Build_Config_Vector;
+      Query         : ADO.Queries.Context;
+   begin
+      Query.Set_Filter ("o.branch_id = :branch_id AND o.status != 0 AND o.status != :status");
+      Query.Bind_Param ("branch_id", Branch.Get_Id);
+      Query.Bind_Param ("status", Integer (Builds.Models.Config_Status_Type'Pos (Status)));
+      Porion.Builds.Models.List (Build_Configs, Session, Query);
+
+      for Iter in Build_Configs.Iterate loop
+         declare
+            Config : constant Models.Build_Config_Vectors.Reference_Type
+              := Models.Build_Config_Vectors.Reference (Build_Configs, Iter);
+         begin
+            Config.Set_Status (Status);
+            Config.Save (Session);
+         end;
+      end loop;
+   end Update_Branch_Config;
+
    procedure Update (Service : in out Context_Type;
                      Config  : in out Build_Config) is
       procedure Remove (List : in out Models.Build_Config_Step_Vector;
@@ -629,13 +650,25 @@ package body Porion.Builds.Services is
    end Update;
 
    procedure Make_Build_Config (Service  : in out Context_Type;
+                                Branch   : in String;
                                 Executor : in out Porion.Executors.Executor_Type'Class) is
       Name    : constant String := Service.Project.Get_Name;
-      Path    : constant String := Configs.Get_Build_Directory (Name, "main", 1);
-      Log_Dir : constant String := Configs.Get_Build_Log_Directory (Name, "main", 1);
+      Path    : constant String := Configs.Get_Build_Directory (Name, Branch, 1);
+      Log_Dir : constant String := Configs.Get_Build_Log_Directory (Name, Branch, 1);
       Config  : Util.Properties.Manager;
+      Query   : ADO.SQL.Query;
+      Found   : Boolean;
    begin
-      Log.Info ("Build {0} in {1}", Name, Path);
+      Log.Info ("Make build config {0} for branch {1} in {2}", Name, Branch, Path);
+
+      Query.Set_Filter ("o.project_id = :project_id and o.name = :branch");
+      Query.Bind_Param ("project_id", Service.Project.Get_Id);
+      Query.Bind_Param ("branch", Branch);
+      Service.Branch.Find (Service.DB, Query, Found);
+      if not Found then
+         Log.Error ("Branch {0} not found in database", Branch);
+         return;
+      end if;
 
       if not Executor.Is_Dry_Run and then not Ada.Directories.Exists (Path) then
          Ada.Directories.Create_Path (Path);
@@ -654,6 +687,7 @@ package body Porion.Builds.Services is
       Service.Build_Config.Set_Project (Service.Project);
       Service.Build_Config.Set_Node (Service.Build_Node);
       Service.Build_Config.Set_Status (Builds.Models.CONFIG_BUILD_REQUIRED);
+      Service.Build_Config.Set_Branch (Service.Branch);
       Service.Build_Config.Save (Service.DB);
       Service.Guess (Path, Executor);
    end Make_Build_Config;
@@ -670,13 +704,13 @@ package body Porion.Builds.Services is
          File_Path : constant String := Util.Files.Compose (Path, File);
          Exists    : constant Boolean := Ada.Directories.Exists (File_Path);
       begin
-         --  Logger.Write (Format (Message, File, (if Exists then -("yes") else -("no")), "", ""));
+         Executor.Log (Format (Message, File, (if Exists then -("yes") else -("no")), "", ""));
          return Exists;
       end Check;
 
       procedure Add_Step (Step    : in out Builds.Models.Build_Config_Step_Ref;
                           Builder : in Builds.Models.Builder_Type;
-                          Kind    : in Builds.Models.Step_Type) is
+                          Kind    : in Builds.Step_Type) is
       begin
          Step.Set_Step (Kind);
          Step.Set_Execution (Builds.Models.EXEC_NO_ERROR);
@@ -689,7 +723,7 @@ package body Porion.Builds.Services is
          Current_Step := Current_Step + 1;
       end Add_Step;
 
-      procedure Add_Step (Kind    : in Builds.Models.Step_Type;
+      procedure Add_Step (Kind    : in Builds.Step_Type;
                           Command : in String) is
          Step   : Builds.Models.Build_Config_Step_Ref;
          Config : Porion.Configs.Config_Type;
@@ -722,31 +756,31 @@ package body Porion.Builds.Services is
       Has_Pom_Xml := Check ("pom.xml", -("checking for {0}"));
 
       if Has_Autogen then
-         Add_Step (Builds.Models.STEP_GENERATE, "./autogen.sh");
+         Add_Step (Builds.STEP_GENERATE, "./autogen.sh");
       end if;
 
       if not Has_Autogen and Has_Autoconf and not Has_Configure then
-         Add_Step (Builds.Models.STEP_GENERATE, "autoconf");
+         Add_Step (Builds.STEP_GENERATE, "autoconf");
       end if;
 
       if not Has_Autogen and Has_Automake and not Has_Makefile_In then
-         Add_Step (Builds.Models.STEP_GENERATE, "automake");
+         Add_Step (Builds.STEP_GENERATE, "automake");
       end if;
 
       if Has_Autogen or Has_Autoconf or Has_Configure then
-         Add_Step (Builds.Models.STEP_CONFIGURE, "./configure --prefix=#{install}");
+         Add_Step (Builds.STEP_CONFIGURE, "./configure --prefix=#{install}");
       end if;
 
       if Has_CMake then
-         Add_Step (Builds.Models.STEP_CONFIGURE, "cmake");
+         Add_Step (Builds.STEP_CONFIGURE, "cmake");
       end if;
 
       if Has_Pom_Xml then
-         Add_Step (Builds.Models.STEP_MAKE, "mvn package");
+         Add_Step (Builds.STEP_MAKE, "mvn package");
       end if;
 
       if Has_CMake or Has_Makefile_In or Has_Automake or Has_Makefile then
-         Add_Step (Builds.Models.STEP_MAKE, "make");
+         Add_Step (Builds.STEP_MAKE, "make");
       end if;
 
    end Guess;

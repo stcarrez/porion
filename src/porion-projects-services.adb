@@ -22,9 +22,11 @@ with Util.Dates.ISO8601;
 with Porion.Configs;
 with Porion.Loggers;
 with Porion.Sources.Factories;
+with Porion.Builds.Models;
 with ADO.SQL;
 with ADO.Queries;
 with ADO.Statements;
+with Porion.Builds.Services;
 package body Porion.Projects.Services is
 
    use type ADO.Identifier;
@@ -183,7 +185,6 @@ package body Porion.Projects.Services is
    end Remove_Project;
 
    procedure Check_Sources (Service  : in out Context_Type;
-                            Force    : in Boolean;
                             Status   : in out Porion.Sources.Status_Type;
                             Executor : in out Porion.Executors.Executor_Type'Class) is
       use Porion.Sources;
@@ -205,6 +206,8 @@ package body Porion.Projects.Services is
          Logger.Create (Log_Dir, "source.log");
       end;
 
+      Executor.Set_Step (Builds.STEP_CHECKOUT);
+
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
       Service.Source_Controller := Sources.Factories.Create (Service.Project.Get_Scm, Config);
 
@@ -222,7 +225,6 @@ package body Porion.Projects.Services is
             Branch  : constant Maps.Reference_Type := Maps.Reference (Src_Status.Changes, Item);
             Is_Head : constant Boolean := Name = To_String (Src_Status.Head);
             Found   : Boolean := False;
-            --  Iter    : Models.Branch_Vectors.Cursor := Branches.First;
          begin
             for Iter in 1 .. Integer (Branches.Length) loop
                declare
@@ -242,23 +244,15 @@ package body Porion.Projects.Services is
                      case Service.Branch.Get_Status is
                         when Models.BUILD_REQUIRED =>
                            Log.Info ("Build required for branch {0}", Name);
-                           Status.Changes.Insert (Name, Branch);
+                           Builds.Services.Update_Branch_Config (Service.Branch,
+                                                                 Builds.Models.CONFIG_BUILD_REQUIRED,
+                                                                 Service.DB);
 
                         when Models.BUILD_SUCCEEDED =>
-                           if Force then
-                              Log.Info ("Build succeed but forced for branch {0}", Name);
-                              Status.Changes.Insert (Name, Branch);
-                           else
-                              Log.Info ("Build already succeed for branch {0}", Name);
-                           end if;
+                           Log.Info ("Build already succeed for branch {0}", Name);
 
                         when Models.BUILD_FAILED =>
-                           if Force then
-                              Log.Info ("Build failed but forced for branch {0}", Name);
-                              Status.Changes.Insert (Name, Branch);
-                           else
-                              Log.Info ("Build failed for branch {0}", Name);
-                           end if;
+                           Log.Info ("Build failed for branch {0}", Name);
 
                         when Models.BUILD_DISABLED =>
                            Log.Info ("Build disabled for branch {0}", Name);
@@ -275,7 +269,9 @@ package body Porion.Projects.Services is
                Add_Branch (Service, Name, Branch, Is_Head);
                if Service.Branch.Get_Status = Models.BUILD_REQUIRED then
                   Log.Info ("Build required for new branch {0}", Name);
-                  Status.Changes.Insert (Name, Branch);
+                  Builds.Services.Update_Branch_Config (Service.Branch,
+                                                        Builds.Models.CONFIG_BUILD_REQUIRED,
+                                                        Service.DB);
                end if;
             end if;
          end;

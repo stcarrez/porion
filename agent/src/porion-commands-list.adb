@@ -16,7 +16,8 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with ANSI;
-with Ada.Calendar;
+with Ada.Calendar.Formatting;
+with Ada.Calendar.Time_Zones;
 with Ada.Text_IO;
 with Util.Strings;
 with Util.Dates.ISO8601;
@@ -36,12 +37,16 @@ package body Porion.Commands.List is
                             Context : in out Context_Type);
 
    function Format (Date : in Ada.Calendar.Time) return String is
-      Result : String := Util.Dates.ISO8601.Image (Date, Util.Dates.ISO8601.MINUTE);
+      use Ada.Calendar;
+
+      Result : String := Formatting.Image (Date, True,
+                                           Time_Zones.UTC_Time_Offset (Date));
    begin
-      if Result (Result'First + 10) = 'T' then
-         Result (Result'First + 10) := ' ';
+      if Result'Length > 16 then
+         return Result (Result'First .. Result'First + 15);
+      else
+         return Result;
       end if;
-      return Result;
    end Format;
 
    --  Report the list of projects, nodes or builds.

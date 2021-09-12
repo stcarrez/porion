@@ -44,6 +44,14 @@ package body Porion.Executors is
    end Enable_Dry_Run;
 
    --  ------------------------------
+   --  Enable writing command output to stdout.
+   --  ------------------------------
+   procedure Enable_Log (Executor : in out Executor_Type) is
+   begin
+      Executor.Output_Log := True;
+   end Enable_Log;
+
+   --  ------------------------------
    --  Get the execution status.
    --  ------------------------------
    function Get_Status (Executor : in Executor_Type) return Integer is
@@ -186,7 +194,7 @@ package body Porion.Executors is
       use type Porion.Builds.Step_Type;
    begin
       Executor.Logger.Write (Line);
-      if Executor.Step /= Porion.Builds.STEP_CHECKOUT then
+      if Executor.Output_Log and Executor.Step /= Porion.Builds.STEP_CHECKOUT then
          Ada.Text_IO.Put_Line (Line);
       end if;
    end Log;

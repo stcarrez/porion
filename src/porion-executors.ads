@@ -31,6 +31,9 @@ package Porion.Executors is
    --  Enable the dry run execution mode.
    procedure Enable_Dry_Run (Executor : in out Executor_Type);
 
+   --  Enable writing command output to stdout.
+   procedure Enable_Log (Executor : in out Executor_Type);
+
    --  Get the execution status.
    function Get_Status (Executor : in Executor_Type) return Integer;
 
@@ -79,11 +82,12 @@ package Porion.Executors is
 private
 
    type Executor_Type is limited new Ada.Finalization.Limited_Controlled with record
-      Dry_Run  : Boolean := False;
-      Commands : Util.Strings.Vectors.Vector;
-      Status   : Integer := 0;
-      Step     : Porion.Builds.Step_Type;
-      Logger   : Porion.Loggers.Logger_Type;
+      Dry_Run    : Boolean := False;
+      Output_Log : Boolean := False;
+      Commands   : Util.Strings.Vectors.Vector;
+      Status     : Integer := 0;
+      Step       : Porion.Builds.Step_Type;
+      Logger     : Porion.Loggers.Logger_Type;
    end record;
 
 end Porion.Executors;

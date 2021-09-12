@@ -15,9 +15,15 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with ANSI;
+with Ada.Calendar;
+with Ada.Text_IO;
 with Util.Strings;
+with Util.Dates.ISO8601;
 with ADO.Queries;
 with ADO.Statements;
+with Porion.Queries;
+with Porion.Builds.Models;
 with Porion.Projects.Models;
 package body Porion.Commands.List is
 
@@ -25,6 +31,18 @@ package body Porion.Commands.List is
                    Context : in out Context_Type;
                    Query   : in ADO.Queries.Context;
                    Prefix  : in String);
+
+   procedure List_Projects (Command : in out Command_Type;
+                            Context : in out Context_Type);
+
+   function Format (Date : in Ada.Calendar.Time) return String is
+      Result : String := Util.Dates.ISO8601.Image (Date, Util.Dates.ISO8601.MINUTE);
+   begin
+      if Result (Result'First + 10) = 'T' then
+         Result (Result'First + 10) := ' ';
+      end if;
+      return Result;
+   end Format;
 
    --  Report the list of projects, nodes or builds.
    overriding
@@ -43,8 +61,8 @@ package body Porion.Commands.List is
       end if;
 
       if Command.List_Projects then
-         Query.Set_Query (Porion.Projects.Models.Query_Command_Project_List);
-         List (Command, Context, Query, "command_project_list_");
+         Query.Set_Query (Porion.Queries.Query_Project_List);
+         List_Projects (Command, Context);
       end if;
 
       if Command.List_Nodes then
@@ -57,6 +75,66 @@ package body Porion.Commands.List is
          List (Command, Context, Query, "command_build_list_");
       end if;
    end Execute;
+
+   procedure List_Projects (Command : in out Command_Type;
+                            Context : in out Context_Type) is
+      use Porion.Builds.Models;
+      use Porion.Projects.Models;
+
+      function Get_Tag (Info : in Porion.Queries.Project_Info) return String is
+         Tag : constant String := To_String (Info.Branch_Tag);
+      begin
+         if Tag'Length > 8 then
+            return Tag (Tag'First .. Tag'First + 7);
+         else
+            return Tag;
+         end if;
+      end Get_Tag;
+
+      List  : Porion.Queries.Project_Info_Vector;
+      Query : ADO.Queries.Context;
+   begin
+      Query.Set_Query (Porion.Queries.Query_Project_List);
+      Porion.Queries.List (List, Context.Project_Service.DB, Query);
+
+      Context.Console.Start_Title;
+      Context.Console.Print_Title (1, "Name", 20);
+      Context.Console.Print_Title (2, "Branch", 20);
+      Context.Console.Print_Title (3, "Tag", 8);
+      Context.Console.Print_Title (4, "Status", 7);
+      Context.Console.Print_Title (5, " Pass", 6);
+      Context.Console.Print_Title (6, " Fail", 6);
+      Context.Console.Print_Title (7, "Date", 18);
+      Context.Console.End_Title;
+
+      for Project of List loop
+         Context.Console.Start_Row;
+         if Project.Project_Status /= Projects.Models.PROJECT_ACTIVE then
+            Ada.Text_IO.Put (ANSI.Foreground (ANSI.Blue));
+         elsif Project.Build_Date.Is_Null then
+            Ada.Text_IO.Put (ANSI.Foreground (ANSI.Blue));
+         elsif Project.Build_Status = Builds.Models.BUILD_PASS then
+            Ada.Text_IO.Put (ANSI.Foreground (ANSI.Green));
+         else
+            Ada.Text_IO.Put (ANSI.Foreground (ANSI.Red));
+         end if;
+         Context.Console.Print_Field (1, To_String (Project.Name));
+         Context.Console.Print_Field (2, To_String (Project.Branch_Name));
+         Context.Console.Print_Field (3, Get_Tag (Project), Consoles.J_LEFT);
+         if not Project.Build_Date.Is_Null then
+            if Project.Build_Status = Builds.Models.BUILD_PASS then
+               Context.Console.Print_Field (4, "OK", Consoles.J_RIGHT);
+            else
+               Context.Console.Print_Field (4, "KO", Consoles.J_RIGHT);
+            end if;
+            Context.Console.Print_Field (5, Util.Strings.Image (Project.Pass_Count), Consoles.J_RIGHT);
+            Context.Console.Print_Field (6, Util.Strings.Image (Project.Fail_Count), Consoles.J_RIGHT);
+            Context.Console.Print_Field (7, Format (Project.Build_Date.Value), Consoles.J_RIGHT);
+         end if;
+         Ada.Text_IO.Put (ANSI.Reset);
+         Context.Console.End_Row;
+      end loop;
+   end List_Projects;
 
    procedure List (Command : in out Command_Type;
                    Context : in out Context_Type;

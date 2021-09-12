@@ -45,6 +45,8 @@ CREATE TABLE IF NOT EXISTS porion_build (
   `test_duration` INTEGER NOT NULL,
   /*  */
   `status`  NOT NULL,
+  /* the source tag that was used when building the project. */
+  `tag` VARCHAR(255) NOT NULL,
   /* the build configuration. */
   `build_config_id` BIGINT NOT NULL,
   /* the node where the build was made. */

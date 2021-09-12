@@ -19,6 +19,8 @@ with Ada.Finalization;
 with EL.Expressions;
 with Util.Properties;
 with Util.Strings.Vectors;
+with Porion.Loggers;
+with Porion.Builds;
 package Porion.Executors is
 
    type Executor_Type is limited new Ada.Finalization.Limited_Controlled with private;
@@ -35,6 +37,10 @@ package Porion.Executors is
    --  Set the execution status.
    procedure Set_Status (Executor : in out Executor_Type;
                          Status   : in Integer);
+
+   --  Set the current execution step when building a project.
+   procedure Set_Step (Executor : in out Executor_Type;
+                       Step     : in Porion.Builds.Step_Type);
 
    procedure Execute (Executor    : in out Executor_Type;
                       Command     : in EL.Expressions.Expression;
@@ -58,6 +64,10 @@ package Porion.Executors is
                       Strip_Crlf  : in Boolean := False;
                       Status      : out Integer);
 
+   procedure Create_Logger (Executor : in out Executor_Type;
+                            Dir      : in String;
+                            Name     : in String);
+
    --  Write the line on the logger.
    procedure Log (Executor : in out Executor_Type;
                   Line     : in String);
@@ -72,6 +82,8 @@ private
       Dry_Run  : Boolean := False;
       Commands : Util.Strings.Vectors.Vector;
       Status   : Integer := 0;
+      Step     : Porion.Builds.Step_Type;
+      Logger   : Porion.Loggers.Logger_Type;
    end record;
 
 end Porion.Executors;

@@ -22,6 +22,7 @@ with Util.Log.Loggers;
 with Util.Streams;
 with Util.Streams.Texts;
 with Util.Beans.Objects;
+with Ada.Text_IO;
 package body Porion.Executors is
 
    Glog : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Executors");
@@ -58,6 +59,15 @@ package body Porion.Executors is
    begin
       Executor.Status := Status;
    end Set_Status;
+
+   --  ------------------------------
+   --  Set the current execution step when building a project.
+   --  ------------------------------
+   procedure Set_Step (Executor : in out Executor_Type;
+                       Step     : in Porion.Builds.Step_Type) is
+   begin
+      Executor.Step := Step;
+   end Set_Step;
 
    procedure Execute (Executor    : in out Executor_Type;
                       Command     : in EL.Expressions.Expression;
@@ -149,6 +159,15 @@ package body Porion.Executors is
       end if;
    end Execute;
 
+   procedure Create_Logger (Executor : in out Executor_Type;
+                            Dir      : in String;
+                            Name     : in String) is
+   begin
+      if not Executor.Dry_Run then
+         Executor.Logger.Create (Dir, Name);
+      end if;
+   end Create_Logger;
+
    --  ------------------------------
    --  Get the commands that were collected during execution and clear the current list.
    --  ------------------------------
@@ -159,11 +178,17 @@ package body Porion.Executors is
       Executor.Commands.Clear;
    end Fetch_Commands;
 
+   --  ------------------------------
    --  Write the line on the logger.
+   --  ------------------------------
    procedure Log (Executor : in out Executor_Type;
                   Line     : in String) is
+      use type Porion.Builds.Step_Type;
    begin
-      null;
+      Executor.Logger.Write (Line);
+      if Executor.Step /= Porion.Builds.STEP_CHECKOUT then
+         Ada.Text_IO.Put_Line (Line);
+      end if;
    end Log;
 
 end Porion.Executors;

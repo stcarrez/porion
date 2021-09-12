@@ -49,9 +49,10 @@ package body Porion.Queries is
          Into.Branch_Status := Porion.Projects.Models.Branch_Status_Type'Val (Stmt.Get_Integer (4));
          Into.Build_Date := Stmt.Get_Nullable_Time (5);
          Into.Build_Status := Porion.Builds.Models.Build_Status_Type'Val (Stmt.Get_Integer (6));
-         Into.Pass_Count := Stmt.Get_Integer (7);
-         Into.Fail_Count := Stmt.Get_Integer (8);
-         Into.Timeout_Count := Stmt.Get_Integer (9);
+         Into.Build_Tag := Stmt.Get_Unbounded_String (7);
+         Into.Pass_Count := Stmt.Get_Integer (8);
+         Into.Fail_Count := Stmt.Get_Integer (9);
+         Into.Timeout_Count := Stmt.Get_Integer (10);
       end Read;
    begin
       Stmt.Execute;

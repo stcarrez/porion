@@ -67,6 +67,9 @@ package Porion.Queries is
       --  the last build status.
       Build_Status : Porion.Builds.Models.Build_Status_Type;
 
+      --  the build tag.
+      Build_Tag : Ada.Strings.Unbounded.Unbounded_String;
+
       --  the number of tests that succeeded.
       Pass_Count : Integer;
 
@@ -97,7 +100,7 @@ private
 
    package File_1 is
       new ADO.Queries.Loaders.File (Path => "command-projects.xml",
-                                    Sha1 => "841A91C2C49EF2D839CCB628EE07AA7F2845C680");
+                                    Sha1 => "2B4AA202D163FA68DAD7ABA6910669E55F4DFDB6");
 
    package Def_Projectinfo_Project_List is
       new ADO.Queries.Loaders.Query (Name => "project-list",

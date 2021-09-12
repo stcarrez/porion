@@ -765,12 +765,42 @@ package body Porion.Builds.Models is
    end Get_Status;
 
 
+   procedure Set_Tag (Object : in out Build_Ref;
+                       Value : in String) is
+      Impl : Build_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_String (Impl.all, 11, Impl.Tag, Value);
+   end Set_Tag;
+
+   procedure Set_Tag (Object : in out Build_Ref;
+                      Value  : in Ada.Strings.Unbounded.Unbounded_String) is
+      Impl : Build_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Unbounded_String (Impl.all, 11, Impl.Tag, Value);
+   end Set_Tag;
+
+   function Get_Tag (Object : in Build_Ref)
+                 return String is
+   begin
+      return Ada.Strings.Unbounded.To_String (Object.Get_Tag);
+   end Get_Tag;
+   function Get_Tag (Object : in Build_Ref)
+                  return Ada.Strings.Unbounded.Unbounded_String is
+      Impl : constant Build_Access
+         := Build_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Tag;
+   end Get_Tag;
+
+
    procedure Set_Build_Config (Object : in out Build_Ref;
                                Value  : in Porion.Builds.Models.Build_Config_Ref'Class) is
       Impl : Build_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 11, Impl.Build_Config, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 12, Impl.Build_Config, Value);
    end Set_Build_Config;
 
    function Get_Build_Config (Object : in Build_Ref)
@@ -787,7 +817,7 @@ package body Porion.Builds.Models is
       Impl : Build_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 12, Impl.Node, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 13, Impl.Node, Value);
    end Set_Node;
 
    function Get_Node (Object : in Build_Ref)
@@ -804,7 +834,7 @@ package body Porion.Builds.Models is
       Impl : Build_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 13, Impl.Branch, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 14, Impl.Branch, Value);
    end Set_Branch;
 
    function Get_Branch (Object : in Build_Ref)
@@ -821,7 +851,7 @@ package body Porion.Builds.Models is
       Impl : Build_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 14, Impl.Project, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 15, Impl.Project, Value);
    end Set_Project;
 
    function Get_Project (Object : in Build_Ref)
@@ -855,6 +885,7 @@ package body Porion.Builds.Models is
             Copy.Timeout_Count := Impl.Timeout_Count;
             Copy.Test_Duration := Impl.Test_Duration;
             Copy.Status := Impl.Status;
+            Copy.Tag := Impl.Tag;
             Copy.Build_Config := Impl.Build_Config;
             Copy.Node := Impl.Node;
             Copy.Branch := Impl.Branch;
@@ -1024,24 +1055,29 @@ package body Porion.Builds.Models is
          Object.Clear_Modified (10);
       end if;
       if Object.Is_Modified (11) then
-         Stmt.Save_Field (Name  => COL_10_2_NAME, --  build_config_id
-                          Value => Object.Build_Config);
+         Stmt.Save_Field (Name  => COL_10_2_NAME, --  tag
+                          Value => Object.Tag);
          Object.Clear_Modified (11);
       end if;
       if Object.Is_Modified (12) then
-         Stmt.Save_Field (Name  => COL_11_2_NAME, --  node_id
-                          Value => Object.Node);
+         Stmt.Save_Field (Name  => COL_11_2_NAME, --  build_config_id
+                          Value => Object.Build_Config);
          Object.Clear_Modified (12);
       end if;
       if Object.Is_Modified (13) then
-         Stmt.Save_Field (Name  => COL_12_2_NAME, --  branch_id
-                          Value => Object.Branch);
+         Stmt.Save_Field (Name  => COL_12_2_NAME, --  node_id
+                          Value => Object.Node);
          Object.Clear_Modified (13);
       end if;
       if Object.Is_Modified (14) then
-         Stmt.Save_Field (Name  => COL_13_2_NAME, --  project_id
-                          Value => Object.Project);
+         Stmt.Save_Field (Name  => COL_13_2_NAME, --  branch_id
+                          Value => Object.Branch);
          Object.Clear_Modified (14);
+      end if;
+      if Object.Is_Modified (15) then
+         Stmt.Save_Field (Name  => COL_14_2_NAME, --  project_id
+                          Value => Object.Project);
+         Object.Clear_Modified (15);
       end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
@@ -1093,13 +1129,15 @@ package body Porion.Builds.Models is
                         Value => Object.Test_Duration);
       Query.Save_Field (Name  => COL_9_2_NAME, --  status
                         Value => Integer (Porion.Builds.Models.Build_Status_Type'Pos (Object.Status)));
-      Query.Save_Field (Name  => COL_10_2_NAME, --  build_config_id
+      Query.Save_Field (Name  => COL_10_2_NAME, --  tag
+                        Value => Object.Tag);
+      Query.Save_Field (Name  => COL_11_2_NAME, --  build_config_id
                         Value => Object.Build_Config);
-      Query.Save_Field (Name  => COL_11_2_NAME, --  node_id
+      Query.Save_Field (Name  => COL_12_2_NAME, --  node_id
                         Value => Object.Node);
-      Query.Save_Field (Name  => COL_12_2_NAME, --  branch_id
+      Query.Save_Field (Name  => COL_13_2_NAME, --  branch_id
                         Value => Object.Branch);
-      Query.Save_Field (Name  => COL_13_2_NAME, --  project_id
+      Query.Save_Field (Name  => COL_14_2_NAME, --  project_id
                         Value => Object.Project);
       Query.Execute (Result);
       if Result /= 1 then
@@ -1154,6 +1192,8 @@ package body Porion.Builds.Models is
          return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Test_Duration));
       elsif Name = "status" then
          return Porion.Builds.Models.Build_Status_Type_Objects.To_Object (Impl.Status);
+      elsif Name = "tag" then
+         return Util.Beans.Objects.To_Object (Impl.Tag);
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -1176,17 +1216,18 @@ package body Porion.Builds.Models is
       Object.Timeout_Count := Stmt.Get_Integer (7);
       Object.Test_Duration := Stmt.Get_Integer (8);
       Object.Status := Porion.Builds.Models.Build_Status_Type'Val (Stmt.Get_Integer (9));
-      if not Stmt.Is_Null (10) then
-         Object.Build_Config.Set_Key_Value (Stmt.Get_Identifier (10), Session);
-      end if;
+      Object.Tag := Stmt.Get_Unbounded_String (10);
       if not Stmt.Is_Null (11) then
-         Object.Node.Set_Key_Value (Stmt.Get_Identifier (11), Session);
+         Object.Build_Config.Set_Key_Value (Stmt.Get_Identifier (11), Session);
       end if;
       if not Stmt.Is_Null (12) then
-         Object.Branch.Set_Key_Value (Stmt.Get_Identifier (12), Session);
+         Object.Node.Set_Key_Value (Stmt.Get_Identifier (12), Session);
       end if;
       if not Stmt.Is_Null (13) then
-         Object.Project.Set_Key_Value (Stmt.Get_Identifier (13), Session);
+         Object.Branch.Set_Key_Value (Stmt.Get_Identifier (13), Session);
+      end if;
+      if not Stmt.Is_Null (14) then
+         Object.Project.Set_Key_Value (Stmt.Get_Identifier (14), Session);
       end if;
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);

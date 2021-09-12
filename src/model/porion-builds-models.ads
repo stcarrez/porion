@@ -317,6 +317,18 @@ package Porion.Builds.Models is
    function Get_Status (Object : in Build_Ref)
                  return Porion.Builds.Models.Build_Status_Type;
 
+   --  Set the source tag that was used when building the project.
+   procedure Set_Tag (Object : in out Build_Ref;
+                      Value  : in Ada.Strings.Unbounded.Unbounded_String);
+   procedure Set_Tag (Object : in out Build_Ref;
+                      Value : in String);
+
+   --  Get the source tag that was used when building the project.
+   function Get_Tag (Object : in Build_Ref)
+                 return Ada.Strings.Unbounded.Unbounded_String;
+   function Get_Tag (Object : in Build_Ref)
+                 return String;
+
    --  Set the build configuration.
    procedure Set_Build_Config (Object : in out Build_Ref;
                                Value  : in Porion.Builds.Models.Build_Config_Ref'Class);
@@ -1105,13 +1117,14 @@ private
    COL_7_2_NAME : aliased constant String := "timeout_count";
    COL_8_2_NAME : aliased constant String := "test_duration";
    COL_9_2_NAME : aliased constant String := "status";
-   COL_10_2_NAME : aliased constant String := "build_config_id";
-   COL_11_2_NAME : aliased constant String := "node_id";
-   COL_12_2_NAME : aliased constant String := "branch_id";
-   COL_13_2_NAME : aliased constant String := "project_id";
+   COL_10_2_NAME : aliased constant String := "tag";
+   COL_11_2_NAME : aliased constant String := "build_config_id";
+   COL_12_2_NAME : aliased constant String := "node_id";
+   COL_13_2_NAME : aliased constant String := "branch_id";
+   COL_14_2_NAME : aliased constant String := "project_id";
 
    BUILD_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 14,
+     (Count   => 15,
       Table   => BUILD_NAME'Access,
       Members => (
          1 => COL_0_2_NAME'Access,
@@ -1127,7 +1140,8 @@ private
          11 => COL_10_2_NAME'Access,
          12 => COL_11_2_NAME'Access,
          13 => COL_12_2_NAME'Access,
-         14 => COL_13_2_NAME'Access)
+         14 => COL_13_2_NAME'Access,
+         15 => COL_14_2_NAME'Access)
      );
    BUILD_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := BUILD_DEF'Access;
@@ -1149,6 +1163,7 @@ private
        Timeout_Count : Integer;
        Test_Duration : Integer;
        Status : Porion.Builds.Models.Build_Status_Type;
+       Tag : Ada.Strings.Unbounded.Unbounded_String;
        Build_Config : Porion.Builds.Models.Build_Config_Ref;
        Node : Porion.Nodes.Models.Node_Ref;
        Branch : Porion.Projects.Models.Branch_Ref;

@@ -60,6 +60,16 @@ package Porion.Builds.Models is
       Value   : Builder_Type;
    end record;
 
+   type Config_Status_Type is (CONFIG_DISABLED, CONFIG_BUILD_PASS, CONFIG_BUILD_FAIL, CONFIG_BUILD_REQUIRED);
+   for Config_Status_Type use (CONFIG_DISABLED => 0, CONFIG_BUILD_PASS => 1, CONFIG_BUILD_FAIL => 2, CONFIG_BUILD_REQUIRED => 3);
+   package Config_Status_Type_Objects is
+      new Util.Beans.Objects.Enums (Config_Status_Type);
+
+   type Nullable_Config_Status_Type is record
+      Is_Null : Boolean := True;
+      Value   : Config_Status_Type;
+   end record;
+
    type Execution_Type is (EXEC_DISABLED, EXEC_NO_ERROR, EXEC_IGNORE_ERROR);
    for Execution_Type use (EXEC_DISABLED => 0, EXEC_NO_ERROR => 1, EXEC_IGNORE_ERROR => 2);
    package Execution_Type_Objects is
@@ -143,6 +153,14 @@ package Porion.Builds.Models is
                  return Ada.Strings.Unbounded.Unbounded_String;
    function Get_Description (Object : in Build_Config_Ref)
                  return String;
+
+   --  Set the build configuration status.
+   procedure Set_Status (Object : in out Build_Config_Ref;
+                         Value  : in Porion.Builds.Models.Config_Status_Type);
+
+   --  Get the build configuration status.
+   function Get_Status (Object : in Build_Config_Ref)
+                 return Porion.Builds.Models.Config_Status_Type;
 
    --
    procedure Set_Node (Object : in out Build_Config_Ref;
@@ -997,11 +1015,12 @@ private
    COL_1_1_NAME : aliased constant String := "version";
    COL_2_1_NAME : aliased constant String := "name";
    COL_3_1_NAME : aliased constant String := "description";
-   COL_4_1_NAME : aliased constant String := "node_id";
-   COL_5_1_NAME : aliased constant String := "project_id";
+   COL_4_1_NAME : aliased constant String := "status";
+   COL_5_1_NAME : aliased constant String := "node_id";
+   COL_6_1_NAME : aliased constant String := "project_id";
 
    BUILD_CONFIG_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 6,
+     (Count   => 7,
       Table   => BUILD_CONFIG_NAME'Access,
       Members => (
          1 => COL_0_1_NAME'Access,
@@ -1009,17 +1028,19 @@ private
          3 => COL_2_1_NAME'Access,
          4 => COL_3_1_NAME'Access,
          5 => COL_4_1_NAME'Access,
-         6 => COL_5_1_NAME'Access)
+         6 => COL_5_1_NAME'Access,
+         7 => COL_6_1_NAME'Access)
      );
    BUILD_CONFIG_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := BUILD_CONFIG_DEF'Access;
 
    BUILD_CONFIG_AUDIT_DEF : aliased constant ADO.Audits.Auditable_Mapping :=
-     (Count    => 2,
+     (Count    => 3,
       Of_Class => BUILD_CONFIG_DEF'Access,
       Members  => (
          1 => 2,
-         2 => 3)
+         2 => 3,
+         3 => 4)
      );
    BUILD_CONFIG_AUDIT_TABLE : constant ADO.Audits.Auditable_Mapping_Access
       := BUILD_CONFIG_AUDIT_DEF'Access;
@@ -1035,6 +1056,7 @@ private
        Version : Integer;
        Name : Ada.Strings.Unbounded.Unbounded_String;
        Description : Ada.Strings.Unbounded.Unbounded_String;
+       Status : Porion.Builds.Models.Config_Status_Type;
        Node : Porion.Nodes.Models.Node_Ref;
        Project : Porion.Projects.Models.Project_Ref;
    end record;

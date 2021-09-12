@@ -64,6 +64,7 @@ package body Porion.Builds.Models is
    begin
       Impl := new Build_Config_Impl;
       Impl.Version := 0;
+      Impl.Status := Porion.Builds.Models.Config_Status_Type'First;
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Allocate;
 
@@ -157,12 +158,33 @@ package body Porion.Builds.Models is
    end Get_Description;
 
 
+   procedure Set_Status (Object : in out Build_Config_Ref;
+                         Value  : in Porion.Builds.Models.Config_Status_Type) is
+      procedure Set_Field_Enum is
+        new ADO.Audits.Set_Field_Operation
+          (Porion.Builds.Models.Config_Status_Type,
+           Porion.Builds.Models.Config_Status_Type_Objects.To_Object);
+      Impl : Build_Config_Access;
+   begin
+      Set_Field (Object, Impl);
+      Set_Field_Enum (Impl.all, 5, Impl.Status, Value);
+   end Set_Status;
+
+   function Get_Status (Object : in Build_Config_Ref)
+                  return Porion.Builds.Models.Config_Status_Type is
+      Impl : constant Build_Config_Access
+         := Build_Config_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Status;
+   end Get_Status;
+
+
    procedure Set_Node (Object : in out Build_Config_Ref;
                        Value  : in Porion.Nodes.Models.Node_Ref'Class) is
       Impl : Build_Config_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 5, Impl.Node, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 6, Impl.Node, Value);
    end Set_Node;
 
    function Get_Node (Object : in Build_Config_Ref)
@@ -179,7 +201,7 @@ package body Porion.Builds.Models is
       Impl : Build_Config_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 6, Impl.Project, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 7, Impl.Project, Value);
    end Set_Project;
 
    function Get_Project (Object : in Build_Config_Ref)
@@ -207,6 +229,7 @@ package body Porion.Builds.Models is
             Copy.Version := Impl.Version;
             Copy.Name := Impl.Name;
             Copy.Description := Impl.Description;
+            Copy.Status := Impl.Status;
             Copy.Node := Impl.Node;
             Copy.Project := Impl.Project;
          end;
@@ -354,14 +377,19 @@ package body Porion.Builds.Models is
          Object.Clear_Modified (4);
       end if;
       if Object.Is_Modified (5) then
-         Stmt.Save_Field (Name  => COL_4_1_NAME, --  node_id
-                          Value => Object.Node);
+         Stmt.Save_Field (Name  => COL_4_1_NAME, --  status
+                          Value => Integer (Porion.Builds.Models.Config_Status_Type'Pos (Object.Status)));
          Object.Clear_Modified (5);
       end if;
       if Object.Is_Modified (6) then
-         Stmt.Save_Field (Name  => COL_5_1_NAME, --  project_id
-                          Value => Object.Project);
+         Stmt.Save_Field (Name  => COL_5_1_NAME, --  node_id
+                          Value => Object.Node);
          Object.Clear_Modified (6);
+      end if;
+      if Object.Is_Modified (7) then
+         Stmt.Save_Field (Name  => COL_6_1_NAME, --  project_id
+                          Value => Object.Project);
+         Object.Clear_Modified (7);
       end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
@@ -402,9 +430,11 @@ package body Porion.Builds.Models is
                         Value => Object.Name);
       Query.Save_Field (Name  => COL_3_1_NAME, --  description
                         Value => Object.Description);
-      Query.Save_Field (Name  => COL_4_1_NAME, --  node_id
+      Query.Save_Field (Name  => COL_4_1_NAME, --  status
+                        Value => Integer (Porion.Builds.Models.Config_Status_Type'Pos (Object.Status)));
+      Query.Save_Field (Name  => COL_5_1_NAME, --  node_id
                         Value => Object.Node);
-      Query.Save_Field (Name  => COL_5_1_NAME, --  project_id
+      Query.Save_Field (Name  => COL_6_1_NAME, --  project_id
                         Value => Object.Project);
       Query.Execute (Result);
       if Result /= 1 then
@@ -444,6 +474,8 @@ package body Porion.Builds.Models is
          return Util.Beans.Objects.To_Object (Impl.Name);
       elsif Name = "description" then
          return Util.Beans.Objects.To_Object (Impl.Description);
+      elsif Name = "status" then
+         return Porion.Builds.Models.Config_Status_Type_Objects.To_Object (Impl.Status);
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -480,11 +512,12 @@ package body Porion.Builds.Models is
       Object.Set_Key_Value (Stmt.Get_Identifier (0));
       Object.Name := Stmt.Get_Unbounded_String (2);
       Object.Description := Stmt.Get_Unbounded_String (3);
-      if not Stmt.Is_Null (4) then
-         Object.Node.Set_Key_Value (Stmt.Get_Identifier (4), Session);
-      end if;
+      Object.Status := Porion.Builds.Models.Config_Status_Type'Val (Stmt.Get_Integer (4));
       if not Stmt.Is_Null (5) then
-         Object.Project.Set_Key_Value (Stmt.Get_Identifier (5), Session);
+         Object.Node.Set_Key_Value (Stmt.Get_Identifier (5), Session);
+      end if;
+      if not Stmt.Is_Null (6) then
+         Object.Project.Set_Key_Value (Stmt.Get_Identifier (6), Session);
       end if;
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);

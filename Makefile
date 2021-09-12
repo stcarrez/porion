@@ -13,6 +13,7 @@ ARE=are
 # Model generation arguments with Dynamo
 # --package XXX.XXX.Models db uml/xxx.zargo
 DYNAMO_ARGS=\
+  --package Porion.Queries \
   --package Porion.Nodes.Models \
   --package Porion.Builds.Models \
   --package Porion.XUnit.Models \

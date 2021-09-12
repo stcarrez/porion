@@ -237,27 +237,16 @@ package body Porion.Projects.Services is
                      if Service.Branch.Is_Modified then
                         if Service.Branch.Get_Status /= Models.BUILD_DISABLED then
                            Service.Branch.Set_Status (Projects.Models.BUILD_REQUIRED);
-                        end if;
-                        Service.Branch.Set_Update_Date (Ada.Calendar.Clock);
-                        Service.Branch.Save (Service.DB);
-                     end if;
-                     case Service.Branch.Get_Status is
-                        when Models.BUILD_REQUIRED =>
                            Log.Info ("Build required for branch {0}", Name);
                            Builds.Services.Update_Branch_Config (Service.Branch,
                                                                  Builds.Models.CONFIG_BUILD_REQUIRED,
                                                                  Service.DB);
-
-                        when Models.BUILD_SUCCEEDED =>
-                           Log.Info ("Build already succeed for branch {0}", Name);
-
-                        when Models.BUILD_FAILED =>
-                           Log.Info ("Build failed for branch {0}", Name);
-
-                        when Models.BUILD_DISABLED =>
-                           Log.Info ("Build disabled for branch {0}", Name);
-
-                     end case;
+                        end if;
+                        Service.Branch.Set_Update_Date (Ada.Calendar.Clock);
+                        Service.Branch.Save (Service.DB);
+                     else
+                        Log.Info ("No change on branch {0}", Name);
+                     end if;
                      Found := True;
                      Branches.Delete (Iter);
                      exit;

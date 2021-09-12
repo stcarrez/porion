@@ -55,6 +55,9 @@ package body Porion.Commands.Build is
             if Command.Dry_Run then
                Executor.Enable_Dry_Run;
             end if;
+            if not Command.Quiet and not (Context.Verbose or Context.Dump) then
+               Executor.Enable_Log;
+            end if;
 
             Context.Build_Service.Find_Build_Configs (Command.Force, Build_Configs);
             for Build_Config of Build_Configs loop
@@ -88,6 +91,8 @@ package body Porion.Commands.Build is
                         "-f", "--force", -("Force the build"));
       GC.Define_Switch (Config, Command.Clean'Access,
                         "-c", "--clean", -("Clean before building"));
+      GC.Define_Switch (Config, Command.Quiet'Access,
+                        "-q", "--quiet", -("Quiet execution where build logs are not printed"));
       GC.Define_Switch (Config, Command.Dry_Run'Access,
                         "-n", "--dry-run", -("Don't build but print commands for building"));
    end Setup;

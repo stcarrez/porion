@@ -38,6 +38,7 @@ private
    type Command_Type is new Porion.Commands.Drivers.Command_Type with record
       Force   : aliased Boolean := False;
       Clean   : aliased Boolean := False;
+      Quiet   : aliased Boolean := False;
       Dry_Run : aliased Boolean := False;
    end record;
 

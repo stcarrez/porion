@@ -82,6 +82,7 @@ package body Porion.Builds.Services is
          if not Found then
             Service.Build_Config.Set_Node (Service.Build_Node);
             Service.Build_Config.Set_Project (Service.Project);
+            Service.Build_Config.Set_Status (Builds.Models.CONFIG_BUILD_REQUIRED);
             Service.Build_Config.Save (Service.DB);
          end if;
       end if;
@@ -652,6 +653,7 @@ package body Porion.Builds.Services is
 
       Service.Build_Config.Set_Project (Service.Project);
       Service.Build_Config.Set_Node (Service.Build_Node);
+      Service.Build_Config.Set_Status (Builds.Models.CONFIG_BUILD_REQUIRED);
       Service.Build_Config.Save (Service.DB);
       Service.Guess (Path, Executor);
    end Make_Build_Config;

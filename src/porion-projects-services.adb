@@ -212,6 +212,7 @@ package body Porion.Projects.Services is
 
       --  Get the current known branches.
       Query.Bind_Param ("project_id", Service.Project.Get_Id);
+      Query.Set_Filter ("o.project_id = :project_id");
       Projects.Models.List (Branches, Service.DB, Query);
 
       Status.Head := Src_Status.Head;
@@ -263,10 +264,6 @@ package body Porion.Projects.Services is
                            Log.Info ("Build disabled for branch {0}", Name);
 
                      end case;
-                     if Service.Branch.Get_Status = Models.BUILD_REQUIRED then
-                        Log.Info ("Build required for branch {0}", Name);
-                        Status.Changes.Insert (Name, Branch);
-                     end if;
                      Found := True;
                      Branches.Delete (Iter);
                      exit;

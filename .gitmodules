@@ -1,3 +1,6 @@
 [submodule "ansi-ada"]
 	path = ansi-ada
 	url = https://github.com/mosteo/ansi-ada
+[submodule "printer-toolkit"]
+	path = printer-toolkit
+	url = athena:/home/git/printer-toolkit.git

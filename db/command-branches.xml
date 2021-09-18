@@ -1,0 +1,42 @@
+<query-mapping package='Porion.Queries'>
+    <description>
+        List of project branches
+    </description>
+
+    <class name="Porion.Queries.Branch_Info" bean="no">
+        <comment>Information about a project branch.</comment>
+        <property type='String' name="name">
+            <comment>the branch name.</comment>
+        </property>
+        <property type='Porion.Projects.Models.Branch_Status_Type' name="branch_status">
+            <comment>the branch status.</comment>
+        </property>
+        <property type='String' name="branch_tag">
+            <comment>the branch tag.</comment>
+        </property>
+        <property type='Integer' name="config_count">
+            <comment>the number of build config for this branch.</comment>
+        </property>
+    </class>
+
+    <query name='branch-list'>
+        <comment>Get the list of project branch</comment>
+        <sql>
+            SELECT
+            branch.name AS name,
+            branch.status AS status,
+            branch.tag AS tag,
+            COUNT(build_config.id) AS config_count
+            FROM porion_branch AS branch
+            LEFT JOIN porion_build_config AS build_config ON build_config.branch_id = branch.id
+            WHERE branch.project_id = :project_id
+            GROUP BY branch.id
+        </sql>
+        <sql-count>
+            SELECT
+            count(project.id)
+            FROM porion_project AS project
+        </sql-count>
+    </query>
+
+</query-mapping>

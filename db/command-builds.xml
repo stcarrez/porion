@@ -1,19 +1,40 @@
-<query-mapping package='Porion.Projects.Models'>
+<query-mapping package='Porion.Queries'>
     <description>
         List of builds
     </description>
+
+    <query name='stat-project-build-status'>
+        <comment>Project build status for a dashboard</comment>
+        <sql>
+          SELECT
+          build.status,
+          count(build.id)
+          FROM porion_build_config AS config
+          LEFT JOIN porion_last_build AS build on build.build_config_id = config.id
+          GROUP BY build.status
+        </sql>
+    </query>
 
     <query name='command-build-list'>
         <comment>Get the list of builds</comment>
         <sql>
             SELECT
-            build.id AS id,
-            build.number AS number,
             project.name AS name,
+            branch.name AS branch_name,
+            config.name AS config_name,
+            build.id AS build_id,
+            build.number AS number,
+            build.tag AS tag,
+            build.status AS build_Status,
+            build.create_date AS build_date,
+            build.finish_date AS finish_date,
             build.pass_count AS pass_count,
             build.fail_count AS fail_count
             FROM porion_build AS build
             INNER JOIN porion_project AS project ON build.project_id = project.id
+            INNER JOIN porion_branch AS branch ON branch.id = build.branch_id
+            INNER JOIN porion_build_config AS config ON build.build_config_id = config.id
+            ORDER BY finish_date DESC
         </sql>
         <sql-count>
             SELECT

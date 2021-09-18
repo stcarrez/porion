@@ -100,6 +100,22 @@ CREATE TABLE IF NOT EXISTS porion_build_executor (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*  */
+CREATE TABLE IF NOT EXISTS porion_build_queue (
+  /* the build queue identifier. */
+  `id` BIGINT NOT NULL,
+  /* the optimistic lock version. */
+  `version` INTEGER NOT NULL,
+  /* the creation date. */
+  `creation_date` DATETIME NOT NULL,
+  /* the last update date. */
+  `update_date` DATETIME NOT NULL,
+  /* the builder order. */
+  `order` INTEGER NOT NULL,
+  /*  */
+  `build_config_id` BIGINT NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*  */
 CREATE TABLE IF NOT EXISTS porion_build_step (
   /* the build step identifier. */
   `id` BIGINT NOT NULL,
@@ -319,7 +335,7 @@ CREATE TABLE IF NOT EXISTS porion_test_run_group (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 INSERT IGNORE INTO entity_type (name) VALUES
-("porion_build"), ("porion_build_config"), ("porion_build_config_step"), ("porion_build_executor"), ("porion_build_step"), ("porion_environment"), ("porion_last_build"), ("porion_node"), ("porion_branch"), ("porion_dependency"), ("porion_project"), ("porion_test"), ("porion_test_group"), ("porion_test_run"), ("porion_test_run_group");
+("porion_build"), ("porion_build_config"), ("porion_build_config_step"), ("porion_build_executor"), ("porion_build_queue"), ("porion_build_step"), ("porion_environment"), ("porion_last_build"), ("porion_node"), ("porion_branch"), ("porion_dependency"), ("porion_project"), ("porion_test"), ("porion_test_group"), ("porion_test_run"), ("porion_test_run_group");
 INSERT IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_config"), "name");
 INSERT IGNORE INTO awa_audit_field (entity_type, name)

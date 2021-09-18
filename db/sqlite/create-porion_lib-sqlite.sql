@@ -124,6 +124,22 @@ CREATE TABLE IF NOT EXISTS porion_build_executor (
   PRIMARY KEY (`id`)
 );
 /*  */
+CREATE TABLE IF NOT EXISTS porion_build_queue (
+  /* the build queue identifier. */
+  `id` BIGINT NOT NULL,
+  /* the optimistic lock version. */
+  `version` INTEGER NOT NULL,
+  /* the creation date. */
+  `creation_date` DATETIME NOT NULL,
+  /* the last update date. */
+  `update_date` DATETIME NOT NULL,
+  /* the builder order. */
+  `order` INTEGER NOT NULL,
+  /*  */
+  `build_config_id` BIGINT NOT NULL,
+  PRIMARY KEY (`id`)
+);
+/*  */
 CREATE TABLE IF NOT EXISTS porion_build_step (
   /* the build step identifier. */
   `id` BIGINT NOT NULL,
@@ -346,6 +362,7 @@ INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_config");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_config_step");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_executor");
+INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_queue");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_step");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_environment");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_last_build");

@@ -10,6 +10,7 @@ DROP TABLE IF EXISTS porion_node;
 DROP TABLE IF EXISTS porion_last_build;
 DROP TABLE IF EXISTS porion_environment;
 DROP TABLE IF EXISTS porion_build_step;
+DROP TABLE IF EXISTS porion_build_queue;
 DROP TABLE IF EXISTS porion_build_executor;
 DROP TABLE IF EXISTS porion_build_config_step;
 DROP TABLE IF EXISTS porion_build_config;

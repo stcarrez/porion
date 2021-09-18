@@ -32,6 +32,7 @@ with Porion.Commands.List;
 with Porion.Commands.Config;
 with Porion.Commands.Init;
 with Porion.Commands.Edit;
+with Porion.Commands.Info;
 package body Porion.Commands is
 
    Help_Command            : aliased Porion.Commands.Drivers.Help_Command_Type;
@@ -44,6 +45,7 @@ package body Porion.Commands is
    Step_Command            : aliased Porion.Commands.Steps.Command_Type;
    Edit_Command            : aliased Porion.Commands.Edit.Command_Type;
    Remove_Command          : aliased Porion.Commands.Remove.Command_Type;
+   Info_Command            : aliased Porion.Commands.Info.Command_Type;
    Driver                  : Drivers.Driver_Type;
 
    procedure Flush_Input;
@@ -155,6 +157,9 @@ package body Porion.Commands is
       Driver.Add_Command ("remove",
                           -("remove a project and its build data"),
                           Remove_Command'Access);
+      Driver.Add_Command ("info",
+                          -("report some information about a project"),
+                          Info_Command'Access);
    end Initialize;
 
    --  ------------------------------

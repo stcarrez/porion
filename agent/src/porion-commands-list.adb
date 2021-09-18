@@ -76,7 +76,7 @@ package body Porion.Commands.List is
       end if;
 
       if Command.List_Builds then
-         Query.Set_Query (Porion.Projects.Models.Query_Command_Build_List);
+         Query.Set_Query (Porion.Queries.Query_Command_Build_List);
          List (Command, Context, Query, "command_build_list_");
       end if;
    end Execute;

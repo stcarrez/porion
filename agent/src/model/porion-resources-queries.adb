@@ -8,13 +8,13 @@ package body Porion.Resources.Queries is
      (1, 11);
 
    T1 : constant array (0 .. 1) of Unsigned_8 :=
-     (4, 4);
+     (16, 1);
 
    T2 : constant array (0 .. 1) of Unsigned_8 :=
-     (13, 5);
+     (15, 8);
 
-   G : constant array (0 .. 13) of Unsigned_8 :=
-     (5, 0, 0, 0, 0, 0, 1, 0, 4, 0, 4, 0, 2, 0);
+   G : constant array (0 .. 16) of Unsigned_8 :=
+     (0, 0, 0, 0, 7, 0, 3, 4, 6, 0, 0, 0, 5, 7, 0, 1, 0);
 
    function Hash (S : String) return Natural is
       F : constant Natural := S'First - 1;
@@ -25,10 +25,10 @@ package body Porion.Resources.Queries is
       for K in P'Range loop
          exit when L < P (K);
          J  := Character'Pos (S (P (K) + F));
-         F1 := (F1 + Natural (T1 (K)) * J) mod 14;
-         F2 := (F2 + Natural (T2 (K)) * J) mod 14;
+         F1 := (F1 + Natural (T1 (K)) * J) mod 17;
+         F2 := (F2 + Natural (T2 (K)) * J) mod 17;
       end loop;
-      return (Natural (G (F1)) + Natural (G (F2))) mod 6;
+      return (Natural (G (F1)) + Natural (G (F2))) mod 8;
    end Hash;
 
    C_0 : aliased constant String := "<query-mapping package='Porion.Projects.M"
@@ -88,7 +88,62 @@ package body Porion.Resources.Queries is
        & "id" & ASCII.LF & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF
        & "</query-mapping>" & ASCII.LF;
 
-   C_1 : aliased constant String := "<query-mapping package='Porion.Projects.M"
+   C_1 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+       & "    <description>" & ASCII.LF & "        List of project branches" & ASCII.LF & "  "
+       & "  </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Queries.Br"
+       & "anch_Info"" bean=""no"">" & ASCII.LF & "        <comment>Information about a pr"
+       & "oject branch.</comment>" & ASCII.LF & "        <property type='String' name=""n"
+       & "ame"">" & ASCII.LF & "            <comment>the branch name.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Porion.Projects.Mode"
+       & "ls.Branch_Status_Type' name=""branch_status"">" & ASCII.LF & "            <comm"
+       & "ent>the branch status.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='String' name=""branch_tag"">" & ASCII.LF & "           "
+       & " <comment>the branch tag.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Integer' name=""config_count"">" & ASCII.LF & "        "
+       & "    <comment>the number of build config for this branch.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF & "    <que"
+       & "ry name='branch-list'>" & ASCII.LF & "        <comment>Get the list of project "
+       & "branch</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & "            SELECT" & ASCII.LF
+       & "            branch.name AS name," & ASCII.LF & "            branch.status AS st"
+       & "atus," & ASCII.LF & "            branch.tag AS tag," & ASCII.LF & "            COUN"
+       & "T(build_config.id) AS config_count" & ASCII.LF & "            FROM porion_branc"
+       & "h AS branch" & ASCII.LF & "            LEFT JOIN porion_build_config AS build_c"
+       & "onfig ON build_config.branch_id = branch.id" & ASCII.LF & "            WHERE br"
+       & "anch.project_id = :project_id" & ASCII.LF & "            GROUP BY branch.id" & ASCII.LF
+       & "        </sql>" & ASCII.LF & "        <sql-count>" & ASCII.LF & "            SELECT"
+       & ASCII.LF & "            count(project.id)" & ASCII.LF & "            FROM porio"
+       & "n_project AS project" & ASCII.LF & "        </sql-count>" & ASCII.LF & "    </query"
+       & ">" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+
+   C_2 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+       & "    <description>" & ASCII.LF & "        List of builds" & ASCII.LF & "    </descri"
+       & "ption>" & ASCII.LF & ASCII.LF & "    <query name='stat-project-build-status'>" & ASCII.LF
+       & "        <comment>Project build status for a dashboard</comment>" & ASCII.LF
+       & "        <sql>" & ASCII.LF & "          SELECT" & ASCII.LF & "          build.status"
+       & "," & ASCII.LF & "          count(build.id)" & ASCII.LF & "          FROM porion_bui"
+       & "ld_config AS config" & ASCII.LF & "          LEFT JOIN porion_last_build AS bui"
+       & "ld on build.build_config_id = config.id" & ASCII.LF & "          GROUP BY build"
+       & ".status" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF
+       & "    <query name='command-build-list'>" & ASCII.LF & "        <comment>Get the l"
+       & "ist of builds</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & "            SEL"
+       & "ECT" & ASCII.LF & "            project.name AS name," & ASCII.LF & "            bra"
+       & "nch.name AS branch_name," & ASCII.LF & "            config.name AS config_name,"
+       & ASCII.LF & "            build.id AS build_id," & ASCII.LF & "            build."
+       & "number AS number," & ASCII.LF & "            build.tag AS tag," & ASCII.LF & "     "
+       & "       build.status AS build_Status," & ASCII.LF & "            build.create_da"
+       & "te AS build_date," & ASCII.LF & "            build.finish_date AS finish_date," & ASCII.LF
+       & "            build.pass_count AS pass_count," & ASCII.LF & "            build.fa"
+       & "il_count AS fail_count" & ASCII.LF & "            FROM porion_build AS build" & ASCII.LF
+       & "            INNER JOIN porion_project AS project ON build.project_id = proj"
+       & "ect.id" & ASCII.LF & "            INNER JOIN porion_branch AS branch ON branch."
+       & "id = build.branch_id" & ASCII.LF & "            INNER JOIN porion_build_config "
+       & "AS config ON build.build_config_id = config.id" & ASCII.LF & "            ORDER"
+       & " BY finish_date DESC" & ASCII.LF & "        </sql>" & ASCII.LF & "        <sql-coun"
+       & "t>" & ASCII.LF & "            SELECT" & ASCII.LF & "            count(build.id)" & ASCII.LF
+       & "            FROM porion_build AS build" & ASCII.LF & "        </sql-count>" & ASCII.LF
+       & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+
+   C_3 : aliased constant String := "<query-mapping package='Porion.Projects.M"
        & "odels'>" & ASCII.LF & "    <description>" & ASCII.LF & "        List of builds" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <query name='command-build-li"
        & "st'>" & ASCII.LF & "        <comment>Get the list of builds</comment>" & ASCII.LF
@@ -103,7 +158,7 @@ package body Porion.Resources.Queries is
        & "ld" & ASCII.LF & "        </sql-count>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF
        & "</query-mapping>" & ASCII.LF;
 
-   C_2 : aliased constant String := "<query-mapping package='Porion.Projects.M"
+   C_4 : aliased constant String := "<query-mapping package='Porion.Projects.M"
        & "odels'>" & ASCII.LF & "    <description>" & ASCII.LF & "        List of nodes" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <query name='command-node-lis"
        & "t'>" & ASCII.LF & "        <comment>Get the list of nodes</comment>" & ASCII.LF
@@ -114,7 +169,7 @@ package body Porion.Resources.Queries is
        & "            FROM porion_node AS node" & ASCII.LF & "        </sql-count>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_3 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_5 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of projects" & ASCII.LF & "    </desc"
        & "ription>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Queries.Project_In"
        & "fo"" bean=""no"">" & ASCII.LF & "        <comment>Information about a project.<"
@@ -164,7 +219,7 @@ package body Porion.Resources.Queries is
        & "        FROM porion_project AS project" & ASCII.LF & "        </sql-count>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_4 : aliased constant String := "<query-mapping package='Porion.Projects.M"
+   C_6 : aliased constant String := "<query-mapping package='Porion.Projects.M"
        & "odels'>" & ASCII.LF & "    <description>" & ASCII.LF & "      Information about bra"
        & "nches on a project." & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF & "  "
        & "  <query name='project-branches'>" & ASCII.LF & "       <comment>Get a list of "
@@ -179,7 +234,7 @@ package body Porion.Resources.Queries is
        & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</query-mappin"
        & "g>" & ASCII.LF;
 
-   C_5 : aliased constant String := "<query-mapping package='Porion.Projects.M"
+   C_7 : aliased constant String := "<query-mapping package='Porion.Projects.M"
        & "odels'>" & ASCII.LF & "    <description>" & ASCII.LF & "      Information about bra"
        & "nches on a project." & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF & "  "
        & "  <query name='project-last-build'>" & ASCII.LF & "       <comment>Get a list o"
@@ -192,7 +247,8 @@ package body Porion.Resources.Queries is
 
    type Content_List_Array is array (Natural range <>) of access constant String;
    Contents : constant Content_List_Array := (
-      C_0'Access, C_1'Access, C_2'Access, C_3'Access, C_4'Access, C_5'Access);
+      C_0'Access, C_1'Access, C_2'Access, C_3'Access, C_4'Access, C_5'Access,
+      C_6'Access, C_7'Access);
 
    function Get_Content (Name : String) return access constant String is
       H : constant Natural := Hash (Name);

@@ -2216,6 +2216,436 @@ package body Porion.Builds.Models is
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);
    end Load;
+   function Build_Queue_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key is
+      Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
+                                       Of_Class => BUILD_QUEUE_DEF'Access);
+   begin
+      ADO.Objects.Set_Value (Result, Id);
+      return Result;
+   end Build_Queue_Key;
+
+   function Build_Queue_Key (Id : in String) return ADO.Objects.Object_Key is
+      Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
+                                       Of_Class => BUILD_QUEUE_DEF'Access);
+   begin
+      ADO.Objects.Set_Value (Result, Id);
+      return Result;
+   end Build_Queue_Key;
+
+   function "=" (Left, Right : Build_Queue_Ref'Class) return Boolean is
+   begin
+      return ADO.Objects.Object_Ref'Class (Left) = ADO.Objects.Object_Ref'Class (Right);
+   end "=";
+
+   procedure Set_Field (Object : in out Build_Queue_Ref'Class;
+                        Impl   : out Build_Queue_Access) is
+      Result : ADO.Objects.Object_Record_Access;
+   begin
+      Object.Prepare_Modify (Result);
+      Impl := Build_Queue_Impl (Result.all)'Access;
+   end Set_Field;
+
+   --  Internal method to allocate the Object_Record instance
+   procedure Allocate (Object : in out Build_Queue_Ref) is
+      Impl : Build_Queue_Access;
+   begin
+      Impl := new Build_Queue_Impl;
+      Impl.Version := 0;
+      Impl.Creation_Date := ADO.DEFAULT_TIME;
+      Impl.Update_Date := ADO.DEFAULT_TIME;
+      Impl.Order := 0;
+      ADO.Objects.Set_Object (Object, Impl.all'Access);
+   end Allocate;
+
+   -- ----------------------------------------
+   --  Data object: Build_Queue
+   -- ----------------------------------------
+
+   procedure Set_Id (Object : in out Build_Queue_Ref;
+                     Value  : in ADO.Identifier) is
+      Impl : Build_Queue_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Key_Value (Impl.all, 1, Value);
+   end Set_Id;
+
+   function Get_Id (Object : in Build_Queue_Ref)
+                  return ADO.Identifier is
+      Impl : constant Build_Queue_Access
+         := Build_Queue_Impl (Object.Get_Object.all)'Access;
+   begin
+      return Impl.Get_Key_Value;
+   end Get_Id;
+
+
+   function Get_Version (Object : in Build_Queue_Ref)
+                  return Integer is
+      Impl : constant Build_Queue_Access
+         := Build_Queue_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Version;
+   end Get_Version;
+
+
+   procedure Set_Creation_Date (Object : in out Build_Queue_Ref;
+                                Value  : in Ada.Calendar.Time) is
+      Impl : Build_Queue_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Time (Impl.all, 3, Impl.Creation_Date, Value);
+   end Set_Creation_Date;
+
+   function Get_Creation_Date (Object : in Build_Queue_Ref)
+                  return Ada.Calendar.Time is
+      Impl : constant Build_Queue_Access
+         := Build_Queue_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Creation_Date;
+   end Get_Creation_Date;
+
+
+   procedure Set_Update_Date (Object : in out Build_Queue_Ref;
+                              Value  : in Ada.Calendar.Time) is
+      Impl : Build_Queue_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Time (Impl.all, 4, Impl.Update_Date, Value);
+   end Set_Update_Date;
+
+   function Get_Update_Date (Object : in Build_Queue_Ref)
+                  return Ada.Calendar.Time is
+      Impl : constant Build_Queue_Access
+         := Build_Queue_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Update_Date;
+   end Get_Update_Date;
+
+
+   procedure Set_Order (Object : in out Build_Queue_Ref;
+                        Value  : in Integer) is
+      Impl : Build_Queue_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Integer (Impl.all, 5, Impl.Order, Value);
+   end Set_Order;
+
+   function Get_Order (Object : in Build_Queue_Ref)
+                  return Integer is
+      Impl : constant Build_Queue_Access
+         := Build_Queue_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Order;
+   end Get_Order;
+
+
+   procedure Set_Build_Config (Object : in out Build_Queue_Ref;
+                               Value  : in Porion.Builds.Models.Build_Config_Ref'Class) is
+      Impl : Build_Queue_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Object (Impl.all, 6, Impl.Build_Config, Value);
+   end Set_Build_Config;
+
+   function Get_Build_Config (Object : in Build_Queue_Ref)
+                  return Porion.Builds.Models.Build_Config_Ref'Class is
+      Impl : constant Build_Queue_Access
+         := Build_Queue_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Build_Config;
+   end Get_Build_Config;
+
+   --  Copy of the object.
+   procedure Copy (Object : in Build_Queue_Ref;
+                   Into   : in out Build_Queue_Ref) is
+      Result : Build_Queue_Ref;
+   begin
+      if not Object.Is_Null then
+         declare
+            Impl : constant Build_Queue_Access
+              := Build_Queue_Impl (Object.Get_Load_Object.all)'Access;
+            Copy : constant Build_Queue_Access
+              := new Build_Queue_Impl;
+         begin
+            ADO.Objects.Set_Object (Result, Copy.all'Access);
+            Copy.Copy (Impl.all);
+            Copy.Version := Impl.Version;
+            Copy.Creation_Date := Impl.Creation_Date;
+            Copy.Update_Date := Impl.Update_Date;
+            Copy.Order := Impl.Order;
+            Copy.Build_Config := Impl.Build_Config;
+         end;
+      end if;
+      Into := Result;
+   end Copy;
+
+   procedure Find (Object  : in out Build_Queue_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class;
+                   Found   : out Boolean) is
+      Impl  : constant Build_Queue_Access := new Build_Queue_Impl;
+   begin
+      Impl.Find (Session, Query, Found);
+      if Found then
+         ADO.Objects.Set_Object (Object, Impl.all'Access);
+      else
+         ADO.Objects.Set_Object (Object, null);
+         Destroy (Impl);
+      end if;
+   end Find;
+
+   procedure Load (Object  : in out Build_Queue_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Id      : in ADO.Identifier) is
+      Impl  : constant Build_Queue_Access := new Build_Queue_Impl;
+      Found : Boolean;
+      Query : ADO.SQL.Query;
+   begin
+      Query.Bind_Param (Position => 1, Value => Id);
+      Query.Set_Filter ("id = ?");
+      Impl.Find (Session, Query, Found);
+      if not Found then
+         Destroy (Impl);
+         raise ADO.Objects.NOT_FOUND;
+      end if;
+      ADO.Objects.Set_Object (Object, Impl.all'Access);
+   end Load;
+
+   procedure Load (Object  : in out Build_Queue_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Id      : in ADO.Identifier;
+                   Found   : out Boolean) is
+      Impl  : constant Build_Queue_Access := new Build_Queue_Impl;
+      Query : ADO.SQL.Query;
+   begin
+      Query.Bind_Param (Position => 1, Value => Id);
+      Query.Set_Filter ("id = ?");
+      Impl.Find (Session, Query, Found);
+      if not Found then
+         Destroy (Impl);
+      else
+         ADO.Objects.Set_Object (Object, Impl.all'Access);
+      end if;
+   end Load;
+
+   procedure Save (Object  : in out Build_Queue_Ref;
+                   Session : in out ADO.Sessions.Master_Session'Class) is
+      Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;
+   begin
+      if Impl = null then
+         Impl := new Build_Queue_Impl;
+         ADO.Objects.Set_Object (Object, Impl);
+      end if;
+      if not ADO.Objects.Is_Created (Impl.all) then
+         Impl.Create (Session);
+      else
+         Impl.Save (Session);
+      end if;
+   end Save;
+
+   procedure Delete (Object  : in out Build_Queue_Ref;
+                     Session : in out ADO.Sessions.Master_Session'Class) is
+      Impl : constant ADO.Objects.Object_Record_Access := Object.Get_Object;
+   begin
+      if Impl /= null then
+         Impl.Delete (Session);
+      end if;
+   end Delete;
+
+   --  --------------------
+   --  Free the object
+   --  --------------------
+   procedure Destroy (Object : access Build_Queue_Impl) is
+      type Build_Queue_Impl_Ptr is access all Build_Queue_Impl;
+      procedure Unchecked_Free is new Ada.Unchecked_Deallocation
+              (Build_Queue_Impl, Build_Queue_Impl_Ptr);
+      pragma Warnings (Off, "*redundant conversion*");
+      Ptr : Build_Queue_Impl_Ptr := Build_Queue_Impl (Object.all)'Access;
+      pragma Warnings (On, "*redundant conversion*");
+   begin
+      Unchecked_Free (Ptr);
+   end Destroy;
+
+   procedure Find (Object  : in out Build_Queue_Impl;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class;
+                   Found   : out Boolean) is
+      Stmt : ADO.Statements.Query_Statement
+          := Session.Create_Statement (Query, BUILD_QUEUE_DEF'Access);
+   begin
+      Stmt.Execute;
+      if Stmt.Has_Elements then
+         Object.Load (Stmt, Session);
+         Stmt.Next;
+         Found := not Stmt.Has_Elements;
+      else
+         Found := False;
+      end if;
+   end Find;
+
+   overriding
+   procedure Load (Object  : in out Build_Queue_Impl;
+                   Session : in out ADO.Sessions.Session'Class) is
+      Found : Boolean;
+      Query : ADO.SQL.Query;
+      Id    : constant ADO.Identifier := Object.Get_Key_Value;
+   begin
+      Query.Bind_Param (Position => 1, Value => Id);
+      Query.Set_Filter ("id = ?");
+      Object.Find (Session, Query, Found);
+      if not Found then
+         raise ADO.Objects.NOT_FOUND;
+      end if;
+   end Load;
+
+   procedure Save (Object  : in out Build_Queue_Impl;
+                   Session : in out ADO.Sessions.Master_Session'Class) is
+      Stmt : ADO.Statements.Update_Statement
+         := Session.Create_Statement (BUILD_QUEUE_DEF'Access);
+   begin
+      if Object.Is_Modified (1) then
+         Stmt.Save_Field (Name  => COL_0_5_NAME, --  id
+                          Value => Object.Get_Key);
+         Object.Clear_Modified (1);
+      end if;
+      if Object.Is_Modified (4) then
+         Stmt.Save_Field (Name  => COL_3_5_NAME, --  update_date
+                          Value => Object.Update_Date);
+         Object.Clear_Modified (4);
+      end if;
+      if Object.Is_Modified (5) then
+         Stmt.Save_Field (Name  => COL_4_5_NAME, --  order
+                          Value => Object.Order);
+         Object.Clear_Modified (5);
+      end if;
+      if Object.Is_Modified (6) then
+         Stmt.Save_Field (Name  => COL_5_5_NAME, --  build_config_id
+                          Value => Object.Build_Config);
+         Object.Clear_Modified (6);
+      end if;
+      if Stmt.Has_Save_Fields then
+         Object.Version := Object.Version + 1;
+         Stmt.Save_Field (Name  => "version",
+                          Value => Object.Version);
+         Stmt.Set_Filter (Filter => "id = ? and version = ?");
+         Stmt.Add_Param (Value => Object.Get_Key);
+         Stmt.Add_Param (Value => Object.Version - 1);
+         declare
+            Result : Integer;
+         begin
+            Stmt.Execute (Result);
+            if Result /= 1 then
+               if Result /= 0 then
+                  raise ADO.Objects.UPDATE_ERROR;
+               else
+                  raise ADO.Objects.LAZY_LOCK;
+               end if;
+            end if;
+         end;
+      end if;
+   end Save;
+
+   procedure Create (Object  : in out Build_Queue_Impl;
+                     Session : in out ADO.Sessions.Master_Session'Class) is
+      Query : ADO.Statements.Insert_Statement
+                  := Session.Create_Statement (BUILD_QUEUE_DEF'Access);
+      Result : Integer;
+   begin
+      Object.Version := 1;
+      Session.Allocate (Id => Object);
+      Query.Save_Field (Name  => COL_0_5_NAME, --  id
+                        Value => Object.Get_Key);
+      Query.Save_Field (Name  => COL_1_5_NAME, --  version
+                        Value => Object.Version);
+      Query.Save_Field (Name  => COL_2_5_NAME, --  creation_date
+                        Value => Object.Creation_Date);
+      Query.Save_Field (Name  => COL_3_5_NAME, --  update_date
+                        Value => Object.Update_Date);
+      Query.Save_Field (Name  => COL_4_5_NAME, --  order
+                        Value => Object.Order);
+      Query.Save_Field (Name  => COL_5_5_NAME, --  build_config_id
+                        Value => Object.Build_Config);
+      Query.Execute (Result);
+      if Result /= 1 then
+         raise ADO.Objects.INSERT_ERROR;
+      end if;
+      ADO.Objects.Set_Created (Object);
+   end Create;
+
+   procedure Delete (Object  : in out Build_Queue_Impl;
+                     Session : in out ADO.Sessions.Master_Session'Class) is
+      Stmt : ADO.Statements.Delete_Statement
+         := Session.Create_Statement (BUILD_QUEUE_DEF'Access);
+   begin
+      Stmt.Set_Filter (Filter => "id = ?");
+      Stmt.Add_Param (Value => Object.Get_Key);
+      Stmt.Execute;
+   end Delete;
+
+   --  ------------------------------
+   --  Get the bean attribute identified by the name.
+   --  ------------------------------
+   overriding
+   function Get_Value (From : in Build_Queue_Ref;
+                       Name : in String) return Util.Beans.Objects.Object is
+      Obj  : ADO.Objects.Object_Record_Access;
+      Impl : access Build_Queue_Impl;
+   begin
+      if From.Is_Null then
+         return Util.Beans.Objects.Null_Object;
+      end if;
+      Obj := From.Get_Load_Object;
+      Impl := Build_Queue_Impl (Obj.all)'Access;
+      if Name = "id" then
+         return ADO.Objects.To_Object (Impl.Get_Key);
+      elsif Name = "creation_date" then
+         return Util.Beans.Objects.Time.To_Object (Impl.Creation_Date);
+      elsif Name = "update_date" then
+         return Util.Beans.Objects.Time.To_Object (Impl.Update_Date);
+      elsif Name = "order" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Order));
+      end if;
+      return Util.Beans.Objects.Null_Object;
+   end Get_Value;
+
+
+   procedure List (Object  : in out Build_Queue_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class) is
+      Stmt : ADO.Statements.Query_Statement
+        := Session.Create_Statement (Query, BUILD_QUEUE_DEF'Access);
+   begin
+      Stmt.Execute;
+      Build_Queue_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         declare
+            Item : Build_Queue_Ref;
+            Impl : constant Build_Queue_Access := new Build_Queue_Impl;
+         begin
+            Impl.Load (Stmt, Session);
+            ADO.Objects.Set_Object (Item, Impl.all'Access);
+            Object.Append (Item);
+         end;
+         Stmt.Next;
+      end loop;
+   end List;
+
+   --  ------------------------------
+   --  Load the object from current iterator position
+   --  ------------------------------
+   procedure Load (Object  : in out Build_Queue_Impl;
+                   Stmt    : in out ADO.Statements.Query_Statement'Class;
+                   Session : in out ADO.Sessions.Session'Class) is
+   begin
+      Object.Set_Key_Value (Stmt.Get_Identifier (0));
+      Object.Creation_Date := Stmt.Get_Time (2);
+      Object.Update_Date := Stmt.Get_Time (3);
+      Object.Order := Stmt.Get_Integer (4);
+      if not Stmt.Is_Null (5) then
+         Object.Build_Config.Set_Key_Value (Stmt.Get_Identifier (5), Session);
+      end if;
+      Object.Version := Stmt.Get_Integer (1);
+      ADO.Objects.Set_Created (Object);
+   end Load;
    function Build_Step_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key is
       Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
                                        Of_Class => BUILD_STEP_DEF'Access);
@@ -2510,22 +2940,22 @@ package body Porion.Builds.Models is
          := Session.Create_Statement (BUILD_STEP_DEF'Access);
    begin
       if Object.Is_Modified (3) then
-         Stmt.Save_Field (Name  => COL_2_5_NAME, --  end_date
+         Stmt.Save_Field (Name  => COL_2_6_NAME, --  end_date
                           Value => Object.End_Date);
          Object.Clear_Modified (3);
       end if;
       if Object.Is_Modified (4) then
-         Stmt.Save_Field (Name  => COL_3_5_NAME, --  exit_status
+         Stmt.Save_Field (Name  => COL_3_6_NAME, --  exit_status
                           Value => Object.Exit_Status);
          Object.Clear_Modified (4);
       end if;
       if Object.Is_Modified (5) then
-         Stmt.Save_Field (Name  => COL_4_5_NAME, --  build_id
+         Stmt.Save_Field (Name  => COL_4_6_NAME, --  build_id
                           Value => Object.Build);
          Object.Clear_Modified (5);
       end if;
       if Object.Is_Modified (6) then
-         Stmt.Save_Field (Name  => COL_5_5_NAME, --  config_id
+         Stmt.Save_Field (Name  => COL_5_6_NAME, --  config_id
                           Value => Object.Config);
          Object.Clear_Modified (6);
       end if;
@@ -2552,17 +2982,17 @@ package body Porion.Builds.Models is
       Result : Integer;
    begin
       Session.Allocate (Id => Object);
-      Query.Save_Field (Name  => COL_0_5_NAME, --  id
+      Query.Save_Field (Name  => COL_0_6_NAME, --  id
                         Value => Object.Get_Key);
-      Query.Save_Field (Name  => COL_1_5_NAME, --  start_date
+      Query.Save_Field (Name  => COL_1_6_NAME, --  start_date
                         Value => Object.Start_Date);
-      Query.Save_Field (Name  => COL_2_5_NAME, --  end_date
+      Query.Save_Field (Name  => COL_2_6_NAME, --  end_date
                         Value => Object.End_Date);
-      Query.Save_Field (Name  => COL_3_5_NAME, --  exit_status
+      Query.Save_Field (Name  => COL_3_6_NAME, --  exit_status
                         Value => Object.Exit_Status);
-      Query.Save_Field (Name  => COL_4_5_NAME, --  build_id
+      Query.Save_Field (Name  => COL_4_6_NAME, --  build_id
                         Value => Object.Build);
-      Query.Save_Field (Name  => COL_5_5_NAME, --  config_id
+      Query.Save_Field (Name  => COL_5_6_NAME, --  config_id
                         Value => Object.Config);
       Query.Execute (Result);
       if Result /= 1 then
@@ -2962,22 +3392,22 @@ package body Porion.Builds.Models is
          := Session.Create_Statement (ENVIRONMENT_DEF'Access);
    begin
       if Object.Is_Modified (1) then
-         Stmt.Save_Field (Name  => COL_0_6_NAME, --  id
+         Stmt.Save_Field (Name  => COL_0_7_NAME, --  id
                           Value => Object.Get_Key);
          Object.Clear_Modified (1);
       end if;
       if Object.Is_Modified (4) then
-         Stmt.Save_Field (Name  => COL_3_6_NAME, --  value
+         Stmt.Save_Field (Name  => COL_3_7_NAME, --  value
                           Value => Object.Value);
          Object.Clear_Modified (4);
       end if;
       if Object.Is_Modified (5) then
-         Stmt.Save_Field (Name  => COL_4_6_NAME, --  node_id
+         Stmt.Save_Field (Name  => COL_4_7_NAME, --  node_id
                           Value => Object.Node);
          Object.Clear_Modified (5);
       end if;
       if Object.Is_Modified (6) then
-         Stmt.Save_Field (Name  => COL_5_6_NAME, --  build_config_id
+         Stmt.Save_Field (Name  => COL_5_7_NAME, --  build_config_id
                           Value => Object.Build_Config);
          Object.Clear_Modified (6);
       end if;
@@ -3012,17 +3442,17 @@ package body Porion.Builds.Models is
    begin
       Object.Version := 1;
       Session.Allocate (Id => Object);
-      Query.Save_Field (Name  => COL_0_6_NAME, --  id
+      Query.Save_Field (Name  => COL_0_7_NAME, --  id
                         Value => Object.Get_Key);
-      Query.Save_Field (Name  => COL_1_6_NAME, --  version
+      Query.Save_Field (Name  => COL_1_7_NAME, --  version
                         Value => Object.Version);
-      Query.Save_Field (Name  => COL_2_6_NAME, --  name
+      Query.Save_Field (Name  => COL_2_7_NAME, --  name
                         Value => Object.Name);
-      Query.Save_Field (Name  => COL_3_6_NAME, --  value
+      Query.Save_Field (Name  => COL_3_7_NAME, --  value
                         Value => Object.Value);
-      Query.Save_Field (Name  => COL_4_6_NAME, --  node_id
+      Query.Save_Field (Name  => COL_4_7_NAME, --  node_id
                         Value => Object.Node);
-      Query.Save_Field (Name  => COL_5_6_NAME, --  build_config_id
+      Query.Save_Field (Name  => COL_5_7_NAME, --  build_config_id
                         Value => Object.Build_Config);
       Query.Execute (Result);
       if Result /= 1 then
@@ -3395,22 +3825,22 @@ package body Porion.Builds.Models is
          := Session.Create_Statement (LAST_BUILD_DEF'Access);
    begin
       if Object.Is_Modified (1) then
-         Stmt.Save_Field (Name  => COL_0_7_NAME, --  id
+         Stmt.Save_Field (Name  => COL_0_8_NAME, --  id
                           Value => Object.Get_Key);
          Object.Clear_Modified (1);
       end if;
       if Object.Is_Modified (4) then
-         Stmt.Save_Field (Name  => COL_3_7_NAME, --  build_id
+         Stmt.Save_Field (Name  => COL_3_8_NAME, --  build_id
                           Value => Object.Build);
          Object.Clear_Modified (4);
       end if;
       if Object.Is_Modified (5) then
-         Stmt.Save_Field (Name  => COL_4_7_NAME, --  branch_id
+         Stmt.Save_Field (Name  => COL_4_8_NAME, --  branch_id
                           Value => Object.Branch);
          Object.Clear_Modified (5);
       end if;
       if Object.Is_Modified (6) then
-         Stmt.Save_Field (Name  => COL_5_7_NAME, --  build_config_id
+         Stmt.Save_Field (Name  => COL_5_8_NAME, --  build_config_id
                           Value => Object.Build_Config);
          Object.Clear_Modified (6);
       end if;
@@ -3444,17 +3874,17 @@ package body Porion.Builds.Models is
    begin
       Object.Version := 1;
       Session.Allocate (Id => Object);
-      Query.Save_Field (Name  => COL_0_7_NAME, --  id
+      Query.Save_Field (Name  => COL_0_8_NAME, --  id
                         Value => Object.Get_Key);
-      Query.Save_Field (Name  => COL_1_7_NAME, --  status
+      Query.Save_Field (Name  => COL_1_8_NAME, --  status
                         Value => Integer (Porion.Builds.Models.Build_Status_Type'Pos (Object.Status)));
-      Query.Save_Field (Name  => COL_2_7_NAME, --  version
+      Query.Save_Field (Name  => COL_2_8_NAME, --  version
                         Value => Object.Version);
-      Query.Save_Field (Name  => COL_3_7_NAME, --  build_id
+      Query.Save_Field (Name  => COL_3_8_NAME, --  build_id
                         Value => Object.Build);
-      Query.Save_Field (Name  => COL_4_7_NAME, --  branch_id
+      Query.Save_Field (Name  => COL_4_8_NAME, --  branch_id
                         Value => Object.Branch);
-      Query.Save_Field (Name  => COL_5_7_NAME, --  build_config_id
+      Query.Save_Field (Name  => COL_5_8_NAME, --  build_config_id
                         Value => Object.Build_Config);
       Query.Execute (Result);
       if Result /= 1 then

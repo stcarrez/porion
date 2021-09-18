@@ -89,6 +89,8 @@ package Porion.Builds.Models is
 
    type Build_Executor_Ref is new ADO.Objects.Object_Ref with null record;
 
+   type Build_Queue_Ref is new ADO.Objects.Object_Ref with null record;
+
    type Build_Step_Ref is new ADO.Objects.Object_Ref with null record;
 
    type Environment_Ref is new ADO.Objects.Object_Ref with null record;
@@ -672,6 +674,114 @@ package Porion.Builds.Models is
    subtype Build_Executor_Vector is Build_Executor_Vectors.Vector;
 
    procedure List (Object  : in out Build_Executor_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class);
+   --  Create an object key for Build_Queue.
+   function Build_Queue_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key;
+   --  Create an object key for Build_Queue from a string.
+   --  Raises Constraint_Error if the string cannot be converted into the object key.
+   function Build_Queue_Key (Id : in String) return ADO.Objects.Object_Key;
+
+   Null_Build_Queue : constant Build_Queue_Ref;
+   function "=" (Left, Right : Build_Queue_Ref'Class) return Boolean;
+
+   --  Set the build queue identifier.
+   procedure Set_Id (Object : in out Build_Queue_Ref;
+                     Value  : in ADO.Identifier);
+
+   --  Get the build queue identifier.
+   function Get_Id (Object : in Build_Queue_Ref)
+                 return ADO.Identifier;
+   --  Get the optimistic lock version.
+   function Get_Version (Object : in Build_Queue_Ref)
+                 return Integer;
+
+   --  Set the creation date.
+   procedure Set_Creation_Date (Object : in out Build_Queue_Ref;
+                                Value  : in Ada.Calendar.Time);
+
+   --  Get the creation date.
+   function Get_Creation_Date (Object : in Build_Queue_Ref)
+                 return Ada.Calendar.Time;
+
+   --  Set the last update date.
+   procedure Set_Update_Date (Object : in out Build_Queue_Ref;
+                              Value  : in Ada.Calendar.Time);
+
+   --  Get the last update date.
+   function Get_Update_Date (Object : in Build_Queue_Ref)
+                 return Ada.Calendar.Time;
+
+   --  Set the builder order.
+   procedure Set_Order (Object : in out Build_Queue_Ref;
+                        Value  : in Integer);
+
+   --  Get the builder order.
+   function Get_Order (Object : in Build_Queue_Ref)
+                 return Integer;
+
+   --
+   procedure Set_Build_Config (Object : in out Build_Queue_Ref;
+                               Value  : in Porion.Builds.Models.Build_Config_Ref'Class);
+
+   --
+   function Get_Build_Config (Object : in Build_Queue_Ref)
+                 return Porion.Builds.Models.Build_Config_Ref'Class;
+
+   --  Load the entity identified by 'Id'.
+   --  Raises the NOT_FOUND exception if it does not exist.
+   procedure Load (Object  : in out Build_Queue_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Id      : in ADO.Identifier);
+
+   --  Load the entity identified by 'Id'.
+   --  Returns True in <b>Found</b> if the object was found and False if it does not exist.
+   procedure Load (Object  : in out Build_Queue_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Id      : in ADO.Identifier;
+                   Found   : out Boolean);
+
+   --  Find and load the entity.
+   overriding
+   procedure Find (Object  : in out Build_Queue_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class;
+                   Found   : out Boolean);
+
+   --  Save the entity.  If the entity does not have an identifier, an identifier is allocated
+   --  and it is inserted in the table.  Otherwise, only data fields which have been changed
+   --  are updated.
+   overriding
+   procedure Save (Object  : in out Build_Queue_Ref;
+                   Session : in out ADO.Sessions.Master_Session'Class);
+
+   --  Delete the entity.
+   overriding
+   procedure Delete (Object  : in out Build_Queue_Ref;
+                     Session : in out ADO.Sessions.Master_Session'Class);
+
+   overriding
+   function Get_Value (From : in Build_Queue_Ref;
+                       Name : in String) return Util.Beans.Objects.Object;
+
+   --  Table definition
+   BUILD_QUEUE_TABLE : constant ADO.Schemas.Class_Mapping_Access;
+
+   --  Internal method to allocate the Object_Record instance
+   overriding
+   procedure Allocate (Object : in out Build_Queue_Ref);
+
+   --  Copy of the object.
+   procedure Copy (Object : in Build_Queue_Ref;
+                   Into   : in out Build_Queue_Ref);
+
+   package Build_Queue_Vectors is
+      new Ada.Containers.Vectors (Index_Type   => Positive,
+                                  Element_Type => Build_Queue_Ref,
+                                  "="          => "=");
+   subtype Build_Queue_Vector is Build_Queue_Vectors.Vector;
+
+   procedure List (Object  : in out Build_Queue_Vector;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class);
    --  Create an object key for Build_Step.
@@ -1349,17 +1459,17 @@ private
 
    procedure Set_Field (Object : in out Build_Executor_Ref'Class;
                         Impl   : out Build_Executor_Access);
-   BUILD_STEP_NAME : aliased constant String := "porion_build_step";
+   BUILD_QUEUE_NAME : aliased constant String := "porion_build_queue";
    COL_0_5_NAME : aliased constant String := "id";
-   COL_1_5_NAME : aliased constant String := "start_date";
-   COL_2_5_NAME : aliased constant String := "end_date";
-   COL_3_5_NAME : aliased constant String := "exit_status";
-   COL_4_5_NAME : aliased constant String := "build_id";
-   COL_5_5_NAME : aliased constant String := "config_id";
+   COL_1_5_NAME : aliased constant String := "version";
+   COL_2_5_NAME : aliased constant String := "creation_date";
+   COL_3_5_NAME : aliased constant String := "update_date";
+   COL_4_5_NAME : aliased constant String := "order";
+   COL_5_5_NAME : aliased constant String := "build_config_id";
 
-   BUILD_STEP_DEF : aliased constant ADO.Schemas.Class_Mapping :=
+   BUILD_QUEUE_DEF : aliased constant ADO.Schemas.Class_Mapping :=
      (Count   => 6,
-      Table   => BUILD_STEP_NAME'Access,
+      Table   => BUILD_QUEUE_NAME'Access,
       Members => (
          1 => COL_0_5_NAME'Access,
          2 => COL_1_5_NAME'Access,
@@ -1367,6 +1477,74 @@ private
          4 => COL_3_5_NAME'Access,
          5 => COL_4_5_NAME'Access,
          6 => COL_5_5_NAME'Access)
+     );
+   BUILD_QUEUE_TABLE : constant ADO.Schemas.Class_Mapping_Access
+      := BUILD_QUEUE_DEF'Access;
+
+
+   Null_Build_Queue : constant Build_Queue_Ref
+      := Build_Queue_Ref'(ADO.Objects.Object_Ref with null record);
+
+   type Build_Queue_Impl is
+      new ADO.Objects.Object_Record (Key_Type => ADO.Objects.KEY_INTEGER,
+                                     Of_Class => BUILD_QUEUE_DEF'Access)
+   with record
+       Version : Integer;
+       Creation_Date : Ada.Calendar.Time;
+       Update_Date : Ada.Calendar.Time;
+       Order : Integer;
+       Build_Config : Porion.Builds.Models.Build_Config_Ref;
+   end record;
+
+   type Build_Queue_Access is access all Build_Queue_Impl;
+
+   overriding
+   procedure Destroy (Object : access Build_Queue_Impl);
+
+   overriding
+   procedure Find (Object  : in out Build_Queue_Impl;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class;
+                   Found   : out Boolean);
+
+   overriding
+   procedure Load (Object  : in out Build_Queue_Impl;
+                   Session : in out ADO.Sessions.Session'Class);
+   procedure Load (Object  : in out Build_Queue_Impl;
+                   Stmt    : in out ADO.Statements.Query_Statement'Class;
+                   Session : in out ADO.Sessions.Session'Class);
+
+   overriding
+   procedure Save (Object  : in out Build_Queue_Impl;
+                   Session : in out ADO.Sessions.Master_Session'Class);
+
+   procedure Create (Object  : in out Build_Queue_Impl;
+                     Session : in out ADO.Sessions.Master_Session'Class);
+
+   overriding
+   procedure Delete (Object  : in out Build_Queue_Impl;
+                     Session : in out ADO.Sessions.Master_Session'Class);
+
+   procedure Set_Field (Object : in out Build_Queue_Ref'Class;
+                        Impl   : out Build_Queue_Access);
+   BUILD_STEP_NAME : aliased constant String := "porion_build_step";
+   COL_0_6_NAME : aliased constant String := "id";
+   COL_1_6_NAME : aliased constant String := "start_date";
+   COL_2_6_NAME : aliased constant String := "end_date";
+   COL_3_6_NAME : aliased constant String := "exit_status";
+   COL_4_6_NAME : aliased constant String := "build_id";
+   COL_5_6_NAME : aliased constant String := "config_id";
+
+   BUILD_STEP_DEF : aliased constant ADO.Schemas.Class_Mapping :=
+     (Count   => 6,
+      Table   => BUILD_STEP_NAME'Access,
+      Members => (
+         1 => COL_0_6_NAME'Access,
+         2 => COL_1_6_NAME'Access,
+         3 => COL_2_6_NAME'Access,
+         4 => COL_3_6_NAME'Access,
+         5 => COL_4_6_NAME'Access,
+         6 => COL_5_6_NAME'Access)
      );
    BUILD_STEP_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := BUILD_STEP_DEF'Access;
@@ -1418,23 +1596,23 @@ private
    procedure Set_Field (Object : in out Build_Step_Ref'Class;
                         Impl   : out Build_Step_Access);
    ENVIRONMENT_NAME : aliased constant String := "porion_environment";
-   COL_0_6_NAME : aliased constant String := "id";
-   COL_1_6_NAME : aliased constant String := "version";
-   COL_2_6_NAME : aliased constant String := "name";
-   COL_3_6_NAME : aliased constant String := "value";
-   COL_4_6_NAME : aliased constant String := "node_id";
-   COL_5_6_NAME : aliased constant String := "build_config_id";
+   COL_0_7_NAME : aliased constant String := "id";
+   COL_1_7_NAME : aliased constant String := "version";
+   COL_2_7_NAME : aliased constant String := "name";
+   COL_3_7_NAME : aliased constant String := "value";
+   COL_4_7_NAME : aliased constant String := "node_id";
+   COL_5_7_NAME : aliased constant String := "build_config_id";
 
    ENVIRONMENT_DEF : aliased constant ADO.Schemas.Class_Mapping :=
      (Count   => 6,
       Table   => ENVIRONMENT_NAME'Access,
       Members => (
-         1 => COL_0_6_NAME'Access,
-         2 => COL_1_6_NAME'Access,
-         3 => COL_2_6_NAME'Access,
-         4 => COL_3_6_NAME'Access,
-         5 => COL_4_6_NAME'Access,
-         6 => COL_5_6_NAME'Access)
+         1 => COL_0_7_NAME'Access,
+         2 => COL_1_7_NAME'Access,
+         3 => COL_2_7_NAME'Access,
+         4 => COL_3_7_NAME'Access,
+         5 => COL_4_7_NAME'Access,
+         6 => COL_5_7_NAME'Access)
      );
    ENVIRONMENT_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := ENVIRONMENT_DEF'Access;
@@ -1495,23 +1673,23 @@ private
    procedure Set_Field (Object : in out Environment_Ref'Class;
                         Impl   : out Environment_Access);
    LAST_BUILD_NAME : aliased constant String := "porion_last_build";
-   COL_0_7_NAME : aliased constant String := "id";
-   COL_1_7_NAME : aliased constant String := "status";
-   COL_2_7_NAME : aliased constant String := "version";
-   COL_3_7_NAME : aliased constant String := "build_id";
-   COL_4_7_NAME : aliased constant String := "branch_id";
-   COL_5_7_NAME : aliased constant String := "build_config_id";
+   COL_0_8_NAME : aliased constant String := "id";
+   COL_1_8_NAME : aliased constant String := "status";
+   COL_2_8_NAME : aliased constant String := "version";
+   COL_3_8_NAME : aliased constant String := "build_id";
+   COL_4_8_NAME : aliased constant String := "branch_id";
+   COL_5_8_NAME : aliased constant String := "build_config_id";
 
    LAST_BUILD_DEF : aliased constant ADO.Schemas.Class_Mapping :=
      (Count   => 6,
       Table   => LAST_BUILD_NAME'Access,
       Members => (
-         1 => COL_0_7_NAME'Access,
-         2 => COL_1_7_NAME'Access,
-         3 => COL_2_7_NAME'Access,
-         4 => COL_3_7_NAME'Access,
-         5 => COL_4_7_NAME'Access,
-         6 => COL_5_7_NAME'Access)
+         1 => COL_0_8_NAME'Access,
+         2 => COL_1_8_NAME'Access,
+         3 => COL_2_8_NAME'Access,
+         4 => COL_3_8_NAME'Access,
+         5 => COL_4_8_NAME'Access,
+         6 => COL_5_8_NAME'Access)
      );
    LAST_BUILD_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := LAST_BUILD_DEF'Access;

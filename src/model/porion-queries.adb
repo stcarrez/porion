@@ -30,6 +30,35 @@ package body Porion.Queries is
    pragma Warnings (Off, "formal parameter * is not referenced");
 
    --  --------------------
+   --  Information about a project branch.
+   --  --------------------
+   procedure List (Object  : in out Branch_Info_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+      procedure Read (Into : in out Branch_Info);
+
+      Stmt : ADO.Statements.Query_Statement
+          := Session.Create_Statement (Context);
+      Pos  : Positive := 1;
+      procedure Read (Into : in out Branch_Info) is
+      begin
+         Into.Name := Stmt.Get_Unbounded_String (0);
+         Into.Branch_Status := Porion.Projects.Models.Branch_Status_Type'Val (Stmt.Get_Integer (1));
+         Into.Branch_Tag := Stmt.Get_Unbounded_String (2);
+         Into.Config_Count := Stmt.Get_Integer (3);
+      end Read;
+   begin
+      Stmt.Execute;
+      Branch_Info_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         Object.Insert_Space (Before => Pos);
+         Object.Update_Element (Index => Pos, Process => Read'Access);
+         Pos := Pos + 1;
+         Stmt.Next;
+      end loop;
+   end List;
+
+   --  --------------------
    --  Information about a project.
    --  --------------------
    procedure List (Object  : in out Project_Info_Vector;

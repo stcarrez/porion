@@ -795,7 +795,7 @@ private
    := Def_Cleanup_Project_Branch.Query'Access;
 
    package File_4 is
-      new ADO.Queries.Loaders.File (Path => "command-builds.xml",
+      new ADO.Queries.Loaders.File (Path => "command-info.xml",
                                     Sha1 => "9B2B599473F75F92CB5AB5045675E4CCEF926543");
 
    package Def_Command_Build_List is

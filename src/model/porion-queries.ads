@@ -41,6 +41,43 @@ package Porion.Queries is
    pragma Style_Checks ("-mr");
 
 
+
+   Query_Stat_Project_Build_Status : constant ADO.Queries.Query_Definition_Access;
+
+   Query_Command_Build_List : constant ADO.Queries.Query_Definition_Access;
+
+   --  --------------------
+   --    Information about a project branch.
+   --  --------------------
+   type Branch_Info is record
+
+      --  the branch name.
+      Name : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the branch status.
+      Branch_Status : Porion.Projects.Models.Branch_Status_Type;
+
+      --  the branch tag.
+      Branch_Tag : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the number of build config for this branch.
+      Config_Count : Integer;
+   end record;
+
+   package Branch_Info_Vectors is
+      new Ada.Containers.Vectors (Index_Type   => Positive,
+                                  Element_Type => Branch_Info,
+                                  "="          => "=");
+
+   subtype Branch_Info_Vector is Branch_Info_Vectors.Vector;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Branch_Info_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
+
+   Query_Branch_List : constant ADO.Queries.Query_Definition_Access;
+
    --  --------------------
    --    Information about a project.
    --  --------------------
@@ -99,12 +136,38 @@ package Porion.Queries is
 private
 
    package File_1 is
+      new ADO.Queries.Loaders.File (Path => "command-builds.xml",
+                                    Sha1 => "9B2B599473F75F92CB5AB5045675E4CCEF926543");
+
+   package Def_Stat_Project_Build_Status is
+      new ADO.Queries.Loaders.Query (Name => "stat-project-build-status",
+                                     File => File_1.File'Access);
+   Query_Stat_Project_Build_Status : constant ADO.Queries.Query_Definition_Access
+   := Def_Stat_Project_Build_Status.Query'Access;
+
+   package Def_Command_Build_List is
+      new ADO.Queries.Loaders.Query (Name => "command-build-list",
+                                     File => File_1.File'Access);
+   Query_Command_Build_List : constant ADO.Queries.Query_Definition_Access
+   := Def_Command_Build_List.Query'Access;
+
+   package File_2 is
+      new ADO.Queries.Loaders.File (Path => "command-branches.xml",
+                                    Sha1 => "E39222B78D5C1AEE0AB9068F03EF25846E4BDA59");
+
+   package Def_Branchinfo_Branch_List is
+      new ADO.Queries.Loaders.Query (Name => "branch-list",
+                                     File => File_2.File'Access);
+   Query_Branch_List : constant ADO.Queries.Query_Definition_Access
+   := Def_Branchinfo_Branch_List.Query'Access;
+
+   package File_3 is
       new ADO.Queries.Loaders.File (Path => "command-projects.xml",
                                     Sha1 => "2B4AA202D163FA68DAD7ABA6910669E55F4DFDB6");
 
    package Def_Projectinfo_Project_List is
       new ADO.Queries.Loaders.Query (Name => "project-list",
-                                     File => File_1.File'Access);
+                                     File => File_3.File'Access);
    Query_Project_List : constant ADO.Queries.Query_Definition_Access
    := Def_Projectinfo_Project_List.Query'Access;
 end Porion.Queries;

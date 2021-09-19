@@ -114,6 +114,10 @@ package body Porion.Commands is
                         Long_Switch => "--debug-sql",
                         Help   => -("Enable debug SQL execution"));
       GC.Define_Switch (Config => Context.Command_Config,
+                        Output => Context.No_Colors'Access,
+                        Long_Switch => "--no-color",
+                        Help   => -("Disable colors in output"));
+      GC.Define_Switch (Config => Context.Command_Config,
                         Output => Context.Config_File'Access,
                         Switch => "-c:",
                         Long_Switch => "--config=",

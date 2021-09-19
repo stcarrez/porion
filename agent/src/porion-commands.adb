@@ -20,6 +20,8 @@ with Ada.Command_Line;
 with Ada.Text_IO;
 with Util.Strings;
 with Util.Commands.Parsers.GNAT_Parser;
+with PT.Drivers.Texts;
+with PT.Colors;
 with Porion.Configs;
 with Porion.Resources.Queries;
 with Porion.Commands.Drivers;
@@ -47,6 +49,8 @@ package body Porion.Commands is
    Remove_Command          : aliased Porion.Commands.Remove.Command_Type;
    Info_Command            : aliased Porion.Commands.Info.Command_Type;
    Driver                  : Drivers.Driver_Type;
+
+   Text_Printer            : aliased PT.Drivers.Texts.Printer_Type;
 
    procedure Flush_Input;
 
@@ -216,6 +220,38 @@ package body Porion.Commands is
                         Help   => -("Read the file that contains the wallet keys"));
    end Setup;
 
+   --  ------------------------------
+   --  Setup and configure the printer to write on the console.
+   --  ------------------------------
+   procedure Setup_Printer (Context : in out Context_Type) is
+      function Get_Cols return Integer with
+        Import => True, Convention => C, Link_Name => "porion_get_cols";
+
+      W : Integer := Get_Cols;
+   begin
+      if W < 10 then
+         W := 80;
+      end if;
+
+      Text_Printer.Create (Width => PT.W_Type (W));
+      Context.Printer := Text_Printer'Access;
+
+      Context.Styles.Default := Text_Printer.Create_Style;
+      if not Context.No_Colors then
+         Context.Styles.Default := Text_Printer.Create_Style (PT.Colors.Yellow);
+         Context.Styles.Error := Text_Printer.Create_Style (PT.Colors.Red);
+         Context.Styles.Info := Text_Printer.Create_Style (PT.Colors.White);
+         Context.Styles.Success := Text_Printer.Create_Style (PT.Colors.Green);
+         Context.Styles.Disabled := Text_Printer.Create_Style (PT.Colors.Blue);
+      else
+         Context.Styles.Error := Context.Styles.Default;
+         Context.Styles.Error := Context.Styles.Default;
+         Context.Styles.Info := Context.Styles.Default;
+         Context.Styles.Success := Context.Styles.Default;
+         Context.Styles.Disabled := Context.Styles.Default;
+      end if;
+   end Setup_Printer;
+
    procedure Parse (Context   : in out Context_Type;
                     Arguments : out Util.Commands.Dynamic_Argument_List) is
    begin
@@ -234,6 +270,8 @@ package body Porion.Commands is
          Ada.Text_IO.Put_Line (Porion.Configs.RELEASE);
          return;
       end if;
+
+      Context.Setup_Printer;
 
       declare
          Cmd_Name : constant String := Arguments.Get_Command_Name;

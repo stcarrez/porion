@@ -16,6 +16,8 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Util.Commands;
+private with PT;
+private with Porion.Reports;
 private with Util.Log.Loggers;
 private with Ada.Finalization;
 private with GNAT.Command_Line;
@@ -70,6 +72,7 @@ private
       Debug             : aliased Boolean := False;
       Dump              : aliased Boolean := False;
       Zero              : aliased Boolean := False;
+      No_Colors         : aliased Boolean := False;
       Config_File       : aliased GNAT.Strings.String_Access;
       Wallet_File       : aliased GNAT.Strings.String_Access;
       Wallet_Key_File   : aliased GNAT.Strings.String_Access;
@@ -84,6 +87,8 @@ private
       First_Arg         : Positive := 1;
       Project_Service   : Porion.Projects.Services.Context_Type;
       Build_Service     : Porion.Builds.Services.Context_Type;
+      Styles            : Porion.Reports.Style_Configuration;
+      Printer           : PT.Printer_Access;
    end record;
 
    --  Initialize the commands.
@@ -99,6 +104,9 @@ private
    --  Setup the command before parsing the arguments and executing it.
    procedure Setup (Config  : in out GC.Command_Line_Configuration;
                     Context : in out Context_Type);
+
+   --  Setup and configure the printer to write on the console.
+   procedure Setup_Printer (Context : in out Context_Type);
 
    --  Report an error message and set exit status for a failure.
    procedure Error (Message : in String;

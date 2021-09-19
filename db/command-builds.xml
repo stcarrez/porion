@@ -2,34 +2,71 @@
     <description>
         List of builds
     </description>
+ 
+    <class name="Porion.Queries.Build_Info" bean="no">
+        <comment>Information about a build.</comment>
+        <property type='String' name="name">
+            <comment>the project name.</comment>
+        </property>
+        <property type='Porion.Projects.Models.Project_Status_Type' name="project_status">
+            <comment>the project status.</comment>
+        </property>
+        <property type='String' name="branch_name">
+            <comment>the branch name.</comment>
+        </property>
+        <property type='Porion.Projects.Models.Branch_Status_Type' name="branch_status">
+            <comment>the branch status.</comment>
+        </property>
+        <property type='String' name="config_name">
+            <comment>the config name.</comment>
+        </property>
+        <property type='Integer' name="build_id">
+            <comment>the build id.</comment>
+        </property>
+        <property type='Integer' name="build_number">
+            <comment>the build number.</comment>
+        </property>
+        <property type='String' name="build_tag">
+            <comment>the build tag.</comment>
+        </property>
+        <property type='Porion.Builds.Models.Build_Status_Type' name="build_status">
+            <comment>the last build status.</comment>
+        </property>
+        <property type='Date' name="build_date" not-null="no">
+            <comment>the build starting date.</comment>
+        </property>
+        <property type='Nullable_Date' name="finish_date" not-null="no">
+            <comment>the build ending date.</comment>
+        </property>
+        <property type='Integer' name="pass_count">
+            <comment>the number of tests that succeeded.</comment>
+        </property>
+        <property type='Integer' name="fail_count">
+            <comment>the number of tests that failed.</comment>
+        </property>
+        <property type='Integer' name="timeout_count">
+            <comment>the number of tests that timeout.</comment>
+        </property>
+    </class>
 
-    <query name='stat-project-build-status'>
-        <comment>Project build status for a dashboard</comment>
-        <sql>
-          SELECT
-          build.status,
-          count(build.id)
-          FROM porion_build_config AS config
-          LEFT JOIN porion_last_build AS build on build.build_config_id = config.id
-          GROUP BY build.status
-        </sql>
-    </query>
-
-    <query name='command-build-list'>
+   <query name='build-list'>
         <comment>Get the list of builds</comment>
         <sql>
             SELECT
             project.name AS name,
+            project.status AS status,
             branch.name AS branch_name,
+            branch.status AS branch_status,
             config.name AS config_name,
             build.id AS build_id,
             build.number AS number,
             build.tag AS tag,
-            build.status AS build_Status,
+            build.status AS build_status,
             build.create_date AS build_date,
             build.finish_date AS finish_date,
             build.pass_count AS pass_count,
-            build.fail_count AS fail_count
+            build.fail_count AS fail_count,
+            build.timeout_count AS timeout_count
             FROM porion_build AS build
             INNER JOIN porion_project AS project ON build.project_id = project.id
             INNER JOIN porion_branch AS branch ON branch.id = build.branch_id
@@ -41,6 +78,34 @@
             count(build.id)
             FROM porion_build AS build
         </sql-count>
+    </query>
+
+   <query name='project-last-build-list'>
+        <comment>Get the list of builds</comment>
+        <sql>
+            SELECT
+            project.name AS name,
+            project.status AS status,
+            branch.name AS branch_name,
+            branch.status AS branch_status,
+            config.name AS config_name,
+            build.id AS build_id,
+            build.number AS number,
+            build.tag AS tag,
+            build.status AS build_status,
+            build.create_date AS build_date,
+            build.finish_date AS finish_date,
+            build.pass_count AS pass_count,
+            build.fail_count AS fail_count,
+            build.timeout_count AS timeout_count
+            FROM porion_last_build AS last_build
+            INNER JOIN porion_build AS build ON last_build.build_id = build.id
+            INNER JOIN porion_project AS project ON build.project_id = project.id
+            INNER JOIN porion_branch AS branch ON branch.id = build.branch_id
+            INNER JOIN porion_build_config AS config ON build.build_config_id = config.id
+            WHERE project.id = :project_id
+            ORDER BY finish_date DESC
+        </sql>
     </query>
 
 </query-mapping>

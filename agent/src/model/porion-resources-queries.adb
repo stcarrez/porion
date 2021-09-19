@@ -8,13 +8,13 @@ package body Porion.Resources.Queries is
      (1, 11);
 
    T1 : constant array (0 .. 1) of Unsigned_8 :=
-     (16, 1);
+     (8, 10);
 
    T2 : constant array (0 .. 1) of Unsigned_8 :=
-     (15, 8);
+     (6, 10);
 
-   G : constant array (0 .. 16) of Unsigned_8 :=
-     (0, 0, 0, 0, 7, 0, 3, 4, 6, 0, 0, 0, 5, 7, 0, 1, 0);
+   G : constant array (0 .. 18) of Unsigned_8 :=
+     (0, 0, 0, 0, 0, 0, 0, 1, 6, 0, 0, 0, 1, 5, 1, 0, 6, 4, 2);
 
    function Hash (S : String) return Natural is
       F : constant Natural := S'First - 1;
@@ -25,10 +25,10 @@ package body Porion.Resources.Queries is
       for K in P'Range loop
          exit when L < P (K);
          J  := Character'Pos (S (P (K) + F));
-         F1 := (F1 + Natural (T1 (K)) * J) mod 17;
-         F2 := (F2 + Natural (T2 (K)) * J) mod 17;
+         F1 := (F1 + Natural (T1 (K)) * J) mod 19;
+         F2 := (F2 + Natural (T2 (K)) * J) mod 19;
       end loop;
-      return (Natural (G (F1)) + Natural (G (F2))) mod 8;
+      return (Natural (G (F1)) + Natural (G (F2))) mod 9;
    end Hash;
 
    C_0 : aliased constant String := "<query-mapping package='Porion.Projects.M"
@@ -117,23 +117,52 @@ package body Porion.Resources.Queries is
 
    C_2 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of builds" & ASCII.LF & "    </descri"
-       & "ption>" & ASCII.LF & ASCII.LF & "    <query name='stat-project-build-status'>" & ASCII.LF
-       & "        <comment>Project build status for a dashboard</comment>" & ASCII.LF
-       & "        <sql>" & ASCII.LF & "          SELECT" & ASCII.LF & "          build.status"
-       & "," & ASCII.LF & "          count(build.id)" & ASCII.LF & "          FROM porion_bui"
-       & "ld_config AS config" & ASCII.LF & "          LEFT JOIN porion_last_build AS bui"
-       & "ld on build.build_config_id = config.id" & ASCII.LF & "          GROUP BY build"
-       & ".status" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF
-       & "    <query name='command-build-list'>" & ASCII.LF & "        <comment>Get the l"
-       & "ist of builds</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & "            SEL"
-       & "ECT" & ASCII.LF & "            project.name AS name," & ASCII.LF & "            bra"
-       & "nch.name AS branch_name," & ASCII.LF & "            config.name AS config_name,"
-       & ASCII.LF & "            build.id AS build_id," & ASCII.LF & "            build."
-       & "number AS number," & ASCII.LF & "            build.tag AS tag," & ASCII.LF & "     "
-       & "       build.status AS build_Status," & ASCII.LF & "            build.create_da"
-       & "te AS build_date," & ASCII.LF & "            build.finish_date AS finish_date," & ASCII.LF
-       & "            build.pass_count AS pass_count," & ASCII.LF & "            build.fa"
-       & "il_count AS fail_count" & ASCII.LF & "            FROM porion_build AS build" & ASCII.LF
+       & "ption>" & ASCII.LF & " " & ASCII.LF & "    <class name=""Porion.Queries.Build_Info"""
+       & " bean=""no"">" & ASCII.LF & "        <comment>Information about a build.</comme"
+       & "nt>" & ASCII.LF & "        <property type='String' name=""name"">" & ASCII.LF & "  "
+       & "          <comment>the project name.</comment>" & ASCII.LF & "        </propert"
+       & "y>" & ASCII.LF & "        <property type='Porion.Projects.Models.Project_Status"
+       & "_Type' name=""project_status"">" & ASCII.LF & "            <comment>the project"
+       & " status.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <prope"
+       & "rty type='String' name=""branch_name"">" & ASCII.LF & "            <comment>the"
+       & " branch name.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <"
+       & "property type='Porion.Projects.Models.Branch_Status_Type' name=""branch_sta"
+       & "tus"">" & ASCII.LF & "            <comment>the branch status.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='String' name=""confi"
+       & "g_name"">" & ASCII.LF & "            <comment>the config name.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Integer' name=""buil"
+       & "d_id"">" & ASCII.LF & "            <comment>the build id.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Integer' name=""buil"
+       & "d_number"">" & ASCII.LF & "            <comment>the build number.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='String' name=""build"
+       & "_tag"">" & ASCII.LF & "            <comment>the build tag.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Porion.Builds.Models"
+       & ".Build_Status_Type' name=""build_status"">" & ASCII.LF & "            <comment>"
+       & "the last build status.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Date' name=""build_date"" not-null=""no"">" & ASCII.LF
+       & "            <comment>the build starting date.</comment>" & ASCII.LF & "        "
+       & "</property>" & ASCII.LF & "        <property type='Nullable_Date' name=""finish"
+       & "_date"" not-null=""no"">" & ASCII.LF & "            <comment>the build ending d"
+       & "ate.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <property "
+       & "type='Integer' name=""pass_count"">" & ASCII.LF & "            <comment>the num"
+       & "ber of tests that succeeded.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Integer' name=""fail_count"">" & ASCII.LF & "          "
+       & "  <comment>the number of tests that failed.</comment>" & ASCII.LF & "        </"
+       & "property>" & ASCII.LF & "        <property type='Integer' name=""timeout_count"""
+       & ">" & ASCII.LF & "            <comment>the number of tests that timeout.</commen"
+       & "t>" & ASCII.LF & "        </property>" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF
+       & "   <query name='build-list'>" & ASCII.LF & "        <comment>Get the list of bu"
+       & "ilds</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & "            SELECT" & ASCII.LF
+       & "            project.name AS name," & ASCII.LF & "            project.status AS "
+       & "status," & ASCII.LF & "            branch.name AS branch_name," & ASCII.LF & "     "
+       & "       branch.status AS branch_status," & ASCII.LF & "            config.name A"
+       & "S config_name," & ASCII.LF & "            build.id AS build_id," & ASCII.LF & "    "
+       & "        build.number AS number," & ASCII.LF & "            build.tag AS tag," & ASCII.LF
+       & "            build.status AS build_status," & ASCII.LF & "            build.crea"
+       & "te_date AS build_date," & ASCII.LF & "            build.finish_date AS finish_d"
+       & "ate," & ASCII.LF & "            build.pass_count AS pass_count," & ASCII.LF & "    "
+       & "        build.fail_count AS fail_count," & ASCII.LF & "            build.timeou"
+       & "t_count AS timeout_count" & ASCII.LF & "            FROM porion_build AS build" & ASCII.LF
        & "            INNER JOIN porion_project AS project ON build.project_id = proj"
        & "ect.id" & ASCII.LF & "            INNER JOIN porion_branch AS branch ON branch."
        & "id = build.branch_id" & ASCII.LF & "            INNER JOIN porion_build_config "
@@ -141,7 +170,27 @@ package body Porion.Resources.Queries is
        & " BY finish_date DESC" & ASCII.LF & "        </sql>" & ASCII.LF & "        <sql-coun"
        & "t>" & ASCII.LF & "            SELECT" & ASCII.LF & "            count(build.id)" & ASCII.LF
        & "            FROM porion_build AS build" & ASCII.LF & "        </sql-count>" & ASCII.LF
-       & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+       & "    </query>" & ASCII.LF & ASCII.LF & "   <query name='project-last-build-list"
+       & "'>" & ASCII.LF & "        <comment>Get the list of builds</comment>" & ASCII.LF
+       & "        <sql>" & ASCII.LF & "            SELECT" & ASCII.LF & "            project."
+       & "name AS name," & ASCII.LF & "            project.status AS status," & ASCII.LF & " "
+       & "           branch.name AS branch_name," & ASCII.LF & "            branch.status"
+       & " AS branch_status," & ASCII.LF & "            config.name AS config_name," & ASCII.LF
+       & "            build.id AS build_id," & ASCII.LF & "            build.number AS nu"
+       & "mber," & ASCII.LF & "            build.tag AS tag," & ASCII.LF & "            build"
+       & ".status AS build_status," & ASCII.LF & "            build.create_date AS build_"
+       & "date," & ASCII.LF & "            build.finish_date AS finish_date," & ASCII.LF & " "
+       & "           build.pass_count AS pass_count," & ASCII.LF & "            build.fai"
+       & "l_count AS fail_count," & ASCII.LF & "            build.timeout_count AS timeou"
+       & "t_count" & ASCII.LF & "            FROM porion_last_build AS last_build" & ASCII.LF
+       & "            INNER JOIN porion_build AS build ON last_build.build_id = build"
+       & ".id" & ASCII.LF & "            INNER JOIN porion_project AS project ON build.pr"
+       & "oject_id = project.id" & ASCII.LF & "            INNER JOIN porion_branch AS br"
+       & "anch ON branch.id = build.branch_id" & ASCII.LF & "            INNER JOIN porio"
+       & "n_build_config AS config ON build.build_config_id = config.id" & ASCII.LF & "  "
+       & "          WHERE project.id = :project_id" & ASCII.LF & "            ORDER BY fi"
+       & "nish_date DESC" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF
+       & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
    C_3 : aliased constant String := "<query-mapping package='Porion.Projects.M"
        & "odels'>" & ASCII.LF & "    <description>" & ASCII.LF & "        List of builds" & ASCII.LF
@@ -244,11 +293,36 @@ package body Porion.Resources.Queries is
        & "= :branch_id" & ASCII.LF & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF
        & "</query-mapping>" & ASCII.LF;
 
+   C_8 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+       & "    <description>" & ASCII.LF & "        Stats for the builds" & ASCII.LF & "    </"
+       & "description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Queries.Build_"
+       & "Stat"" bean=""no"">" & ASCII.LF & "        <comment>Information about a build.<"
+       & "/comment>" & ASCII.LF & "        <property type='Porion.Builds.Models.Build_Sta"
+       & "tus_Type' name=""build_status"">" & ASCII.LF & "            <comment>the build "
+       & "status.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <proper"
+       & "ty type='Natural' name=""count"">" & ASCII.LF & "            <comment>the numbe"
+       & "r of builds.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "    </clas"
+       & "s>" & ASCII.LF & ASCII.LF & "    <query name='stat-project-config-status'>" & ASCII.LF
+       & "        <comment>Project build config status for a dashboard</comment>" & ASCII.LF
+       & "        <sql>" & ASCII.LF & "          SELECT" & ASCII.LF & "          build.status"
+       & "," & ASCII.LF & "          count(build.id)" & ASCII.LF & "          FROM porion_bui"
+       & "ld_config AS config" & ASCII.LF & "          LEFT JOIN porion_last_build AS bui"
+       & "ld on build.build_config_id = config.id" & ASCII.LF & "          WHERE build.pr"
+       & "oject_id = :project_id" & ASCII.LF & "          GROUP BY build.status" & ASCII.LF
+       & "        </sql>" & ASCII.LF & "    </query> " & ASCII.LF & ASCII.LF & "    <query n"
+       & "ame='stat-project-build-status'>" & ASCII.LF & "        <comment>Project build "
+       & "status for a dashboard</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & "      "
+       & "    SELECT" & ASCII.LF & "          build.status," & ASCII.LF & "          count(bu"
+       & "ild.id)" & ASCII.LF & "          FROM porion_build AS build" & ASCII.LF & "        "
+       & "  WHERE build.project_id = :project_id" & ASCII.LF & "          GROUP BY build."
+       & "status" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query> " & ASCII.LF & ASCII.LF
+       & "</query-mapping>" & ASCII.LF;
+
 
    type Content_List_Array is array (Natural range <>) of access constant String;
    Contents : constant Content_List_Array := (
       C_0'Access, C_1'Access, C_2'Access, C_3'Access, C_4'Access, C_5'Access,
-      C_6'Access, C_7'Access);
+      C_6'Access, C_7'Access, C_8'Access);
 
    function Get_Content (Name : String) return access constant String is
       H : constant Natural := Hash (Name);

@@ -59,6 +59,72 @@ package body Porion.Queries is
    end List;
 
    --  --------------------
+   --  Information about a build.
+   --  --------------------
+   procedure List (Object  : in out Build_Info_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+      procedure Read (Into : in out Build_Info);
+
+      Stmt : ADO.Statements.Query_Statement
+          := Session.Create_Statement (Context);
+      Pos  : Positive := 1;
+      procedure Read (Into : in out Build_Info) is
+      begin
+         Into.Name := Stmt.Get_Unbounded_String (0);
+         Into.Project_Status := Porion.Projects.Models.Project_Status_Type'Val (Stmt.Get_Integer (1));
+         Into.Branch_Name := Stmt.Get_Unbounded_String (2);
+         Into.Branch_Status := Porion.Projects.Models.Branch_Status_Type'Val (Stmt.Get_Integer (3));
+         Into.Config_Name := Stmt.Get_Unbounded_String (4);
+         Into.Build_Id := Stmt.Get_Integer (5);
+         Into.Build_Number := Stmt.Get_Integer (6);
+         Into.Build_Tag := Stmt.Get_Unbounded_String (7);
+         Into.Build_Status := Porion.Builds.Models.Build_Status_Type'Val (Stmt.Get_Integer (8));
+         Into.Build_Date := Stmt.Get_Nullable_Time (9);
+         Into.Finish_Date := Stmt.Get_Nullable_Time (10);
+         Into.Pass_Count := Stmt.Get_Integer (11);
+         Into.Fail_Count := Stmt.Get_Integer (12);
+         Into.Timeout_Count := Stmt.Get_Integer (13);
+      end Read;
+   begin
+      Stmt.Execute;
+      Build_Info_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         Object.Insert_Space (Before => Pos);
+         Object.Update_Element (Index => Pos, Process => Read'Access);
+         Pos := Pos + 1;
+         Stmt.Next;
+      end loop;
+   end List;
+
+   --  --------------------
+   --  Information about a build.
+   --  --------------------
+   procedure List (Object  : in out Build_Stat_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+      procedure Read (Into : in out Build_Stat);
+
+      Stmt : ADO.Statements.Query_Statement
+          := Session.Create_Statement (Context);
+      Pos  : Positive := 1;
+      procedure Read (Into : in out Build_Stat) is
+      begin
+         Into.Build_Status := Porion.Builds.Models.Build_Status_Type'Val (Stmt.Get_Integer (0));
+         Into.Count := Stmt.Get_Natural (1);
+      end Read;
+   begin
+      Stmt.Execute;
+      Build_Stat_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         Object.Insert_Space (Before => Pos);
+         Object.Update_Element (Index => Pos, Process => Read'Access);
+         Pos := Pos + 1;
+         Stmt.Next;
+      end loop;
+   end List;
+
+   --  --------------------
    --  Information about a project.
    --  --------------------
    procedure List (Object  : in out Project_Info_Vector;

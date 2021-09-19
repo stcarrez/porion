@@ -15,8 +15,7 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Text_IO;
-with Util.Strings.Vectors;
+
 with Porion.Executors;
 with Porion.Sources;
 with Porion.Builds.Models;
@@ -64,15 +63,11 @@ package body Porion.Commands.Build is
                Porion.Builds.Services.Build (Context.Build_Service, Build_Config, Executor);
                if Command.Dry_Run then
                   declare
-                     Commands : Util.Strings.Vectors.Vector;
+                     Commands : Porion.Executors.Command_Vector;
                      Step     : Natural := 0;
                   begin
                      Executor.Fetch_Commands (Commands);
-                     for Cmd of Commands loop
-                        Step := Step + 1;
-                        Context.Console.Notice (N_INFO, Util.Strings.Image (Step)
-                                                  & ". " & Cmd);
-                     end loop;
+                     Porion.Reports.List_Commands (Commands, Context.Printer.all, Context.Styles);
                   end;
                end if;
             end loop;

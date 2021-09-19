@@ -15,14 +15,11 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Calendar.Formatting;
-with Ada.Calendar.Time_Zones;
+
 with Util.Strings;
 with ADO.Queries;
 with ADO.Statements;
-with Porion.Queries;
 with Porion.Reports;
-with Porion.Builds.Models;
 with Porion.Projects.Models;
 package body Porion.Commands.List is
 

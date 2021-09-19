@@ -33,4 +33,9 @@ package Porion.Reports is
                           Printer : in out PT.Printer_Type'Class;
                           Styles  : in Style_Configuration);
 
+   --  Create a report about the projects.
+   procedure List_Projects (Service : in out Porion.Services.Context_Type'Class;
+                            Printer : in out PT.Printer_Type'Class;
+                            Styles  : in Style_Configuration);
+
 end Porion.Reports;

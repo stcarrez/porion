@@ -24,18 +24,32 @@ with Porion.Builds.Models;
 with Porion.Projects.Models;
 package body Porion.Reports is
 
+   function Get_Tag (Tag : in UString) return String;
+   function Format (Date : in Ada.Calendar.Time) return String;
+
    function Format (Date : in Ada.Calendar.Time) return String is
       use Ada.Calendar;
 
-      Result : String := Formatting.Image (Date, True,
-                                           Time_Zones.UTC_Time_Offset (Date));
+      Result : constant String := Formatting.Image (Date, True,
+                                                    Time_Zones.UTC_Time_Offset (Date));
    begin
       if Result'Length > 16 then
+         --  Drop the seconds.
          return Result (Result'First .. Result'First + 15);
       else
          return Result;
       end if;
    end Format;
+
+   function Get_Tag (Tag : in UString) return String is
+      Value : constant String := To_String (Tag);
+   begin
+      if Value'Length > 8 then
+         return Value (Value'First .. Value'First + 7);
+      else
+         return Value;
+      end if;
+   end Get_Tag;
 
    --  ------------------------------
    --  Create a report about the builds.  If the service is configured with
@@ -47,22 +61,12 @@ package body Porion.Reports is
       use Porion.Builds.Models;
       use Porion.Projects.Models;
 
-      function Get_Tag (Info : in Porion.Queries.Build_Info) return String is
-         Tag : constant String := To_String (Info.Build_Tag);
-      begin
-         if Tag'Length > 8 then
-            return Tag (Tag'First .. Tag'First + 7);
-         else
-            return Tag;
-         end if;
-      end Get_Tag;
-
       Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
       List   : Porion.Queries.Build_Info_Vector;
       Query  : ADO.Queries.Context;
       Fields : PT.Texts.Field_Array (1 .. 8);
-      Style1 : PT.Style_Type := Writer.Create_Style (Styles.Default);
-      Style2 : PT.Style_Type := Writer.Create_Style (Styles.Default);
+      Style1 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
+      Style2 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
    begin
       if Service.Project.Is_Null then
          Query.Set_Query (Porion.Queries.Query_Build_List);
@@ -114,7 +118,7 @@ package body Porion.Reports is
          Writer.Set_Justify (Style2, PT.J_RIGHT);
          Writer.Put_UString (Fields (1), Build.Name);
          Writer.Put_UString (Fields (2), Build.Branch_Name);
-         Writer.Put (Fields (3), Get_Tag (Build));
+         Writer.Put (Fields (3), Get_Tag (Build.Build_Tag));
          if Build.Build_Status = Builds.Models.BUILD_PASS then
             Writer.Put (Fields (4), -("OK"));
          else
@@ -126,5 +130,76 @@ package body Porion.Reports is
          Writer.New_Line;
       end loop;
    end List_Builds;
+
+   --  ------------------------------
+   --  Create a report about the projects.
+   --  ------------------------------
+   procedure List_Projects (Service : in out Porion.Services.Context_Type'Class;
+                            Printer : in out PT.Printer_Type'Class;
+                            Styles  : in Style_Configuration) is
+      use Porion.Builds.Models;
+      use Porion.Projects.Models;
+
+      Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
+      List   : Porion.Queries.Project_Info_Vector;
+      Query  : ADO.Queries.Context;
+      Fields : PT.Texts.Field_Array (1 .. 8);
+      Style1 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
+      Style2 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
+   begin
+      Query.Set_Query (Porion.Queries.Query_Project_List);
+      Porion.Queries.List (List, Service.DB, Query);
+
+      Writer.Set_Justify (Style2, PT.J_RIGHT);
+      Writer.Create_Field (Fields (1), Style1, 20.0);
+      Writer.Create_Field (Fields (2), Style1, 20.0);
+      Writer.Create_Field (Fields (3), Style1, 10.0);
+      Writer.Create_Field (Fields (4), Style2, 10.0);
+      Writer.Create_Field (Fields (5), Style2, 0.0);
+      Writer.Create_Field (Fields (6), Style2, 0.0);
+      Writer.Create_Field (Fields (7), Style1, 30.0);
+
+      Writer.Layout_Fields (Fields);
+      Writer.Put (Fields (1), -("Name"));
+      Writer.Put (Fields (2), -("Branch"));
+      Writer.Put (Fields (3), -("Tag"));
+      Writer.Put (Fields (4), -("Status"));
+      Writer.Put (Fields (5), -("Pass"));
+      Writer.Put (Fields (6), -("Fail"));
+      Writer.Put (Fields (7), -("Date"));
+      Writer.New_Line;
+
+      for Project of List loop
+         if Project.Project_Status /= Projects.Models.PROJECT_ACTIVE then
+            Writer.Copy_Style (To => Style1, From => Styles.Disabled);
+            Writer.Copy_Style (To => Style2, From => Styles.Disabled);
+         elsif Project.Build_Date.Is_Null then
+            Writer.Copy_Style (To => Style1, From => Styles.Disabled);
+            Writer.Copy_Style (To => Style2, From => Styles.Disabled);
+         elsif Project.Build_Status = Builds.Models.BUILD_PASS then
+            Writer.Copy_Style (To => Style1, From => Styles.Success);
+            Writer.Copy_Style (To => Style2, From => Styles.Success);
+         else
+            Writer.Copy_Style (To => Style1, From => Styles.Error);
+            Writer.Copy_Style (To => Style2, From => Styles.Error);
+         end if;
+
+         Writer.Set_Justify (Style2, PT.J_RIGHT);
+         Writer.Put_UString (Fields (1), Project.Name);
+         Writer.Put_UString (Fields (2), Project.Branch_Name);
+         Writer.Put (Fields (3), Get_Tag (Project.Branch_Tag));
+         if not Project.Build_Date.Is_Null then
+            if Project.Build_Status = Builds.Models.BUILD_PASS then
+               Writer.Put (Fields (4), -("OK"));
+            else
+               Writer.Put (Fields (4), -("KO"));
+            end if;
+            Writer.Put_Int (Fields (5), Project.Pass_Count);
+            Writer.Put_Int (Fields (6), Project.Fail_Count);
+            Writer.Put (Fields (7), Format (Project.Build_Date.Value));
+         end if;
+         Writer.New_Line;
+      end loop;
+   end List_Projects;
 
 end Porion.Reports;

@@ -506,12 +506,21 @@ package body Porion.Builds.Services is
                                  List    : in out Porion.Builds.Models.Build_Config_Vector) is
       Query         : ADO.Queries.Context;
    begin
-      if Force then
-         Query.Set_Filter ("o.branch_id = :branch_id AND o.status != 0");
+      if not Service.Branch.Is_Null then
+         if Force then
+            Query.Set_Filter ("o.branch_id = :branch_id AND o.status != 0");
+         else
+            Query.Set_Filter ("o.branch_id = :branch_id AND o.status = 3");
+         end if;
+         Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
       else
-         Query.Set_Filter ("o.branch_id = :branch_id AND o.status = 3");
+         if Force then
+            Query.Set_Filter ("o.project_id = :project_id AND o.status != 0");
+         else
+            Query.Set_Filter ("o.project_id = :project_id AND o.status = 3");
+         end if;
+         Query.Bind_Param ("project_id", Service.Project.Get_Id);
       end if;
-      Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
       Porion.Builds.Models.List (List, Service.DB, Query);
    end Find_Build_Configs;
 

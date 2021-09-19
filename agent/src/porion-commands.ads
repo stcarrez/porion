@@ -114,6 +114,10 @@ private
                     Arg2    : in String := "";
                     Arg3    : in String := "");
 
+   --  Report an information message.
+   procedure Notice (Context : in out Context_Type;
+                     Message : in String);
+
    function Format (Message : in String;
                     Arg1    : in String) return String
      renames Util.Strings.Formats.Format;

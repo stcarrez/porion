@@ -22,6 +22,7 @@ with Util.Strings;
 with Util.Commands.Parsers.GNAT_Parser;
 with PT.Drivers.Texts;
 with PT.Colors;
+with PT.Texts;
 with Porion.Configs;
 with Porion.Resources.Queries;
 with Porion.Commands.Drivers;
@@ -307,6 +308,15 @@ package body Porion.Commands is
       Log.Error (Message, Arg1, Arg2, Arg3);
       Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
    end Error;
+
+   --  ------------------------------
+   --  Report an information message.
+   --  ------------------------------
+   procedure Notice (Context : in out Context_Type;
+                     Message : in String) is
+   begin
+      Ada.Text_IO.Put_Line (Message);
+   end Notice;
 
    --  Open the database.
    procedure Open (Context : in out Context_Type) is

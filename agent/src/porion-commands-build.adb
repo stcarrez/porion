@@ -40,7 +40,7 @@ package body Porion.Commands.Build is
          declare
             use Porion.Sources.Maps;
 
-            Name          : constant String := Args.Get_Argument (Count);
+            Name          : constant String := Args.Get_Argument (I);
             Source_Status : Porion.Sources.Status_Type;
             Executor      : Porion.Executors.Executor_Type;
             Build_Configs : Porion.Builds.Models.Build_Config_Vector;
@@ -59,6 +59,11 @@ package body Porion.Commands.Build is
             end if;
 
             Context.Build_Service.Find_Build_Configs (Command.Force, Build_Configs);
+
+            if Build_Configs.Is_Empty then
+               Context.Notice (Format (-("no change for {0}"), Name));
+            end if;
+
             for Build_Config of Build_Configs loop
                Porion.Builds.Services.Build (Context.Build_Service, Build_Config, Executor);
                if Command.Dry_Run then

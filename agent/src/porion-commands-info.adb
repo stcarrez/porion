@@ -21,6 +21,7 @@ with Porion.Services;
 with Porion.Queries;
 with Porion.Builds.Models;
 with Porion.Reports;
+with Porion.Executors;
 with ADO.Queries;
 with PT.Texts;
 package body Porion.Commands.Info is
@@ -82,9 +83,12 @@ package body Porion.Commands.Info is
                return Result;
             end Count_Active_Branches;
 
-            Last_Builds : Porion.Builds.Models.Last_Build_Vector;
+            Last_Builds   : Porion.Builds.Models.Last_Build_Vector;
+            Executor      : Porion.Executors.Executor_Type;
+            Build_Configs : Porion.Builds.Models.Build_Config_Vector;
          begin
             Context.Project_Service.Load_Project (Project_Name);
+            Context.Build_Service.Open (Context.Project_Service);
 
             Printer.Layout_Fields (Fields (1 .. 2));
             Printer.Put (Fields (1), -("Name:"));
@@ -130,6 +134,20 @@ package body Porion.Commands.Info is
             Porion.Reports.List_Builds (Service => Context.Project_Service,
                                         Printer => Printer,
                                         Styles  => Context.Styles);
+
+            Executor.Enable_Dry_Run;
+            Context.Build_Service.Find_Build_Configs (True, Build_Configs);
+            for Build_Config of Build_Configs loop
+               Porion.Builds.Services.Build (Context.Build_Service, Build_Config, Executor);
+               declare
+                  Commands : Porion.Executors.Command_Vector;
+                  Step     : Natural := 0;
+               begin
+                  Printer.New_Line;
+                  Executor.Fetch_Commands (Commands);
+                  Porion.Reports.List_Commands (Commands, Context.Printer.all, Context.Styles);
+               end;
+            end loop;
 
          exception
             when Porion.Services.Not_Found =>

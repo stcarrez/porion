@@ -16,12 +16,24 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Finalization;
+with Ada.Containers.Indefinite_Vectors;
 with EL.Expressions;
 with Util.Properties;
-with Util.Strings.Vectors;
 with Porion.Loggers;
 with Porion.Builds;
 package Porion.Executors is
+
+   type Command_Type (Len : Positive) is record
+      Step    : Porion.Builds.Step_Type;
+      Command : String (1 .. Len);
+   end record;
+
+   package Command_Vectors is
+     new Ada.Containers.Indefinite_Vectors (Index_Type   => Positive,
+                                            Element_Type => Command_Type);
+
+   subtype Command_Vector is Command_Vectors.Vector;
+   subtype Command_Cursor is Command_Vectors.Cursor;
 
    type Executor_Type is limited new Ada.Finalization.Limited_Controlled with private;
 
@@ -77,14 +89,14 @@ package Porion.Executors is
 
    --  Get the commands that were collected during execution and clear the current list.
    procedure Fetch_Commands (Executor : in out Executor_Type;
-                             Commands : out Util.Strings.Vectors.Vector);
+                             Commands : out Command_Vector);
 
 private
 
    type Executor_Type is limited new Ada.Finalization.Limited_Controlled with record
       Dry_Run    : Boolean := False;
       Output_Log : Boolean := False;
-      Commands   : Util.Strings.Vectors.Vector;
+      Commands   : Command_Vector;
       Status     : Integer := 0;
       Step       : Porion.Builds.Step_Type;
       Logger     : Porion.Loggers.Logger_Type;

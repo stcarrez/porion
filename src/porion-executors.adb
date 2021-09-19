@@ -95,7 +95,9 @@ package body Porion.Executors is
       begin
          if Executor.Dry_Run then
             Status := 0;
-            Executor.Commands.Append (Command);
+            Executor.Commands.Append ((Len     => Command'Length,
+                                       Step    => Executor.Step,
+                                       Command => Command));
             return;
          end if;
 
@@ -180,7 +182,7 @@ package body Porion.Executors is
    --  Get the commands that were collected during execution and clear the current list.
    --  ------------------------------
    procedure Fetch_Commands (Executor : in out Executor_Type;
-                             Commands : out Util.Strings.Vectors.Vector) is
+                             Commands : out Command_Vector) is
    begin
       Commands := Executor.Commands;
       Executor.Commands.Clear;

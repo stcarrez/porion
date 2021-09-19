@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 with PT;
 with Porion.Services;
+with Porion.Executors;
 package Porion.Reports is
 
    type Style_Configuration is record
@@ -37,5 +38,10 @@ package Porion.Reports is
    procedure List_Projects (Service : in out Porion.Services.Context_Type'Class;
                             Printer : in out PT.Printer_Type'Class;
                             Styles  : in Style_Configuration);
+
+   --  Create a report with the list of commands to build the project.
+   procedure List_Commands (Commands : in Porion.Executors.Command_Vector;
+                            Printer  : in out PT.Printer_Type'Class;
+                            Styles   : in Style_Configuration);
 
 end Porion.Reports;

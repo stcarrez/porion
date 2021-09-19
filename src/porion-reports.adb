@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 with Ada.Calendar.Formatting;
 with Ada.Calendar.Time_Zones;
+with Util.Strings;
 with PT.Texts;
 with ADO.Queries;
 with Porion.Queries;
@@ -26,6 +27,7 @@ package body Porion.Reports is
 
    function Get_Tag (Tag : in UString) return String;
    function Format (Date : in Ada.Calendar.Time) return String;
+   function Get_Image (Step : in Porion.Builds.Step_Type) return String;
 
    function Format (Date : in Ada.Calendar.Time) return String is
       use Ada.Calendar;
@@ -50,6 +52,41 @@ package body Porion.Reports is
          return Value;
       end if;
    end Get_Tag;
+
+   function Get_Image (Step : in Porion.Builds.Step_Type) return String is
+      use Porion.Builds;
+   begin
+      case Step is
+         when STEP_CHECKOUT =>
+            return -("checkout");
+
+         when STEP_SETUP =>
+            return -("setup");
+
+         when STEP_GENERATE =>
+            return -("generate");
+
+         when STEP_CONFIGURE =>
+            return -("configure");
+
+         when STEP_MAKE =>
+            return -("make");
+
+         when STEP_TEST =>
+            return -("test");
+
+         when STEP_PACKAGE =>
+            return -("package");
+
+         when STEP_INSTALL =>
+            return -("install");
+
+         when STEP_PUBLISH =>
+            return -("publish");
+
+      end case;
+      return "";
+   end Get_Image;
 
    --  ------------------------------
    --  Create a report about the builds.  If the service is configured with
@@ -201,5 +238,48 @@ package body Porion.Reports is
          Writer.New_Line;
       end loop;
    end List_Projects;
+
+   --  ------------------------------
+   --  Create a report with the list of commands to build the project.
+   --  ------------------------------
+   procedure List_Commands (Commands : in Porion.Executors.Command_Vector;
+                            Printer  : in out PT.Printer_Type'Class;
+                            Styles   : in Style_Configuration) is
+      use Porion.Builds;
+
+      Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
+      Fields : PT.Texts.Field_Array (1 .. 3);
+      Style1 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
+      Style2 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
+      Step   : Natural := 0;
+
+   begin
+      Writer.Set_Justify (Style2, PT.J_RIGHT);
+      Writer.Create_Field (Fields (1), Style1, 0.0);
+      Writer.Create_Field (Fields (2), Style1, 0.0);
+      Writer.Create_Field (Fields (3), Style1, 0.0);
+
+      Writer.Set_Bottom_Right_Padding (Fields (1), (W => 1, H => 0));
+      Writer.Set_Bottom_Right_Padding (Fields (2), (W => 1, H => 0));
+
+      for Cmd of Commands loop
+         Writer.Will_Put (Fields (1), Util.Strings.Image (Step) & ".");
+         Writer.Will_Put (Fields (2), Get_Image (Cmd.Step));
+      end loop;
+
+      Writer.Layout_Fields (Fields);
+      Writer.Put (Fields (1), -("No"));
+      Writer.Put (Fields (2), -("Step"));
+      Writer.Put (Fields (3), -("Command"));
+      Writer.New_Line;
+
+      for Cmd of Commands loop
+         Step := Step + 1;
+         Writer.Put (Fields (1), Util.Strings.Image (Step) & ".");
+         Writer.Put (Fields (2), Get_Image (Cmd.Step));
+         Writer.Put (Fields (3), Cmd.Command);
+         Writer.New_Line;
+      end loop;
+   end List_Commands;
 
 end Porion.Reports;

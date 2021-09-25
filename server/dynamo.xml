@@ -1,25 +1,18 @@
 <project>
-     <name>porion</name>
+     <name>porion_server</name>
      <property name="author_email">Stephane.Carrez@gmail.com</property>
-     <property name="search_dirs">/build/local-gnat-2021/share/dynamo/awa_counters;.;/build/local-gnat-2021/share/dynamo/awa_workspaces;/build/local-gnat-2021/share/dynamo/awa;/build/local-gnat-2021/share/dynamo/ado;/build/local-gnat-2021/share/dynamo/asf</property>
      <property name="is_ado">FALSE</property>
      <property name="license">apache</property>
      <property name="is_gtk">FALSE</property>
      <property name="is_lib">FALSE</property>
      <property name="author">Stephane Carrez</property>
-     <property name="is_web">TRUE</property>
+     <property name="is_web">FALSE</property>
      <property name="is_tool">FALSE</property>
-     <depend name="asf"></depend>
      <depend name="ado"></depend>
+     <depend name="porion"></depend>
+     <depend name="porion_lib"></depend>
+     <depend name="asf"></depend>
      <depend name="awa"></depend>
-     <depend name="awa-workspaces"></depend>
      <depend name="awa-mail"></depend>
-     <depend name="awa-comments"></depend>
-     <depend name="awa-tags"></depend>
-     <depend name="awa-storages"></depend>
-     <depend name="awa-jobs"></depend>
-     <depend name="awa-images"></depend>
-     <depend name="awa_counters"></depend>
-     <depend name="awa-wikis"></depend>
      <depend name="awa-setup"></depend>
 </project>

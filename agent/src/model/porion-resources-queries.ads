@@ -1,10 +1,11 @@
--- Advanced Resource Embedder 1.1.0
+--  Advanced Resource Embedder 1.2.0
 package Porion.Resources.Queries is
 
    Names : constant Name_Array;
 
    --  Returns the data stream with the given name or null.
-   function Get_Content (Name : String) return access constant String;
+   function Get_Content (Name : String) return
+      access constant String;
 
 private
 

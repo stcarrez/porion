@@ -218,6 +218,8 @@ package Porion.Queries is
 
    Query_Project_List : constant ADO.Queries.Query_Definition_Access;
 
+   Query_Project_Dependency_List : constant ADO.Queries.Query_Definition_Access;
+
 
 
 private
@@ -273,4 +275,10 @@ private
                                      File => File_4.File'Access);
    Query_Project_List : constant ADO.Queries.Query_Definition_Access
    := Def_Projectinfo_Project_List.Query'Access;
+
+   package Def_Projectinfo_Project_Dependency_List is
+      new ADO.Queries.Loaders.Query (Name => "project-dependency-list",
+                                     File => File_4.File'Access);
+   Query_Project_Dependency_List : constant ADO.Queries.Query_Definition_Access
+   := Def_Projectinfo_Project_Dependency_List.Query'Access;
 end Porion.Queries;

@@ -20,14 +20,19 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+pragma Warnings (Off);
 with Ada.Unchecked_Deallocation;
 with Util.Beans.Objects.Time;
+pragma Warnings (On);
 package body Porion.Xunit.Models is
+
+   pragma Style_Checks ("-mr");
+   pragma Warnings (Off, "formal parameter * is not referenced");
+   pragma Warnings (Off, "use clause for type *");
+   pragma Warnings (Off, "use clause for private type *");
 
    use type ADO.Objects.Object_Record_Access;
    use type ADO.Objects.Object_Ref;
-
-   pragma Warnings (Off, "formal parameter * is not referenced");
 
    function Test_Group_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key is
       Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,

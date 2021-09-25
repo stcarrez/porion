@@ -105,7 +105,7 @@ package body Porion.Builds.Services is
       Number  : constant Positive := Service.Build.Get_Number;
       Name    : constant String := Service.Project.Get_Name;
       Branch_Name : constant String := Service.Branch.Get_Name;
-      Path    : constant String := Configs.Get_Build_Directory (Name, Branch_Name, Number);
+      Path    : constant String := Configs.Get_Build_Directory (Name, Branch_Name);
       Log_Dir : constant String := Configs.Get_Build_Log_Directory (Name, Branch_Name, Number);
       Config  : Util.Properties.Manager;
       Status  : Builds.Models.Build_Status_Type := Builds.Models.BUILD_RUNNING;
@@ -402,6 +402,9 @@ package body Porion.Builds.Services is
          Stream.Write_Attribute ("id", Integer (Build_Config.Get_Node.Get_Id));
          Stream.End_Entity ("node");
       end if;
+      Stream.Write_Entity ("name", String '(Build_Config.Get_Name));
+      Stream.Write_Entity ("description", String '(Build_Config.Get_Description));
+      Stream.Write_Entity ("status", Build_Config.Get_Status'Image);
 
       --  Load the build steps.
       declare
@@ -663,8 +666,7 @@ package body Porion.Builds.Services is
                                 Branch   : in String;
                                 Executor : in out Porion.Executors.Executor_Type'Class) is
       Name    : constant String := Service.Project.Get_Name;
-      Path    : constant String := Configs.Get_Build_Directory (Name, Branch, 1);
-      Log_Dir : constant String := Configs.Get_Build_Log_Directory (Name, Branch, 1);
+      Path    : constant String := Configs.Get_Build_Directory (Name, Branch);
       Config  : Util.Properties.Manager;
       Query   : ADO.SQL.Query;
       Found   : Boolean;

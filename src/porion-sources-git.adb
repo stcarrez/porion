@@ -77,7 +77,7 @@ package body Porion.Sources.Git is
                        Executor   : in out Porion.Executors.Executor_Type'Class) is
       Status : Integer;
    begin
-      if Ada.Directories.Exists (Path) then
+      if not Executor.Is_Dry_Run and then Ada.Directories.Exists (Path) then
          Ada.Directories.Delete_Tree (Path);
       end if;
       Controller.Config.Set ("build_dir", Path);

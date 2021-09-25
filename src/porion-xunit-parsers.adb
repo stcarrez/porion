@@ -20,6 +20,8 @@ with Ada.Directories;
 with Util.Beans.Objects;
 with Util.Serialize.Mappers.Record_Mapper;
 with Util.Serialize.IO.XML;
+with Util.Log.Loggers;
+with Util.Files;
 
 with Porion.XUnit.Models;
 package body Porion.XUnit.Parsers is
@@ -63,6 +65,8 @@ package body Porion.XUnit.Parsers is
 
    function Get_Status (Config : in XUnit_Config) return Test_Status_Type;
    function To_Duration (Value : in Util.Beans.Objects.Object) return Integer;
+
+   Log   : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.XUnit.Parsers");
 
    function To_Duration (Value : in Util.Beans.Objects.Object) return Integer is
    begin
@@ -190,6 +194,8 @@ package body Porion.XUnit.Parsers is
       Parser : Util.Serialize.Mappers.Processing;
       Reader : Util.Serialize.IO.XML.Parser;
    begin
+      Log.Info ("Scanning file {0}", Path);
+
       Mapper.Add_Mapping ("@name", TESTSUITE_NAME);
       Mapper.Add_Mapping ("@time", TESTSUITE_TIME);
       Mapper.Add_Mapping ("**/testsuite/@name", TESTSUITE_NAME);
@@ -223,22 +229,36 @@ package body Porion.XUnit.Parsers is
                    Results : in out Analysis.Test_Results) is
       use Ada.Directories;
 
-      Filter  : constant Filter_Type := (Ordinary_File => True,
-                                         Directory     => True,
-                                         others        => False);
-      Search  : Search_Type;
-      Ent     : Ada.Directories.Directory_Entry_Type;
+      Sep     : constant Natural := Util.Strings.Index (Pattern, '/');
    begin
-      Start_Search (Search, Directory => Path,
-                    Pattern => Pattern, Filter => Filter);
-      while More_Entries (Search) loop
-         Get_Next_Entry (Search, Ent);
+      if Sep > 0 then
          declare
-            Full_Path : constant String := Ada.Directories.Full_Name (Ent);
+            Name : constant String := Pattern (Pattern'First .. Sep - 1);
+            Child : constant String := Util.Files.Compose (Path, Name);
          begin
-            Scan (Full_Path, Results);
+            Scan (Child, Pattern (Sep + 1 .. Pattern'Last), Exclude, Results);
+            return;
          end;
-      end loop;
+      else
+         declare
+            Filter  : constant Filter_Type := (Ordinary_File => True,
+                                               Directory     => True,
+                                               others        => False);
+            Search  : Search_Type;
+            Ent     : Ada.Directories.Directory_Entry_Type;
+         begin
+            Start_Search (Search, Directory => Path,
+                          Pattern => Pattern, Filter => Filter);
+            while More_Entries (Search) loop
+               Get_Next_Entry (Search, Ent);
+               declare
+                  Full_Path : constant String := Ada.Directories.Full_Name (Ent);
+               begin
+                  Scan (Full_Path, Results);
+               end;
+            end loop;
+         end;
+      end if;
    end Scan;
 
 end Porion.XUnit.Parsers;

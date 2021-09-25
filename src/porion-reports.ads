@@ -16,6 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with PT;
+with Porion.Queries;
 with Porion.Services;
 with Porion.Executors;
 package Porion.Reports is
@@ -33,11 +34,19 @@ package Porion.Reports is
    procedure List_Builds (Service : in out Porion.Services.Context_Type'Class;
                           Printer : in out PT.Printer_Type'Class;
                           Styles  : in Style_Configuration);
+   procedure List_Builds (List    : in Porion.Queries.Build_Info_Vector;
+                          Printer : in out PT.Printer_Type'Class;
+                          Styles  : in Style_Configuration;
+                          Label   : in String);
 
    --  Create a report about the projects.
    procedure List_Projects (Service : in out Porion.Services.Context_Type'Class;
                             Printer : in out PT.Printer_Type'Class;
                             Styles  : in Style_Configuration);
+   procedure List_Projects (List    : in Porion.Queries.Project_Info_Vector;
+                            Printer : in out PT.Printer_Type'Class;
+                            Styles  : in Style_Configuration;
+                            Label   : in String);
 
    --  Create a report with the list of commands to build the project.
    procedure List_Commands (Commands : in Porion.Executors.Command_Vector;

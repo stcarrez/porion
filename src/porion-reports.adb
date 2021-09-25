@@ -20,7 +20,6 @@ with Ada.Calendar.Time_Zones;
 with Util.Strings;
 with PT.Texts;
 with ADO.Queries;
-with Porion.Queries;
 with Porion.Builds.Models;
 with Porion.Projects.Models;
 package body Porion.Reports is
@@ -85,7 +84,6 @@ package body Porion.Reports is
             return -("publish");
 
       end case;
-      return "";
    end Get_Image;
 
    --  ------------------------------
@@ -95,15 +93,8 @@ package body Porion.Reports is
    procedure List_Builds (Service : in out Porion.Services.Context_Type'Class;
                           Printer : in out PT.Printer_Type'Class;
                           Styles  : in Style_Configuration) is
-      use Porion.Builds.Models;
-      use Porion.Projects.Models;
-
-      Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
       List   : Porion.Queries.Build_Info_Vector;
       Query  : ADO.Queries.Context;
-      Fields : PT.Texts.Field_Array (1 .. 8);
-      Style1 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
-      Style2 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
    begin
       if Service.Project.Is_Null then
          Query.Set_Query (Porion.Queries.Query_Build_List);
@@ -113,6 +104,25 @@ package body Porion.Reports is
       end if;
       Porion.Queries.List (List, Service.DB, Query);
 
+      List_Builds (List, Printer, Styles, -("Name"));
+   end List_Builds;
+
+   --  ------------------------------
+   --  Create a report about the builds.  If the service is configured with
+   --  a project, the report only indicates the builds of the project.
+   --  ------------------------------
+   procedure List_Builds (List    : in Porion.Queries.Build_Info_Vector;
+                          Printer : in out PT.Printer_Type'Class;
+                          Styles  : in Style_Configuration;
+                          Label   : in String) is
+      use Porion.Builds.Models;
+      use Porion.Projects.Models;
+
+      Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
+      Fields : PT.Texts.Field_Array (1 .. 8);
+      Style1 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
+      Style2 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
+   begin
       Writer.Set_Justify (Style2, PT.J_RIGHT);
       Writer.Create_Field (Fields (1), Style1, 20.0);
       Writer.Create_Field (Fields (2), Style1, 20.0);
@@ -129,7 +139,7 @@ package body Porion.Reports is
       end loop;
 
       Writer.Layout_Fields (Fields);
-      Writer.Put (Fields (1), -("Name"));
+      Writer.Put (Fields (1), Label);
       Writer.Put (Fields (2), -("Branch"));
       Writer.Put (Fields (3), -("Tag"));
       Writer.Put (Fields (4), -("Status"));
@@ -174,19 +184,30 @@ package body Porion.Reports is
    procedure List_Projects (Service : in out Porion.Services.Context_Type'Class;
                             Printer : in out PT.Printer_Type'Class;
                             Styles  : in Style_Configuration) is
-      use Porion.Builds.Models;
-      use Porion.Projects.Models;
-
-      Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
       List   : Porion.Queries.Project_Info_Vector;
       Query  : ADO.Queries.Context;
-      Fields : PT.Texts.Field_Array (1 .. 8);
-      Style1 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
-      Style2 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
    begin
       Query.Set_Query (Porion.Queries.Query_Project_List);
       Porion.Queries.List (List, Service.DB, Query);
 
+      List_Projects (List, Printer, Styles, -("Name"));
+   end List_Projects;
+
+   --  ------------------------------
+   --  Create a report about the projects.
+   --  ------------------------------
+   procedure List_Projects (List    : in Porion.Queries.Project_Info_Vector;
+                            Printer : in out PT.Printer_Type'Class;
+                            Styles  : in Style_Configuration;
+                            Label   : in String) is
+      use Porion.Builds.Models;
+      use Porion.Projects.Models;
+
+      Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
+      Fields : PT.Texts.Field_Array (1 .. 8);
+      Style1 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
+      Style2 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
+   begin
       Writer.Set_Justify (Style2, PT.J_RIGHT);
       Writer.Create_Field (Fields (1), Style1, 20.0);
       Writer.Create_Field (Fields (2), Style1, 20.0);
@@ -197,7 +218,7 @@ package body Porion.Reports is
       Writer.Create_Field (Fields (7), Style1, 30.0);
 
       Writer.Layout_Fields (Fields);
-      Writer.Put (Fields (1), -("Name"));
+      Writer.Put (Fields (1), Label);
       Writer.Put (Fields (2), -("Branch"));
       Writer.Put (Fields (3), -("Tag"));
       Writer.Put (Fields (4), -("Status"));
@@ -245,14 +266,11 @@ package body Porion.Reports is
    procedure List_Commands (Commands : in Porion.Executors.Command_Vector;
                             Printer  : in out PT.Printer_Type'Class;
                             Styles   : in Style_Configuration) is
-      use Porion.Builds;
-
       Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
       Fields : PT.Texts.Field_Array (1 .. 3);
       Style1 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
       Style2 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
       Step   : Natural := 0;
-
    begin
       Writer.Set_Justify (Style2, PT.J_RIGHT);
       Writer.Create_Field (Fields (1), Style1, 0.0);

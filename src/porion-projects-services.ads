@@ -48,6 +48,14 @@ package Porion.Projects.Services is
    procedure Remove_Project (Service : in out Context_Type;
                              Name    : in String);
 
+   --  Add a dependency on the current project.
+   procedure Add_Dependency (Service : in out Context_Type;
+                             Depend  : in String);
+
+   --  Remove a dependency on the current project.
+   procedure Remove_Dependency (Service : in out Context_Type;
+                                Depend  : in String);
+
    procedure Check_Sources (Service  : in out Context_Type;
                             Status   : in out Porion.Sources.Status_Type;
                             Executor : in out Porion.Executors.Executor_Type'Class);

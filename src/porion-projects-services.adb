@@ -179,10 +179,95 @@ package body Porion.Projects.Services is
 
       --  Cleanup project branches.
       Execute (Porion.Projects.Models.Query_Cleanup_Project_Branch);
+      Execute (Porion.Projects.Models.Query_Cleanup_Project_Dependency);
 
       Service.Project.Delete (Service.DB);
       Service.DB.Commit;
    end Remove_Project;
+
+   --  ------------------------------
+   --  Add a dependency on the current project.
+   --  ------------------------------
+   procedure Add_Dependency (Service : in out Context_Type;
+                             Depend  : in String) is
+      Project    : Porion.Projects.Models.Project_Ref;
+      Dependency : Porion.Projects.Models.Dependency_Ref;
+      Query      : ADO.SQL.Query;
+      Found      : Boolean;
+   begin
+      Log.Debug ("Adding dependency to {0}", Depend);
+
+      Query.Set_Filter ("o.name = ?");
+      Query.Bind_Param (1, Depend);
+      Project.Find (Session => Service.DB,
+                    Query   => Query,
+                    Found   => Found);
+      if not Found then
+         Log.Warn ("Project {0} not found", Depend);
+         raise Not_Found;
+      end if;
+
+      Query.Clear;
+      Query.Set_Filter ("o.owner_id = :owner_id AND o.project_id = :project_id");
+      Query.Bind_Param ("owner_id", Service.Project.Get_Id);
+      Query.Bind_Param ("project_id", Project.Get_Id);
+      Dependency.Find (Session => Service.DB,
+                       Query   => Query,
+                       Found   => Found);
+      if Found then
+         Log.Info ("Project {0} already depends on {1}",
+                   String '(Service.Project.Get_Name), Depend);
+         return;
+      end if;
+
+      Dependency.Set_Owner (Service.Project);
+      Dependency.Set_Project (Project);
+      Dependency.Save (Service.DB);
+
+      Log.Info ("Project {0} now depends on {1}",
+                String '(Service.Project.Get_Name), Depend);
+   end Add_Dependency;
+
+   --  ------------------------------
+   --  Remove a dependency on the current project.
+   --  ------------------------------
+   procedure Remove_Dependency (Service : in out Context_Type;
+                                Depend  : in String) is
+      Project    : Porion.Projects.Models.Project_Ref;
+      Dependency : Porion.Projects.Models.Dependency_Ref;
+      Query      : ADO.SQL.Query;
+      Found      : Boolean;
+   begin
+      Log.Debug ("Removing dependency to {0}", Depend);
+
+      Query.Set_Filter ("o.name = ?");
+      Query.Bind_Param (1, Depend);
+      Project.Find (Session => Service.DB,
+                    Query   => Query,
+                    Found   => Found);
+      if not Found then
+         Log.Warn ("Project {0} not found", Depend);
+         raise Not_Found;
+      end if;
+
+      Query.Clear;
+      Query.Set_Filter ("o.owner_id = :owner_id AND o.project_id = :project_id");
+      Query.Bind_Param ("owner_id", Service.Project.Get_Id);
+      Query.Bind_Param ("project_id", Project.Get_Id);
+      Dependency.Find (Session => Service.DB,
+                       Query   => Query,
+                       Found   => Found);
+      if not Found then
+         Log.Info ("Project {0} does not depend on {1}",
+                   String '(Service.Project.Get_Name), Depend);
+         return;
+      end if;
+
+      Dependency.Delete (Service.DB);
+
+      Log.Info ("Project {0} now does not depend on {1}",
+                String '(Service.Project.Get_Name), Depend);
+   end Remove_Dependency;
 
    procedure Check_Sources (Service  : in out Context_Type;
                             Status   : in out Porion.Sources.Status_Type;

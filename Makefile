@@ -23,6 +23,9 @@ DYNAMO_ARGS=\
 AGENT_DYNAMO_ARGS=\
   db
 
+SERVER_DYNAMO_ARGS=\
+  db
+
 ROOTDIR=.
 
 # Build executables for all mains defined by the project.
@@ -30,6 +33,9 @@ build-test::
 
 build::
 	$(GNATMAKE) -m -p -P "$(GPRPATH)" $(MAKE_ARGS)
+
+server build-server::
+	cd server && $(GNATMAKE) -m -p -P "porion_server" $(MAKE_ARGS)
 
 test:	build
 	bin/porion_harness -v -config test.properties -xml porion-aunit.xml
@@ -39,3 +45,5 @@ generate::
 	$(DYNAMO) generate $(DYNAMO_ARGS)
 	cd agent && $(DYNAMO) generate $(AGENT_DYNAMO_ARGS)
 	cd agent && $(ARE) -o src/model --rule=are-package.xml --no-type-declaration --list-access --content-only --name-access .. .
+	cd server && $(DYNAMO) generate $(SERVER_DYNAMO_ARGS)
+	cd server && $(ARE) -o src/model --rule=are-package.xml --no-type-declaration --list-access --content-only --name-access .. .

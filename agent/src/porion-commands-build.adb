@@ -38,8 +38,6 @@ package body Porion.Commands.Build is
 
       for I in 1 .. Count loop
          declare
-            use Porion.Sources.Maps;
-
             Name          : constant String := Args.Get_Argument (I);
             Source_Status : Porion.Sources.Status_Type;
             Executor      : Porion.Executors.Executor_Type;
@@ -69,7 +67,6 @@ package body Porion.Commands.Build is
                if Command.Dry_Run then
                   declare
                      Commands : Porion.Executors.Command_Vector;
-                     Step     : Natural := 0;
                   begin
                      Executor.Fetch_Commands (Commands);
                      Porion.Reports.List_Commands (Commands, Context.Printer.all, Context.Styles);

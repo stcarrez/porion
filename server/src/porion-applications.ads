@@ -33,7 +33,7 @@ with AWA.Services.Filters;
 with AWA.Converters.Dates;
 package Porion.Applications is
 
-   CONFIG_PATH  : constant String := "porion";
+   CONFIG_PATH  : constant String := "porion-server";
    CONTEXT_PATH : constant String := "/porion";
 
    type Application is new AWA.Applications.Application with private;

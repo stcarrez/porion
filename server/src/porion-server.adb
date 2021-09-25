@@ -20,7 +20,6 @@ with Util.Commands;
 
 with Servlet.Server.Web;
 
-with AWA.Setup.Applications;
 with AWA.Commands.Drivers;
 with AWA.Commands.Start;
 with AWA.Commands.Setup;
@@ -28,10 +27,7 @@ with AWA.Commands.Stop;
 with AWA.Commands.List;
 with AWA.Commands.Info;
 
-with ADO.Drivers;
---  with ADO.Sqlite;
---  with ADO.Mysql;
---  with ADO.Postgresql;
+with ADO.Sqlite;
 
 with Porion.Applications;
 procedure Porion.Server is
@@ -53,10 +49,7 @@ procedure Porion.Server is
    Arguments : Util.Commands.Dynamic_Argument_List;
 begin
    --  Initialize the database drivers (all of them or specific ones).
-   ADO.Drivers.Initialize;
-   --  ADO.Sqlite.Initialize;
-   --  ADO.Mysql.Initialize;
-   --  ADO.Postgresql.Initialize;
+   ADO.Sqlite.Initialize;
    Log.Info ("Connect you browser to: http://localhost:8080{0}/index.html",
              Porion.Applications.CONTEXT_PATH);
    WS.Register_Application (Porion.Applications.CONTEXT_PATH, App.all'Access);

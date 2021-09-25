@@ -31,3 +31,9 @@ porion.gpr
 porion_tests.gpr
 .clang-format
 .clangd
+model.yaml
+agent/model.yaml
+server/model.yaml
+agent/porion_agent.properties
+*-aunit.xml
+*.prj

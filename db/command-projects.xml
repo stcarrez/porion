@@ -67,4 +67,33 @@
         </sql-count>
     </query>
 
+    <query name='project-dependency-list'>
+        <comment>Get the list of projects that another project depend on</comment>
+        <sql>
+            SELECT
+            project.name AS name,
+            project.status AS status,
+            COALESCE(branch.name, '') AS branch_name,
+            COALESCE(branch.tag, '') AS branch_tag,
+            COALESCE(branch.status, 0) AS branch_status,
+            build.finish_date AS build_date,
+            COALESCE(build.status, 0) AS build_status,
+            COALESCE(build.tag, '') AS build_tag,
+            COALESCE(build.pass_count, 0) AS pass_count,
+            COALESCE(build.fail_count, 0) AS fail_count,
+            COALESCE(build.timeout_count, 0) AS timeout_count
+            FROM porion_dependency AS dependency
+            INNER JOIN porion_project AS project ON dependency.project_id = project.id
+            LEFT JOIN porion_branch AS branch ON project.id = branch.project_id AND branch.status != 0
+            LEFT JOIN porion_last_build AS last_build ON last_build.branch_id = branch.id
+            LEFT JOIN porion_build AS build ON last_build.build_id = build.id
+            WHERE dependency.owner_id = :project_id
+        </sql>
+        <sql-count>
+            SELECT
+            count(project.id)
+            FROM porion_project AS project
+        </sql-count>
+    </query>
+
 </query-mapping>

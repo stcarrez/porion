@@ -89,4 +89,11 @@
        </sql>
     </query>
 
+    <query name='cleanup-project-dependency'>
+       <comment>Cleanup the project dependencies of a project.</comment>
+       <sql>
+    DELETE FROM porion_dependency WHERE project_id = :project_id OR owner_id = :project_id
+       </sql>
+    </query>
+
 </query-mapping>

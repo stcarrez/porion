@@ -278,7 +278,7 @@ package body Porion.Builds.Services is
          begin
             Step.Step := DB_Step;
             if Params'Length > 0 then
-               Util.Properties.JSON.Parse_JSON (Step.Config, Params);
+               Step.Config := Util.Serialize.IO.JSON.Read (Params);
             end if;
             Service.Steps.Append (Step);
          end;
@@ -318,6 +318,7 @@ package body Porion.Builds.Services is
    procedure Insert_Step (Service   : in out Context_Type;
                           Position  : in Natural;
                           Kind      : in Porion.Builds.Models.Builder_Type;
+                          Step      : in Porion.Builds.Step_Type;
                           Arguments : in Util.Strings.Vectors.Vector) is
       use Porion.Builds.Models;
 
@@ -342,26 +343,29 @@ package body Porion.Builds.Services is
       Free (Controller);
 
       declare
-         Step : Build_Step;
+         New_Step : Build_Step;
          Pos  : Natural := Position;
       begin
          if Pos = 0 then
             Pos := Natural (Service.Steps.Length);
          end if;
-         Service.Steps.Insert (Pos, Step);
-         Step.Step.Set_Parameters (Util.Streams.Texts.To_String (Output));
-         Step.Step.Set_Builder (Kind);
-         Step.Step.Set_Number (Pos);
-         Step.Step.Set_Step (Porion.Builds.STEP_MAKE);
-         Step.Step.Set_Execution (Builds.Models.EXEC_NO_ERROR);
-         Step.Step.Set_Build_Config (Service.Build_Config);
-         Step.Step.Save (Service.DB);
+         Service.Steps.Insert (Pos, New_Step);
+         New_Step.Step.Set_Parameters (Util.Streams.Texts.To_String (Output));
+         New_Step.Step.Set_Builder (Kind);
+         New_Step.Step.Set_Number (Pos);
+         New_Step.Step.Set_Step (Step);
+         New_Step.Step.Set_Execution (Builds.Models.EXEC_NO_ERROR);
+         New_Step.Step.Set_Build_Config (Service.Build_Config);
+         New_Step.Step.Save (Service.DB);
 
          Pos := Pos + 1;
          while Pos < Natural (Service.Steps.Length) loop
-            Step := Service.Steps.Element (Pos);
-            Step.Step.Set_Number (Pos);
-            Step.Step.Save (Service.DB);
+            declare
+               Next_Step : Build_Step := Service.Steps.Element (Pos);
+            begin
+               Next_Step.Step.Set_Number (Pos);
+               Next_Step.Step.Save (Service.DB);
+            end;
             Pos := Pos + 1;
          end loop;
       end;

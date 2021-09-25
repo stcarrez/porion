@@ -19,9 +19,20 @@ with Ada.Finalization;
 with Ada.Containers.Indefinite_Vectors;
 with EL.Expressions;
 with Util.Properties;
+with Util.Beans.Objects.Enums;
 with Porion.Loggers;
 with Porion.Builds;
 package Porion.Executors is
+
+   type Executor_Mode_Type is (EXECUTOR_LOCAL, EXECUTOR_SSH, EXECUTOR_DOCKER);
+
+   --  Use a fixed enum configuration because the value is stored in database.
+   for Executor_Mode_Type use (EXECUTOR_LOCAL => 0,
+                               EXECUTOR_SSH => 1,
+                               EXECUTOR_DOCKER => 2);
+
+   package Executor_Mode_Type_Objects is
+      new Util.Beans.Objects.Enums (Executor_Mode_Type);
 
    type Command_Type (Len : Positive) is record
       Step    : Porion.Builds.Step_Type;
@@ -72,13 +83,6 @@ package Porion.Executors is
                       Strip_Crlf  : in Boolean := False;
                       Status      : out Integer);
 
-   procedure Execute (Executor    : in out Executor_Type;
-                      Command     : in String;
-                      Process     : not null access procedure (Line : in String);
-                      Working_Dir : in String := "";
-                      Strip_Crlf  : in Boolean := False;
-                      Status      : out Integer);
-
    procedure Create_Logger (Executor : in out Executor_Type;
                             Dir      : in String;
                             Name     : in String);
@@ -91,7 +95,35 @@ package Porion.Executors is
    procedure Fetch_Commands (Executor : in out Executor_Type;
                              Commands : out Command_Vector);
 
+   procedure Execute (Executor    : in out Executor_Type;
+                      Command     : in String;
+                      Process     : not null access procedure (Line : in String);
+                      Working_Dir : in String := "";
+                      Strip_Crlf  : in Boolean := False;
+                      Status      : out Integer);
+
+   --  Record a command that is executed during the build step.
+   --  The command is not executed but added to the list of commands.
+   procedure Record_Command (Executor : in out Executor_Type;
+                             Command  : in String);
+
 private
+
+   type Controller_Type is limited interface;
+   type Controller_Access is access all Controller_Type'Class;
+
+   procedure Start (Controller : in out Controller_Type;
+                    Executor   : in out Executor_Type'Class) is abstract;
+
+   procedure Execute (Controller : in out Controller_Type;
+                      Command     : in String;
+                      Process     : not null access procedure (Line : in String);
+                      Working_Dir : in String := "";
+                      Strip_Crlf  : in Boolean := False;
+                      Status      : out Integer) is abstract;
+
+   procedure Stop (Controller : in out Controller_Type;
+                   Executor   : in out Executor_Type'Class) is abstract;
 
    type Executor_Type is limited new Ada.Finalization.Limited_Controlled with record
       Dry_Run    : Boolean := False;
@@ -100,6 +132,7 @@ private
       Status     : Integer := 0;
       Step       : Porion.Builds.Step_Type;
       Logger     : Porion.Loggers.Logger_Type;
+      Controller : Controller_Access;
    end record;
 
 end Porion.Executors;

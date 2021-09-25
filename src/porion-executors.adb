@@ -93,13 +93,6 @@ package body Porion.Executors is
          Cmd     : constant Util.Beans.Objects.Object := Command.Get_Value (Ctx);
          Command : constant String := Util.Beans.Objects.To_String (Cmd);
       begin
-         if Executor.Dry_Run then
-            Status := 0;
-            Executor.Commands.Append ((Len     => Command'Length,
-                                       Step    => Executor.Step,
-                                       Command => Command));
-            return;
-         end if;
 
          Executor_Type'Class (Executor).Execute (Command, Process, Working_Dir,
                                                  Strip_Crlf, Status);
@@ -126,6 +119,7 @@ package body Porion.Executors is
       Executor_Type'Class (Executor).Execute (Command, Parameters, Process'Access,
                                               Working_Dir, Strip_Crlf, Status);
    end Execute;
+
    procedure Execute (Executor    : in out Executor_Type;
                       Command     : in String;
                       Process     : not null access procedure (Line : in String);
@@ -137,6 +131,12 @@ package body Porion.Executors is
       Input   : Util.Streams.Output_Stream_Access;
       Reader  : Util.Streams.Texts.Reader_Stream;
    begin
+      if Executor.Dry_Run then
+         Status := 0;
+         Executor.Record_Command (Command);
+         return;
+      end if;
+
       if Working_Dir'Length > 0 then
          Glog.Info ("Running '{0}' in '{1}'", Command, Working_Dir);
          Util.Processes.Set_Working_Directory (Proc, Working_Dir);
@@ -187,6 +187,18 @@ package body Porion.Executors is
       Commands := Executor.Commands;
       Executor.Commands.Clear;
    end Fetch_Commands;
+
+   --  ------------------------------
+   --  Record a command that is executed during the build step.
+   --  The command is not executed but added to the list of commands.
+   --  ------------------------------
+   procedure Record_Command (Executor : in out Executor_Type;
+                             Command  : in String)is
+   begin
+      Executor.Commands.Append ((Len     => Command'Length,
+                                 Step    => Executor.Step,
+                                 Command => Command));
+   end Record_Command;
 
    --  ------------------------------
    --  Write the line on the logger.

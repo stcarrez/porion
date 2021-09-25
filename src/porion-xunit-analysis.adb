@@ -193,6 +193,7 @@ package body Porion.XUnit.Analysis is
             Pass_Count    : Natural := 0;
             Fail_Count    : Natural := 0;
             Timeout_Count : Natural := 0;
+            Duration      : Natural := 0;
          begin
             for Test_Iter in Group.Tests.Iterate loop
                declare
@@ -221,6 +222,7 @@ package body Porion.XUnit.Analysis is
                   end if;
                   Test.Test.Save (Session);
 
+                  Duration := Duration + Test.Duration;
                   Test.Run.Set_Duration (Test.Duration);
                   Test.Run.Set_Status (Test.Status);
                   Test.Run.Set_Test (Test.Test);
@@ -231,18 +233,35 @@ package body Porion.XUnit.Analysis is
             Group.Run.Set_Total_Pass_Count (Pass_Count + Group.Run.Get_Total_Pass_Count);
             Group.Run.Set_Total_Fail_Count (Fail_Count + Group.Run.Get_Total_Fail_Count);
             Group.Run.Set_Total_Timeout_Count (Timeout_Count + Group.Run.Get_Total_Timeout_Count);
+            Group.Run.Set_Duration (Duration);
          end;
       end loop;
 
       --  Step 3: save the group since their stats have been updated.
-      for Iter in Results.Groups.Iterate loop
-         declare
-            Group : constant Test_Group_Maps.Reference_Type := Results.Groups.Reference (Iter);
-         begin
-            Group.Run.Save (Session);
-         end;
-      end loop;
+      declare
+         Pass_Count    : Natural := 0;
+         Fail_Count    : Natural := 0;
+         Timeout_Count : Natural := 0;
+         Duration      : Natural := 0;
+      begin
+         for Iter in Results.Groups.Iterate loop
+            declare
+               Group : constant Test_Group_Maps.Reference_Type := Results.Groups.Reference (Iter);
+            begin
+               Group.Run.Save (Session);
+               Pass_Count := Pass_Count + Group.Run.Get_Total_Pass_Count;
+               Fail_Count := Fail_Count + Group.Run.Get_Total_Fail_Count;
+               Timeout_Count := Timeout_Count + Group.Run.Get_Total_Timeout_Count;
+               Duration := Duration + Group.Run.Get_Duration;
+            end;
+         end loop;
 
+         Build.Set_Pass_Count (Pass_Count);
+         Build.Set_Fail_Count (Fail_Count);
+         Build.Set_Timeout_Count (Timeout_Count);
+         Build.Set_Test_Duration (Duration);
+         Build.Save (Session);
+      end;
    end Save_Run_Tests;
 
    procedure Load (Tests      : in out Test_Results;

@@ -38,7 +38,11 @@ package body Porion.Builders.XUnit is
       end if;
 
       for Include of Controller.Includes loop
-         Porion.XUnit.Parsers.Scan (Path, Include, Controller.Excludes, Results);
+         if Executor.Is_Dry_Run then
+            Executor.Record_Command ("xunit " & Include);
+         else
+            Porion.XUnit.Parsers.Scan (Path, Include, Controller.Excludes, Results);
+         end if;
       end loop;
 
       Porion.XUnit.Analysis.Save (Results => Results,

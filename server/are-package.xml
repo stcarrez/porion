@@ -1,0 +1,33 @@
+<package>
+
+  <resource name='Porion.Resources.Queries'
+            format='string'
+            type='access constant String'>
+    <install mode='copy'>
+      <fileset dir="db">
+        <include name="*.xml"/>
+      </fileset>
+    </install>
+  </resource>
+
+  <resource name='Porion.Resources.Schema'
+            format='lines'>
+    <line-separator>;</line-separator>
+
+    <!-- Remove new lines -->
+    <line-filter>[\r\n]</line-filter>
+
+    <!-- Remove C comments -->
+    <line-filter>/\*[^/]*\*/</line-filter>
+
+    <!-- Remove contiguous spaces after C comments removal -->
+    <line-filter replace=' '>[ \t][ \t]+</line-filter>
+    
+    <install mode='copy' strip-extension='yes'>
+      <fileset dir="db/sqlite">
+        <include name="create-porion_agent-sqlite.sql"/>
+      </fileset>
+    </install>
+  </resource>
+
+</package>

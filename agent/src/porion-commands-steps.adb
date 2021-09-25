@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 with Util.Strings.Vectors;
 with Porion.Builds.Models;
+with Porion.Services;
 package body Porion.Commands.Steps is
 
    --  ------------------------------
@@ -36,6 +37,10 @@ package body Porion.Commands.Steps is
          Porion.Commands.Log.Error (-("use only one of --insert, --update or --delete option"));
          return;
       end if;
+      if Args.Get_Count = 1 then
+         Porion.Commands.Error (-("missing step action"));
+         return;
+      end if;
       Context.Open;
 
       declare
@@ -51,25 +56,33 @@ package body Porion.Commands.Steps is
             Context.Build_Service.Delete_Step (Command.Delete_Pos);
             return;
          end if;
+
+      exception
+         when Porion.Services.Not_Found =>
+            Porion.Commands.Error (-("project '{0}' not found"), Name);
+            return;
       end;
 
       declare
          First  : constant String := Args.Get_Argument (2);
          Kind   : Porion.Builds.Models.Builder_Type;
+         Step   : Porion.Builds.Step_Type;
          Params : Util.Strings.Vectors.Vector;
          Pos    : Positive := 2;
       begin
          if First = "xunit" then
             Kind := Porion.Builds.Models.BUILDER_XUNIT;
+            Step := Porion.Builds.STEP_TEST;
             Pos := 3;
          else
             Kind := Porion.Builds.Models.BUILDER_SCRIPT;
+            Step := Porion.Builds.STEP_MAKE;
          end if;
          while Pos <= Args.Get_Count loop
             Params.Append (Args.Get_Argument (Pos));
             Pos := Pos + 1;
          end loop;
-         Context.Build_Service.Insert_Step (Command.Insert_Pos, Kind, Params);
+         Context.Build_Service.Insert_Step (Command.Insert_Pos, Kind, Step, Params);
       end;
    end Execute;
 

@@ -202,6 +202,8 @@ CREATE TABLE IF NOT EXISTS porion_node (
   "name" VARCHAR(255) NOT NULL,
   /* the login name. */
   "login" VARCHAR(255) NOT NULL,
+  /* the repository directory. */
+  "repository_dir" VARCHAR(255) NOT NULL,
   PRIMARY KEY ("id")
 );
 /*  */
@@ -380,6 +382,9 @@ INSERT INTO awa_audit_field (entity_type, name)
   ON CONFLICT DO NOTHING;
 INSERT INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = 'porion_node'), 'login')
+  ON CONFLICT DO NOTHING;
+INSERT INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = 'porion_node'), 'repository_dir')
   ON CONFLICT DO NOTHING;
 INSERT INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = 'porion_branch'), 'tag')

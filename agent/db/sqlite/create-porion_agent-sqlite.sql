@@ -208,6 +208,8 @@ CREATE TABLE IF NOT EXISTS porion_node (
   `name` VARCHAR(255) NOT NULL,
   /* the login name. */
   `login` VARCHAR(255) NOT NULL,
+  /* the repository directory. */
+  `repository_dir` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`)
 );
 /*  */
@@ -394,6 +396,8 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "name");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "login");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "repository_dir");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "tag");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)

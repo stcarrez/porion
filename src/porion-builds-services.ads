@@ -76,6 +76,7 @@ package Porion.Builds.Services is
    procedure Insert_Step (Service   : in out Context_Type;
                           Position  : in Natural;
                           Kind      : in Porion.Builds.Models.Builder_Type;
+                          Step      : in Porion.Builds.Step_Type;
                           Arguments : in Util.Strings.Vectors.Vector) with
      Pre => Service.Has_Project;
 

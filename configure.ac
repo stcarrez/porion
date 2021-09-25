@@ -40,6 +40,17 @@ else
 fi
 AC_SUBST(USE_NLS)
 
+ac_enable_server=no
+AC_ARG_ENABLE(server,
+  [  --enable-server         Enable compilation of Porion server],
+  [case "${enableval}" in
+    no|none)  ac_enable_server= ;;
+    *)        ac_enable_server=yes
+		  	  ;;
+  esac])
+
+PORION_SERVER=${ac_enable_server}
+AC_SUBST(PORION_SERVER)
 
 if test T$GETTEXT_INTL = TTrue; then
   USE_LIBINTL=yes
@@ -48,16 +59,23 @@ else
 fi
 AC_SUBST(USE_LIBINTL)
 
+AC_CHECK_PROG(HAVE_PANDOC,pandoc,yes)
+AC_CHECK_PROG(HAVE_DYNAMO,dynamo,yes)
+
 AM_GNAT_FIND_ADA_UTIL([porion])
 AM_GNAT_FIND_ADA_EL([porion])
-AM_GNAT_FIND_ADA_SECURITY([porion])
-AM_GNAT_FIND_ADA_SERVLET([porion])
-AM_GNAT_FIND_ADA_SERVER_FACES([porion])
 AM_GNAT_FIND_ADA_ADO([porion])
-AM_GNAT_FIND_ADA_WIKI([porion])
-AM_GNAT_FIND_ADA_OPENAPI([porion])
 AM_GNAT_FIND_ADA_KEYSTORE([porion])
-AM_GNAT_FIND_ADA_AWA([porion])
+
+# Building the server required the AWA framework
+if test x$ac_enable_server = 'xyes'; then
+  AM_GNAT_FIND_ADA_WIKI([porion])
+  AM_GNAT_FIND_ADA_OPENAPI([porion])
+  AM_GNAT_FIND_ADA_SECURITY([porion])
+  AM_GNAT_FIND_ADA_SERVLET([porion])
+  AM_GNAT_FIND_ADA_SERVER_FACES([porion])
+  AM_GNAT_FIND_ADA_AWA([porion])
+fi
 
 AC_OUTPUT(
 Makefile.conf agent/porion_agent.gpr server/porion_server.gpr porion_lib.gpr porion_tests.gpr

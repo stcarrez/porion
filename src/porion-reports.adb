@@ -217,6 +217,11 @@ package body Porion.Reports is
       Writer.Create_Field (Fields (6), Style2, 0.0);
       Writer.Create_Field (Fields (7), Style1, 30.0);
 
+      Writer.Set_Max_Dimension (Fields (5), (6, 1));
+      Writer.Set_Max_Dimension (Fields (6), (6, 1));
+      Writer.Set_Bottom_Right_Padding (Fields (5), (1, 0));
+      Writer.Set_Bottom_Right_Padding (Fields (6), (1, 0));
+
       Writer.Layout_Fields (Fields);
       Writer.Put (Fields (1), Label);
       Writer.Put (Fields (2), -("Branch"));

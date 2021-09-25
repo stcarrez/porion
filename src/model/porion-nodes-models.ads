@@ -82,6 +82,18 @@ package Porion.Nodes.Models is
    function Get_Login (Object : in Node_Ref)
                  return String;
 
+   --  Set the repository directory.
+   procedure Set_Repository_Dir (Object : in out Node_Ref;
+                                 Value  : in Ada.Strings.Unbounded.Unbounded_String);
+   procedure Set_Repository_Dir (Object : in out Node_Ref;
+                                 Value : in String);
+
+   --  Get the repository directory.
+   function Get_Repository_Dir (Object : in Node_Ref)
+                 return Ada.Strings.Unbounded.Unbounded_String;
+   function Get_Repository_Dir (Object : in Node_Ref)
+                 return String;
+
    --  Load the entity identified by 'Id'.
    --  Raises the NOT_FOUND exception if it does not exist.
    procedure Load (Object  : in out Node_Ref;
@@ -138,25 +150,28 @@ private
    COL_1_1_NAME : aliased constant String := "version";
    COL_2_1_NAME : aliased constant String := "name";
    COL_3_1_NAME : aliased constant String := "login";
+   COL_4_1_NAME : aliased constant String := "repository_dir";
 
    NODE_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 4,
+     (Count   => 5,
       Table   => NODE_NAME'Access,
       Members => (
          1 => COL_0_1_NAME'Access,
          2 => COL_1_1_NAME'Access,
          3 => COL_2_1_NAME'Access,
-         4 => COL_3_1_NAME'Access)
+         4 => COL_3_1_NAME'Access,
+         5 => COL_4_1_NAME'Access)
      );
    NODE_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := NODE_DEF'Access;
 
    NODE_AUDIT_DEF : aliased constant ADO.Audits.Auditable_Mapping :=
-     (Count    => 2,
+     (Count    => 3,
       Of_Class => NODE_DEF'Access,
       Members  => (
          1 => 2,
-         2 => 3)
+         2 => 3,
+         3 => 4)
      );
    NODE_AUDIT_TABLE : constant ADO.Audits.Auditable_Mapping_Access
       := NODE_AUDIT_DEF'Access;
@@ -172,6 +187,7 @@ private
        Version : Integer;
        Name : Ada.Strings.Unbounded.Unbounded_String;
        Login : Ada.Strings.Unbounded.Unbounded_String;
+       Repository_Dir : Ada.Strings.Unbounded.Unbounded_String;
    end record;
 
    type Node_Access is access all Node_Impl;

@@ -160,6 +160,36 @@ package body Porion.Nodes.Models is
       return Impl.Login;
    end Get_Login;
 
+
+   procedure Set_Repository_Dir (Object : in out Node_Ref;
+                                  Value : in String) is
+      Impl : Node_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Audits.Set_Field_String (Impl.all, 5, Impl.Repository_Dir, Value);
+   end Set_Repository_Dir;
+
+   procedure Set_Repository_Dir (Object : in out Node_Ref;
+                                 Value  : in Ada.Strings.Unbounded.Unbounded_String) is
+      Impl : Node_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Audits.Set_Field_Unbounded_String (Impl.all, 5, Impl.Repository_Dir, Value);
+   end Set_Repository_Dir;
+
+   function Get_Repository_Dir (Object : in Node_Ref)
+                 return String is
+   begin
+      return Ada.Strings.Unbounded.To_String (Object.Get_Repository_Dir);
+   end Get_Repository_Dir;
+   function Get_Repository_Dir (Object : in Node_Ref)
+                  return Ada.Strings.Unbounded.Unbounded_String is
+      Impl : constant Node_Access
+         := Node_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Repository_Dir;
+   end Get_Repository_Dir;
+
    --  Copy of the object.
    procedure Copy (Object : in Node_Ref;
                    Into   : in out Node_Ref) is
@@ -177,6 +207,7 @@ package body Porion.Nodes.Models is
             Copy.Version := Impl.Version;
             Copy.Name := Impl.Name;
             Copy.Login := Impl.Login;
+            Copy.Repository_Dir := Impl.Repository_Dir;
          end;
       end if;
       Into := Result;
@@ -321,6 +352,11 @@ package body Porion.Nodes.Models is
                           Value => Object.Login);
          Object.Clear_Modified (4);
       end if;
+      if Object.Is_Modified (5) then
+         Stmt.Save_Field (Name  => COL_4_1_NAME, --  repository_dir
+                          Value => Object.Repository_Dir);
+         Object.Clear_Modified (5);
+      end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
          Stmt.Save_Field (Name  => "version",
@@ -360,6 +396,8 @@ package body Porion.Nodes.Models is
                         Value => Object.Name);
       Query.Save_Field (Name  => COL_3_1_NAME, --  login
                         Value => Object.Login);
+      Query.Save_Field (Name  => COL_4_1_NAME, --  repository_dir
+                        Value => Object.Repository_Dir);
       Query.Execute (Result);
       if Result /= 1 then
          raise ADO.Objects.INSERT_ERROR;
@@ -398,6 +436,8 @@ package body Porion.Nodes.Models is
          return Util.Beans.Objects.To_Object (Impl.Name);
       elsif Name = "login" then
          return Util.Beans.Objects.To_Object (Impl.Login);
+      elsif Name = "repository_dir" then
+         return Util.Beans.Objects.To_Object (Impl.Repository_Dir);
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -415,6 +455,7 @@ package body Porion.Nodes.Models is
       Object.Set_Key_Value (Stmt.Get_Identifier (0));
       Object.Name := Stmt.Get_Unbounded_String (2);
       Object.Login := Stmt.Get_Unbounded_String (3);
+      Object.Repository_Dir := Stmt.Get_Unbounded_String (4);
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);
    end Load;

@@ -167,10 +167,7 @@ package body Porion.Configs is
    --  Get the directory holding the project sources for the given build.
    --  ------------------------------
    function Get_Build_Directory (Name   : in String;
-                                 Branch : in String;
-                                 Number : in Positive) return String is
-      pragma Unreferenced (Number);
-
+                                 Branch : in String) return String is
       Project_Dir : constant String := Get_Project_Directory (Name);
    begin
       return Util.Files.Compose (Project_Dir, Branch);

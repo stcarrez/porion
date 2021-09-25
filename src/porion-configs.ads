@@ -57,8 +57,7 @@ package Porion.Configs is
 
    --  Get the directory holding the project sources for the given build.
    function Get_Build_Directory (Name   : in String;
-                                 Branch : in String;
-                                 Number : in Positive) return String;
+                                 Branch : in String) return String;
 
    --  Get the directory holding the build log files for the given build.
    function Get_Build_Log_Directory (Name   : in String;

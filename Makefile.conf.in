@@ -14,3 +14,6 @@ VPATH = @srcdir@
 prefix = @prefix@
 exec_prefix = @exec_prefix@
 PROCESSORS=@NR_CPUS@
+HAVE_SERVER=@PORION_SERVER@
+HAVE_PANDOC=@HAVE_PANDOC@
+HAVE_DYNAMO=@HAVE_DYNAMO@

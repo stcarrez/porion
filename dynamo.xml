@@ -1,6 +1,7 @@
 <project>
      <name>porion_lib</name>
      <property name="author_email">Stephane.Carrez@gmail.com</property>
+     <property name="search_dirs">.;/build/local-gnat-2021/share/dynamo/ado</property>
      <property name="is_ado">FALSE</property>
      <property name="license">apache</property>
      <property name="is_gtk">FALSE</property>

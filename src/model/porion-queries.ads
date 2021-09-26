@@ -168,7 +168,8 @@ package Porion.Queries is
    --  --------------------
    --    Information about a project.
    --  --------------------
-   type Project_Info is record
+   type Project_Info is
+     new Util.Beans.Basic.Bean with  record
 
       --  the project name.
       Name : Ada.Strings.Unbounded.Unbounded_String;
@@ -204,10 +205,29 @@ package Porion.Queries is
       Timeout_Count : Integer;
    end record;
 
-   package Project_Info_Vectors is
-      new Ada.Containers.Vectors (Index_Type   => Positive,
-                                  Element_Type => Project_Info,
-                                  "="          => "=");
+   --  Get the bean attribute identified by the name.
+   overriding
+   function Get_Value (From : in Project_Info;
+                       Name : in String) return Util.Beans.Objects.Object;
+
+   --  Set the bean attribute identified by the name.
+   overriding
+   procedure Set_Value (Item  : in out Project_Info;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object);
+
+
+   package Project_Info_Beans is
+      new Util.Beans.Basic.Lists (Element_Type => Project_Info);
+   package Project_Info_Vectors renames Project_Info_Beans.Vectors;
+   subtype Project_Info_List_Bean is Project_Info_Beans.List_Bean;
+
+   type Project_Info_List_Bean_Access is access all Project_Info_List_Bean;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Project_Info_List_Bean'Class;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
 
    subtype Project_Info_Vector is Project_Info_Vectors.Vector;
 

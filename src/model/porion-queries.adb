@@ -129,6 +129,93 @@ package body Porion.Queries is
       end loop;
    end List;
 
+
+
+   --  ------------------------------
+   --  Get the bean attribute identified by the name.
+   --  ------------------------------
+   overriding
+   function Get_Value (From : in Project_Info;
+                       Name : in String) return Util.Beans.Objects.Object is
+   begin
+      if Name = "name" then
+         return Util.Beans.Objects.To_Object (From.Name);
+      elsif Name = "project_status" then
+         return Porion.Projects.Models.Project_Status_Type_Objects.To_Object (From.Project_Status);
+      elsif Name = "branch_name" then
+         return Util.Beans.Objects.To_Object (From.Branch_Name);
+      elsif Name = "branch_tag" then
+         return Util.Beans.Objects.To_Object (From.Branch_Tag);
+      elsif Name = "branch_status" then
+         return Porion.Projects.Models.Branch_Status_Type_Objects.To_Object (From.Branch_Status);
+      elsif Name = "build_date" then
+         if From.Build_Date.Is_Null then
+            return Util.Beans.Objects.Null_Object;
+         else
+            return Util.Beans.Objects.Time.To_Object (From.Build_Date.Value);
+         end if;
+      elsif Name = "build_status" then
+         return Porion.Builds.Models.Build_Status_Type_Objects.To_Object (From.Build_Status);
+      elsif Name = "build_tag" then
+         return Util.Beans.Objects.To_Object (From.Build_Tag);
+      elsif Name = "pass_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Pass_Count));
+      elsif Name = "fail_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Fail_Count));
+      elsif Name = "timeout_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Timeout_Count));
+      end if;
+      return Util.Beans.Objects.Null_Object;
+   end Get_Value;
+
+
+   --  ------------------------------
+   --  Set the value identified by the name
+   --  ------------------------------
+   overriding
+   procedure Set_Value (Item  : in out Project_Info;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object) is
+   begin
+      if Name = "name" then
+         Item.Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "project_status" then
+         Item.Project_Status := Porion.Projects.Models.Project_Status_Type_Objects.To_Value (Value);
+      elsif Name = "branch_name" then
+         Item.Branch_Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "branch_tag" then
+         Item.Branch_Tag := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "branch_status" then
+         Item.Branch_Status := Porion.Projects.Models.Branch_Status_Type_Objects.To_Value (Value);
+      elsif Name = "build_date" then
+         Item.Build_Date.Is_Null := Util.Beans.Objects.Is_Null (Value);
+         if not Item.Build_Date.Is_Null then
+            Item.Build_Date.Value := Util.Beans.Objects.Time.To_Time (Value);
+         end if;
+      elsif Name = "build_status" then
+         Item.Build_Status := Porion.Builds.Models.Build_Status_Type_Objects.To_Value (Value);
+      elsif Name = "build_tag" then
+         Item.Build_Tag := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "pass_count" then
+         Item.Pass_Count := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "fail_count" then
+         Item.Fail_Count := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "timeout_count" then
+         Item.Timeout_Count := Util.Beans.Objects.To_Integer (Value);
+      end if;
+   end Set_Value;
+
+
+   --  --------------------
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   --  --------------------
+   procedure List (Object  : in out Project_Info_List_Bean'Class;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+   begin
+      List (Object.List, Session, Context);
+   end List;
+
    --  --------------------
    --  Information about a project.
    --  --------------------

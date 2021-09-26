@@ -24,7 +24,8 @@ AGENT_DYNAMO_ARGS=\
   db
 
 SERVER_DYNAMO_ARGS=\
-  db
+  --package Porion.Dashboards.Models \
+  db ../uml/porion.zargo
 
 ROOTDIR=.
 

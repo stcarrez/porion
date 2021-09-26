@@ -1,5 +1,5 @@
 <project>
-     <name>porion_server</name>
+     <name>porion</name>
      <property name="author_email">Stephane.Carrez@gmail.com</property>
      <property name="is_ado">FALSE</property>
      <property name="license">apache</property>
@@ -7,6 +7,7 @@
      <property name="is_lib">FALSE</property>
      <property name="author">Stephane Carrez</property>
      <property name="is_web">FALSE</property>
+     <property name="gnat_project">porion_server.gpr</property>
      <property name="is_tool">FALSE</property>
      <depend name="ado"></depend>
      <depend name="porion"></depend>

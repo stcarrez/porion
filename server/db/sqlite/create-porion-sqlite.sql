@@ -685,3 +685,5 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "scm");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "scm_url");
+/* Copied from porion-sqlite.sql*/
+/* File generated automatically by dynamo */

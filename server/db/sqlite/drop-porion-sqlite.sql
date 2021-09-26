@@ -1,4 +1,6 @@
 pragma synchronous=OFF;
+/* Copied from porion-drop-sqlite.sql*/
+/* File generated automatically by dynamo */
 /* Copied from porion_lib-drop-sqlite.sql*/
 /* File generated automatically by dynamo */
 DROP TABLE IF EXISTS `porion_test_run_group`;

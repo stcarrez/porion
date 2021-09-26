@@ -15,6 +15,8 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Ada.Directories;
+
 with Util.Log.Loggers;
 with Util.Commands;
 
@@ -22,13 +24,17 @@ with Servlet.Server.Web;
 
 with AWA.Commands.Drivers;
 with AWA.Commands.Start;
-with AWA.Commands.Setup;
+--  with AWA.Commands.Setup;
 with AWA.Commands.Stop;
 with AWA.Commands.List;
 with AWA.Commands.Info;
 
 with ADO.Sqlite;
 
+with Porion.Configs;
+with Porion.Projects.Services;
+with Porion.Resources.Schema;
+with Porion.Resources.Queries;
 with Porion.Applications;
 procedure Porion.Server is
 
@@ -40,18 +46,68 @@ procedure Porion.Server is
    package Start_Command is new AWA.Commands.Start (Server_Commands);
    package Stop_Command is new AWA.Commands.Stop (Server_Commands);
    package Info_Command is new AWA.Commands.Info (Server_Commands);
-   package Setup_Command is new AWA.Commands.Setup (Start_Command);
+   --  package Setup_Command is new AWA.Commands.Setup (Start_Command);
+
+   type Init_Command_Type is new Server_Commands.Command_Type with null record;
+
+   overriding
+   procedure Execute (Command : in out Init_Command_Type;
+                      Name    : in String;
+                      Args    : in Util.Commands.Argument_List'Class;
+                      Context : in out AWA.Commands.Context_Type);
 
    Log       : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Server");
    App       : constant Porion.Applications.Application_Access := new Porion.Applications.Application;
    WS        : Servlet.Server.Web.AWS_Container renames Server_Commands.WS;
    Context   : AWA.Commands.Context_Type;
    Arguments : Util.Commands.Dynamic_Argument_List;
+
+   overriding
+   procedure Execute (Command : in out Init_Command_Type;
+                      Name    : in String;
+                      Args    : in Util.Commands.Argument_List'Class;
+                      Context : in out AWA.Commands.Context_Type) is
+
+      Config_Path : constant String := Server_Commands.Get_Configuration_Path (Context);
+      Schema      : constant Porion.Resources.Content_Access
+        := Porion.Resources.Schema.Get_Content ("create-porion_server-sqlite");
+      Project_Service : Porion.Projects.Services.Context_Type;
+   begin
+      if Args.Get_Count = 0 then
+         Log.Error (-("missing directory to setup"));
+
+      elsif Args.Get_Count /= 1 then
+         Log.Error (-("too many arguments for the command"));
+      else
+         declare
+            Path  : constant String := Args.Get_Argument (1);
+         begin
+            if Ada.Directories.Exists (Path) then
+               Log.Error (-("directory {0} exists"), Path);
+               return;
+            end if;
+
+            Ada.Directories.Create_Path (Path);
+            Porion.Configs.Initialize (Config_Path);
+            Porion.Configs.Set (Porion.Configs.WORKSPACE_DIR_NAME, Path);
+            Porion.Configs.Save;
+         end;
+         Project_Service.Open (Resources.Queries.Get_Content'Access, Schema);
+         Project_Service.Add_Node (Hostname => "localhost",
+                                   Login    => "");
+      end if;
+   end Execute;
+
+   Init_Command : aliased Init_Command_Type;
 begin
    --  Initialize the database drivers (all of them or specific ones).
    ADO.Sqlite.Initialize;
    Log.Info ("Connect you browser to: http://localhost:8080{0}/index.html",
              Porion.Applications.CONTEXT_PATH);
+
+   Server_Commands.Driver.Add_Command ("init", -("setup the build server"),
+                                       Init_Command'Access);
+
    WS.Register_Application (Porion.Applications.CONTEXT_PATH, App.all'Access);
 
    Server_Commands.Run (Context, Arguments);

@@ -1,10 +1,14 @@
 NAME=porion
 GPRPATH=${NAME}.gpr
+VERSION=x.x.x
 #GPRPATH_AGENT=porion_agent.gpr
 
 -include Makefile.conf
 
 include Makefile.defaults
+
+DIST_DIR=porion-$(VERSION)
+DIST_FILE=porion-$(VERSION).tar.gz
 
 LIBNAME=lib${NAME}
 
@@ -50,4 +54,6 @@ generate::
 	cd server && $(ARE) -o src/model --rule=are-package.xml --no-type-declaration --list-access --content-only --name-access .. .
 
 package:
-	cd server && dynamo dist porion-0.1 package.xml
+	cd server && rm -rf $(DIST_DIR)
+	cd server && dynamo dist $(DIST_DIR) package.xml
+	cd server && tar czf ../$(DIST_FILE) $(DIST_DIR)

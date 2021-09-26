@@ -44,3 +44,38 @@ div.awa-title dd {
 .awa-title div {
   float: left;
 }
+
+#porion-top a {
+    color: #ccc;
+    text-decoration: none;
+}
+
+.project-page-grid {
+    float: left;
+    width: 20%;
+    border: 1px solid #ccc;
+    padding: 5px;
+    margin: 1px;
+}
+.project-page-grid a {
+    text-decoration: none;
+}
+.project-page-grid a span {
+    display: inline-block;
+    line-height: 32px;
+    vertical-align: top;
+}
+.project-page-grid .project-build-status {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+}
+.build-status-BUILD_FAIL .project-build-status {
+    background: red;
+}
+.build-status-BUILD_PASS .project-build-status {
+    background: green;
+}
+.build-status-BUILD_RUNNING .project-build-status {
+    background: orange;
+}

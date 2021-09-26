@@ -6,9 +6,9 @@
   </application>
 
   <managed-bean>
-    <description>An example of a bean (change description and bean name)</description>
-    <managed-bean-name>dashboard</managed-bean-name>
-    <managed-bean-class>Porion.Dashboards.Beans.Dashboards_Bean</managed-bean-class>
+    <description>List of projects</description>
+    <managed-bean-name>projectList</managed-bean-name>
+    <managed-bean-class>Porion.Dashboards.Beans.Project_List_Bean</managed-bean-class>
     <managed-bean-scope>request</managed-bean-scope>
   </managed-bean>
 

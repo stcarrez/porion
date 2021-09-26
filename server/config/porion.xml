@@ -12,6 +12,11 @@
       <url-pattern>/statistics.xml</url-pattern>
     </servlet-mapping>
 
+  <filter-mapping>
+    <filter-name>service</filter-name>
+    <url-pattern>/*.html</url-pattern>
+  </filter-mapping>
+
   <url-policy>
     <description>
        Security rule to allow anonymous users to display the main page.

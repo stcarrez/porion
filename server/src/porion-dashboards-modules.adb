@@ -39,8 +39,8 @@ package body Porion.Dashboards.Modules is
 
       --  Register here any bean class, servlet, filter.
       Register.Register (Plugin => Plugin,
-                         Name   => "Porion.Dashboards.Beans.Dashboards_Bean",
-                         Handler => Porion.Dashboards.Beans.Create_Dashboard_Bean'Access);
+                         Name   => "Porion.Dashboards.Beans.Project_List_Bean",
+                         Handler => Porion.Dashboards.Beans.Create_Project_List_Bean'Access);
 
       AWA.Modules.Module (Plugin).Initialize (App, Props);
 

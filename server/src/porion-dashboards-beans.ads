@@ -20,39 +20,35 @@ with Ada.Strings.Unbounded;
 
 with Util.Beans.Basic;
 with Util.Beans.Objects;
-with Util.Beans.Methods;
+with Porion.Queries;
 with Porion.Dashboards.Modules;
+with Porion.Dashboards.Models;
 package Porion.Dashboards.Beans is
 
-   type Dashboard_Bean is new Util.Beans.Basic.Bean
-     and Util.Beans.Methods.Method_Bean with record
-      Module : Porion.Dashboards.Modules.Dashboard_Module_Access := null;
-      Count  : Natural := 0;
+   type Project_List_Bean is new Porion.Dashboards.Models.Project_List_Bean with record
+      Module        : Porion.Dashboards.Modules.Dashboard_Module_Access := null;
+      Projects      : aliased Porion.Queries.Project_Info_List_Bean;
+      Projects_Bean : Porion.Queries.Project_Info_List_Bean_Access;
    end record;
-   type Dashboard_Bean_Access is access all Dashboard_Bean'Class;
+   type Project_List_Bean_Access is access all Project_List_Bean'Class;
 
    --  Get the value identified by the name.
    overriding
-   function Get_Value (From : in Dashboard_Bean;
+   function Get_Value (From : in Project_List_Bean;
                        Name : in String) return Util.Beans.Objects.Object;
 
    --  Set the value identified by the name.
    overriding
-   procedure Set_Value (From  : in out Dashboard_Bean;
+   procedure Set_Value (From  : in out Project_List_Bean;
                         Name  : in String;
                         Value : in Util.Beans.Objects.Object);
 
-   --  This bean provides some methods that can be used in a Method_Expression
-   overriding
-   function Get_Method_Bindings (From : in Dashboard_Bean)
-                                 return Util.Beans.Methods.Method_Binding_Array_Access;
+   --  Load the list of projects.
+   procedure Load (Bean    : in out Project_List_Bean;
+                   Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
 
-   --  Example of action method.
-   procedure Action (Bean    : in out Dashboard_Bean;
-                     Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
-
-   --  Create the Dashboards_Bean bean instance.
-   function Create_Dashboard_Bean (Module : in Porion.Dashboards.Modules.Dashboard_Module_Access)
+   --  Create the project list bean instance.
+   function Create_Project_List_Bean (Module : in Modules.Dashboard_Module_Access)
       return Util.Beans.Basic.Readonly_Bean_Access;
 
 end Porion.Dashboards.Beans;

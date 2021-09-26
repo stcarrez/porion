@@ -15,36 +15,36 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-
-with ASF.Events.Faces.Actions;
+with ADO.Sessions;
+with ADO.Queries;
+with AWA.Services.Contexts;
 package body Porion.Dashboards.Beans is
 
+   package ASC renames AWA.Services.Contexts;
+
    --  ------------------------------
-   --  Example of action method.
+   --  Load the list of projects.
    --  ------------------------------
-   procedure Action (Bean    : in out Dashboard_Bean;
-                     Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
+   procedure Load (Bean    : in out Project_List_Bean;
+                   Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
+      Ctx     : constant ASC.Service_Context_Access := ASC.Current;
+      Session : ADO.Sessions.Session := ASC.Get_Session (Ctx);
+      Query   : ADO.Queries.Context;
    begin
-      null;
-   end Action;
-
-   package Action_Binding is
-     new ASF.Events.Faces.Actions.Action_Method.Bind (Bean   => Dashboard_Bean,
-                                                      Method => Action,
-                                                      Name   => "action");
-
-   Dashboard_Bean_Binding : aliased constant Util.Beans.Methods.Method_Binding_Array
-     := (Action_Binding.Proxy'Access, null);
+      Query.Set_Query (Porion.Queries.Query_Project_List);
+      Porion.Queries.List (Bean.Projects, Session, Query);
+   end Load;
 
    --  ------------------------------
    --  Get the value identified by the name.
    --  ------------------------------
    overriding
-   function Get_Value (From : in Dashboard_Bean;
+   function Get_Value (From : in Project_List_Bean;
                        Name : in String) return Util.Beans.Objects.Object is
    begin
-      if Name = "count" then
-         return Util.Beans.Objects.To_Object (From.Count);
+      if Name = "projects" then
+         return Util.Beans.Objects.To_Object (Value   => From.Projects_Bean,
+                                              Storage => Util.Beans.Objects.STATIC);
       else
          return Util.Beans.Objects.Null_Object;
       end if;
@@ -54,35 +54,23 @@ package body Porion.Dashboards.Beans is
    --  Set the value identified by the name.
    --  ------------------------------
    overriding
-   procedure Set_Value (From  : in out Dashboard_Bean;
+   procedure Set_Value (From  : in out Project_List_Bean;
                         Name  : in String;
                         Value : in Util.Beans.Objects.Object) is
    begin
-      if Name = "count" then
-         From.Count := Util.Beans.Objects.To_Integer (Value);
-      end if;
+      null;
    end Set_Value;
 
    --  ------------------------------
-   --  This bean provides some methods that can be used in a Method_Expression
+   --  Create the project list bean instance.
    --  ------------------------------
-   overriding
-   function Get_Method_Bindings (From : in Dashboard_Bean)
-                                 return Util.Beans.Methods.Method_Binding_Array_Access is
-      pragma Unreferenced (From);
-   begin
-      return Dashboard_Bean_Binding'Access;
-   end Get_Method_Bindings;
-
-   --  ------------------------------
-   --  Create the Dashboard_Bean bean instance.
-   --  ------------------------------
-   function Create_Dashboard_Bean (Module : in Porion.Dashboards.Modules.Dashboard_Module_Access)
+   function Create_Project_List_Bean (Module : in Modules.Dashboard_Module_Access)
       return Util.Beans.Basic.Readonly_Bean_Access is
-      Object : constant Dashboard_Bean_Access := new Dashboard_Bean;
+      Object : constant Project_List_Bean_Access := new Project_List_Bean;
    begin
       Object.Module := Module;
+      Object.Projects_Bean := Object.Projects'Access;
       return Object.all'Access;
-   end Create_Dashboard_Bean;
+   end Create_Project_List_Bean;
 
 end Porion.Dashboards.Beans;

@@ -48,3 +48,6 @@ generate::
 	cd agent && $(ARE) -o src/model --rule=are-package.xml --no-type-declaration --list-access --content-only --name-access .. .
 	cd server && $(DYNAMO) generate $(SERVER_DYNAMO_ARGS)
 	cd server && $(ARE) -o src/model --rule=are-package.xml --no-type-declaration --list-access --content-only --name-access .. .
+
+package:
+	cd server && dynamo dist porion-0.1 package.xml

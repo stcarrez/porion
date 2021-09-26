@@ -1,9 +1,12 @@
 <project>
      <name>porion</name>
      <property name="author_email">Stephane.Carrez@gmail.com</property>
+     <property name="search_dirs">.;../;/build/local-gnat-2021/share/dynamo/awa_setup;/build/local-gnat-2021/share/dynamo/awa_mail;/build/local-gnat-2021/share/dynamo/awa;/build/local-gnat-2021/share/dynamo/ado;/build/local-gnat-2021/share/dynamo/asf</property>
      <property name="is_ado">FALSE</property>
      <property name="license">apache</property>
      <property name="is_gtk">FALSE</property>
+     <property name="use_postgresql">false</property>
+     <property name="use_mysql">false</property>
      <property name="is_lib">FALSE</property>
      <property name="author">Stephane Carrez</property>
      <property name="is_web">FALSE</property>

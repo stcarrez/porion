@@ -31,6 +31,7 @@ with AWA.Mail.Modules;
 with AWA.Applications;
 with AWA.Services.Filters;
 with AWA.Converters.Dates;
+with Porion.Dashboards.Modules;
 package Porion.Applications is
 
    CONFIG_PATH  : constant String := "porion-server";
@@ -84,6 +85,7 @@ private
       Mail_Module        : aliased AWA.Mail.Modules.Mail_Module;
 
       --  Add your modules here.
+      Dashboard_Module  : aliased Porion.Dashboards.Modules.Dashboard_Module;
    end record;
 
 end Porion.Applications;

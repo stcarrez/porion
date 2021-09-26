@@ -87,6 +87,10 @@ package body Porion.Applications is
                 URI    => "mail",
                 Module => App.Mail_Module'Access);
 
+      Register (App    => App.Self.all'Access,
+                Name   => Porion.Dashboards.Modules.NAME,
+                URI    => "dashboards",
+                Module => App.Dashboard_Module'Access);
    end Initialize_Modules;
 
 end Porion.Applications;

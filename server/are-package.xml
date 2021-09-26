@@ -25,7 +25,7 @@
     
     <install mode='copy' strip-extension='yes'>
       <fileset dir="db/sqlite">
-        <include name="create-porion_agent-sqlite.sql"/>
+        <include name="create-porion_server-sqlite.sql"/>
       </fileset>
     </install>
   </resource>

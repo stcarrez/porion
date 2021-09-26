@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<module version="1.0">
+    <application>
+        <locale-config>
+               <default-locale>en</default-locale>
+               <supported-locale>en</supported-locale>
+        </locale-config>
+        <message-bundle var='porionMsg'>porion</message-bundle>
+    </application>
+    <servlet-mapping>
+      <servlet-name>measures</servlet-name>
+      <url-pattern>/statistics.xml</url-pattern>
+    </servlet-mapping>
+
+  <url-policy>
+    <description>
+       Security rule to allow anonymous users to display the main page.
+    </description>
+    <permission>anonymous</permission>
+    <url-pattern>/index.html</url-pattern>
+  </url-policy>
+
+</module>

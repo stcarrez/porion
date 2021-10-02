@@ -17,13 +17,14 @@
 -----------------------------------------------------------------------
 with EL.Contexts.Properties;
 with EL.Contexts.Default;
-with Util.Processes;
 with Util.Log.Loggers;
-with Util.Streams;
-with Util.Streams.Texts;
 with Util.Beans.Objects;
 with Ada.Text_IO;
+with Porion.Nodes.Local;
+with Porion.Nodes.SSH;
 package body Porion.Executors is
+
+   use type Porion.Nodes.Controller_Access;
 
    Glog : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Executors");
 
@@ -77,6 +78,25 @@ package body Porion.Executors is
       Executor.Step := Step;
    end Set_Step;
 
+   --  ------------------------------
+   --  Setup the executor to build with the given build node.
+   --  ------------------------------
+   procedure Set_Build_Node (Executor : in out Executor_Type;
+                             Node     : in Porion.Nodes.Models.Node_Ref) is
+   begin
+      case Node.Get_Kind is
+         when Nodes.NODE_LOCAL =>
+            Executor.Controller := Nodes.Local.Create;
+
+         when Nodes.NODE_SSH =>
+            Executor.Controller := Nodes.SSH.Create (Node);
+
+         when others =>
+            Glog.Error ("Not supported");
+
+      end case;
+   end Set_Build_Node;
+
    procedure Execute (Executor    : in out Executor_Type;
                       Command     : in EL.Expressions.Expression;
                       Parameters  : in Util.Properties.Manager;
@@ -126,10 +146,6 @@ package body Porion.Executors is
                       Working_Dir : in String := "";
                       Strip_Crlf  : in Boolean := False;
                       Status      : out Integer) is
-      Proc    : Util.Processes.Process;
-      Output  : Util.Streams.Input_Stream_Access;
-      Input   : Util.Streams.Output_Stream_Access;
-      Reader  : Util.Streams.Texts.Reader_Stream;
    begin
       if Executor.Dry_Run then
          Status := 0;
@@ -137,33 +153,24 @@ package body Porion.Executors is
          return;
       end if;
 
-      if Working_Dir'Length > 0 then
-         Glog.Info ("Running '{0}' in '{1}'", Command, Working_Dir);
-         Util.Processes.Set_Working_Directory (Proc, Working_Dir);
+      if Executor.Controller /= null then
+         Executor.Controller.Execute (Command     => Command,
+                                      Working_Dir => Working_Dir,
+                                      Process     => Process,
+                                      Strip_Crlf  => Strip_Crlf,
+                                      Status      => Status);
       else
-         Glog.Info ("Running '{0}'", Command);
+         if Executor.Local = null then
+            Executor.Local := Nodes.Local.Create;
+         end if;
+         Executor.Local.Execute (Command     => Command,
+                                 Working_Dir => Working_Dir,
+                                 Process     => Process,
+                                 Strip_Crlf  => Strip_Crlf,
+                                 Status      => Status);
       end if;
 
-      Util.Processes.Spawn (Proc    => Proc,
-                            Command => Command,
-                            Mode    => Util.Processes.READ_WRITE_ALL);
-      Input := Util.Processes.Get_Input_Stream (Proc);
-      Output := Util.Processes.Get_Output_Stream (Proc);
-      Reader.Initialize (Output, 4096);
-      Input.Close;
-      while not Reader.Is_Eof loop
-         declare
-            Line : Ada.Strings.Unbounded.Unbounded_String;
-         begin
-            Reader.Read_Line (Line, Strip_Crlf);
-            Process (Ada.Strings.Unbounded.To_String (Line));
-         end;
-      end loop;
-      Util.Processes.Wait (Proc);
-      Status := Util.Processes.Get_Exit_Status (Proc);
       if Status /= 0 then
-         Glog.Warn ("Command '{0}' terminated with exit code{1}", Command,
-                    Integer'Image (Status));
          Executor.Log ("Command exit status:" & Integer'Image (Status) & ASCII.LF);
          Executor.Status := Status;
       end if;
@@ -193,7 +200,7 @@ package body Porion.Executors is
    --  The command is not executed but added to the list of commands.
    --  ------------------------------
    procedure Record_Command (Executor : in out Executor_Type;
-                             Command  : in String)is
+                             Command  : in String) is
    begin
       Executor.Commands.Append ((Len     => Command'Length,
                                  Step    => Executor.Step,

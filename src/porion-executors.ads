@@ -22,6 +22,7 @@ with Util.Properties;
 with Util.Beans.Objects.Enums;
 with Porion.Loggers;
 with Porion.Builds;
+with Porion.Nodes.Models;
 package Porion.Executors is
 
    type Executor_Mode_Type is (EXECUTOR_LOCAL, EXECUTOR_SSH, EXECUTOR_DOCKER);
@@ -68,6 +69,10 @@ package Porion.Executors is
    procedure Set_Step (Executor : in out Executor_Type;
                        Step     : in Porion.Builds.Step_Type);
 
+   --  Setup the executor to build with the given build node.
+   procedure Set_Build_Node (Executor : in out Executor_Type;
+                             Node     : in Porion.Nodes.Models.Node_Ref);
+
    procedure Execute (Executor    : in out Executor_Type;
                       Command     : in EL.Expressions.Expression;
                       Parameters  : in Util.Properties.Manager;
@@ -109,22 +114,6 @@ package Porion.Executors is
 
 private
 
-   type Controller_Type is limited interface;
-   type Controller_Access is access all Controller_Type'Class;
-
-   procedure Start (Controller : in out Controller_Type;
-                    Executor   : in out Executor_Type'Class) is abstract;
-
-   procedure Execute (Controller : in out Controller_Type;
-                      Command     : in String;
-                      Process     : not null access procedure (Line : in String);
-                      Working_Dir : in String := "";
-                      Strip_Crlf  : in Boolean := False;
-                      Status      : out Integer) is abstract;
-
-   procedure Stop (Controller : in out Controller_Type;
-                   Executor   : in out Executor_Type'Class) is abstract;
-
    type Executor_Type is limited new Ada.Finalization.Limited_Controlled with record
       Dry_Run    : Boolean := False;
       Output_Log : Boolean := False;
@@ -132,7 +121,8 @@ private
       Status     : Integer := 0;
       Step       : Porion.Builds.Step_Type;
       Logger     : Porion.Loggers.Logger_Type;
-      Controller : Controller_Access;
+      Controller : Porion.Nodes.Controller_Access;
+      Local      : Porion.Nodes.Controller_Access;
    end record;
 
 end Porion.Executors;

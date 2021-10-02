@@ -2,7 +2,8 @@
 <package>
    <dist>
      <install mode='copy'>
-         <include name="bin/*-server"/>
+         <include name="bin/porion"/>
+         <include name="bin/porion-server"/>
          <include name="config/*.xml"/>
          <include name="porion*.properties"/>
      </install>

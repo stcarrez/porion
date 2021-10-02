@@ -16,17 +16,8 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Util.Strings;
-with ADO.Queries;
-with ADO.Statements;
 with Porion.Reports;
-with Porion.Projects.Models;
 package body Porion.Commands.List is
-
-   procedure List (Command : in out Command_Type;
-                   Context : in out Context_Type;
-                   Query   : in ADO.Queries.Context;
-                   Prefix  : in String);
 
    --  Report the list of projects, nodes or builds.
    overriding
@@ -35,8 +26,6 @@ package body Porion.Commands.List is
                       Args      : in Argument_List'Class;
                       Context   : in out Context_Type) is
       pragma Unreferenced (Name, Args);
-
-      Query       : ADO.Queries.Context;
    begin
       Context.Open;
 
@@ -51,8 +40,9 @@ package body Porion.Commands.List is
       end if;
 
       if Command.List_Nodes then
-         Query.Set_Query (Porion.Projects.Models.Query_Command_Node_List);
-         List (Command, Context, Query, "command_node_list_");
+         Porion.Reports.List_Nodes (Service => Context.Project_Service,
+                                    Printer => Context.Printer.all,
+                                    Styles  => Context.Styles);
       end if;
 
       if Command.List_Builds then
@@ -61,55 +51,6 @@ package body Porion.Commands.List is
                                      Styles  => Context.Styles);
       end if;
    end Execute;
-
-   procedure List (Command : in out Command_Type;
-                   Context : in out Context_Type;
-                   Query   : in ADO.Queries.Context;
-                   Prefix  : in String) is
-      function Get_Label (Name : in String) return String;
-
-      function Get_Label (Name : in String) return String is
-         Result : constant String := Command.Bundle.Get (Prefix & Name, Name);
-      begin
-         if Util.Strings.Index (Result, ':') > 0 then
-            return Result;
-         else
-            return Result & ":10";
-         end if;
-      end Get_Label;
-
-      Statement   : ADO.Statements.Query_Statement;
-      Print_Names : Boolean := True;
-   begin
-      Statement := Context.Project_Service.Create_Query (Query);
-      Statement.Execute;
-      while Statement.Has_Elements loop
-         if Print_Names then
-            Context.Console.Start_Title;
-            for I in 1 .. Statement.Get_Column_Count loop
-               declare
-                  Info : constant String := Get_Label (Statement.Get_Column_Name (I - 1));
-                  Pos  : constant Natural := Util.Strings.Index (Info, ':');
-               begin
-                  Context.Console.Print_Title (Field_Number (I),
-                                               Info (Info'First .. Pos - 1),
-                                               Natural'Value (Info (Pos + 1 .. Info'Last)));
-               end;
-            end loop;
-            Context.Console.End_Title;
-            Print_Names := False;
-         end if;
-         Context.Console.Start_Row;
-         for I in 1 .. Statement.Get_Column_Count loop
-            if not Statement.Is_Null (I - 1) then
-               Context.Console.Print_Field (Field_Number (I),
-                                            Statement.Get_String (I - 1));
-            end if;
-         end loop;
-         Context.Console.End_Row;
-         Statement.Next;
-      end loop;
-   end List;
 
    --  Setup the command before parsing the arguments and executing it.
    overriding

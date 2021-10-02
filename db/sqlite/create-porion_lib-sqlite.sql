@@ -214,6 +214,10 @@ CREATE TABLE IF NOT EXISTS porion_node (
   `update_date` DATETIME ,
   /* the type of node */
   `kind`  NOT NULL,
+  /* whether the build node was deleted. */
+  `deleted` TINYINT NOT NULL,
+  /* the node status. */
+  `status`  NOT NULL,
   PRIMARY KEY (`id`)
 );
 /*  */
@@ -424,6 +428,8 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "repository_dir");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "kind");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "deleted");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "tag");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)

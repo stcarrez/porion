@@ -112,6 +112,8 @@ package body Porion.Builds.Services is
    begin
       Log.Info ("Build {0} in {1}", Name, Path);
 
+      Executor.Set_Build_Node (Service.Build_Node);
+
       Executor.Set_Step (Builds.STEP_CHECKOUT);
       if not Executor.Is_Dry_Run and then not Ada.Directories.Exists (Path) then
          Ada.Directories.Create_Path (Path);

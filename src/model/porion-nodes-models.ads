@@ -132,6 +132,22 @@ package Porion.Nodes.Models is
    function Get_Kind (Object : in Node_Ref)
                  return Porion.Nodes.Node_Type;
 
+   --  Set whether the build node was deleted.
+   procedure Set_Deleted (Object : in out Node_Ref;
+                          Value  : in Boolean);
+
+   --  Get whether the build node was deleted.
+   function Get_Deleted (Object : in Node_Ref)
+                 return Boolean;
+
+   --  Set the node status.
+   procedure Set_Status (Object : in out Node_Ref;
+                         Value  : in Porion.Nodes.Node_Status_Type);
+
+   --  Get the node status.
+   function Get_Status (Object : in Node_Ref)
+                 return Porion.Nodes.Node_Status_Type;
+
    --  Load the entity identified by 'Id'.
    --  Raises the NOT_FOUND exception if it does not exist.
    procedure Load (Object  : in out Node_Ref;
@@ -193,9 +209,11 @@ private
    COL_6_1_NAME : aliased constant String := "create_date";
    COL_7_1_NAME : aliased constant String := "update_date";
    COL_8_1_NAME : aliased constant String := "kind";
+   COL_9_1_NAME : aliased constant String := "deleted";
+   COL_10_1_NAME : aliased constant String := "status";
 
    NODE_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 9,
+     (Count   => 11,
       Table   => NODE_NAME'Access,
       Members => (
          1 => COL_0_1_NAME'Access,
@@ -206,19 +224,22 @@ private
          6 => COL_5_1_NAME'Access,
          7 => COL_6_1_NAME'Access,
          8 => COL_7_1_NAME'Access,
-         9 => COL_8_1_NAME'Access)
+         9 => COL_8_1_NAME'Access,
+         10 => COL_9_1_NAME'Access,
+         11 => COL_10_1_NAME'Access)
      );
    NODE_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := NODE_DEF'Access;
 
    NODE_AUDIT_DEF : aliased constant ADO.Audits.Auditable_Mapping :=
-     (Count    => 4,
+     (Count    => 5,
       Of_Class => NODE_DEF'Access,
       Members  => (
          1 => 2,
          2 => 3,
          3 => 4,
-         4 => 8)
+         4 => 8,
+         5 => 9)
      );
    NODE_AUDIT_TABLE : constant ADO.Audits.Auditable_Mapping_Access
       := NODE_AUDIT_DEF'Access;
@@ -239,6 +260,8 @@ private
        Create_Date : Ada.Calendar.Time;
        Update_Date : ADO.Nullable_Time;
        Kind : Porion.Nodes.Node_Type;
+       Deleted : Boolean;
+       Status : Porion.Nodes.Node_Status_Type;
    end record;
 
    type Node_Access is access all Node_Impl;

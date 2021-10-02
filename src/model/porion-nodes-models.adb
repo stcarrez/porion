@@ -72,6 +72,8 @@ package body Porion.Nodes.Models is
       Impl.Create_Date := ADO.DEFAULT_TIME;
       Impl.Update_Date.Is_Null := True;
       Impl.Kind := Porion.Nodes.Node_Type'First;
+      Impl.Deleted := False;
+      Impl.Status := Porion.Nodes.Node_Status_Type'First;
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Allocate;
 
@@ -279,6 +281,43 @@ package body Porion.Nodes.Models is
       return Impl.Kind;
    end Get_Kind;
 
+
+   procedure Set_Deleted (Object : in out Node_Ref;
+                          Value  : in Boolean) is
+      Impl : Node_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Audits.Set_Field_Boolean (Impl.all, 10, Impl.Deleted, Value);
+   end Set_Deleted;
+
+   function Get_Deleted (Object : in Node_Ref)
+                  return Boolean is
+      Impl : constant Node_Access
+         := Node_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Deleted;
+   end Get_Deleted;
+
+
+   procedure Set_Status (Object : in out Node_Ref;
+                         Value  : in Porion.Nodes.Node_Status_Type) is
+      procedure Set_Field_Enum is
+        new ADO.Objects.Set_Field_Operation
+          (Porion.Nodes.Node_Status_Type);
+      Impl : Node_Access;
+   begin
+      Set_Field (Object, Impl);
+      Set_Field_Enum (Impl.all, 11, Impl.Status, Value);
+   end Set_Status;
+
+   function Get_Status (Object : in Node_Ref)
+                  return Porion.Nodes.Node_Status_Type is
+      Impl : constant Node_Access
+         := Node_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Status;
+   end Get_Status;
+
    --  Copy of the object.
    procedure Copy (Object : in Node_Ref;
                    Into   : in out Node_Ref) is
@@ -301,6 +340,8 @@ package body Porion.Nodes.Models is
             Copy.Create_Date := Impl.Create_Date;
             Copy.Update_Date := Impl.Update_Date;
             Copy.Kind := Impl.Kind;
+            Copy.Deleted := Impl.Deleted;
+            Copy.Status := Impl.Status;
          end;
       end if;
       Into := Result;
@@ -470,6 +511,16 @@ package body Porion.Nodes.Models is
                           Value => Integer (Porion.Nodes.Node_Type'Pos (Object.Kind)));
          Object.Clear_Modified (9);
       end if;
+      if Object.Is_Modified (10) then
+         Stmt.Save_Field (Name  => COL_9_1_NAME, --  deleted
+                          Value => Object.Deleted);
+         Object.Clear_Modified (10);
+      end if;
+      if Object.Is_Modified (11) then
+         Stmt.Save_Field (Name  => COL_10_1_NAME, --  status
+                          Value => Integer (Porion.Nodes.Node_Status_Type'Pos (Object.Status)));
+         Object.Clear_Modified (11);
+      end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
          Stmt.Save_Field (Name  => "version",
@@ -519,6 +570,10 @@ package body Porion.Nodes.Models is
                         Value => Object.Update_Date);
       Query.Save_Field (Name  => COL_8_1_NAME, --  kind
                         Value => Integer (Porion.Nodes.Node_Type'Pos (Object.Kind)));
+      Query.Save_Field (Name  => COL_9_1_NAME, --  deleted
+                        Value => Object.Deleted);
+      Query.Save_Field (Name  => COL_10_1_NAME, --  status
+                        Value => Integer (Porion.Nodes.Node_Status_Type'Pos (Object.Status)));
       Query.Execute (Result);
       if Result /= 1 then
          raise ADO.Objects.INSERT_ERROR;
@@ -571,6 +626,10 @@ package body Porion.Nodes.Models is
          end if;
       elsif Name = "kind" then
          return Porion.Nodes.Node_Type_Objects.To_Object (Impl.Kind);
+      elsif Name = "deleted" then
+         return Util.Beans.Objects.To_Object (Impl.Deleted);
+      elsif Name = "status" then
+         return Porion.Nodes.Node_Status_Type_Objects.To_Object (Impl.Status);
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -593,6 +652,8 @@ package body Porion.Nodes.Models is
       Object.Create_Date := Stmt.Get_Time (6);
       Object.Update_Date := Stmt.Get_Nullable_Time (7);
       Object.Kind := Porion.Nodes.Node_Type'Val (Stmt.Get_Integer (8));
+      Object.Deleted := Stmt.Get_Boolean (9);
+      Object.Status := Porion.Nodes.Node_Status_Type'Val (Stmt.Get_Integer (10));
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);
    end Load;

@@ -18,20 +18,20 @@ package body Porion.Resources.Schema is
        & "NULL, `create_date` DATETIME NOT NULL, `finish_date` DATETIME , `pass_co"
        & "unt` INTEGER NOT NULL, `fail_count` INTEGER NOT NULL, `timeout_count` IN"
        & "TEGER NOT NULL, `test_duration` INTEGER NOT NULL, `status` NOT NULL, `ta"
-       & "g` VARCHAR(255) NOT NULL, `build_config_id` BIGINT NOT NULL, `node_id` B"
-       & "IGINT NOT NULL, `branch_id` BIGINT NOT NULL, `project_id` BIGINT NOT NUL"
+       & "g` VARCHAR(255) NOT NULL, `branch_id` BIGINT NOT NULL, `build_config_id`"
+       & " BIGINT NOT NULL, `node_id` BIGINT NOT NULL, `project_id` BIGINT NOT NUL"
        & "L, PRIMARY KEY (`id`))";
    L_8   : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_build_c"
        & "onfig ( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `name` VARCHAR"
        & "(255) NOT NULL, `description` VARCHAR(4096) NOT NULL, `status` INTEGER N"
-       & "OT NULL, `node_id` BIGINT , `project_id` BIGINT NOT NULL, `branch_id` BI"
-       & "GINT NOT NULL, PRIMARY KEY (`id`))";
+       & "OT NULL, `rate_factor` INTEGER NOT NULL, `node_id` BIGINT , `branch_id` "
+       & "BIGINT NOT NULL, `project_id` BIGINT NOT NULL, PRIMARY KEY (`id`))";
    L_9   : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_build_c"
        & "onfig_step ( `id` BIGINT NOT NULL, `parameters` VARCHAR(65536) NOT NULL,"
        & " `number` INTEGER NOT NULL, `builder` INTEGER NOT NULL, `timeout` INTEGE"
        & "R NOT NULL, `step` INTEGER NOT NULL, `version` INTEGER NOT NULL, `execut"
-       & "ion` NOT NULL, `build_config_id` BIGINT NOT NULL, `previous_version_id` "
-       & "BIGINT , PRIMARY KEY (`id`))";
+       & "ion` NOT NULL, `previous_version_id` BIGINT , `build_config_id` BIGINT N"
+       & "OT NULL, PRIMARY KEY (`id`))";
    L_10  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_build_e"
        & "xecutor ( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `pid` INTEGE"
        & "R NOT NULL, `start_date` DATETIME NOT NULL, `port` INTEGER NOT NULL, `no"
@@ -39,7 +39,8 @@ package body Porion.Resources.Schema is
    L_11  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_build_q"
        & "ueue ( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `creation_date`"
        & " DATETIME NOT NULL, `update_date` DATETIME NOT NULL, `order` INTEGER NOT"
-       & " NULL, `build_config_id` BIGINT NOT NULL, PRIMARY KEY (`id`))";
+       & " NULL, `node_id` BIGINT NOT NULL, `build_config_id` BIGINT NOT NULL, PRI"
+       & "MARY KEY (`id`))";
    L_12  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_build_s"
        & "tep ( `id` BIGINT NOT NULL, `start_date` DATETIME NOT NULL, `end_date` D"
        & "ATETIME , `exit_status` INTEGER NOT NULL, `build_id` BIGINT NOT NULL, `c"
@@ -60,7 +61,9 @@ package body Porion.Resources.Schema is
        & "( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `name` VARCHAR(255) "
        & "NOT NULL, `tag` VARCHAR(255) NOT NULL, `last_date` DATETIME , `create_da"
        & "te` DATETIME NOT NULL, `update_date` DATETIME NOT NULL, `status` INTEGER"
-       & " NOT NULL, `project_id` BIGINT NOT NULL, PRIMARY KEY (`id`))";
+       & " NOT NULL, `pass_rate` INTEGER NOT NULL, `fail_rate` INTEGER NOT NULL, `"
+       & "timeout_rate` INTEGER NOT NULL, `build_rate` INTEGER NOT NULL, `rate_fac"
+       & "tor` INTEGER NOT NULL, `project_id` BIGINT NOT NULL, PRIMARY KEY (`id`))";
    L_17  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_depende"
        & "ncy ( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `project_id` BIG"
        & "INT NOT NULL, `owner_id` BIGINT NOT NULL, PRIMARY KEY (`id`))";
@@ -68,7 +71,9 @@ package body Porion.Resources.Schema is
        & " ( `id` BIGINT NOT NULL, `name` VARCHAR(255) NOT NULL, `version` INTEGER"
        & " NOT NULL, `description` VARCHAR(255) NOT NULL, `create_date` DATETIME N"
        & "OT NULL, `update_date` DATETIME , `status` INTEGER NOT NULL, `scm` INTEG"
-       & "ER NOT NULL, `scm_url` VARCHAR(255) NOT NULL, PRIMARY KEY (`id`))";
+       & "ER NOT NULL, `scm_url` VARCHAR(255) NOT NULL, `pass_rate` INTEGER NOT NU"
+       & "LL, `fail_rate` INTEGER NOT NULL, `timeout_rate` INTEGER NOT NULL, `buil"
+       & "d_rate` INTEGER NOT NULL, PRIMARY KEY (`id`))";
    L_19  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_test ( "
        & "`id` BIGINT NOT NULL, `name` VARCHAR(255) NOT NULL, `create_date` DATETI"
        & "ME NOT NULL, `version` INTEGER NOT NULL, `total_pass_count` INTEGER NOT "
@@ -92,7 +97,7 @@ package body Porion.Resources.Schema is
        & "eout_count` INTEGER NOT NULL, `total_skip_count` INTEGER NOT NULL, `diff"
        & "_pass` INTEGER NOT NULL, `diff_fail` INTEGER NOT NULL, `diff_timeout` IN"
        & "TEGER NOT NULL, `diff_skip` INTEGER NOT NULL, `duration` INTEGER NOT NUL"
-       & "L, `build_id` BIGINT NOT NULL, `group_id` BIGINT NOT NULL, PRIMARY KEY ("
+       & "L, `group_id` BIGINT NOT NULL, `build_id` BIGINT NOT NULL, PRIMARY KEY ("
        & "`id`))";
    L_23  : aliased constant String := "INSERT OR IGNORE INTO entity_type (name) "
        & "VALUES (""porion_build"")";
@@ -137,35 +142,38 @@ package body Porion.Resources.Schema is
        & "on_build_config""), ""status"")";
    L_42  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""pori"
-       & "on_environment""), ""value"")";
+       & "on_build_config""), ""rate_factor"")";
    L_43  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""pori"
-       & "on_node""), ""name"")";
+       & "on_environment""), ""value"")";
    L_44  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""pori"
-       & "on_node""), ""login"")";
+       & "on_node""), ""name"")";
    L_45  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""pori"
-       & "on_node""), ""repository_dir"")";
+       & "on_node""), ""login"")";
    L_46  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""pori"
-       & "on_branch""), ""tag"")";
+       & "on_node""), ""repository_dir"")";
    L_47  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""pori"
-       & "on_branch""), ""last_date"")";
+       & "on_branch""), ""tag"")";
    L_48  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""pori"
-       & "on_project""), ""name"")";
+       & "on_branch""), ""last_date"")";
    L_49  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""pori"
-       & "on_project""), ""description"")";
+       & "on_project""), ""name"")";
    L_50  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""pori"
-       & "on_project""), ""status"")";
+       & "on_project""), ""description"")";
    L_51  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""pori"
-       & "on_project""), ""scm"")";
+       & "on_project""), ""status"")";
    L_52  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
+       & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""pori"
+       & "on_project""), ""scm"")";
+   L_53  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""pori"
        & "on_project""), ""scm_url"")";
    C_0 : aliased constant Content_Array :=
@@ -220,7 +228,8 @@ package body Porion.Resources.Schema is
       L_49'Access,
       L_50'Access,
       L_51'Access,
-      L_52'Access);
+      L_52'Access,
+      L_53'Access);
 
 
    type Content_List_Array is array (Natural range <>) of Content_Access;

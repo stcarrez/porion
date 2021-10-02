@@ -328,12 +328,12 @@ CREATE TABLE IF NOT EXISTS porion_build (
   `status`  NOT NULL,
   /* the source tag that was used when building the project. */
   `tag` VARCHAR(255) NOT NULL,
+  /* the branch associated with the build. */
+  `branch_id` BIGINT NOT NULL,
   /* the build configuration. */
   `build_config_id` BIGINT NOT NULL,
   /* the node where the build was made. */
   `node_id` BIGINT NOT NULL,
-  /* the branch associated with the build. */
-  `branch_id` BIGINT NOT NULL,
   /* the project. */
   `project_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`)
@@ -353,12 +353,14 @@ CREATE TABLE IF NOT EXISTS porion_build_config (
   `description` VARCHAR(4096) NOT NULL,
   /* the build configuration status. */
   `status` INTEGER NOT NULL,
+  /* a rate factor to apply on the build for this build configuration. */
+  `rate_factor` INTEGER NOT NULL,
   /*  */
   `node_id` BIGINT ,
   /*  */
-  `project_id` BIGINT NOT NULL,
-  /*  */
   `branch_id` BIGINT NOT NULL,
+  /*  */
+  `project_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`)
 );
 /* Describes a step in the build process.
@@ -382,10 +384,10 @@ CREATE TABLE IF NOT EXISTS porion_build_config_step (
   `version` INTEGER NOT NULL,
   /*  */
   `execution`  NOT NULL,
-  /* the build configuration that contains this build step. */
-  `build_config_id` BIGINT NOT NULL,
   /*  */
   `previous_version_id` BIGINT ,
+  /* the build configuration that contains this build step. */
+  `build_config_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`)
 );
 /* Tracks a porion agent that is building something. */
@@ -416,6 +418,8 @@ CREATE TABLE IF NOT EXISTS porion_build_queue (
   `update_date` DATETIME NOT NULL,
   /* the builder order. */
   `order` INTEGER NOT NULL,
+  /* the node for which the build was queued. */
+  `node_id` BIGINT NOT NULL,
   /*  */
   `build_config_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`)
@@ -503,6 +507,16 @@ CREATE TABLE IF NOT EXISTS porion_branch (
   `update_date` DATETIME NOT NULL,
   /* the branch status. */
   `status` INTEGER NOT NULL,
+  /* the test success rate for the last builds with build configuration of this branch */
+  `pass_rate` INTEGER NOT NULL,
+  /* the test failure rate for the last builds with build configuration of this branch */
+  `fail_rate` INTEGER NOT NULL,
+  /* the test timeout rate for the last builds with build configuration of this branch */
+  `timeout_rate` INTEGER NOT NULL,
+  /* the build success rate for the build configuration of this branch. */
+  `build_rate` INTEGER NOT NULL,
+  /* a rate factor to apply when consolidating results on the project */
+  `rate_factor` INTEGER NOT NULL,
   /*  */
   `project_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`)
@@ -539,6 +553,14 @@ CREATE TABLE IF NOT EXISTS porion_project (
   `scm` INTEGER NOT NULL,
   /* source control information parameter */
   `scm_url` VARCHAR(255) NOT NULL,
+  /* the test success rate for the last builds with build configuration of this project (all branches) */
+  `pass_rate` INTEGER NOT NULL,
+  /* the test failure rate for the last builds with build configuration of this project (all branches) */
+  `fail_rate` INTEGER NOT NULL,
+  /* the test timeout rate for the last builds with build configuration of this project (all branches) */
+  `timeout_rate` INTEGER NOT NULL,
+  /* the build success rate for the build configuration of this project (all branches). */
+  `build_rate` INTEGER NOT NULL,
   PRIMARY KEY (`id`)
 );
 /*  */
@@ -636,9 +658,9 @@ CREATE TABLE IF NOT EXISTS porion_test_run_group (
   /* total duration for the execution of the test group */
   `duration` INTEGER NOT NULL,
   /*  */
-  `build_id` BIGINT NOT NULL,
-  /*  */
   `group_id` BIGINT NOT NULL,
+  /*  */
+  `build_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`)
 );
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build");
@@ -663,6 +685,8 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_config"), "description");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_config"), "status");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_config"), "rate_factor");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_environment"), "value");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)

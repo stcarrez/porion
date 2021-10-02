@@ -1,20 +1,52 @@
-<query-mapping package='Porion.Projects.Models'>
+<query-mapping package='Porion.Queries'>
     <description>
-        List of nodes
+        List of builds
     </description>
+ 
+    <class name="Porion.Queries.Node_Info" bean="no">
+        <comment>Information about a build node.</comment>
+        <property type='String' name="name">
+            <comment>the node name.</comment>
+        </property>
+        <property type='String' name="login">
+            <comment>the node login name.</comment>
+        </property>
+        <property type='String' name="repository_dir">
+            <comment>the node repository dir.</comment>
+        </property>
+        <property type='Porion.Nodes.Node_Type' name="kind">
+            <comment>the node kind.</comment>
+        </property>
+        <property type='Porion.Nodes.Node_Status_Type' name="status">
+            <comment>the node status.</comment>
+        </property>
+        <property type='Integer' name="config_count">
+            <comment>the number of configuration that use this node.</comment>
+        </property>
+        <property type='Integer' name="build_count">
+            <comment>the number of builds for this node.</comment>
+        </property>
+    </class>
 
-    <query name='command-node-list'>
-        <comment>Get the list of nodes</comment>
+   <query name='node-list'>
+        <comment>Get the list of build nodes</comment>
         <sql>
             SELECT
-            node.id AS id,
-            node.name AS name
+            node.name AS name,
+            node.login AS login,
+            node.repository_dir AS repository_dir,
+            node.kind AS kind,
+            node.status AS status,
+            (SELECT COUNT(config.id) FROM porion_build_config AS config WHERE config.node_id = node.id) AS config_count,
+            (SELECT COUNT(build.id) FROM porion_build AS build WHERE build.node_id = node.id) AS bld_count
             FROM porion_node AS node
+            WHERE node.deleted = 0
+            ORDER BY node.name
         </sql>
         <sql-count>
             SELECT
-            count(node.id)
-            FROM porion_node AS node
+            count(build.id)
+            FROM porion_build AS build
         </sql-count>
     </query>
 

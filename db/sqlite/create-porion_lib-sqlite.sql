@@ -206,6 +206,14 @@ CREATE TABLE IF NOT EXISTS porion_node (
   `login` VARCHAR(255) NOT NULL,
   /* the repository directory. */
   `repository_dir` VARCHAR(255) NOT NULL,
+  /* node launcher specific parameters. */
+  `parameters` VARCHAR(255) NOT NULL,
+  /* date when the node was created. */
+  `create_date` DATETIME NOT NULL,
+  /* date when the node was updated. */
+  `update_date` DATETIME ,
+  /* the type of node */
+  `kind`  NOT NULL,
   PRIMARY KEY (`id`)
 );
 /*  */
@@ -414,6 +422,8 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "login");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "repository_dir");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "kind");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "tag");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)

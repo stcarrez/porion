@@ -37,6 +37,7 @@ with Porion.Commands.Init;
 with Porion.Commands.Edit;
 with Porion.Commands.Info;
 with Porion.Commands.Depend;
+with Porion.Commands.Node;
 package body Porion.Commands is
 
    Help_Command            : aliased Porion.Commands.Drivers.Help_Command_Type;
@@ -51,6 +52,7 @@ package body Porion.Commands is
    Remove_Command          : aliased Porion.Commands.Remove.Command_Type;
    Info_Command            : aliased Porion.Commands.Info.Command_Type;
    Depend_Command          : aliased Porion.Commands.Depend.Command_Type;
+   Node_Command            : aliased Porion.Commands.Node.Command_Type;
    Driver                  : Drivers.Driver_Type;
 
    Text_Printer            : aliased PT.Drivers.Texts.Printer_Type;
@@ -174,6 +176,9 @@ package body Porion.Commands is
       Driver.Add_Command ("depend",
                           -("add or remove project dependencies"),
                           Depend_Command'Access);
+      Driver.Add_Command ("node",
+                          -("add, update or remove build nodes"),
+                          Node_Command'Access);
    end Initialize;
 
    --  ------------------------------

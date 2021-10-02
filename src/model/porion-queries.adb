@@ -129,6 +129,38 @@ package body Porion.Queries is
       end loop;
    end List;
 
+   --  --------------------
+   --  Information about a build node.
+   --  --------------------
+   procedure List (Object  : in out Node_Info_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+      procedure Read (Into : in out Node_Info);
+
+      Stmt : ADO.Statements.Query_Statement
+          := Session.Create_Statement (Context);
+      Pos  : Positive := 1;
+      procedure Read (Into : in out Node_Info) is
+      begin
+         Into.Name := Stmt.Get_Unbounded_String (0);
+         Into.Login := Stmt.Get_Unbounded_String (1);
+         Into.Repository_Dir := Stmt.Get_Unbounded_String (2);
+         Into.Kind := Porion.Nodes.Node_Type'Val (Stmt.Get_Integer (3));
+         Into.Status := Porion.Nodes.Node_Status_Type'Val (Stmt.Get_Integer (4));
+         Into.Config_Count := Stmt.Get_Integer (5);
+         Into.Build_Count := Stmt.Get_Integer (6);
+      end Read;
+   begin
+      Stmt.Execute;
+      Node_Info_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         Object.Insert_Space (Before => Pos);
+         Object.Update_Element (Index => Pos, Process => Read'Access);
+         Pos := Pos + 1;
+         Stmt.Next;
+      end loop;
+   end List;
+
 
 
    --  ------------------------------

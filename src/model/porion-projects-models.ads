@@ -499,10 +499,7 @@ package Porion.Projects.Models is
 
 
 
-   Query_Command_Node_List : constant ADO.Queries.Query_Definition_Access;
-
-
-   Query_Project_Last_Build : constant ADO.Queries.Query_Definition_Access;
+   Query_Project_Branches : constant ADO.Queries.Query_Definition_Access;
 
 
    Query_Cleanup_Project_Build_Step : constant ADO.Queries.Query_Definition_Access;
@@ -533,7 +530,7 @@ package Porion.Projects.Models is
    Query_Command_Build_List : constant ADO.Queries.Query_Definition_Access;
 
 
-   Query_Project_Branches : constant ADO.Queries.Query_Definition_Access;
+   Query_Project_Last_Build : constant ADO.Queries.Query_Definition_Access;
 
 
 
@@ -806,118 +803,108 @@ private
                         Impl   : out Dependency_Access);
 
    package File_1 is
-      new ADO.Queries.Loaders.File (Path => "command-nodes.xml",
-                                    Sha1 => "9B2B599473F75F92CB5AB5045675E4CCEF926543");
-
-   package Def_Command_Node_List is
-      new ADO.Queries.Loaders.Query (Name => "command-node-list",
-                                     File => File_1.File'Access);
-   Query_Command_Node_List : constant ADO.Queries.Query_Definition_Access
-   := Def_Command_Node_List.Query'Access;
-
-   package File_2 is
-      new ADO.Queries.Loaders.File (Path => "project-builds.xml",
-                                    Sha1 => "9B2B599473F75F92CB5AB5045675E4CCEF926543");
-
-   package Def_Project_Last_Build is
-      new ADO.Queries.Loaders.Query (Name => "project-last-build",
-                                     File => File_2.File'Access);
-   Query_Project_Last_Build : constant ADO.Queries.Query_Definition_Access
-   := Def_Project_Last_Build.Query'Access;
-
-   package File_3 is
-      new ADO.Queries.Loaders.File (Path => "cleanup.xml",
-                                    Sha1 => "9B2B599473F75F92CB5AB5045675E4CCEF926543");
-
-   package Def_Cleanup_Project_Build_Step is
-      new ADO.Queries.Loaders.Query (Name => "cleanup-project-build-step",
-                                     File => File_3.File'Access);
-   Query_Cleanup_Project_Build_Step : constant ADO.Queries.Query_Definition_Access
-   := Def_Cleanup_Project_Build_Step.Query'Access;
-
-   package Def_Cleanup_Project_Test_Run is
-      new ADO.Queries.Loaders.Query (Name => "cleanup-project-test-run",
-                                     File => File_3.File'Access);
-   Query_Cleanup_Project_Test_Run : constant ADO.Queries.Query_Definition_Access
-   := Def_Cleanup_Project_Test_Run.Query'Access;
-
-   package Def_Cleanup_Project_Test_Run_Group is
-      new ADO.Queries.Loaders.Query (Name => "cleanup-project-test-run-group",
-                                     File => File_3.File'Access);
-   Query_Cleanup_Project_Test_Run_Group : constant ADO.Queries.Query_Definition_Access
-   := Def_Cleanup_Project_Test_Run_Group.Query'Access;
-
-   package Def_Cleanup_Project_Test is
-      new ADO.Queries.Loaders.Query (Name => "cleanup-project-test",
-                                     File => File_3.File'Access);
-   Query_Cleanup_Project_Test : constant ADO.Queries.Query_Definition_Access
-   := Def_Cleanup_Project_Test.Query'Access;
-
-   package Def_Cleanup_Project_Test_Group is
-      new ADO.Queries.Loaders.Query (Name => "cleanup-project-test-group",
-                                     File => File_3.File'Access);
-   Query_Cleanup_Project_Test_Group : constant ADO.Queries.Query_Definition_Access
-   := Def_Cleanup_Project_Test_Group.Query'Access;
-
-   package Def_Cleanup_Project_Last_Build is
-      new ADO.Queries.Loaders.Query (Name => "cleanup-project-last-build",
-                                     File => File_3.File'Access);
-   Query_Cleanup_Project_Last_Build : constant ADO.Queries.Query_Definition_Access
-   := Def_Cleanup_Project_Last_Build.Query'Access;
-
-   package Def_Cleanup_Project_Build is
-      new ADO.Queries.Loaders.Query (Name => "cleanup-project-build",
-                                     File => File_3.File'Access);
-   Query_Cleanup_Project_Build : constant ADO.Queries.Query_Definition_Access
-   := Def_Cleanup_Project_Build.Query'Access;
-
-   package Def_Cleanup_Project_Environment is
-      new ADO.Queries.Loaders.Query (Name => "cleanup-project-environment",
-                                     File => File_3.File'Access);
-   Query_Cleanup_Project_Environment : constant ADO.Queries.Query_Definition_Access
-   := Def_Cleanup_Project_Environment.Query'Access;
-
-   package Def_Cleanup_Project_Build_Config_Step is
-      new ADO.Queries.Loaders.Query (Name => "cleanup-project-build-config-step",
-                                     File => File_3.File'Access);
-   Query_Cleanup_Project_Build_Config_Step : constant ADO.Queries.Query_Definition_Access
-   := Def_Cleanup_Project_Build_Config_Step.Query'Access;
-
-   package Def_Cleanup_Project_Build_Config is
-      new ADO.Queries.Loaders.Query (Name => "cleanup-project-build-config",
-                                     File => File_3.File'Access);
-   Query_Cleanup_Project_Build_Config : constant ADO.Queries.Query_Definition_Access
-   := Def_Cleanup_Project_Build_Config.Query'Access;
-
-   package Def_Cleanup_Project_Branch is
-      new ADO.Queries.Loaders.Query (Name => "cleanup-project-branch",
-                                     File => File_3.File'Access);
-   Query_Cleanup_Project_Branch : constant ADO.Queries.Query_Definition_Access
-   := Def_Cleanup_Project_Branch.Query'Access;
-
-   package Def_Cleanup_Project_Dependency is
-      new ADO.Queries.Loaders.Query (Name => "cleanup-project-dependency",
-                                     File => File_3.File'Access);
-   Query_Cleanup_Project_Dependency : constant ADO.Queries.Query_Definition_Access
-   := Def_Cleanup_Project_Dependency.Query'Access;
-
-   package File_4 is
-      new ADO.Queries.Loaders.File (Path => "command-info.xml",
-                                    Sha1 => "9B2B599473F75F92CB5AB5045675E4CCEF926543");
-
-   package Def_Command_Build_List is
-      new ADO.Queries.Loaders.Query (Name => "command-build-list",
-                                     File => File_4.File'Access);
-   Query_Command_Build_List : constant ADO.Queries.Query_Definition_Access
-   := Def_Command_Build_List.Query'Access;
-
-   package File_5 is
       new ADO.Queries.Loaders.File (Path => "project-branches.xml",
                                     Sha1 => "9B2B599473F75F92CB5AB5045675E4CCEF926543");
 
    package Def_Project_Branches is
       new ADO.Queries.Loaders.Query (Name => "project-branches",
-                                     File => File_5.File'Access);
+                                     File => File_1.File'Access);
    Query_Project_Branches : constant ADO.Queries.Query_Definition_Access
    := Def_Project_Branches.Query'Access;
+
+   package File_2 is
+      new ADO.Queries.Loaders.File (Path => "cleanup.xml",
+                                    Sha1 => "9B2B599473F75F92CB5AB5045675E4CCEF926543");
+
+   package Def_Cleanup_Project_Build_Step is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-project-build-step",
+                                     File => File_2.File'Access);
+   Query_Cleanup_Project_Build_Step : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Project_Build_Step.Query'Access;
+
+   package Def_Cleanup_Project_Test_Run is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-project-test-run",
+                                     File => File_2.File'Access);
+   Query_Cleanup_Project_Test_Run : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Project_Test_Run.Query'Access;
+
+   package Def_Cleanup_Project_Test_Run_Group is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-project-test-run-group",
+                                     File => File_2.File'Access);
+   Query_Cleanup_Project_Test_Run_Group : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Project_Test_Run_Group.Query'Access;
+
+   package Def_Cleanup_Project_Test is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-project-test",
+                                     File => File_2.File'Access);
+   Query_Cleanup_Project_Test : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Project_Test.Query'Access;
+
+   package Def_Cleanup_Project_Test_Group is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-project-test-group",
+                                     File => File_2.File'Access);
+   Query_Cleanup_Project_Test_Group : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Project_Test_Group.Query'Access;
+
+   package Def_Cleanup_Project_Last_Build is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-project-last-build",
+                                     File => File_2.File'Access);
+   Query_Cleanup_Project_Last_Build : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Project_Last_Build.Query'Access;
+
+   package Def_Cleanup_Project_Build is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-project-build",
+                                     File => File_2.File'Access);
+   Query_Cleanup_Project_Build : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Project_Build.Query'Access;
+
+   package Def_Cleanup_Project_Environment is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-project-environment",
+                                     File => File_2.File'Access);
+   Query_Cleanup_Project_Environment : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Project_Environment.Query'Access;
+
+   package Def_Cleanup_Project_Build_Config_Step is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-project-build-config-step",
+                                     File => File_2.File'Access);
+   Query_Cleanup_Project_Build_Config_Step : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Project_Build_Config_Step.Query'Access;
+
+   package Def_Cleanup_Project_Build_Config is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-project-build-config",
+                                     File => File_2.File'Access);
+   Query_Cleanup_Project_Build_Config : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Project_Build_Config.Query'Access;
+
+   package Def_Cleanup_Project_Branch is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-project-branch",
+                                     File => File_2.File'Access);
+   Query_Cleanup_Project_Branch : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Project_Branch.Query'Access;
+
+   package Def_Cleanup_Project_Dependency is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-project-dependency",
+                                     File => File_2.File'Access);
+   Query_Cleanup_Project_Dependency : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Project_Dependency.Query'Access;
+
+   package File_3 is
+      new ADO.Queries.Loaders.File (Path => "command-info.xml",
+                                    Sha1 => "9B2B599473F75F92CB5AB5045675E4CCEF926543");
+
+   package Def_Command_Build_List is
+      new ADO.Queries.Loaders.Query (Name => "command-build-list",
+                                     File => File_3.File'Access);
+   Query_Command_Build_List : constant ADO.Queries.Query_Definition_Access
+   := Def_Command_Build_List.Query'Access;
+
+   package File_4 is
+      new ADO.Queries.Loaders.File (Path => "project-builds.xml",
+                                    Sha1 => "9B2B599473F75F92CB5AB5045675E4CCEF926543");
+
+   package Def_Project_Last_Build is
+      new ADO.Queries.Loaders.Query (Name => "project-last-build",
+                                     File => File_4.File'Access);
+   Query_Project_Last_Build : constant ADO.Queries.Query_Definition_Access
+   := Def_Project_Last_Build.Query'Access;
 end Porion.Projects.Models;

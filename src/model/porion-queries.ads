@@ -34,6 +34,7 @@ with Ada.Strings.Unbounded;
 with Util.Beans.Objects;
 with Util.Beans.Basic.Lists;
 with Porion.Builds.Models;
+with Porion.Nodes;
 with Porion.Projects.Models;
 pragma Warnings (On);
 package Porion.Queries is
@@ -166,6 +167,49 @@ package Porion.Queries is
    Query_Stat_Project_Build_Status : constant ADO.Queries.Query_Definition_Access;
 
    --  --------------------
+   --    Information about a build node.
+   --  --------------------
+   type Node_Info is record
+
+      --  the node name.
+      Name : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the node login name.
+      Login : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the node repository dir.
+      Repository_Dir : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the node kind.
+      Kind : Porion.Nodes.Node_Type;
+
+      --  the node status.
+      Status : Porion.Nodes.Node_Status_Type;
+
+      --  the number of configuration that use this node.
+      Config_Count : Integer;
+
+      --  the number of builds for this node.
+      Build_Count : Integer;
+   end record;
+
+   package Node_Info_Vectors is
+      new Ada.Containers.Vectors (Index_Type   => Positive,
+                                  Element_Type => Node_Info,
+                                  "="          => "=");
+
+   subtype Node_Info_Vector is Node_Info_Vectors.Vector;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Node_Info_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
+
+   Query_Node_List : constant ADO.Queries.Query_Definition_Access;
+
+   Query_Project_Node_List : constant ADO.Queries.Query_Definition_Access;
+
+   --  --------------------
    --    Information about a project.
    --  --------------------
    type Project_Info is
@@ -287,18 +331,34 @@ private
    := Def_Buildstat_Stat_Project_Build_Status.Query'Access;
 
    package File_4 is
+      new ADO.Queries.Loaders.File (Path => "command-nodes.xml",
+                                    Sha1 => "A3F76D9513E0E52944630A166E83D78371DC8EF4");
+
+   package Def_Nodeinfo_Node_List is
+      new ADO.Queries.Loaders.Query (Name => "node-list",
+                                     File => File_4.File'Access);
+   Query_Node_List : constant ADO.Queries.Query_Definition_Access
+   := Def_Nodeinfo_Node_List.Query'Access;
+
+   package Def_Nodeinfo_Project_Node_List is
+      new ADO.Queries.Loaders.Query (Name => "project-node-list",
+                                     File => File_4.File'Access);
+   Query_Project_Node_List : constant ADO.Queries.Query_Definition_Access
+   := Def_Nodeinfo_Project_Node_List.Query'Access;
+
+   package File_5 is
       new ADO.Queries.Loaders.File (Path => "command-projects.xml",
                                     Sha1 => "2B4AA202D163FA68DAD7ABA6910669E55F4DFDB6");
 
    package Def_Projectinfo_Project_List is
       new ADO.Queries.Loaders.Query (Name => "project-list",
-                                     File => File_4.File'Access);
+                                     File => File_5.File'Access);
    Query_Project_List : constant ADO.Queries.Query_Definition_Access
    := Def_Projectinfo_Project_List.Query'Access;
 
    package Def_Projectinfo_Project_Dependency_List is
       new ADO.Queries.Loaders.Query (Name => "project-dependency-list",
-                                     File => File_4.File'Access);
+                                     File => File_5.File'Access);
    Query_Project_Dependency_List : constant ADO.Queries.Query_Definition_Access
    := Def_Projectinfo_Project_Dependency_List.Query'Access;
 end Porion.Queries;

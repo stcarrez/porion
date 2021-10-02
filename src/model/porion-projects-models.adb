@@ -73,6 +73,10 @@ package body Porion.Projects.Models is
       Impl.Update_Date.Is_Null := True;
       Impl.Status := Porion.Projects.Models.Project_Status_Type'First;
       Impl.Scm := Porion.Sources.Source_Control_Type'First;
+      Impl.Pass_Rate := 0;
+      Impl.Fail_Rate := 0;
+      Impl.Timeout_Rate := 0;
+      Impl.Build_Rate := 0;
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Allocate;
 
@@ -271,6 +275,74 @@ package body Porion.Projects.Models is
       return Impl.Scm_Url;
    end Get_Scm_Url;
 
+
+   procedure Set_Pass_Rate (Object : in out Project_Ref;
+                            Value  : in Integer) is
+      Impl : Project_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Integer (Impl.all, 10, Impl.Pass_Rate, Value);
+   end Set_Pass_Rate;
+
+   function Get_Pass_Rate (Object : in Project_Ref)
+                  return Integer is
+      Impl : constant Project_Access
+         := Project_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Pass_Rate;
+   end Get_Pass_Rate;
+
+
+   procedure Set_Fail_Rate (Object : in out Project_Ref;
+                            Value  : in Integer) is
+      Impl : Project_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Integer (Impl.all, 11, Impl.Fail_Rate, Value);
+   end Set_Fail_Rate;
+
+   function Get_Fail_Rate (Object : in Project_Ref)
+                  return Integer is
+      Impl : constant Project_Access
+         := Project_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Fail_Rate;
+   end Get_Fail_Rate;
+
+
+   procedure Set_Timeout_Rate (Object : in out Project_Ref;
+                               Value  : in Integer) is
+      Impl : Project_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Integer (Impl.all, 12, Impl.Timeout_Rate, Value);
+   end Set_Timeout_Rate;
+
+   function Get_Timeout_Rate (Object : in Project_Ref)
+                  return Integer is
+      Impl : constant Project_Access
+         := Project_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Timeout_Rate;
+   end Get_Timeout_Rate;
+
+
+   procedure Set_Build_Rate (Object : in out Project_Ref;
+                             Value  : in Integer) is
+      Impl : Project_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Integer (Impl.all, 13, Impl.Build_Rate, Value);
+   end Set_Build_Rate;
+
+   function Get_Build_Rate (Object : in Project_Ref)
+                  return Integer is
+      Impl : constant Project_Access
+         := Project_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Build_Rate;
+   end Get_Build_Rate;
+
    --  Copy of the object.
    procedure Copy (Object : in Project_Ref;
                    Into   : in out Project_Ref) is
@@ -293,6 +365,10 @@ package body Porion.Projects.Models is
             Copy.Status := Impl.Status;
             Copy.Scm := Impl.Scm;
             Copy.Scm_Url := Impl.Scm_Url;
+            Copy.Pass_Rate := Impl.Pass_Rate;
+            Copy.Fail_Rate := Impl.Fail_Rate;
+            Copy.Timeout_Rate := Impl.Timeout_Rate;
+            Copy.Build_Rate := Impl.Build_Rate;
          end;
       end if;
       Into := Result;
@@ -457,6 +533,26 @@ package body Porion.Projects.Models is
                           Value => Object.Scm_Url);
          Object.Clear_Modified (9);
       end if;
+      if Object.Is_Modified (10) then
+         Stmt.Save_Field (Name  => COL_9_1_NAME, --  pass_rate
+                          Value => Object.Pass_Rate);
+         Object.Clear_Modified (10);
+      end if;
+      if Object.Is_Modified (11) then
+         Stmt.Save_Field (Name  => COL_10_1_NAME, --  fail_rate
+                          Value => Object.Fail_Rate);
+         Object.Clear_Modified (11);
+      end if;
+      if Object.Is_Modified (12) then
+         Stmt.Save_Field (Name  => COL_11_1_NAME, --  timeout_rate
+                          Value => Object.Timeout_Rate);
+         Object.Clear_Modified (12);
+      end if;
+      if Object.Is_Modified (13) then
+         Stmt.Save_Field (Name  => COL_12_1_NAME, --  build_rate
+                          Value => Object.Build_Rate);
+         Object.Clear_Modified (13);
+      end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
          Stmt.Save_Field (Name  => "version",
@@ -506,6 +602,14 @@ package body Porion.Projects.Models is
                         Value => Integer (Porion.Sources.Source_Control_Type'Pos (Object.Scm)));
       Query.Save_Field (Name  => COL_8_1_NAME, --  scm_url
                         Value => Object.Scm_Url);
+      Query.Save_Field (Name  => COL_9_1_NAME, --  pass_rate
+                        Value => Object.Pass_Rate);
+      Query.Save_Field (Name  => COL_10_1_NAME, --  fail_rate
+                        Value => Object.Fail_Rate);
+      Query.Save_Field (Name  => COL_11_1_NAME, --  timeout_rate
+                        Value => Object.Timeout_Rate);
+      Query.Save_Field (Name  => COL_12_1_NAME, --  build_rate
+                        Value => Object.Build_Rate);
       Query.Execute (Result);
       if Result /= 1 then
          raise ADO.Objects.INSERT_ERROR;
@@ -558,6 +662,14 @@ package body Porion.Projects.Models is
          return Porion.Sources.Source_Control_Type_Objects.To_Object (Impl.Scm);
       elsif Name = "scm_url" then
          return Util.Beans.Objects.To_Object (Impl.Scm_Url);
+      elsif Name = "pass_rate" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Pass_Rate));
+      elsif Name = "fail_rate" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Fail_Rate));
+      elsif Name = "timeout_rate" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Timeout_Rate));
+      elsif Name = "build_rate" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Build_Rate));
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -580,6 +692,10 @@ package body Porion.Projects.Models is
       Object.Status := Porion.Projects.Models.Project_Status_Type'Val (Stmt.Get_Integer (6));
       Object.Scm := Porion.Sources.Source_Control_Type'Val (Stmt.Get_Integer (7));
       Object.Scm_Url := Stmt.Get_Unbounded_String (8);
+      Object.Pass_Rate := Stmt.Get_Integer (9);
+      Object.Fail_Rate := Stmt.Get_Integer (10);
+      Object.Timeout_Rate := Stmt.Get_Integer (11);
+      Object.Build_Rate := Stmt.Get_Integer (12);
       Object.Version := Stmt.Get_Integer (2);
       ADO.Objects.Set_Created (Object);
    end Load;
@@ -622,6 +738,11 @@ package body Porion.Projects.Models is
       Impl.Create_Date := ADO.DEFAULT_TIME;
       Impl.Update_Date := ADO.DEFAULT_TIME;
       Impl.Status := Porion.Projects.Models.Branch_Status_Type'First;
+      Impl.Pass_Rate := 0;
+      Impl.Fail_Rate := 0;
+      Impl.Timeout_Rate := 0;
+      Impl.Build_Rate := 0;
+      Impl.Rate_Factor := 0;
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Allocate;
 
@@ -786,12 +907,97 @@ package body Porion.Projects.Models is
    end Get_Status;
 
 
+   procedure Set_Pass_Rate (Object : in out Branch_Ref;
+                            Value  : in Integer) is
+      Impl : Branch_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Integer (Impl.all, 9, Impl.Pass_Rate, Value);
+   end Set_Pass_Rate;
+
+   function Get_Pass_Rate (Object : in Branch_Ref)
+                  return Integer is
+      Impl : constant Branch_Access
+         := Branch_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Pass_Rate;
+   end Get_Pass_Rate;
+
+
+   procedure Set_Fail_Rate (Object : in out Branch_Ref;
+                            Value  : in Integer) is
+      Impl : Branch_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Integer (Impl.all, 10, Impl.Fail_Rate, Value);
+   end Set_Fail_Rate;
+
+   function Get_Fail_Rate (Object : in Branch_Ref)
+                  return Integer is
+      Impl : constant Branch_Access
+         := Branch_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Fail_Rate;
+   end Get_Fail_Rate;
+
+
+   procedure Set_Timeout_Rate (Object : in out Branch_Ref;
+                               Value  : in Integer) is
+      Impl : Branch_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Integer (Impl.all, 11, Impl.Timeout_Rate, Value);
+   end Set_Timeout_Rate;
+
+   function Get_Timeout_Rate (Object : in Branch_Ref)
+                  return Integer is
+      Impl : constant Branch_Access
+         := Branch_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Timeout_Rate;
+   end Get_Timeout_Rate;
+
+
+   procedure Set_Build_Rate (Object : in out Branch_Ref;
+                             Value  : in Integer) is
+      Impl : Branch_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Integer (Impl.all, 12, Impl.Build_Rate, Value);
+   end Set_Build_Rate;
+
+   function Get_Build_Rate (Object : in Branch_Ref)
+                  return Integer is
+      Impl : constant Branch_Access
+         := Branch_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Build_Rate;
+   end Get_Build_Rate;
+
+
+   procedure Set_Rate_Factor (Object : in out Branch_Ref;
+                              Value  : in Integer) is
+      Impl : Branch_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Integer (Impl.all, 13, Impl.Rate_Factor, Value);
+   end Set_Rate_Factor;
+
+   function Get_Rate_Factor (Object : in Branch_Ref)
+                  return Integer is
+      Impl : constant Branch_Access
+         := Branch_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Rate_Factor;
+   end Get_Rate_Factor;
+
+
    procedure Set_Project (Object : in out Branch_Ref;
                           Value  : in Porion.Projects.Models.Project_Ref'Class) is
       Impl : Branch_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 9, Impl.Project, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 14, Impl.Project, Value);
    end Set_Project;
 
    function Get_Project (Object : in Branch_Ref)
@@ -823,6 +1029,11 @@ package body Porion.Projects.Models is
             Copy.Create_Date := Impl.Create_Date;
             Copy.Update_Date := Impl.Update_Date;
             Copy.Status := Impl.Status;
+            Copy.Pass_Rate := Impl.Pass_Rate;
+            Copy.Fail_Rate := Impl.Fail_Rate;
+            Copy.Timeout_Rate := Impl.Timeout_Rate;
+            Copy.Build_Rate := Impl.Build_Rate;
+            Copy.Rate_Factor := Impl.Rate_Factor;
             Copy.Project := Impl.Project;
          end;
       end if;
@@ -984,9 +1195,34 @@ package body Porion.Projects.Models is
          Object.Clear_Modified (8);
       end if;
       if Object.Is_Modified (9) then
-         Stmt.Save_Field (Name  => COL_8_2_NAME, --  project_id
-                          Value => Object.Project);
+         Stmt.Save_Field (Name  => COL_8_2_NAME, --  pass_rate
+                          Value => Object.Pass_Rate);
          Object.Clear_Modified (9);
+      end if;
+      if Object.Is_Modified (10) then
+         Stmt.Save_Field (Name  => COL_9_2_NAME, --  fail_rate
+                          Value => Object.Fail_Rate);
+         Object.Clear_Modified (10);
+      end if;
+      if Object.Is_Modified (11) then
+         Stmt.Save_Field (Name  => COL_10_2_NAME, --  timeout_rate
+                          Value => Object.Timeout_Rate);
+         Object.Clear_Modified (11);
+      end if;
+      if Object.Is_Modified (12) then
+         Stmt.Save_Field (Name  => COL_11_2_NAME, --  build_rate
+                          Value => Object.Build_Rate);
+         Object.Clear_Modified (12);
+      end if;
+      if Object.Is_Modified (13) then
+         Stmt.Save_Field (Name  => COL_12_2_NAME, --  rate_factor
+                          Value => Object.Rate_Factor);
+         Object.Clear_Modified (13);
+      end if;
+      if Object.Is_Modified (14) then
+         Stmt.Save_Field (Name  => COL_13_2_NAME, --  project_id
+                          Value => Object.Project);
+         Object.Clear_Modified (14);
       end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
@@ -1035,7 +1271,17 @@ package body Porion.Projects.Models is
                         Value => Object.Update_Date);
       Query.Save_Field (Name  => COL_7_2_NAME, --  status
                         Value => Integer (Porion.Projects.Models.Branch_Status_Type'Pos (Object.Status)));
-      Query.Save_Field (Name  => COL_8_2_NAME, --  project_id
+      Query.Save_Field (Name  => COL_8_2_NAME, --  pass_rate
+                        Value => Object.Pass_Rate);
+      Query.Save_Field (Name  => COL_9_2_NAME, --  fail_rate
+                        Value => Object.Fail_Rate);
+      Query.Save_Field (Name  => COL_10_2_NAME, --  timeout_rate
+                        Value => Object.Timeout_Rate);
+      Query.Save_Field (Name  => COL_11_2_NAME, --  build_rate
+                        Value => Object.Build_Rate);
+      Query.Save_Field (Name  => COL_12_2_NAME, --  rate_factor
+                        Value => Object.Rate_Factor);
+      Query.Save_Field (Name  => COL_13_2_NAME, --  project_id
                         Value => Object.Project);
       Query.Execute (Result);
       if Result /= 1 then
@@ -1087,6 +1333,16 @@ package body Porion.Projects.Models is
          return Util.Beans.Objects.Time.To_Object (Impl.Update_Date);
       elsif Name = "status" then
          return Porion.Projects.Models.Branch_Status_Type_Objects.To_Object (Impl.Status);
+      elsif Name = "pass_rate" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Pass_Rate));
+      elsif Name = "fail_rate" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Fail_Rate));
+      elsif Name = "timeout_rate" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Timeout_Rate));
+      elsif Name = "build_rate" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Build_Rate));
+      elsif Name = "rate_factor" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Rate_Factor));
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -1127,8 +1383,13 @@ package body Porion.Projects.Models is
       Object.Create_Date := Stmt.Get_Time (5);
       Object.Update_Date := Stmt.Get_Time (6);
       Object.Status := Porion.Projects.Models.Branch_Status_Type'Val (Stmt.Get_Integer (7));
-      if not Stmt.Is_Null (8) then
-         Object.Project.Set_Key_Value (Stmt.Get_Identifier (8), Session);
+      Object.Pass_Rate := Stmt.Get_Integer (8);
+      Object.Fail_Rate := Stmt.Get_Integer (9);
+      Object.Timeout_Rate := Stmt.Get_Integer (10);
+      Object.Build_Rate := Stmt.Get_Integer (11);
+      Object.Rate_Factor := Stmt.Get_Integer (12);
+      if not Stmt.Is_Null (13) then
+         Object.Project.Set_Key_Value (Stmt.Get_Identifier (13), Session);
       end if;
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);

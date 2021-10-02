@@ -26,6 +26,8 @@ with ADO.Objects;
 with ADO.Statements;
 with ADO.SQL;
 with ADO.Schemas;
+with ADO.Queries;
+with ADO.Queries.Loaders;
 with Ada.Calendar;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
@@ -155,6 +157,14 @@ package Porion.Builds.Models is
    function Get_Status (Object : in Build_Config_Ref)
                  return Porion.Builds.Models.Config_Status_Type;
 
+   --  Set a rate factor to apply on the build for this build configuration.
+   procedure Set_Rate_Factor (Object : in out Build_Config_Ref;
+                              Value  : in Integer);
+
+   --  Get a rate factor to apply on the build for this build configuration.
+   function Get_Rate_Factor (Object : in Build_Config_Ref)
+                 return Integer;
+
    --
    procedure Set_Node (Object : in out Build_Config_Ref;
                        Value  : in Porion.Nodes.Models.Node_Ref'Class);
@@ -164,20 +174,20 @@ package Porion.Builds.Models is
                  return Porion.Nodes.Models.Node_Ref'Class;
 
    --
-   procedure Set_Project (Object : in out Build_Config_Ref;
-                          Value  : in Porion.Projects.Models.Project_Ref'Class);
-
-   --
-   function Get_Project (Object : in Build_Config_Ref)
-                 return Porion.Projects.Models.Project_Ref'Class;
-
-   --
    procedure Set_Branch (Object : in out Build_Config_Ref;
                          Value  : in Porion.Projects.Models.Branch_Ref'Class);
 
    --
    function Get_Branch (Object : in Build_Config_Ref)
                  return Porion.Projects.Models.Branch_Ref'Class;
+
+   --
+   procedure Set_Project (Object : in out Build_Config_Ref;
+                          Value  : in Porion.Projects.Models.Project_Ref'Class);
+
+   --
+   function Get_Project (Object : in Build_Config_Ref)
+                 return Porion.Projects.Models.Project_Ref'Class;
 
    --  Load the entity identified by 'Id'.
    --  Raises the NOT_FOUND exception if it does not exist.
@@ -331,6 +341,14 @@ package Porion.Builds.Models is
    function Get_Tag (Object : in Build_Ref)
                  return String;
 
+   --  Set the branch associated with the build.
+   procedure Set_Branch (Object : in out Build_Ref;
+                         Value  : in Porion.Projects.Models.Branch_Ref'Class);
+
+   --  Get the branch associated with the build.
+   function Get_Branch (Object : in Build_Ref)
+                 return Porion.Projects.Models.Branch_Ref'Class;
+
    --  Set the build configuration.
    procedure Set_Build_Config (Object : in out Build_Ref;
                                Value  : in Porion.Builds.Models.Build_Config_Ref'Class);
@@ -346,14 +364,6 @@ package Porion.Builds.Models is
    --  Get the node where the build was made.
    function Get_Node (Object : in Build_Ref)
                  return Porion.Nodes.Models.Node_Ref'Class;
-
-   --  Set the branch associated with the build.
-   procedure Set_Branch (Object : in out Build_Ref;
-                         Value  : in Porion.Projects.Models.Branch_Ref'Class);
-
-   --  Get the branch associated with the build.
-   function Get_Branch (Object : in Build_Ref)
-                 return Porion.Projects.Models.Branch_Ref'Class;
 
    --  Set the project.
    procedure Set_Project (Object : in out Build_Ref;
@@ -493,14 +503,6 @@ package Porion.Builds.Models is
    function Get_Execution (Object : in Build_Config_Step_Ref)
                  return Porion.Builds.Models.Execution_Type;
 
-   --  Set the build configuration that contains this build step.
-   procedure Set_Build_Config (Object : in out Build_Config_Step_Ref;
-                               Value  : in Porion.Builds.Models.Build_Config_Ref'Class);
-
-   --  Get the build configuration that contains this build step.
-   function Get_Build_Config (Object : in Build_Config_Step_Ref)
-                 return Porion.Builds.Models.Build_Config_Ref'Class;
-
    --
    procedure Set_Previous_Version (Object : in out Build_Config_Step_Ref;
                                    Value  : in Porion.Builds.Models.Build_Config_Step_Ref'Class);
@@ -508,6 +510,14 @@ package Porion.Builds.Models is
    --
    function Get_Previous_Version (Object : in Build_Config_Step_Ref)
                  return Porion.Builds.Models.Build_Config_Step_Ref'Class;
+
+   --  Set the build configuration that contains this build step.
+   procedure Set_Build_Config (Object : in out Build_Config_Step_Ref;
+                               Value  : in Porion.Builds.Models.Build_Config_Ref'Class);
+
+   --  Get the build configuration that contains this build step.
+   function Get_Build_Config (Object : in Build_Config_Step_Ref)
+                 return Porion.Builds.Models.Build_Config_Ref'Class;
 
    --  Load the entity identified by 'Id'.
    --  Raises the NOT_FOUND exception if it does not exist.
@@ -719,6 +729,14 @@ package Porion.Builds.Models is
    --  Get the builder order.
    function Get_Order (Object : in Build_Queue_Ref)
                  return Integer;
+
+   --  Set the node for which the build was queued.
+   procedure Set_Node (Object : in out Build_Queue_Ref;
+                       Value  : in Porion.Nodes.Models.Node_Ref'Class);
+
+   --  Get the node for which the build was queued.
+   function Get_Node (Object : in Build_Queue_Ref)
+                 return Porion.Nodes.Models.Node_Ref'Class;
 
    --
    procedure Set_Build_Config (Object : in out Build_Queue_Ref;
@@ -1128,6 +1146,70 @@ package Porion.Builds.Models is
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class);
 
+   --  --------------------
+   --    Summary of information about last builds of a project.
+   --  --------------------
+   type Build_Status is
+     new Util.Beans.Basic.Bean with  record
+
+      --  the build config id.
+      Config_Id : ADO.Identifier;
+
+      --  the last build status.
+      Build_Status : Porion.Builds.Models.Build_Status_Type;
+
+      --  the branch tag.
+      Build_Tag : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the build number.
+      Build_Number : Integer;
+
+      --  the number of tests that succeeded.
+      Pass_Count : Integer;
+
+      --  the number of tests that failed.
+      Fail_Count : Integer;
+
+      --  the number of tests that timeout.
+      Timeout_Count : Integer;
+
+      --  the build date.
+      Build_Date : ADO.Nullable_Time;
+   end record;
+
+   --  Get the bean attribute identified by the name.
+   overriding
+   function Get_Value (From : in Build_Status;
+                       Name : in String) return Util.Beans.Objects.Object;
+
+   --  Set the bean attribute identified by the name.
+   overriding
+   procedure Set_Value (Item  : in out Build_Status;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object);
+
+
+   package Build_Status_Beans is
+      new Util.Beans.Basic.Lists (Element_Type => Build_Status);
+   package Build_Status_Vectors renames Build_Status_Beans.Vectors;
+   subtype Build_Status_List_Bean is Build_Status_Beans.List_Bean;
+
+   type Build_Status_List_Bean_Access is access all Build_Status_List_Bean;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Build_Status_List_Bean'Class;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
+
+   subtype Build_Status_Vector is Build_Status_Vectors.Vector;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Build_Status_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
+
+   Query_Project_Build_Status : constant ADO.Queries.Query_Definition_Access;
+
 
 
 private
@@ -1137,12 +1219,13 @@ private
    COL_2_1_NAME : aliased constant String := "name";
    COL_3_1_NAME : aliased constant String := "description";
    COL_4_1_NAME : aliased constant String := "status";
-   COL_5_1_NAME : aliased constant String := "node_id";
-   COL_6_1_NAME : aliased constant String := "project_id";
+   COL_5_1_NAME : aliased constant String := "rate_factor";
+   COL_6_1_NAME : aliased constant String := "node_id";
    COL_7_1_NAME : aliased constant String := "branch_id";
+   COL_8_1_NAME : aliased constant String := "project_id";
 
    BUILD_CONFIG_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 8,
+     (Count   => 9,
       Table   => BUILD_CONFIG_NAME'Access,
       Members => (
          1 => COL_0_1_NAME'Access,
@@ -1152,18 +1235,20 @@ private
          5 => COL_4_1_NAME'Access,
          6 => COL_5_1_NAME'Access,
          7 => COL_6_1_NAME'Access,
-         8 => COL_7_1_NAME'Access)
+         8 => COL_7_1_NAME'Access,
+         9 => COL_8_1_NAME'Access)
      );
    BUILD_CONFIG_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := BUILD_CONFIG_DEF'Access;
 
    BUILD_CONFIG_AUDIT_DEF : aliased constant ADO.Audits.Auditable_Mapping :=
-     (Count    => 3,
+     (Count    => 4,
       Of_Class => BUILD_CONFIG_DEF'Access,
       Members  => (
          1 => 2,
          2 => 3,
-         3 => 4)
+         3 => 4,
+         4 => 5)
      );
    BUILD_CONFIG_AUDIT_TABLE : constant ADO.Audits.Auditable_Mapping_Access
       := BUILD_CONFIG_AUDIT_DEF'Access;
@@ -1180,9 +1265,10 @@ private
        Name : Ada.Strings.Unbounded.Unbounded_String;
        Description : Ada.Strings.Unbounded.Unbounded_String;
        Status : Porion.Builds.Models.Config_Status_Type;
+       Rate_Factor : Integer;
        Node : Porion.Nodes.Models.Node_Ref;
-       Project : Porion.Projects.Models.Project_Ref;
        Branch : Porion.Projects.Models.Branch_Ref;
+       Project : Porion.Projects.Models.Project_Ref;
    end record;
 
    type Build_Config_Access is access all Build_Config_Impl;
@@ -1228,9 +1314,9 @@ private
    COL_8_2_NAME : aliased constant String := "test_duration";
    COL_9_2_NAME : aliased constant String := "status";
    COL_10_2_NAME : aliased constant String := "tag";
-   COL_11_2_NAME : aliased constant String := "build_config_id";
-   COL_12_2_NAME : aliased constant String := "node_id";
-   COL_13_2_NAME : aliased constant String := "branch_id";
+   COL_11_2_NAME : aliased constant String := "branch_id";
+   COL_12_2_NAME : aliased constant String := "build_config_id";
+   COL_13_2_NAME : aliased constant String := "node_id";
    COL_14_2_NAME : aliased constant String := "project_id";
 
    BUILD_DEF : aliased constant ADO.Schemas.Class_Mapping :=
@@ -1274,9 +1360,9 @@ private
        Test_Duration : Integer;
        Status : Porion.Builds.Models.Build_Status_Type;
        Tag : Ada.Strings.Unbounded.Unbounded_String;
+       Branch : Porion.Projects.Models.Branch_Ref;
        Build_Config : Porion.Builds.Models.Build_Config_Ref;
        Node : Porion.Nodes.Models.Node_Ref;
-       Branch : Porion.Projects.Models.Branch_Ref;
        Project : Porion.Projects.Models.Project_Ref;
    end record;
 
@@ -1320,8 +1406,8 @@ private
    COL_5_3_NAME : aliased constant String := "step";
    COL_6_3_NAME : aliased constant String := "version";
    COL_7_3_NAME : aliased constant String := "execution";
-   COL_8_3_NAME : aliased constant String := "build_config_id";
-   COL_9_3_NAME : aliased constant String := "previous_version_id";
+   COL_8_3_NAME : aliased constant String := "previous_version_id";
+   COL_9_3_NAME : aliased constant String := "build_config_id";
 
    BUILD_CONFIG_STEP_DEF : aliased constant ADO.Schemas.Class_Mapping :=
      (Count   => 10,
@@ -1356,8 +1442,8 @@ private
        Step : Porion.Builds.Step_Type;
        Version : Integer;
        Execution : Porion.Builds.Models.Execution_Type;
-       Build_Config : Porion.Builds.Models.Build_Config_Ref;
        Previous_Version : Porion.Builds.Models.Build_Config_Step_Ref;
+       Build_Config : Porion.Builds.Models.Build_Config_Ref;
    end record;
 
    type Build_Config_Step_Access is access all Build_Config_Step_Impl;
@@ -1465,10 +1551,11 @@ private
    COL_2_5_NAME : aliased constant String := "creation_date";
    COL_3_5_NAME : aliased constant String := "update_date";
    COL_4_5_NAME : aliased constant String := "order";
-   COL_5_5_NAME : aliased constant String := "build_config_id";
+   COL_5_5_NAME : aliased constant String := "node_id";
+   COL_6_5_NAME : aliased constant String := "build_config_id";
 
    BUILD_QUEUE_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 6,
+     (Count   => 7,
       Table   => BUILD_QUEUE_NAME'Access,
       Members => (
          1 => COL_0_5_NAME'Access,
@@ -1476,7 +1563,8 @@ private
          3 => COL_2_5_NAME'Access,
          4 => COL_3_5_NAME'Access,
          5 => COL_4_5_NAME'Access,
-         6 => COL_5_5_NAME'Access)
+         6 => COL_5_5_NAME'Access,
+         7 => COL_6_5_NAME'Access)
      );
    BUILD_QUEUE_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := BUILD_QUEUE_DEF'Access;
@@ -1493,6 +1581,7 @@ private
        Creation_Date : Ada.Calendar.Time;
        Update_Date : Ada.Calendar.Time;
        Order : Integer;
+       Node : Porion.Nodes.Models.Node_Ref;
        Build_Config : Porion.Builds.Models.Build_Config_Ref;
    end record;
 
@@ -1740,4 +1829,14 @@ private
 
    procedure Set_Field (Object : in out Last_Build_Ref'Class;
                         Impl   : out Last_Build_Access);
+
+   package File_1 is
+      new ADO.Queries.Loaders.File (Path => "project-update-status.xml",
+                                    Sha1 => "12E8716B81E3076E43615C32ABC39F612180D441");
+
+   package Def_Buildstatus_Project_Build_Status is
+      new ADO.Queries.Loaders.Query (Name => "project-build-status",
+                                     File => File_1.File'Access);
+   Query_Project_Build_Status : constant ADO.Queries.Query_Definition_Access
+   := Def_Buildstatus_Project_Build_Status.Query'Access;
 end Porion.Builds.Models;

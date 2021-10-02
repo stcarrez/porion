@@ -461,20 +461,20 @@ package Porion.Xunit.Models is
                  return Integer;
 
    --
-   procedure Set_Build (Object : in out Test_Run_Group_Ref;
-                        Value  : in Porion.Builds.Models.Build_Ref'Class);
-
-   --
-   function Get_Build (Object : in Test_Run_Group_Ref)
-                 return Porion.Builds.Models.Build_Ref'Class;
-
-   --
    procedure Set_Group (Object : in out Test_Run_Group_Ref;
                         Value  : in Porion.Xunit.Models.Test_Group_Ref'Class);
 
    --
    function Get_Group (Object : in Test_Run_Group_Ref)
                  return Porion.Xunit.Models.Test_Group_Ref'Class;
+
+   --
+   procedure Set_Build (Object : in out Test_Run_Group_Ref;
+                        Value  : in Porion.Builds.Models.Build_Ref'Class);
+
+   --
+   function Get_Build (Object : in Test_Run_Group_Ref)
+                 return Porion.Builds.Models.Build_Ref'Class;
 
    --  Load the entity identified by 'Id'.
    --  Raises the NOT_FOUND exception if it does not exist.
@@ -824,8 +824,8 @@ private
    COL_8_3_NAME : aliased constant String := "diff_timeout";
    COL_9_3_NAME : aliased constant String := "diff_skip";
    COL_10_3_NAME : aliased constant String := "duration";
-   COL_11_3_NAME : aliased constant String := "build_id";
-   COL_12_3_NAME : aliased constant String := "group_id";
+   COL_11_3_NAME : aliased constant String := "group_id";
+   COL_12_3_NAME : aliased constant String := "build_id";
 
    TEST_RUN_GROUP_DEF : aliased constant ADO.Schemas.Class_Mapping :=
      (Count   => 13,
@@ -866,8 +866,8 @@ private
        Diff_Timeout : Integer;
        Diff_Skip : Integer;
        Duration : Integer;
-       Build : Porion.Builds.Models.Build_Ref;
        Group : Porion.Xunit.Models.Test_Group_Ref;
+       Build : Porion.Builds.Models.Build_Ref;
    end record;
 
    type Test_Run_Group_Access is access all Test_Run_Group_Impl;

@@ -1491,29 +1491,12 @@ package body Porion.Xunit.Models is
    end Get_Duration;
 
 
-   procedure Set_Build (Object : in out Test_Run_Group_Ref;
-                        Value  : in Porion.Builds.Models.Build_Ref'Class) is
-      Impl : Test_Run_Group_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 12, Impl.Build, Value);
-   end Set_Build;
-
-   function Get_Build (Object : in Test_Run_Group_Ref)
-                  return Porion.Builds.Models.Build_Ref'Class is
-      Impl : constant Test_Run_Group_Access
-         := Test_Run_Group_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Build;
-   end Get_Build;
-
-
    procedure Set_Group (Object : in out Test_Run_Group_Ref;
                         Value  : in Porion.Xunit.Models.Test_Group_Ref'Class) is
       Impl : Test_Run_Group_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 13, Impl.Group, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 12, Impl.Group, Value);
    end Set_Group;
 
    function Get_Group (Object : in Test_Run_Group_Ref)
@@ -1523,6 +1506,23 @@ package body Porion.Xunit.Models is
    begin
       return Impl.Group;
    end Get_Group;
+
+
+   procedure Set_Build (Object : in out Test_Run_Group_Ref;
+                        Value  : in Porion.Builds.Models.Build_Ref'Class) is
+      Impl : Test_Run_Group_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Object (Impl.all, 13, Impl.Build, Value);
+   end Set_Build;
+
+   function Get_Build (Object : in Test_Run_Group_Ref)
+                  return Porion.Builds.Models.Build_Ref'Class is
+      Impl : constant Test_Run_Group_Access
+         := Test_Run_Group_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Build;
+   end Get_Build;
 
    --  Copy of the object.
    procedure Copy (Object : in Test_Run_Group_Ref;
@@ -1548,8 +1548,8 @@ package body Porion.Xunit.Models is
             Copy.Diff_Timeout := Impl.Diff_Timeout;
             Copy.Diff_Skip := Impl.Diff_Skip;
             Copy.Duration := Impl.Duration;
-            Copy.Build := Impl.Build;
             Copy.Group := Impl.Group;
+            Copy.Build := Impl.Build;
          end;
       end if;
       Into := Result;
@@ -1730,13 +1730,13 @@ package body Porion.Xunit.Models is
          Object.Clear_Modified (11);
       end if;
       if Object.Is_Modified (12) then
-         Stmt.Save_Field (Name  => COL_11_3_NAME, --  build_id
-                          Value => Object.Build);
+         Stmt.Save_Field (Name  => COL_11_3_NAME, --  group_id
+                          Value => Object.Group);
          Object.Clear_Modified (12);
       end if;
       if Object.Is_Modified (13) then
-         Stmt.Save_Field (Name  => COL_12_3_NAME, --  group_id
-                          Value => Object.Group);
+         Stmt.Save_Field (Name  => COL_12_3_NAME, --  build_id
+                          Value => Object.Build);
          Object.Clear_Modified (13);
       end if;
       if Stmt.Has_Save_Fields then
@@ -1791,10 +1791,10 @@ package body Porion.Xunit.Models is
                         Value => Object.Diff_Skip);
       Query.Save_Field (Name  => COL_10_3_NAME, --  duration
                         Value => Object.Duration);
-      Query.Save_Field (Name  => COL_11_3_NAME, --  build_id
-                        Value => Object.Build);
-      Query.Save_Field (Name  => COL_12_3_NAME, --  group_id
+      Query.Save_Field (Name  => COL_11_3_NAME, --  group_id
                         Value => Object.Group);
+      Query.Save_Field (Name  => COL_12_3_NAME, --  build_id
+                        Value => Object.Build);
       Query.Execute (Result);
       if Result /= 1 then
          raise ADO.Objects.INSERT_ERROR;
@@ -1890,10 +1890,10 @@ package body Porion.Xunit.Models is
       Object.Diff_Skip := Stmt.Get_Integer (9);
       Object.Duration := Stmt.Get_Integer (10);
       if not Stmt.Is_Null (11) then
-         Object.Build.Set_Key_Value (Stmt.Get_Identifier (11), Session);
+         Object.Group.Set_Key_Value (Stmt.Get_Identifier (11), Session);
       end if;
       if not Stmt.Is_Null (12) then
-         Object.Group.Set_Key_Value (Stmt.Get_Identifier (12), Session);
+         Object.Build.Set_Key_Value (Stmt.Get_Identifier (12), Session);
       end if;
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);

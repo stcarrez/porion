@@ -155,6 +155,38 @@ package Porion.Projects.Models is
    function Get_Scm_Url (Object : in Project_Ref)
                  return String;
 
+   --  Set the test success rate for the last builds with build configuration of this project (all branches)
+   procedure Set_Pass_Rate (Object : in out Project_Ref;
+                            Value  : in Integer);
+
+   --  Get the test success rate for the last builds with build configuration of this project (all branches)
+   function Get_Pass_Rate (Object : in Project_Ref)
+                 return Integer;
+
+   --  Set the test failure rate for the last builds with build configuration of this project (all branches)
+   procedure Set_Fail_Rate (Object : in out Project_Ref;
+                            Value  : in Integer);
+
+   --  Get the test failure rate for the last builds with build configuration of this project (all branches)
+   function Get_Fail_Rate (Object : in Project_Ref)
+                 return Integer;
+
+   --  Set the test timeout rate for the last builds with build configuration of this project (all branches)
+   procedure Set_Timeout_Rate (Object : in out Project_Ref;
+                               Value  : in Integer);
+
+   --  Get the test timeout rate for the last builds with build configuration of this project (all branches)
+   function Get_Timeout_Rate (Object : in Project_Ref)
+                 return Integer;
+
+   --  Set the build success rate for the build configuration of this project (all branches).
+   procedure Set_Build_Rate (Object : in out Project_Ref;
+                             Value  : in Integer);
+
+   --  Get the build success rate for the build configuration of this project (all branches).
+   function Get_Build_Rate (Object : in Project_Ref)
+                 return Integer;
+
    --  Load the entity identified by 'Id'.
    --  Raises the NOT_FOUND exception if it does not exist.
    procedure Load (Object  : in out Project_Ref;
@@ -277,6 +309,46 @@ package Porion.Projects.Models is
    --  Get the branch status.
    function Get_Status (Object : in Branch_Ref)
                  return Porion.Projects.Models.Branch_Status_Type;
+
+   --  Set the test success rate for the last builds with build configuration of this branch
+   procedure Set_Pass_Rate (Object : in out Branch_Ref;
+                            Value  : in Integer);
+
+   --  Get the test success rate for the last builds with build configuration of this branch
+   function Get_Pass_Rate (Object : in Branch_Ref)
+                 return Integer;
+
+   --  Set the test failure rate for the last builds with build configuration of this branch
+   procedure Set_Fail_Rate (Object : in out Branch_Ref;
+                            Value  : in Integer);
+
+   --  Get the test failure rate for the last builds with build configuration of this branch
+   function Get_Fail_Rate (Object : in Branch_Ref)
+                 return Integer;
+
+   --  Set the test timeout rate for the last builds with build configuration of this branch
+   procedure Set_Timeout_Rate (Object : in out Branch_Ref;
+                               Value  : in Integer);
+
+   --  Get the test timeout rate for the last builds with build configuration of this branch
+   function Get_Timeout_Rate (Object : in Branch_Ref)
+                 return Integer;
+
+   --  Set the build success rate for the build configuration of this branch.
+   procedure Set_Build_Rate (Object : in out Branch_Ref;
+                             Value  : in Integer);
+
+   --  Get the build success rate for the build configuration of this branch.
+   function Get_Build_Rate (Object : in Branch_Ref)
+                 return Integer;
+
+   --  Set a rate factor to apply when consolidating results on the project
+   procedure Set_Rate_Factor (Object : in out Branch_Ref;
+                              Value  : in Integer);
+
+   --  Get a rate factor to apply when consolidating results on the project
+   function Get_Rate_Factor (Object : in Branch_Ref)
+                 return Integer;
 
    --
    procedure Set_Project (Object : in out Branch_Ref;
@@ -476,9 +548,13 @@ private
    COL_6_1_NAME : aliased constant String := "status";
    COL_7_1_NAME : aliased constant String := "scm";
    COL_8_1_NAME : aliased constant String := "scm_url";
+   COL_9_1_NAME : aliased constant String := "pass_rate";
+   COL_10_1_NAME : aliased constant String := "fail_rate";
+   COL_11_1_NAME : aliased constant String := "timeout_rate";
+   COL_12_1_NAME : aliased constant String := "build_rate";
 
    PROJECT_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 9,
+     (Count   => 13,
       Table   => PROJECT_NAME'Access,
       Members => (
          1 => COL_0_1_NAME'Access,
@@ -489,7 +565,11 @@ private
          6 => COL_5_1_NAME'Access,
          7 => COL_6_1_NAME'Access,
          8 => COL_7_1_NAME'Access,
-         9 => COL_8_1_NAME'Access)
+         9 => COL_8_1_NAME'Access,
+         10 => COL_9_1_NAME'Access,
+         11 => COL_10_1_NAME'Access,
+         12 => COL_11_1_NAME'Access,
+         13 => COL_12_1_NAME'Access)
      );
    PROJECT_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := PROJECT_DEF'Access;
@@ -523,6 +603,10 @@ private
        Status : Porion.Projects.Models.Project_Status_Type;
        Scm : Porion.Sources.Source_Control_Type;
        Scm_Url : Ada.Strings.Unbounded.Unbounded_String;
+       Pass_Rate : Integer;
+       Fail_Rate : Integer;
+       Timeout_Rate : Integer;
+       Build_Rate : Integer;
    end record;
 
    type Project_Access is access all Project_Impl;
@@ -565,10 +649,15 @@ private
    COL_5_2_NAME : aliased constant String := "create_date";
    COL_6_2_NAME : aliased constant String := "update_date";
    COL_7_2_NAME : aliased constant String := "status";
-   COL_8_2_NAME : aliased constant String := "project_id";
+   COL_8_2_NAME : aliased constant String := "pass_rate";
+   COL_9_2_NAME : aliased constant String := "fail_rate";
+   COL_10_2_NAME : aliased constant String := "timeout_rate";
+   COL_11_2_NAME : aliased constant String := "build_rate";
+   COL_12_2_NAME : aliased constant String := "rate_factor";
+   COL_13_2_NAME : aliased constant String := "project_id";
 
    BRANCH_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 9,
+     (Count   => 14,
       Table   => BRANCH_NAME'Access,
       Members => (
          1 => COL_0_2_NAME'Access,
@@ -579,7 +668,12 @@ private
          6 => COL_5_2_NAME'Access,
          7 => COL_6_2_NAME'Access,
          8 => COL_7_2_NAME'Access,
-         9 => COL_8_2_NAME'Access)
+         9 => COL_8_2_NAME'Access,
+         10 => COL_9_2_NAME'Access,
+         11 => COL_10_2_NAME'Access,
+         12 => COL_11_2_NAME'Access,
+         13 => COL_12_2_NAME'Access,
+         14 => COL_13_2_NAME'Access)
      );
    BRANCH_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := BRANCH_DEF'Access;
@@ -609,6 +703,11 @@ private
        Create_Date : Ada.Calendar.Time;
        Update_Date : Ada.Calendar.Time;
        Status : Porion.Projects.Models.Branch_Status_Type;
+       Pass_Rate : Integer;
+       Fail_Rate : Integer;
+       Timeout_Rate : Integer;
+       Build_Rate : Integer;
+       Rate_Factor : Integer;
        Project : Porion.Projects.Models.Project_Ref;
    end record;
 

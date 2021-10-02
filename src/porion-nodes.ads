@@ -29,6 +29,26 @@ package Porion.Nodes is
 
    package Node_Type_Objects is new Util.Beans.Objects.Enums (Node_Type);
 
+   type Node_Status_Type is (NODE_ERROR,
+                             NODE_DISABLED,
+                             NODE_ENABLED,
+                             NODE_STARTING,
+                             NODE_ONLINE,
+                             NODE_STOPPING,
+                             NODE_OFFLINE);
+
+   --  Use a fixed enum configuration because the value is stored in database.
+   --  Use -1 for error so that it helps in trouble shotting.
+   for Node_Status_Type use (NODE_ERROR    => -1,
+                             NODE_DISABLED => 0,
+                             NODE_ENABLED  => 1,
+                             NODE_STARTING => 2,
+                             NODE_ONLINE   => 3,
+                             NODE_STOPPING => 4,
+                             NODE_OFFLINE  => 5);
+
+   package Node_Status_Type_Objects is new Util.Beans.Objects.Enums (Node_Status_Type);
+
    type Controller_Type is abstract tagged limited private;
    type Controller_Access is access all Controller_Type'Class;
 

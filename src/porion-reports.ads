@@ -53,4 +53,14 @@ package Porion.Reports is
                             Printer  : in out PT.Printer_Type'Class;
                             Styles   : in Style_Configuration);
 
+   --  Create a report about the build nodes.  If the service is configured with
+   --  a project, the report only indicates the build nodes of the project.
+   procedure List_Nodes (Service : in out Porion.Services.Context_Type'Class;
+                         Printer : in out PT.Printer_Type'Class;
+                         Styles  : in Style_Configuration);
+   procedure List_Nodes (List    : in Porion.Queries.Node_Info_Vector;
+                         Printer : in out PT.Printer_Type'Class;
+                         Styles  : in Style_Configuration;
+                         Label   : in String);
+
 end Porion.Reports;

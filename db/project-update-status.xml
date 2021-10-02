@@ -1,0 +1,54 @@
+<query-mapping package='Porion.Builds.Models'>
+    <description>
+        Provide project build status
+    </description>
+
+    <class name="Porion.Builds.Models.Build_Status" bean="yes">
+        <comment>Summary of information about last builds of a project.</comment>
+        <property type='ADO.Identifier' name="config_id">
+            <comment>the build config id.</comment>
+        </property>
+        <property type='Porion.Builds.Models.Build_Status_Type' name="build_status">
+            <comment>the last build status.</comment>
+        </property>
+        <property type='String' name="build_tag">
+            <comment>the branch tag.</comment>
+        </property>
+        <property type='Integer' name="build_number">
+            <comment>the build number.</comment>
+        </property>
+        <property type='Integer' name="pass_count">
+            <comment>the number of tests that succeeded.</comment>
+        </property>
+        <property type='Integer' name="fail_count">
+            <comment>the number of tests that failed.</comment>
+        </property>
+        <property type='Integer' name="timeout_count">
+            <comment>the number of tests that timeout.</comment>
+        </property>
+        <property type='Nullable_Date' name="build_date" not-null="no">
+            <comment>the build date.</comment>
+        </property>
+    </class>
+
+    <query name='project-build-status'>
+        <comment>Get the build status of every configuration of a project</comment>
+        <sql>
+          SELECT
+          config.id,
+          build.status,
+          build.tag,
+          build.number,
+          build.pass_count,
+          build.fail_count,
+          build.timeout_count,
+          build.finish_date
+          FROM porion_build_config AS config
+          INNER JOIN porion_last_build AS last_build ON last_build.build_config_id = config.id
+          INNER JOIN porion_build AS build ON last_build.build_id = build.id
+          WHERE config.project_id = 1 AND
+             build.id IN (SELECT MAX(sb.build_id) FROM porion_last_build AS sb WHERE sb.build_config_id = config.id)
+        </sql>
+    </query>
+
+</query-mapping>

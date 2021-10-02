@@ -536,6 +536,7 @@ package body Porion.Builds.Services is
                                    Session : in out ADO.Sessions.Master_Session) is
       use Porion.Builds.Models;
       Build_Configs : Porion.Builds.Models.Build_Config_Vector;
+      Build_Queues  : Porion.Builds.Models.Build_Queue_Vector;
       Query         : ADO.Queries.Context;
    begin
       Query.Set_Filter ("o.branch_id = :branch_id AND o.status != 0 AND o.status != :status");
@@ -547,9 +548,26 @@ package body Porion.Builds.Services is
          declare
             Config : constant Models.Build_Config_Vectors.Reference_Type
               := Models.Build_Config_Vectors.Reference (Build_Configs, Iter);
+            Queue  : Models.Build_Queue_Ref;
+            Found  : Boolean;
+            Id     : constant ADO.Identifier := Config.Get_Id;
          begin
             Config.Set_Status (Status);
             Config.Save (Session);
+
+            Query.Clear;
+            Query.Set_Filter ("o.build_config_id = :config_id");
+            Query.Bind_Param ("config_id", Id);
+            Queue.Find (Session, Query, Found);
+            if not Found then
+               Queue.Set_Build_Config (Config);
+               Queue.Set_Node (Config.Get_Node);
+               Queue.Set_Creation_Date (Ada.Calendar.Clock);
+
+               Log.Info ("Add build queue for{0}",
+                         ADO.Identifier'Image (Id));
+            end if;
+            Queue.Save (Session);
          end;
       end loop;
    end Update_Branch_Config;

@@ -22,6 +22,7 @@
 -----------------------------------------------------------------------
 pragma Warnings (Off);
 with Ada.Unchecked_Deallocation;
+with Util.Beans.Objects.Time;
 pragma Warnings (On);
 package body Porion.Nodes.Models is
 
@@ -68,6 +69,9 @@ package body Porion.Nodes.Models is
    begin
       Impl := new Node_Impl;
       Impl.Version := 0;
+      Impl.Create_Date := ADO.DEFAULT_TIME;
+      Impl.Update_Date.Is_Null := True;
+      Impl.Kind := Porion.Nodes.Node_Type'First;
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Allocate;
 
@@ -190,6 +194,91 @@ package body Porion.Nodes.Models is
       return Impl.Repository_Dir;
    end Get_Repository_Dir;
 
+
+   procedure Set_Parameters (Object : in out Node_Ref;
+                              Value : in String) is
+      Impl : Node_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_String (Impl.all, 6, Impl.Parameters, Value);
+   end Set_Parameters;
+
+   procedure Set_Parameters (Object : in out Node_Ref;
+                             Value  : in Ada.Strings.Unbounded.Unbounded_String) is
+      Impl : Node_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Unbounded_String (Impl.all, 6, Impl.Parameters, Value);
+   end Set_Parameters;
+
+   function Get_Parameters (Object : in Node_Ref)
+                 return String is
+   begin
+      return Ada.Strings.Unbounded.To_String (Object.Get_Parameters);
+   end Get_Parameters;
+   function Get_Parameters (Object : in Node_Ref)
+                  return Ada.Strings.Unbounded.Unbounded_String is
+      Impl : constant Node_Access
+         := Node_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Parameters;
+   end Get_Parameters;
+
+
+   procedure Set_Create_Date (Object : in out Node_Ref;
+                              Value  : in Ada.Calendar.Time) is
+      Impl : Node_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Time (Impl.all, 7, Impl.Create_Date, Value);
+   end Set_Create_Date;
+
+   function Get_Create_Date (Object : in Node_Ref)
+                  return Ada.Calendar.Time is
+      Impl : constant Node_Access
+         := Node_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Create_Date;
+   end Get_Create_Date;
+
+
+   procedure Set_Update_Date (Object : in out Node_Ref;
+                              Value  : in ADO.Nullable_Time) is
+      Impl : Node_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Time (Impl.all, 8, Impl.Update_Date, Value);
+   end Set_Update_Date;
+
+   function Get_Update_Date (Object : in Node_Ref)
+                  return ADO.Nullable_Time is
+      Impl : constant Node_Access
+         := Node_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Update_Date;
+   end Get_Update_Date;
+
+
+   procedure Set_Kind (Object : in out Node_Ref;
+                       Value  : in Porion.Nodes.Node_Type) is
+      procedure Set_Field_Enum is
+        new ADO.Audits.Set_Field_Operation
+          (Porion.Nodes.Node_Type,
+           Porion.Nodes.Node_Type_Objects.To_Object);
+      Impl : Node_Access;
+   begin
+      Set_Field (Object, Impl);
+      Set_Field_Enum (Impl.all, 9, Impl.Kind, Value);
+   end Set_Kind;
+
+   function Get_Kind (Object : in Node_Ref)
+                  return Porion.Nodes.Node_Type is
+      Impl : constant Node_Access
+         := Node_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Kind;
+   end Get_Kind;
+
    --  Copy of the object.
    procedure Copy (Object : in Node_Ref;
                    Into   : in out Node_Ref) is
@@ -208,6 +297,10 @@ package body Porion.Nodes.Models is
             Copy.Name := Impl.Name;
             Copy.Login := Impl.Login;
             Copy.Repository_Dir := Impl.Repository_Dir;
+            Copy.Parameters := Impl.Parameters;
+            Copy.Create_Date := Impl.Create_Date;
+            Copy.Update_Date := Impl.Update_Date;
+            Copy.Kind := Impl.Kind;
          end;
       end if;
       Into := Result;
@@ -357,6 +450,26 @@ package body Porion.Nodes.Models is
                           Value => Object.Repository_Dir);
          Object.Clear_Modified (5);
       end if;
+      if Object.Is_Modified (6) then
+         Stmt.Save_Field (Name  => COL_5_1_NAME, --  parameters
+                          Value => Object.Parameters);
+         Object.Clear_Modified (6);
+      end if;
+      if Object.Is_Modified (7) then
+         Stmt.Save_Field (Name  => COL_6_1_NAME, --  create_date
+                          Value => Object.Create_Date);
+         Object.Clear_Modified (7);
+      end if;
+      if Object.Is_Modified (8) then
+         Stmt.Save_Field (Name  => COL_7_1_NAME, --  update_date
+                          Value => Object.Update_Date);
+         Object.Clear_Modified (8);
+      end if;
+      if Object.Is_Modified (9) then
+         Stmt.Save_Field (Name  => COL_8_1_NAME, --  kind
+                          Value => Integer (Porion.Nodes.Node_Type'Pos (Object.Kind)));
+         Object.Clear_Modified (9);
+      end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
          Stmt.Save_Field (Name  => "version",
@@ -398,6 +511,14 @@ package body Porion.Nodes.Models is
                         Value => Object.Login);
       Query.Save_Field (Name  => COL_4_1_NAME, --  repository_dir
                         Value => Object.Repository_Dir);
+      Query.Save_Field (Name  => COL_5_1_NAME, --  parameters
+                        Value => Object.Parameters);
+      Query.Save_Field (Name  => COL_6_1_NAME, --  create_date
+                        Value => Object.Create_Date);
+      Query.Save_Field (Name  => COL_7_1_NAME, --  update_date
+                        Value => Object.Update_Date);
+      Query.Save_Field (Name  => COL_8_1_NAME, --  kind
+                        Value => Integer (Porion.Nodes.Node_Type'Pos (Object.Kind)));
       Query.Execute (Result);
       if Result /= 1 then
          raise ADO.Objects.INSERT_ERROR;
@@ -438,6 +559,18 @@ package body Porion.Nodes.Models is
          return Util.Beans.Objects.To_Object (Impl.Login);
       elsif Name = "repository_dir" then
          return Util.Beans.Objects.To_Object (Impl.Repository_Dir);
+      elsif Name = "parameters" then
+         return Util.Beans.Objects.To_Object (Impl.Parameters);
+      elsif Name = "create_date" then
+         return Util.Beans.Objects.Time.To_Object (Impl.Create_Date);
+      elsif Name = "update_date" then
+         if Impl.Update_Date.Is_Null then
+            return Util.Beans.Objects.Null_Object;
+         else
+            return Util.Beans.Objects.Time.To_Object (Impl.Update_Date.Value);
+         end if;
+      elsif Name = "kind" then
+         return Porion.Nodes.Node_Type_Objects.To_Object (Impl.Kind);
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -456,6 +589,10 @@ package body Porion.Nodes.Models is
       Object.Name := Stmt.Get_Unbounded_String (2);
       Object.Login := Stmt.Get_Unbounded_String (3);
       Object.Repository_Dir := Stmt.Get_Unbounded_String (4);
+      Object.Parameters := Stmt.Get_Unbounded_String (5);
+      Object.Create_Date := Stmt.Get_Time (6);
+      Object.Update_Date := Stmt.Get_Nullable_Time (7);
+      Object.Kind := Porion.Nodes.Node_Type'Val (Stmt.Get_Integer (8));
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);
    end Load;

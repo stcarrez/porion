@@ -232,6 +232,8 @@ CREATE TABLE IF NOT EXISTS porion_node (
   `os_version` VARCHAR(255) NOT NULL,
   /* the date when the node system information was collected. */
   `info_date` DATETIME ,
+  /* the CPU type on this build node. */
+  `cpu_type` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`)
 );
 /*  */

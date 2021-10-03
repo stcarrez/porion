@@ -373,7 +373,7 @@ package body Porion.Reports is
       end if;
       Porion.Queries.List (List, Service.DB, Query);
 
-      List_Nodes (List, Printer, Styles, -("Name"));
+      List_Nodes (List, Printer, Styles, -("Kind"));
    end List_Nodes;
 
    procedure List_Nodes (List    : in Porion.Queries.Node_Info_Vector;
@@ -410,7 +410,7 @@ package body Porion.Reports is
       Writer.Set_Bottom_Right_Padding (Fields (4), (1, 0));
 
       Writer.Layout_Fields (Fields);
-      Writer.Put (Fields (1), -("Kind"));
+      Writer.Put (Fields (1), Label);
       Writer.Put (Fields (2), -("Status"));
       Writer.Put (Fields (3), -("Configs"));
       Writer.Put (Fields (4), -("Builds"));

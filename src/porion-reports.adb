@@ -383,23 +383,27 @@ package body Porion.Reports is
       use Porion.Nodes;
 
       Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
-      Fields : PT.Texts.Field_Array (1 .. 7);
+      Fields : PT.Texts.Field_Array (1 .. 9);
       Style1 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
       Style2 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
    begin
       Writer.Set_Justify (Style2, PT.J_RIGHT);
       Writer.Create_Field (Fields (1), Style1, 0.0);
-      Writer.Create_Field (Fields (2), Style2, 0.0);
+      Writer.Create_Field (Fields (2), Style1, 0.0);
       Writer.Create_Field (Fields (3), Style1, 0.0);
       Writer.Create_Field (Fields (4), Style1, 0.0);
-      Writer.Create_Field (Fields (5), Style1, 20.0);
+      Writer.Create_Field (Fields (5), Style1, 10.0);
       Writer.Create_Field (Fields (6), Style1, 10.0);
-      Writer.Create_Field (Fields (7), Style1, 20.0);
+      Writer.Create_Field (Fields (7), Style1, 10.0);
+      Writer.Create_Field (Fields (8), Style1, 10.0);
+      Writer.Create_Field (Fields (9), Style1, 20.0);
 
-      Writer.Set_Max_Dimension (Fields (1), (10, 1));
-      Writer.Set_Max_Dimension (Fields (2), (10, 1));
+      Writer.Set_Max_Dimension (Fields (1), (8, 1));
+      Writer.Set_Max_Dimension (Fields (2), (8, 1));
       Writer.Set_Max_Dimension (Fields (3), (7, 1));
       Writer.Set_Max_Dimension (Fields (4), (7, 1));
+      Writer.Set_Max_Dimension (Fields (5), (7, 1));
+      Writer.Set_Max_Dimension (Fields (6), (7, 1));
       Writer.Set_Bottom_Right_Padding (Fields (1), (1, 0));
       Writer.Set_Bottom_Right_Padding (Fields (2), (1, 0));
       Writer.Set_Bottom_Right_Padding (Fields (3), (1, 0));
@@ -410,9 +414,11 @@ package body Porion.Reports is
       Writer.Put (Fields (2), -("Status"));
       Writer.Put (Fields (3), -("Configs"));
       Writer.Put (Fields (4), -("Builds"));
-      Writer.Put (Fields (5), -("Hostname"));
-      Writer.Put (Fields (6), -("Login"));
-      Writer.Put (Fields (7), -("Directory"));
+      Writer.Put (Fields (5), -("OS"));
+      Writer.Put (Fields (6), -("CPU"));
+      Writer.Put (Fields (7), -("Hostname"));
+      Writer.Put (Fields (8), -("Login"));
+      Writer.Put (Fields (9), -("Directory"));
       Writer.New_Line;
 
       for Node of List loop
@@ -435,9 +441,16 @@ package body Porion.Reports is
          Writer.Put (Fields (2), Get_Status (Node.Status));
          Writer.Put_Int (Fields (3), Node.Config_Count);
          Writer.Put_Int (Fields (4), Node.Build_Count);
-         Writer.Put_UString (Fields (5), Node.Name);
-         Writer.Put_UString (Fields (6), Node.Login);
-         Writer.Put_UString (Fields (7), Node.Repository_Dir);
+         if Ada.Strings.Unbounded.Length (Node.Os_Version) > 0 then
+            Writer.Put (Fields (5), To_String (Node.OS_Name)
+                        & " " & To_String (Node.OS_Version));
+         else
+            Writer.Put_UString (Fields (5), Node.OS_Name);
+         end if;
+         Writer.Put_UString (Fields (6), Node.Cpu_Type);
+         Writer.Put_UString (Fields (7), Node.Name);
+         Writer.Put_UString (Fields (8), Node.Login);
+         Writer.Put_UString (Fields (9), Node.Repository_Dir);
          Writer.New_Line;
       end loop;
    end List_Nodes;

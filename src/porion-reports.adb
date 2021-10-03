@@ -365,7 +365,12 @@ package body Porion.Reports is
       List   : Porion.Queries.Node_Info_Vector;
       Query  : ADO.Queries.Context;
    begin
-      Query.Set_Query (Porion.Queries.Query_Node_List);
+      if Service.Project.Is_Null then
+         Query.Set_Query (Porion.Queries.Query_Node_List);
+      else
+         Query.Set_Query (Porion.Queries.Query_Project_Node_List);
+         Query.Bind_Param ("project_id", Service.Project.Get_Id);
+      end if;
       Porion.Queries.List (List, Service.DB, Query);
 
       List_Nodes (List, Printer, Styles, -("Name"));
@@ -383,27 +388,31 @@ package body Porion.Reports is
       Style2 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
    begin
       Writer.Set_Justify (Style2, PT.J_RIGHT);
-      Writer.Create_Field (Fields (1), Style1, 10.0);
-      Writer.Create_Field (Fields (2), Style1, 20.0);
-      Writer.Create_Field (Fields (3), Style1, 10.0);
-      Writer.Create_Field (Fields (4), Style1, 20.0);
-      Writer.Create_Field (Fields (5), Style2, 10.0);
-      Writer.Create_Field (Fields (6), Style1, 0.0);
-      Writer.Create_Field (Fields (7), Style1, 0.0);
+      Writer.Create_Field (Fields (1), Style1, 0.0);
+      Writer.Create_Field (Fields (2), Style2, 0.0);
+      Writer.Create_Field (Fields (3), Style1, 0.0);
+      Writer.Create_Field (Fields (4), Style1, 0.0);
+      Writer.Create_Field (Fields (5), Style1, 20.0);
+      Writer.Create_Field (Fields (6), Style1, 10.0);
+      Writer.Create_Field (Fields (7), Style1, 20.0);
 
-      Writer.Set_Max_Dimension (Fields (6), (6, 1));
-      Writer.Set_Max_Dimension (Fields (7), (6, 1));
-      Writer.Set_Bottom_Right_Padding (Fields (5), (1, 0));
-      Writer.Set_Bottom_Right_Padding (Fields (7), (1, 0));
+      Writer.Set_Max_Dimension (Fields (1), (10, 1));
+      Writer.Set_Max_Dimension (Fields (2), (10, 1));
+      Writer.Set_Max_Dimension (Fields (3), (7, 1));
+      Writer.Set_Max_Dimension (Fields (4), (7, 1));
+      Writer.Set_Bottom_Right_Padding (Fields (1), (1, 0));
+      Writer.Set_Bottom_Right_Padding (Fields (2), (1, 0));
+      Writer.Set_Bottom_Right_Padding (Fields (3), (1, 0));
+      Writer.Set_Bottom_Right_Padding (Fields (4), (1, 0));
 
       Writer.Layout_Fields (Fields);
       Writer.Put (Fields (1), -("Kind"));
-      Writer.Put (Fields (2), -("Hostname"));
-      Writer.Put (Fields (3), -("Login"));
-      Writer.Put (Fields (4), -("Directory"));
-      Writer.Put (Fields (5), -("Status"));
-      Writer.Put (Fields (6), -("Configs"));
-      Writer.Put (Fields (7), -("Builds"));
+      Writer.Put (Fields (2), -("Status"));
+      Writer.Put (Fields (3), -("Configs"));
+      Writer.Put (Fields (4), -("Builds"));
+      Writer.Put (Fields (5), -("Hostname"));
+      Writer.Put (Fields (6), -("Login"));
+      Writer.Put (Fields (7), -("Directory"));
       Writer.New_Line;
 
       for Node of List loop
@@ -423,12 +432,12 @@ package body Porion.Reports is
 
          Writer.Set_Justify (Style2, PT.J_RIGHT);
          Writer.Put (Fields (1), Get_Kind (Node.Kind));
-         Writer.Put_UString (Fields (2), Node.Name);
-         Writer.Put_UString (Fields (3), Node.Login);
-         Writer.Put_UString (Fields (4), Node.Repository_Dir);
-         Writer.Put (Fields (5), Get_Status (Node.Status));
-         Writer.Put_Int (Fields (6), Node.Config_Count);
-         Writer.Put_Int (Fields (7), Node.Build_Count);
+         Writer.Put (Fields (2), Get_Status (Node.Status));
+         Writer.Put_Int (Fields (3), Node.Config_Count);
+         Writer.Put_Int (Fields (4), Node.Build_Count);
+         Writer.Put_UString (Fields (5), Node.Name);
+         Writer.Put_UString (Fields (6), Node.Login);
+         Writer.Put_UString (Fields (7), Node.Repository_Dir);
          Writer.New_Line;
       end loop;
    end List_Nodes;

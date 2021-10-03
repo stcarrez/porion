@@ -43,11 +43,25 @@
             WHERE node.deleted = 0
             ORDER BY node.name
         </sql>
-        <sql-count>
+   </query>
+
+   <query name='project-node-list'>
+        <comment>Get the list of build nodes for a project</comment>
+        <sql>
             SELECT
-            count(build.id)
-            FROM porion_build AS build
-        </sql-count>
+            node.name AS name,
+            node.login AS login,
+            node.repository_dir AS repository_dir,
+            node.kind AS kind,
+            node.status AS status,
+            COUNT(distinct config.id) AS config_count,
+            (SELECT COUNT(build.id) FROM porion_build AS build WHERE build.node_id = node.id AND build.project_id = :project_id) AS bld_count
+            FROM porion_node AS node
+            INNER JOIN porion_build_config AS config ON config.node_id = node.id
+            WHERE node.deleted = 0 AND config.project_id = :project_id
+            GROUP BY node.id
+            ORDER BY node.name
+        </sql>
     </query>
 
 </query-mapping>

@@ -164,6 +164,20 @@ package body Porion.Commands.Info is
                end if;
             end;
 
+            declare
+               List   : Porion.Queries.Node_Info_Vector;
+               Query  : ADO.Queries.Context;
+            begin
+               Query.Set_Query (Porion.Queries.Query_Project_Node_List);
+               Query.Bind_Param ("project_id", Context.Project_Service.Project.Get_Id);
+               Porion.Queries.List (List, Context.Project_Service.DB, Query);
+
+               if not List.Is_Empty then
+                  Printer.New_Line;
+                  Porion.Reports.List_Nodes (List, Printer, Context.Styles, -("Nodes"));
+               end if;
+            end;
+
             Query.Clear;
             Query.Set_Join ("INNER JOIN porion_branch AS b ON o.branch_id = b.id");
             Query.Set_Filter ("b.project_id = :project_id");

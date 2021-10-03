@@ -46,7 +46,7 @@ package body Porion.Commands.Node is
       begin
          if Sep > 0 then
             First := Sep + 1;
-            while First + 1 >= URI'Last and then URI (First) = '/' loop
+            while First <= URI'Last and then URI (First) = '/' loop
                First := First + 1;
             end loop;
          else
@@ -65,7 +65,7 @@ package body Porion.Commands.Node is
       begin
          if Sep > 0 then
             First := Sep + 1;
-            while First >= URI'Last and then URI (First) = '/' loop
+            while First <= URI'Last and then URI (First) = '/' loop
                First := First + 1;
             end loop;
          else
@@ -84,8 +84,27 @@ package body Porion.Commands.Node is
       end Get_Hostname;
 
       function Get_Path (URI : in String) return String is
+         First : Natural;
+         Sep   : Natural := Util.Strings.Index (URI, ':');
       begin
-         return URI;
+         if Sep > 0 then
+            First := Sep + 1;
+            while First <= URI'Last and then URI (First) = '/' loop
+               First := First + 1;
+            end loop;
+         else
+            First := URI'First;
+         end if;
+         Sep := Util.Strings.Index (URI, '@', First);
+         if Sep > 0 then
+            First := Sep + 1;
+         end if;
+         Sep := Util.Strings.Index (URI, '/', First);
+         if Sep = 0 then
+            return "";
+         else
+            return URI (Sep .. URI'Last);
+         end if;
       end Get_Path;
 
       function Get_Type (Scheme : in String) return Porion.Nodes.Node_Type is
@@ -124,6 +143,8 @@ package body Porion.Commands.Node is
                                            Hostname   => Hostname,
                                            Login      => Login,
                                            Repository => Directory);
+
+            Context.Node_Service.Probe_Node;
 
          exception
             when Porion.Nodes.Services.Name_Used =>

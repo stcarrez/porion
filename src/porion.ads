@@ -29,6 +29,9 @@ package Porion is
    function To_String (Value : in UString) return String
      renames Ada.Strings.Unbounded.To_String;
 
+   function Length (Value : in UString) return Natural
+     renames Ada.Strings.Unbounded.Length;
+
    function "=" (Left, Right : in UString) return Boolean
      renames Ada.Strings.Unbounded."=";
    function "=" (Left : in UString; Right : in String) return Boolean

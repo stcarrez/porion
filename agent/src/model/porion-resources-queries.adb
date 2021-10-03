@@ -238,12 +238,19 @@ package body Porion.Resources.Queries is
        & " name.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "     "
        & "   <property type='String' name=""login"">" & ASCII.LF & "            <c"
        & "omment>the node login name.</comment>" & ASCII.LF & "        </property>"
-       & ASCII.LF & "        <property type='String' name=""repository_dir"">" & ASCII.LF
-       & "            <comment>the node repository dir.</comment>" & ASCII.LF & " "
-       & "       </property>" & ASCII.LF & "        <property type='Porion.Nodes.N"
-       & "ode_Type' name=""kind"">" & ASCII.LF & "            <comment>the node ki"
-       & "nd.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        "
-       & "<property type='Porion.Nodes.Node_Status_Type' name=""status"">" & ASCII.LF
+       & ASCII.LF & "        <property type='String' name=""os_name"">" & ASCII.LF
+       & "            <comment>the node OS name.</comment>" & ASCII.LF & "        "
+       & "</property>" & ASCII.LF & "        <property type='String' name=""os_ver"
+       & "sion"">" & ASCII.LF & "            <comment>the node OS version.</commen"
+       & "t>" & ASCII.LF & "        </property>" & ASCII.LF & "        <property t"
+       & "ype='String' name=""cpu_type"">" & ASCII.LF & "            <comment>the "
+       & "node CPU type.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='String' name=""repository_dir"">" & ASCII.LF & " "
+       & "           <comment>the node repository dir.</comment>" & ASCII.LF & "  "
+       & "      </property>" & ASCII.LF & "        <property type='Porion.Nodes.No"
+       & "de_Type' name=""kind"">" & ASCII.LF & "            <comment>the node kin"
+       & "d.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <"
+       & "property type='Porion.Nodes.Node_Status_Type' name=""status"">" & ASCII.LF
        & "            <comment>the node status.</comment>" & ASCII.LF & "        <"
        & "/property>" & ASCII.LF & "        <property type='Integer' name=""config"
        & "_count"">" & ASCII.LF & "            <comment>the number of configuratio"
@@ -254,30 +261,35 @@ package body Porion.Resources.Queries is
        & "   <query name='node-list'>" & ASCII.LF & "        <comment>Get the list"
        & " of build nodes</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & "  "
        & "          SELECT" & ASCII.LF & "            node.name AS name," & ASCII.LF
-       & "            node.login AS login," & ASCII.LF & "            node.reposit"
-       & "ory_dir AS repository_dir," & ASCII.LF & "            node.kind AS kind,"
-       & ASCII.LF & "            node.status AS status," & ASCII.LF & "          "
-       & "  (SELECT COUNT(config.id) FROM porion_build_config AS config WHERE conf"
-       & "ig.node_id = node.id) AS config_count," & ASCII.LF & "            (SELEC"
-       & "T COUNT(build.id) FROM porion_build AS build WHERE build.node_id = node."
-       & "id) AS bld_count" & ASCII.LF & "            FROM porion_node AS node" & ASCII.LF
-       & "            WHERE node.deleted = 0" & ASCII.LF & "            ORDER BY n"
-       & "ode.name" & ASCII.LF & "        </sql>" & ASCII.LF & "   </query>" & ASCII.LF
-       & ASCII.LF & "   <query name='project-node-list'>" & ASCII.LF & "        <"
-       & "comment>Get the list of build nodes for a project</comment>" & ASCII.LF
-       & "        <sql>" & ASCII.LF & "            SELECT" & ASCII.LF & "         "
-       & "   node.name AS name," & ASCII.LF & "            node.login AS login," & ASCII.LF
-       & "            node.repository_dir AS repository_dir," & ASCII.LF & "      "
-       & "      node.kind AS kind," & ASCII.LF & "            node.status AS statu"
-       & "s," & ASCII.LF & "            COUNT(distinct config.id) AS config_count,"
-       & ASCII.LF & "            (SELECT COUNT(build.id) FROM porion_build AS bui"
-       & "ld WHERE build.node_id = node.id AND build.project_id = :project_id) AS "
-       & "bld_count" & ASCII.LF & "            FROM porion_node AS node" & ASCII.LF
-       & "            INNER JOIN porion_build_config AS config ON config.node_id ="
-       & " node.id" & ASCII.LF & "            WHERE node.deleted = 0 AND config.pr"
-       & "oject_id = :project_id" & ASCII.LF & "            GROUP BY node.id" & ASCII.LF
-       & "            ORDER BY node.name" & ASCII.LF & "        </sql>" & ASCII.LF
-       & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+       & "            node.login AS login," & ASCII.LF & "            node.os_name"
+       & " AS os_name," & ASCII.LF & "            node.os_version AS os_version," & ASCII.LF
+       & "            node.cpu_type AS cpu_type," & ASCII.LF & "            node.r"
+       & "epository_dir AS repository_dir," & ASCII.LF & "            node.kind AS"
+       & " kind," & ASCII.LF & "            node.status AS status," & ASCII.LF & " "
+       & "           (SELECT COUNT(config.id) FROM porion_build_config AS config W"
+       & "HERE config.node_id = node.id) AS config_count," & ASCII.LF & "         "
+       & "   (SELECT COUNT(build.id) FROM porion_build AS build WHERE build.node_i"
+       & "d = node.id) AS bld_count" & ASCII.LF & "            FROM porion_node AS"
+       & " node" & ASCII.LF & "            WHERE node.deleted = 0" & ASCII.LF & " "
+       & "           ORDER BY node.name" & ASCII.LF & "        </sql>" & ASCII.LF
+       & "   </query>" & ASCII.LF & ASCII.LF & "   <query name='project-node-list"
+       & "'>" & ASCII.LF & "        <comment>Get the list of build nodes for a pro"
+       & "ject</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & "            S"
+       & "ELECT" & ASCII.LF & "            node.name AS name," & ASCII.LF & "     "
+       & "       node.login AS login," & ASCII.LF & "            node.os_name AS o"
+       & "s_name," & ASCII.LF & "            node.os_version AS os_version," & ASCII.LF
+       & "            node.cpu_type AS cpu_type," & ASCII.LF & "            node.r"
+       & "epository_dir AS repository_dir," & ASCII.LF & "            node.kind AS"
+       & " kind," & ASCII.LF & "            node.status AS status," & ASCII.LF & " "
+       & "           COUNT(distinct config.id) AS config_count," & ASCII.LF & "   "
+       & "         (SELECT COUNT(build.id) FROM porion_build AS build WHERE build."
+       & "node_id = node.id AND build.project_id = :project_id) AS bld_count" & ASCII.LF
+       & "            FROM porion_node AS node" & ASCII.LF & "            INNER JO"
+       & "IN porion_build_config AS config ON config.node_id = node.id" & ASCII.LF
+       & "            WHERE node.deleted = 0 AND config.project_id = :project_id" & ASCII.LF
+       & "            GROUP BY node.id" & ASCII.LF & "            ORDER BY node.na"
+       & "me" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF
+       & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
    C_5 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of projects" & ASCII.LF & " "

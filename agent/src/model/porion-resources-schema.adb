@@ -59,7 +59,8 @@ package body Porion.Resources.Schema is
        & " NULL, `parameters` VARCHAR(255) NOT NULL, `create_date` DATETIME NOT NU"
        & "LL, `update_date` DATETIME , `kind` NOT NULL, `deleted` TINYINT NOT NULL"
        & ", `status` NOT NULL, `os_name` VARCHAR(255) NOT NULL, `os_version` VARCH"
-       & "AR(255) NOT NULL, `info_date` DATETIME , PRIMARY KEY (`id`))";
+       & "AR(255) NOT NULL, `info_date` DATETIME , `cpu_type` VARCHAR(255) NOT NUL"
+       & "L, PRIMARY KEY (`id`))";
    L_16  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_branch "
        & "( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `name` VARCHAR(255) "
        & "NOT NULL, `tag` VARCHAR(255) NOT NULL, `last_date` DATETIME , `create_da"

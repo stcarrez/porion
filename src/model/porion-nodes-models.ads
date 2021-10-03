@@ -180,6 +180,18 @@ package Porion.Nodes.Models is
    function Get_Info_Date (Object : in Node_Ref)
                  return ADO.Nullable_Time;
 
+   --  Set the CPU type on this build node.
+   procedure Set_Cpu_Type (Object : in out Node_Ref;
+                           Value  : in Ada.Strings.Unbounded.Unbounded_String);
+   procedure Set_Cpu_Type (Object : in out Node_Ref;
+                           Value : in String);
+
+   --  Get the CPU type on this build node.
+   function Get_Cpu_Type (Object : in Node_Ref)
+                 return Ada.Strings.Unbounded.Unbounded_String;
+   function Get_Cpu_Type (Object : in Node_Ref)
+                 return String;
+
    --  Load the entity identified by 'Id'.
    --  Raises the NOT_FOUND exception if it does not exist.
    procedure Load (Object  : in out Node_Ref;
@@ -246,9 +258,10 @@ private
    COL_11_1_NAME : aliased constant String := "os_name";
    COL_12_1_NAME : aliased constant String := "os_version";
    COL_13_1_NAME : aliased constant String := "info_date";
+   COL_14_1_NAME : aliased constant String := "cpu_type";
 
    NODE_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 14,
+     (Count   => 15,
       Table   => NODE_NAME'Access,
       Members => (
          1 => COL_0_1_NAME'Access,
@@ -264,7 +277,8 @@ private
          11 => COL_10_1_NAME'Access,
          12 => COL_11_1_NAME'Access,
          13 => COL_12_1_NAME'Access,
-         14 => COL_13_1_NAME'Access)
+         14 => COL_13_1_NAME'Access,
+         15 => COL_14_1_NAME'Access)
      );
    NODE_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := NODE_DEF'Access;
@@ -303,6 +317,7 @@ private
        Os_Name : Ada.Strings.Unbounded.Unbounded_String;
        Os_Version : Ada.Strings.Unbounded.Unbounded_String;
        Info_Date : ADO.Nullable_Time;
+       Cpu_Type : Ada.Strings.Unbounded.Unbounded_String;
    end record;
 
    type Node_Access is access all Node_Impl;

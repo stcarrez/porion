@@ -144,11 +144,14 @@ package body Porion.Queries is
       begin
          Into.Name := Stmt.Get_Unbounded_String (0);
          Into.Login := Stmt.Get_Unbounded_String (1);
-         Into.Repository_Dir := Stmt.Get_Unbounded_String (2);
-         Into.Kind := Porion.Nodes.Node_Type'Val (Stmt.Get_Integer (3));
-         Into.Status := Porion.Nodes.Node_Status_Type'Val (Stmt.Get_Integer (4));
-         Into.Config_Count := Stmt.Get_Integer (5);
-         Into.Build_Count := Stmt.Get_Integer (6);
+         Into.Os_Name := Stmt.Get_Unbounded_String (2);
+         Into.Os_Version := Stmt.Get_Unbounded_String (3);
+         Into.Cpu_Type := Stmt.Get_Unbounded_String (4);
+         Into.Repository_Dir := Stmt.Get_Unbounded_String (5);
+         Into.Kind := Porion.Nodes.Node_Type'Val (Stmt.Get_Integer (6));
+         Into.Status := Porion.Nodes.Node_Status_Type'Val (Stmt.Get_Integer (7));
+         Into.Config_Count := Stmt.Get_Integer (8);
+         Into.Build_Count := Stmt.Get_Integer (9);
       end Read;
    begin
       Stmt.Execute;

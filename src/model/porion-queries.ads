@@ -177,6 +177,15 @@ package Porion.Queries is
       --  the node login name.
       Login : Ada.Strings.Unbounded.Unbounded_String;
 
+      --  the node OS name.
+      Os_Name : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the node OS version.
+      Os_Version : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the node CPU type.
+      Cpu_Type : Ada.Strings.Unbounded.Unbounded_String;
+
       --  the node repository dir.
       Repository_Dir : Ada.Strings.Unbounded.Unbounded_String;
 
@@ -332,7 +341,7 @@ private
 
    package File_4 is
       new ADO.Queries.Loaders.File (Path => "command-nodes.xml",
-                                    Sha1 => "A3F76D9513E0E52944630A166E83D78371DC8EF4");
+                                    Sha1 => "DECF963F46AF0AAD8077BBC027B129720EBB3655");
 
    package Def_Nodeinfo_Node_List is
       new ADO.Queries.Loaders.Query (Name => "node-list",

@@ -396,6 +396,36 @@ package body Porion.Nodes.Models is
       return Impl.Info_Date;
    end Get_Info_Date;
 
+
+   procedure Set_Cpu_Type (Object : in out Node_Ref;
+                            Value : in String) is
+      Impl : Node_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_String (Impl.all, 15, Impl.Cpu_Type, Value);
+   end Set_Cpu_Type;
+
+   procedure Set_Cpu_Type (Object : in out Node_Ref;
+                           Value  : in Ada.Strings.Unbounded.Unbounded_String) is
+      Impl : Node_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Unbounded_String (Impl.all, 15, Impl.Cpu_Type, Value);
+   end Set_Cpu_Type;
+
+   function Get_Cpu_Type (Object : in Node_Ref)
+                 return String is
+   begin
+      return Ada.Strings.Unbounded.To_String (Object.Get_Cpu_Type);
+   end Get_Cpu_Type;
+   function Get_Cpu_Type (Object : in Node_Ref)
+                  return Ada.Strings.Unbounded.Unbounded_String is
+      Impl : constant Node_Access
+         := Node_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Cpu_Type;
+   end Get_Cpu_Type;
+
    --  Copy of the object.
    procedure Copy (Object : in Node_Ref;
                    Into   : in out Node_Ref) is
@@ -423,6 +453,7 @@ package body Porion.Nodes.Models is
             Copy.Os_Name := Impl.Os_Name;
             Copy.Os_Version := Impl.Os_Version;
             Copy.Info_Date := Impl.Info_Date;
+            Copy.Cpu_Type := Impl.Cpu_Type;
          end;
       end if;
       Into := Result;
@@ -617,6 +648,11 @@ package body Porion.Nodes.Models is
                           Value => Object.Info_Date);
          Object.Clear_Modified (14);
       end if;
+      if Object.Is_Modified (15) then
+         Stmt.Save_Field (Name  => COL_14_1_NAME, --  cpu_type
+                          Value => Object.Cpu_Type);
+         Object.Clear_Modified (15);
+      end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
          Stmt.Save_Field (Name  => "version",
@@ -676,6 +712,8 @@ package body Porion.Nodes.Models is
                         Value => Object.Os_Version);
       Query.Save_Field (Name  => COL_13_1_NAME, --  info_date
                         Value => Object.Info_Date);
+      Query.Save_Field (Name  => COL_14_1_NAME, --  cpu_type
+                        Value => Object.Cpu_Type);
       Query.Execute (Result);
       if Result /= 1 then
          raise ADO.Objects.INSERT_ERROR;
@@ -742,6 +780,8 @@ package body Porion.Nodes.Models is
          else
             return Util.Beans.Objects.Time.To_Object (Impl.Info_Date.Value);
          end if;
+      elsif Name = "cpu_type" then
+         return Util.Beans.Objects.To_Object (Impl.Cpu_Type);
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -769,6 +809,7 @@ package body Porion.Nodes.Models is
       Object.Os_Name := Stmt.Get_Unbounded_String (11);
       Object.Os_Version := Stmt.Get_Unbounded_String (12);
       Object.Info_Date := Stmt.Get_Nullable_Time (13);
+      Object.Cpu_Type := Stmt.Get_Unbounded_String (14);
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);
    end Load;

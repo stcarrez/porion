@@ -78,4 +78,47 @@ package body Porion.Nodes.Local is
       end if;
    end Execute;
 
+   procedure Execute (Controller  : in out Controller_Type;
+                      Args        : in Util.Strings.Vectors.Vector;
+                      Working_Dir : in String := "";
+                      Process     : not null access procedure (Line : in String);
+                      Strip_Crlf  : in Boolean := False;
+                      Status      : out Integer) is
+
+      Command : constant String := Args.First_Element;
+      Proc    : Util.Processes.Process;
+      Output  : Util.Streams.Input_Stream_Access;
+      Input   : Util.Streams.Output_Stream_Access;
+      Reader  : Util.Streams.Texts.Reader_Stream;
+   begin
+      if Working_Dir'Length > 0 then
+         Log.Info ("Running '{0}' in '{1}'", Command, Working_Dir);
+         Util.Processes.Set_Working_Directory (Proc, Working_Dir);
+      else
+         Log.Info ("Running '{0}'", Command);
+      end if;
+
+      Util.Processes.Spawn (Proc      => Proc,
+                            Arguments => Args,
+                            Mode      => Util.Processes.READ_WRITE_ALL);
+      Input := Util.Processes.Get_Input_Stream (Proc);
+      Output := Util.Processes.Get_Output_Stream (Proc);
+      Reader.Initialize (Output, 4096);
+      Input.Close;
+      while not Reader.Is_Eof loop
+         declare
+            Line : Ada.Strings.Unbounded.Unbounded_String;
+         begin
+            Reader.Read_Line (Line, Strip_Crlf);
+            Process (Ada.Strings.Unbounded.To_String (Line));
+         end;
+      end loop;
+      Util.Processes.Wait (Proc);
+      Status := Util.Processes.Get_Exit_Status (Proc);
+      if Status /= 0 then
+         Log.Warn ("Command '{0}' terminated with exit code{1}", Command,
+                    Integer'Image (Status));
+      end if;
+   end Execute;
+
 end Porion.Nodes.Local;

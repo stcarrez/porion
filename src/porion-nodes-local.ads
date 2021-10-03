@@ -15,6 +15,7 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Util.Strings.Vectors;
 package Porion.Nodes.Local is
 
    type Controller_Type is limited new Porion.Nodes.Controller_Type with private;
@@ -28,6 +29,13 @@ package Porion.Nodes.Local is
    overriding
    procedure Execute (Controller  : in out Controller_Type;
                       Command     : in String;
+                      Working_Dir : in String := "";
+                      Process     : not null access procedure (Line : in String);
+                      Strip_Crlf  : in Boolean := False;
+                      Status      : out Integer);
+
+   procedure Execute (Controller  : in out Controller_Type;
+                      Args        : in Util.Strings.Vectors.Vector;
                       Working_Dir : in String := "";
                       Process     : not null access procedure (Line : in String);
                       Strip_Crlf  : in Boolean := False;

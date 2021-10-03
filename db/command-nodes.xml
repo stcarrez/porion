@@ -11,6 +11,15 @@
         <property type='String' name="login">
             <comment>the node login name.</comment>
         </property>
+        <property type='String' name="os_name">
+            <comment>the node OS name.</comment>
+        </property>
+        <property type='String' name="os_version">
+            <comment>the node OS version.</comment>
+        </property>
+        <property type='String' name="cpu_type">
+            <comment>the node CPU type.</comment>
+        </property>
         <property type='String' name="repository_dir">
             <comment>the node repository dir.</comment>
         </property>
@@ -34,6 +43,9 @@
             SELECT
             node.name AS name,
             node.login AS login,
+            node.os_name AS os_name,
+            node.os_version AS os_version,
+            node.cpu_type AS cpu_type,
             node.repository_dir AS repository_dir,
             node.kind AS kind,
             node.status AS status,
@@ -51,6 +63,9 @@
             SELECT
             node.name AS name,
             node.login AS login,
+            node.os_name AS os_name,
+            node.os_version AS os_version,
+            node.cpu_type AS cpu_type,
             node.repository_dir AS repository_dir,
             node.kind AS kind,
             node.status AS status,

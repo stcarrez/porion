@@ -67,7 +67,7 @@ package body Porion.Services is
       Log.Debug ("Load build node {0}", Hostname);
 
       Query.Bind_Param (1, Hostname);
-      Query.Set_Filter ("o.name = ?");
+      Query.Set_Filter ("o.name = ? AND o.deleted = 0");
       Service.Build_Node.Find (Service.DB, Query, Found);
       if not Found then
          Log.Warn ("Build node {0} does not exist", Hostname);

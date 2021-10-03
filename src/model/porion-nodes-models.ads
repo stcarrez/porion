@@ -148,6 +148,38 @@ package Porion.Nodes.Models is
    function Get_Status (Object : in Node_Ref)
                  return Porion.Nodes.Node_Status_Type;
 
+   --  Set the OS name.
+   procedure Set_Os_Name (Object : in out Node_Ref;
+                          Value  : in Ada.Strings.Unbounded.Unbounded_String);
+   procedure Set_Os_Name (Object : in out Node_Ref;
+                          Value : in String);
+
+   --  Get the OS name.
+   function Get_Os_Name (Object : in Node_Ref)
+                 return Ada.Strings.Unbounded.Unbounded_String;
+   function Get_Os_Name (Object : in Node_Ref)
+                 return String;
+
+   --  Set the OS version or additional information.
+   procedure Set_Os_Version (Object : in out Node_Ref;
+                             Value  : in Ada.Strings.Unbounded.Unbounded_String);
+   procedure Set_Os_Version (Object : in out Node_Ref;
+                             Value : in String);
+
+   --  Get the OS version or additional information.
+   function Get_Os_Version (Object : in Node_Ref)
+                 return Ada.Strings.Unbounded.Unbounded_String;
+   function Get_Os_Version (Object : in Node_Ref)
+                 return String;
+
+   --  Set the date when the node system information was collected.
+   procedure Set_Info_Date (Object : in out Node_Ref;
+                            Value  : in ADO.Nullable_Time);
+
+   --  Get the date when the node system information was collected.
+   function Get_Info_Date (Object : in Node_Ref)
+                 return ADO.Nullable_Time;
+
    --  Load the entity identified by 'Id'.
    --  Raises the NOT_FOUND exception if it does not exist.
    procedure Load (Object  : in out Node_Ref;
@@ -211,9 +243,12 @@ private
    COL_8_1_NAME : aliased constant String := "kind";
    COL_9_1_NAME : aliased constant String := "deleted";
    COL_10_1_NAME : aliased constant String := "status";
+   COL_11_1_NAME : aliased constant String := "os_name";
+   COL_12_1_NAME : aliased constant String := "os_version";
+   COL_13_1_NAME : aliased constant String := "info_date";
 
    NODE_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 11,
+     (Count   => 14,
       Table   => NODE_NAME'Access,
       Members => (
          1 => COL_0_1_NAME'Access,
@@ -226,7 +261,10 @@ private
          8 => COL_7_1_NAME'Access,
          9 => COL_8_1_NAME'Access,
          10 => COL_9_1_NAME'Access,
-         11 => COL_10_1_NAME'Access)
+         11 => COL_10_1_NAME'Access,
+         12 => COL_11_1_NAME'Access,
+         13 => COL_12_1_NAME'Access,
+         14 => COL_13_1_NAME'Access)
      );
    NODE_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := NODE_DEF'Access;
@@ -262,6 +300,9 @@ private
        Kind : Porion.Nodes.Node_Type;
        Deleted : Boolean;
        Status : Porion.Nodes.Node_Status_Type;
+       Os_Name : Ada.Strings.Unbounded.Unbounded_String;
+       Os_Version : Ada.Strings.Unbounded.Unbounded_String;
+       Info_Date : ADO.Nullable_Time;
    end record;
 
    type Node_Access is access all Node_Impl;

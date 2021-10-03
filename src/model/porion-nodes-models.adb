@@ -74,6 +74,7 @@ package body Porion.Nodes.Models is
       Impl.Kind := Porion.Nodes.Node_Type'First;
       Impl.Deleted := False;
       Impl.Status := Porion.Nodes.Node_Status_Type'First;
+      Impl.Info_Date.Is_Null := True;
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Allocate;
 
@@ -318,6 +319,83 @@ package body Porion.Nodes.Models is
       return Impl.Status;
    end Get_Status;
 
+
+   procedure Set_Os_Name (Object : in out Node_Ref;
+                           Value : in String) is
+      Impl : Node_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_String (Impl.all, 12, Impl.Os_Name, Value);
+   end Set_Os_Name;
+
+   procedure Set_Os_Name (Object : in out Node_Ref;
+                          Value  : in Ada.Strings.Unbounded.Unbounded_String) is
+      Impl : Node_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Unbounded_String (Impl.all, 12, Impl.Os_Name, Value);
+   end Set_Os_Name;
+
+   function Get_Os_Name (Object : in Node_Ref)
+                 return String is
+   begin
+      return Ada.Strings.Unbounded.To_String (Object.Get_Os_Name);
+   end Get_Os_Name;
+   function Get_Os_Name (Object : in Node_Ref)
+                  return Ada.Strings.Unbounded.Unbounded_String is
+      Impl : constant Node_Access
+         := Node_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Os_Name;
+   end Get_Os_Name;
+
+
+   procedure Set_Os_Version (Object : in out Node_Ref;
+                              Value : in String) is
+      Impl : Node_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_String (Impl.all, 13, Impl.Os_Version, Value);
+   end Set_Os_Version;
+
+   procedure Set_Os_Version (Object : in out Node_Ref;
+                             Value  : in Ada.Strings.Unbounded.Unbounded_String) is
+      Impl : Node_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Unbounded_String (Impl.all, 13, Impl.Os_Version, Value);
+   end Set_Os_Version;
+
+   function Get_Os_Version (Object : in Node_Ref)
+                 return String is
+   begin
+      return Ada.Strings.Unbounded.To_String (Object.Get_Os_Version);
+   end Get_Os_Version;
+   function Get_Os_Version (Object : in Node_Ref)
+                  return Ada.Strings.Unbounded.Unbounded_String is
+      Impl : constant Node_Access
+         := Node_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Os_Version;
+   end Get_Os_Version;
+
+
+   procedure Set_Info_Date (Object : in out Node_Ref;
+                            Value  : in ADO.Nullable_Time) is
+      Impl : Node_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Time (Impl.all, 14, Impl.Info_Date, Value);
+   end Set_Info_Date;
+
+   function Get_Info_Date (Object : in Node_Ref)
+                  return ADO.Nullable_Time is
+      Impl : constant Node_Access
+         := Node_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Info_Date;
+   end Get_Info_Date;
+
    --  Copy of the object.
    procedure Copy (Object : in Node_Ref;
                    Into   : in out Node_Ref) is
@@ -342,6 +420,9 @@ package body Porion.Nodes.Models is
             Copy.Kind := Impl.Kind;
             Copy.Deleted := Impl.Deleted;
             Copy.Status := Impl.Status;
+            Copy.Os_Name := Impl.Os_Name;
+            Copy.Os_Version := Impl.Os_Version;
+            Copy.Info_Date := Impl.Info_Date;
          end;
       end if;
       Into := Result;
@@ -521,6 +602,21 @@ package body Porion.Nodes.Models is
                           Value => Integer (Porion.Nodes.Node_Status_Type'Pos (Object.Status)));
          Object.Clear_Modified (11);
       end if;
+      if Object.Is_Modified (12) then
+         Stmt.Save_Field (Name  => COL_11_1_NAME, --  os_name
+                          Value => Object.Os_Name);
+         Object.Clear_Modified (12);
+      end if;
+      if Object.Is_Modified (13) then
+         Stmt.Save_Field (Name  => COL_12_1_NAME, --  os_version
+                          Value => Object.Os_Version);
+         Object.Clear_Modified (13);
+      end if;
+      if Object.Is_Modified (14) then
+         Stmt.Save_Field (Name  => COL_13_1_NAME, --  info_date
+                          Value => Object.Info_Date);
+         Object.Clear_Modified (14);
+      end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
          Stmt.Save_Field (Name  => "version",
@@ -574,6 +670,12 @@ package body Porion.Nodes.Models is
                         Value => Object.Deleted);
       Query.Save_Field (Name  => COL_10_1_NAME, --  status
                         Value => Integer (Porion.Nodes.Node_Status_Type'Pos (Object.Status)));
+      Query.Save_Field (Name  => COL_11_1_NAME, --  os_name
+                        Value => Object.Os_Name);
+      Query.Save_Field (Name  => COL_12_1_NAME, --  os_version
+                        Value => Object.Os_Version);
+      Query.Save_Field (Name  => COL_13_1_NAME, --  info_date
+                        Value => Object.Info_Date);
       Query.Execute (Result);
       if Result /= 1 then
          raise ADO.Objects.INSERT_ERROR;
@@ -630,6 +732,16 @@ package body Porion.Nodes.Models is
          return Util.Beans.Objects.To_Object (Impl.Deleted);
       elsif Name = "status" then
          return Porion.Nodes.Node_Status_Type_Objects.To_Object (Impl.Status);
+      elsif Name = "os_name" then
+         return Util.Beans.Objects.To_Object (Impl.Os_Name);
+      elsif Name = "os_version" then
+         return Util.Beans.Objects.To_Object (Impl.Os_Version);
+      elsif Name = "info_date" then
+         if Impl.Info_Date.Is_Null then
+            return Util.Beans.Objects.Null_Object;
+         else
+            return Util.Beans.Objects.Time.To_Object (Impl.Info_Date.Value);
+         end if;
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -654,6 +766,9 @@ package body Porion.Nodes.Models is
       Object.Kind := Porion.Nodes.Node_Type'Val (Stmt.Get_Integer (8));
       Object.Deleted := Stmt.Get_Boolean (9);
       Object.Status := Porion.Nodes.Node_Status_Type'Val (Stmt.Get_Integer (10));
+      Object.Os_Name := Stmt.Get_Unbounded_String (11);
+      Object.Os_Version := Stmt.Get_Unbounded_String (12);
+      Object.Info_Date := Stmt.Get_Nullable_Time (13);
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);
    end Load;

@@ -194,6 +194,12 @@ CREATE TABLE IF NOT EXISTS porion_node (
   `deleted` TINYINT NOT NULL,
   /* the node status. */
   `status`  NOT NULL,
+  /* the OS name. */
+  `os_name` VARCHAR(255) NOT NULL,
+  /* the OS version or additional information. */
+  `os_version` VARCHAR(255) NOT NULL,
+  /* the date when the node system information was collected. */
+  `info_date` DATETIME ,
   PRIMARY KEY (`id`)
 );
 /*  */

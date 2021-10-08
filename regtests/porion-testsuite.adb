@@ -26,6 +26,7 @@ with Util.Streams.Pipes;
 with Util.Streams.Buffered;
 
 with Porion.Tests;
+with Porion.Projects.Tests;
 with Porion.Sources.Tests;
 with Porion.Tools.Tests;
 with Porion.XUnit.Tests;
@@ -69,6 +70,7 @@ package body Porion.Testsuite is
       Porion.Tools.Tests.Add_Tests (Tests'Access);
       Porion.XUnit.Tests.Add_Tests (Tests'Access);
       Porion.Sources.Tests.Add_Tests (Tests'Access);
+      Porion.Projects.Tests.Add_Tests (Tests'Access);
       return Tests'Access;
    end Suite;
 

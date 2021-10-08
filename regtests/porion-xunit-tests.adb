@@ -84,7 +84,7 @@ package body Porion.XUnit.Tests is
       Builder.Open (Service);
       Config.Set_Branch (Service.Branch);
       Config.Set_Project (Service.Project);
-      Config.Save (Session);
+      Config.Save (Service.DB);
       Builder.Start_Build (Config      => Config,
                            Executor    => Executor);
       Porion.XUnit.Parsers.Scan (Path, Results);

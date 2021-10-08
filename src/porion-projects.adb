@@ -19,9 +19,67 @@
 with Ada.Directories;
 with Util.Log.Loggers;
 with Util.Files;
+with Util.Strings;
 package body Porion.Projects is
 
    Log     : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Projects");
+
+   --  ------------------------------
+   --  Parse an identification string with the format:
+   --   <project>[^<branch>][~<recipe>][@<node]
+   --  Raises the Invalid_Ident exception if the format is invalid.
+   --  ------------------------------
+   function Parse (Ident : in String) return Ident_Type is
+      Result    : Ident_Type;
+      Caret_Pos : Natural;
+      Tilde_Pos : Natural;
+      At_Pos    : Natural;
+   begin
+      Caret_Pos := Util.Strings.Index (Ident, '^');
+      Tilde_Pos := Util.Strings.Index (Ident, '~');
+      At_Pos := Util.Strings.Index (Ident, '@');
+      if Caret_Pos > 0 then
+         Result.Name := To_UString (Ident (Ident'First .. Caret_Pos - 1));
+         if Tilde_Pos = 0 and At_Pos = 0 then
+            Result.Branch := To_UString (Ident (Caret_Pos + 1 .. Ident'Last));
+
+         elsif Tilde_Pos = 0 and At_Pos > Caret_Pos + 1 then
+            Result.Branch := To_UString (Ident (Caret_Pos + 1 .. At_Pos - 1));
+            Result.Node := To_UString (Ident (At_Pos + 1 .. Ident'Last));
+
+         elsif At_Pos = 0 and Tilde_Pos > Caret_Pos + 1 then
+            Result.Branch := To_UString (Ident (Caret_Pos + 1 .. Tilde_Pos - 1));
+            Result.Recipe := To_UString (Ident (Tilde_Pos + 1 .. Ident'Last));
+
+         elsif Tilde_Pos > Caret_Pos + 1 and At_Pos > Tilde_Pos + 1 then
+            Result.Branch := To_UString (Ident (Caret_Pos + 1 .. Tilde_Pos - 1));
+            Result.Recipe := To_UString (Ident (Tilde_Pos + 1 .. At_Pos - 1));
+            Result.Node := To_UString (Ident (At_Pos + 1 .. Ident'Last));
+         else
+            raise Invalid_Ident;
+         end if;
+
+      elsif Tilde_Pos > 0 then
+         Result.Name := To_UString (Ident (Ident'First .. Tilde_Pos - 1));
+         if At_Pos = 0 then
+            Result.Recipe := To_UString (Ident (Tilde_Pos + 1 .. Ident'Last));
+         elsif At_Pos > Tilde_Pos + 1 then
+            Result.Recipe := To_UString (Ident (Tilde_Pos + 1 .. At_Pos - 1));
+            Result.Node := To_UString (Ident (At_Pos + 1 .. Ident'Last));
+         else
+            raise Invalid_Ident;
+         end if;
+
+      elsif At_Pos > 0 then
+         Result.Name := To_UString (Ident (Ident'First .. At_Pos - 1));
+         Result.Node := To_UString (Ident (At_Pos + 1 .. Ident'Last));
+
+      else
+         Result.Name := To_UString (Ident);
+      end if;
+
+      return Result;
+   end Parse;
 
    --  Load the project description.
    procedure Load_Project (Name    : in String;

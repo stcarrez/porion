@@ -19,7 +19,21 @@
 with Porion.Configs;
 package Porion.Projects is
 
+   Invalid_Ident : exception;
+
    subtype Config_Type is Porion.Configs.Config_Type;
+
+   type Ident_Type is record
+      Name   : UString;
+      Branch : UString;
+      Recipe : UString;
+      Node   : UString;
+   end record;
+
+   --  Parse an identification string with the format:
+   --   <project>[^<branch>][~<recipe>][@<node]
+   --  Raises the Invalid_Ident exception if the format is invalid.
+   function Parse (Ident : in String) return Ident_Type;
 
    type Project_Type is record
       Name    : UString;

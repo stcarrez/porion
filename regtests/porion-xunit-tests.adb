@@ -52,7 +52,7 @@ package body Porion.XUnit.Tests is
       Build     : Porion.Builds.Models.Build_Ref;
       Session   : ADO.Sessions.Master_Session;
       Executor  : Porion.Executors.Executor_Type;
-      Config    : Porion.Builds.Models.Build_Config_Ref;
+      Recipe    : Porion.Builds.Models.Recipe_Ref;
       Schema : constant Porion.Resources.Content_Access
         := Porion.Resources.Schema.Get_Content ("create-porion_agent-sqlite");
    begin
@@ -82,10 +82,10 @@ package body Porion.XUnit.Tests is
       end;
       Service.Add_Branch ("master", Branch, True);
       Builder.Open (Service);
-      Config.Set_Branch (Service.Branch);
-      Config.Set_Project (Service.Project);
-      Config.Save (Service.DB);
-      Builder.Start_Build (Config      => Config,
+      Recipe.Set_Branch (Service.Branch);
+      Recipe.Set_Project (Service.Project);
+      Recipe.Save (Service.DB);
+      Builder.Start_Build (Recipe      => Recipe,
                            Executor    => Executor);
       Porion.XUnit.Parsers.Scan (Path, Results);
       Porion.XUnit.Parsers.Scan (Path2, Results);

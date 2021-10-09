@@ -103,6 +103,10 @@ package Porion.Builds.Services is
                                 Branch   : in String;
                                 Executor : in out Porion.Executors.Executor_Type'Class);
 
+   procedure Copy_Recipe (Service  : in out Context_Type;
+                          Branch   : in String;
+                          Node     : in String);
+
    procedure Guess (Service  : in out Context_Type;
                     Path     : in String;
                     Executor : in out Porion.Executors.Executor_Type'Class);

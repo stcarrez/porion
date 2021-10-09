@@ -30,7 +30,7 @@ private with Util.Strings.Maps;
 package Porion.Builds.Services is
 
    type Build_Step is record
-      Step   : Porion.Builds.Models.Build_Config_Step_Ref;
+      Step   : Porion.Builds.Models.Recipe_Step_Ref;
       Config : Porion.Configs.Config_Type;
    end record;
 
@@ -41,7 +41,7 @@ package Porion.Builds.Services is
    subtype Build_Step_Cursor is Build_Step_Vectors.Cursor;
 
    type Build_Config is record
-      Config : Porion.Builds.Models.Build_Config_Ref;
+      Config : Porion.Builds.Models.Recipe_Ref;
       Steps  : Build_Step_Vector;
    end record;
 
@@ -54,18 +54,18 @@ package Porion.Builds.Services is
    type Context_Type is limited new Porion.Services.Context_Type with private;
 
    procedure Build (Service     : in out Context_Type;
-                    Config      : in Porion.Builds.Models.Build_Config_Ref;
+                    Recipe      : in Porion.Builds.Models.Recipe_Ref;
                     Executor    : in out Porion.Executors.Executor_Type'Class) with
-     Pre => Service.Has_Project and Config.Is_Loaded;
+     Pre => Service.Has_Project and Recipe.Is_Loaded;
 
    procedure Start_Build (Service     : in out Context_Type;
-                          Config      : in Porion.Builds.Models.Build_Config_Ref;
+                          Recipe      : in Porion.Builds.Models.Recipe_Ref;
                           Executor    : in out Porion.Executors.Executor_Type'Class) with
      Pre => Service.Has_Project;
 
    function Get_Build (Service : in Context_Type) return Porion.Builds.Models.Build_Ref;
 
-   procedure Load_Config (Service : in out Context_Type) with
+   procedure Load_Recipe (Service : in out Context_Type) with
      Pre => Service.Has_Project;
 
    --  Delete the build step at the given execution order.
@@ -85,12 +85,12 @@ package Porion.Builds.Services is
                      Stream  : in out Util.Serialize.IO.Output_Stream'Class);
 
    --  Export some information about the project in the output stream.
-   procedure Export (Service      : in out Context_Type;
-                     Build_Config : in Porion.Builds.Models.Build_Config_Ref;
-                     Stream       : in out Util.Serialize.IO.Output_Stream'Class);
+   procedure Export (Service : in out Context_Type;
+                     Recipe  : in Porion.Builds.Models.Recipe_Ref;
+                     Stream  : in out Util.Serialize.IO.Output_Stream'Class);
 
    procedure Update_Parameters (Service : in out Context_Type;
-                                Step    : in out Builds.Models.Build_Config_Step_Ref;
+                                Step    : in out Builds.Models.Recipe_Step_Ref;
                                 Config  : in out Porion.Configs.Config_Type);
 
    procedure Update (Service : in out Context_Type;
@@ -113,7 +113,7 @@ package Porion.Builds.Services is
 
    procedure Find_Build_Configs (Service : in out Context_Type;
                                  Force   : in Boolean;
-                                 List    : in out Porion.Builds.Models.Build_Config_Vector);
+                                 List    : in out Porion.Builds.Models.Recipe_Vector);
 
    procedure Update_Branch_Config (Branch  : in Porion.Projects.Models.Branch_Ref;
                                    Status  : in Porion.Builds.Models.Config_Status_Type;
@@ -126,7 +126,6 @@ private
       Build_Controller  : Porion.Builders.Controller_Access;
       Environments      : Util.Strings.Maps.Map;
       Steps             : Build_Step_Vector;
-      -- Last_Build        : Porion.Builds.Models.Last_Build_Ref;
    end record;
 
    procedure Build (Service     : in out Context_Type;

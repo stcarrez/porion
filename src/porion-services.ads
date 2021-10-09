@@ -35,7 +35,7 @@ package Porion.Services is
       Branch            : Porion.Projects.Models.Branch_Ref;
       Build             : Porion.Builds.Models.Build_Ref;
       Build_Node        : Porion.Nodes.Models.Node_Ref;
-      Build_Config      : Porion.Builds.Models.Build_Config_Ref;
+      Build_Config      : Porion.Builds.Models.Recipe_Ref;
       Dry_Run           : Boolean := False;
    end record;
 

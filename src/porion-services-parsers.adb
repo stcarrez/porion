@@ -173,13 +173,13 @@ package body Porion.Services.Parsers is
 
             when BUILD_STEP_END =>
                N.Config.Steps.Append (N.Step);
-               N.Step.Step := Porion.Builds.Models.Null_Build_Config_Step;
+               N.Step.Step := Porion.Builds.Models.Null_Recipe_Step;
                N.Step.Config := Porion.Configs.Null_Config;
 
             when BUILD_CONFIG_END =>
                Result.Build_Configs.Append (N.Config);
                N.Config.Steps.Clear;
-               N.Config.Config := Porion.Builds.Models.Null_Build_Config;
+               N.Config.Config := Porion.Builds.Models.Null_Recipe;
 
          end case;
       end Set_Member;
@@ -203,21 +203,21 @@ package body Porion.Services.Parsers is
 
       Mapper.Add_Mapping ("scm", PROJECT_SCM);
       Mapper.Add_Mapping ("scm_url", PROJECT_SCM_URL);
-      Mapper.Add_Mapping ("build_config/@id", BUILD_CONFIG_ID);
-      Mapper.Add_Mapping ("build_config/@version", BUILD_CONFIG_VERSION);
-      Mapper.Add_Mapping ("build_config/node/@id", NODE_ID);
-      Mapper.Add_Mapping ("build_config/step/@id", BUILD_STEP_ID);
-      Mapper.Add_Mapping ("build_config/step/@version", BUILD_STEP_VERSION);
-      Mapper.Add_Mapping ("build_config/step/number", BUILD_STEP_NUMBER);
-      Mapper.Add_Mapping ("build_config/step/timeout", BUILD_STEP_TIMEOUT);
-      Mapper.Add_Mapping ("build_config/step/builder", BUILD_STEP_BUILDER);
-      Mapper.Add_Mapping ("build_config/step/execution", BUILD_STEP_EXECUTION);
-      Mapper.Add_Mapping ("build_config/step/step", BUILD_STEP_STEP);
-      Mapper.Add_Mapping ("build_config/step/parameters/parameter/@name", BUILD_PARAM_NAME);
-      Mapper.Add_Mapping ("build_config/step/parameters/parameter/value", BUILD_PARAM_VALUE);
-      Mapper.Add_Mapping ("build_config/step/parameters/parameter", BUILD_PARAM_END);
-      Mapper.Add_Mapping ("build_config/step", BUILD_STEP_END);
-      Mapper.Add_Mapping ("build_config", BUILD_CONFIG_END);
+      Mapper.Add_Mapping ("recipe/@id", BUILD_CONFIG_ID);
+      Mapper.Add_Mapping ("recipe/@version", BUILD_CONFIG_VERSION);
+      Mapper.Add_Mapping ("recipe/node/@id", NODE_ID);
+      Mapper.Add_Mapping ("recipe/step/@id", BUILD_STEP_ID);
+      Mapper.Add_Mapping ("recipe/step/@version", BUILD_STEP_VERSION);
+      Mapper.Add_Mapping ("recipe/step/number", BUILD_STEP_NUMBER);
+      Mapper.Add_Mapping ("recipe/step/timeout", BUILD_STEP_TIMEOUT);
+      Mapper.Add_Mapping ("recipe/step/builder", BUILD_STEP_BUILDER);
+      Mapper.Add_Mapping ("recipe/step/execution", BUILD_STEP_EXECUTION);
+      Mapper.Add_Mapping ("recipe/step/step", BUILD_STEP_STEP);
+      Mapper.Add_Mapping ("recipe/step/parameters/parameter/@name", BUILD_PARAM_NAME);
+      Mapper.Add_Mapping ("recipe/step/parameters/parameter/value", BUILD_PARAM_VALUE);
+      Mapper.Add_Mapping ("recipe/step/parameters/parameter", BUILD_PARAM_END);
+      Mapper.Add_Mapping ("recipe/step", BUILD_STEP_END);
+      Mapper.Add_Mapping ("recipe", BUILD_CONFIG_END);
 
       Project_Mapper.Set_Context (Parser, Config'Unchecked_Access);
       Parser.Add_Mapping ("project", Mapper'Unchecked_Access);

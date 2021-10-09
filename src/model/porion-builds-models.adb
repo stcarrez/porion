@@ -34,556 +34,6 @@ package body Porion.Builds.Models is
    use type ADO.Objects.Object_Record_Access;
    use type ADO.Objects.Object_Ref;
 
-   function Build_Config_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key is
-      Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
-                                       Of_Class => BUILD_CONFIG_DEF'Access);
-   begin
-      ADO.Objects.Set_Value (Result, Id);
-      return Result;
-   end Build_Config_Key;
-
-   function Build_Config_Key (Id : in String) return ADO.Objects.Object_Key is
-      Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
-                                       Of_Class => BUILD_CONFIG_DEF'Access);
-   begin
-      ADO.Objects.Set_Value (Result, Id);
-      return Result;
-   end Build_Config_Key;
-
-   function "=" (Left, Right : Build_Config_Ref'Class) return Boolean is
-   begin
-      return ADO.Objects.Object_Ref'Class (Left) = ADO.Objects.Object_Ref'Class (Right);
-   end "=";
-
-   procedure Set_Field (Object : in out Build_Config_Ref'Class;
-                        Impl   : out Build_Config_Access) is
-      Result : ADO.Objects.Object_Record_Access;
-   begin
-      Object.Prepare_Modify (Result);
-      Impl := Build_Config_Impl (Result.all)'Access;
-   end Set_Field;
-
-   --  Internal method to allocate the Object_Record instance
-   procedure Allocate (Object : in out Build_Config_Ref) is
-      Impl : Build_Config_Access;
-   begin
-      Impl := new Build_Config_Impl;
-      Impl.Version := 0;
-      Impl.Status := Porion.Builds.Models.Config_Status_Type'First;
-      Impl.Rate_Factor := 0;
-      ADO.Objects.Set_Object (Object, Impl.all'Access);
-   end Allocate;
-
-   -- ----------------------------------------
-   --  Data object: Build_Config
-   -- ----------------------------------------
-
-   procedure Set_Id (Object : in out Build_Config_Ref;
-                     Value  : in ADO.Identifier) is
-      Impl : Build_Config_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Key_Value (Impl.all, 1, Value);
-   end Set_Id;
-
-   function Get_Id (Object : in Build_Config_Ref)
-                  return ADO.Identifier is
-      Impl : constant Build_Config_Access
-         := Build_Config_Impl (Object.Get_Object.all)'Access;
-   begin
-      return Impl.Get_Key_Value;
-   end Get_Id;
-
-
-   function Get_Version (Object : in Build_Config_Ref)
-                  return Integer is
-      Impl : constant Build_Config_Access
-         := Build_Config_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Version;
-   end Get_Version;
-
-
-   procedure Set_Name (Object : in out Build_Config_Ref;
-                        Value : in String) is
-      Impl : Build_Config_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Audits.Set_Field_String (Impl.all, 3, Impl.Name, Value);
-   end Set_Name;
-
-   procedure Set_Name (Object : in out Build_Config_Ref;
-                       Value  : in Ada.Strings.Unbounded.Unbounded_String) is
-      Impl : Build_Config_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Audits.Set_Field_Unbounded_String (Impl.all, 3, Impl.Name, Value);
-   end Set_Name;
-
-   function Get_Name (Object : in Build_Config_Ref)
-                 return String is
-   begin
-      return Ada.Strings.Unbounded.To_String (Object.Get_Name);
-   end Get_Name;
-   function Get_Name (Object : in Build_Config_Ref)
-                  return Ada.Strings.Unbounded.Unbounded_String is
-      Impl : constant Build_Config_Access
-         := Build_Config_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Name;
-   end Get_Name;
-
-
-   procedure Set_Description (Object : in out Build_Config_Ref;
-                               Value : in String) is
-      Impl : Build_Config_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Audits.Set_Field_String (Impl.all, 4, Impl.Description, Value);
-   end Set_Description;
-
-   procedure Set_Description (Object : in out Build_Config_Ref;
-                              Value  : in Ada.Strings.Unbounded.Unbounded_String) is
-      Impl : Build_Config_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Audits.Set_Field_Unbounded_String (Impl.all, 4, Impl.Description, Value);
-   end Set_Description;
-
-   function Get_Description (Object : in Build_Config_Ref)
-                 return String is
-   begin
-      return Ada.Strings.Unbounded.To_String (Object.Get_Description);
-   end Get_Description;
-   function Get_Description (Object : in Build_Config_Ref)
-                  return Ada.Strings.Unbounded.Unbounded_String is
-      Impl : constant Build_Config_Access
-         := Build_Config_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Description;
-   end Get_Description;
-
-
-   procedure Set_Status (Object : in out Build_Config_Ref;
-                         Value  : in Porion.Builds.Models.Config_Status_Type) is
-      procedure Set_Field_Enum is
-        new ADO.Audits.Set_Field_Operation
-          (Porion.Builds.Models.Config_Status_Type,
-           Porion.Builds.Models.Config_Status_Type_Objects.To_Object);
-      Impl : Build_Config_Access;
-   begin
-      Set_Field (Object, Impl);
-      Set_Field_Enum (Impl.all, 5, Impl.Status, Value);
-   end Set_Status;
-
-   function Get_Status (Object : in Build_Config_Ref)
-                  return Porion.Builds.Models.Config_Status_Type is
-      Impl : constant Build_Config_Access
-         := Build_Config_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Status;
-   end Get_Status;
-
-
-   procedure Set_Rate_Factor (Object : in out Build_Config_Ref;
-                              Value  : in Integer) is
-      Impl : Build_Config_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Audits.Set_Field_Integer (Impl.all, 6, Impl.Rate_Factor, Value);
-   end Set_Rate_Factor;
-
-   function Get_Rate_Factor (Object : in Build_Config_Ref)
-                  return Integer is
-      Impl : constant Build_Config_Access
-         := Build_Config_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Rate_Factor;
-   end Get_Rate_Factor;
-
-
-   procedure Set_Node (Object : in out Build_Config_Ref;
-                       Value  : in Porion.Nodes.Models.Node_Ref'Class) is
-      Impl : Build_Config_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 7, Impl.Node, Value);
-   end Set_Node;
-
-   function Get_Node (Object : in Build_Config_Ref)
-                  return Porion.Nodes.Models.Node_Ref'Class is
-      Impl : constant Build_Config_Access
-         := Build_Config_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Node;
-   end Get_Node;
-
-
-   procedure Set_Branch (Object : in out Build_Config_Ref;
-                         Value  : in Porion.Projects.Models.Branch_Ref'Class) is
-      Impl : Build_Config_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 8, Impl.Branch, Value);
-   end Set_Branch;
-
-   function Get_Branch (Object : in Build_Config_Ref)
-                  return Porion.Projects.Models.Branch_Ref'Class is
-      Impl : constant Build_Config_Access
-         := Build_Config_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Branch;
-   end Get_Branch;
-
-
-   procedure Set_Project (Object : in out Build_Config_Ref;
-                          Value  : in Porion.Projects.Models.Project_Ref'Class) is
-      Impl : Build_Config_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 9, Impl.Project, Value);
-   end Set_Project;
-
-   function Get_Project (Object : in Build_Config_Ref)
-                  return Porion.Projects.Models.Project_Ref'Class is
-      Impl : constant Build_Config_Access
-         := Build_Config_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Project;
-   end Get_Project;
-
-   --  Copy of the object.
-   procedure Copy (Object : in Build_Config_Ref;
-                   Into   : in out Build_Config_Ref) is
-      Result : Build_Config_Ref;
-   begin
-      if not Object.Is_Null then
-         declare
-            Impl : constant Build_Config_Access
-              := Build_Config_Impl (Object.Get_Load_Object.all)'Access;
-            Copy : constant Build_Config_Access
-              := new Build_Config_Impl;
-         begin
-            ADO.Objects.Set_Object (Result, Copy.all'Access);
-            Copy.Copy (Impl.all);
-            Copy.Version := Impl.Version;
-            Copy.Name := Impl.Name;
-            Copy.Description := Impl.Description;
-            Copy.Status := Impl.Status;
-            Copy.Rate_Factor := Impl.Rate_Factor;
-            Copy.Node := Impl.Node;
-            Copy.Branch := Impl.Branch;
-            Copy.Project := Impl.Project;
-         end;
-      end if;
-      Into := Result;
-   end Copy;
-
-   procedure Find (Object  : in out Build_Config_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Query   : in ADO.SQL.Query'Class;
-                   Found   : out Boolean) is
-      Impl  : constant Build_Config_Access := new Build_Config_Impl;
-   begin
-      Impl.Find (Session, Query, Found);
-      if Found then
-         ADO.Objects.Set_Object (Object, Impl.all'Access);
-      else
-         ADO.Objects.Set_Object (Object, null);
-         Destroy (Impl);
-      end if;
-   end Find;
-
-   procedure Load (Object  : in out Build_Config_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Id      : in ADO.Identifier) is
-      Impl  : constant Build_Config_Access := new Build_Config_Impl;
-      Found : Boolean;
-      Query : ADO.SQL.Query;
-   begin
-      Query.Bind_Param (Position => 1, Value => Id);
-      Query.Set_Filter ("id = ?");
-      Impl.Find (Session, Query, Found);
-      if not Found then
-         Destroy (Impl);
-         raise ADO.Objects.NOT_FOUND;
-      end if;
-      ADO.Objects.Set_Object (Object, Impl.all'Access);
-   end Load;
-
-   procedure Load (Object  : in out Build_Config_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Id      : in ADO.Identifier;
-                   Found   : out Boolean) is
-      Impl  : constant Build_Config_Access := new Build_Config_Impl;
-      Query : ADO.SQL.Query;
-   begin
-      Query.Bind_Param (Position => 1, Value => Id);
-      Query.Set_Filter ("id = ?");
-      Impl.Find (Session, Query, Found);
-      if not Found then
-         Destroy (Impl);
-      else
-         ADO.Objects.Set_Object (Object, Impl.all'Access);
-      end if;
-   end Load;
-
-   procedure Save (Object  : in out Build_Config_Ref;
-                   Session : in out ADO.Sessions.Master_Session'Class) is
-      Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;
-   begin
-      if Impl = null then
-         Impl := new Build_Config_Impl;
-         ADO.Objects.Set_Object (Object, Impl);
-      end if;
-      if not ADO.Objects.Is_Created (Impl.all) then
-         Impl.Create (Session);
-      else
-         Impl.Save (Session);
-      end if;
-   end Save;
-
-   procedure Delete (Object  : in out Build_Config_Ref;
-                     Session : in out ADO.Sessions.Master_Session'Class) is
-      Impl : constant ADO.Objects.Object_Record_Access := Object.Get_Object;
-   begin
-      if Impl /= null then
-         Impl.Delete (Session);
-      end if;
-   end Delete;
-
-   --  --------------------
-   --  Free the object
-   --  --------------------
-   procedure Destroy (Object : access Build_Config_Impl) is
-      type Build_Config_Impl_Ptr is access all Build_Config_Impl;
-      procedure Unchecked_Free is new Ada.Unchecked_Deallocation
-              (Build_Config_Impl, Build_Config_Impl_Ptr);
-      pragma Warnings (Off, "*redundant conversion*");
-      Ptr : Build_Config_Impl_Ptr := Build_Config_Impl (Object.all)'Access;
-      pragma Warnings (On, "*redundant conversion*");
-   begin
-      Unchecked_Free (Ptr);
-   end Destroy;
-
-   procedure Find (Object  : in out Build_Config_Impl;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Query   : in ADO.SQL.Query'Class;
-                   Found   : out Boolean) is
-      Stmt : ADO.Statements.Query_Statement
-          := Session.Create_Statement (Query, BUILD_CONFIG_DEF'Access);
-   begin
-      Stmt.Execute;
-      if Stmt.Has_Elements then
-         Object.Load (Stmt, Session);
-         Stmt.Next;
-         Found := not Stmt.Has_Elements;
-      else
-         Found := False;
-      end if;
-   end Find;
-
-   overriding
-   procedure Load (Object  : in out Build_Config_Impl;
-                   Session : in out ADO.Sessions.Session'Class) is
-      Found : Boolean;
-      Query : ADO.SQL.Query;
-      Id    : constant ADO.Identifier := Object.Get_Key_Value;
-   begin
-      Query.Bind_Param (Position => 1, Value => Id);
-      Query.Set_Filter ("id = ?");
-      Object.Find (Session, Query, Found);
-      if not Found then
-         raise ADO.Objects.NOT_FOUND;
-      end if;
-   end Load;
-
-   procedure Save (Object  : in out Build_Config_Impl;
-                   Session : in out ADO.Sessions.Master_Session'Class) is
-      Stmt : ADO.Statements.Update_Statement
-         := Session.Create_Statement (BUILD_CONFIG_DEF'Access);
-   begin
-      if Object.Is_Modified (1) then
-         Stmt.Save_Field (Name  => COL_0_1_NAME, --  id
-                          Value => Object.Get_Key);
-         Object.Clear_Modified (1);
-      end if;
-      if Object.Is_Modified (3) then
-         Stmt.Save_Field (Name  => COL_2_1_NAME, --  name
-                          Value => Object.Name);
-         Object.Clear_Modified (3);
-      end if;
-      if Object.Is_Modified (4) then
-         Stmt.Save_Field (Name  => COL_3_1_NAME, --  description
-                          Value => Object.Description);
-         Object.Clear_Modified (4);
-      end if;
-      if Object.Is_Modified (5) then
-         Stmt.Save_Field (Name  => COL_4_1_NAME, --  status
-                          Value => Integer (Porion.Builds.Models.Config_Status_Type'Pos (Object.Status)));
-         Object.Clear_Modified (5);
-      end if;
-      if Object.Is_Modified (6) then
-         Stmt.Save_Field (Name  => COL_5_1_NAME, --  rate_factor
-                          Value => Object.Rate_Factor);
-         Object.Clear_Modified (6);
-      end if;
-      if Object.Is_Modified (7) then
-         Stmt.Save_Field (Name  => COL_6_1_NAME, --  node_id
-                          Value => Object.Node);
-         Object.Clear_Modified (7);
-      end if;
-      if Object.Is_Modified (8) then
-         Stmt.Save_Field (Name  => COL_7_1_NAME, --  branch_id
-                          Value => Object.Branch);
-         Object.Clear_Modified (8);
-      end if;
-      if Object.Is_Modified (9) then
-         Stmt.Save_Field (Name  => COL_8_1_NAME, --  project_id
-                          Value => Object.Project);
-         Object.Clear_Modified (9);
-      end if;
-      if Stmt.Has_Save_Fields then
-         Object.Version := Object.Version + 1;
-         Stmt.Save_Field (Name  => "version",
-                          Value => Object.Version);
-         Stmt.Set_Filter (Filter => "id = ? and version = ?");
-         Stmt.Add_Param (Value => Object.Get_Key);
-         Stmt.Add_Param (Value => Object.Version - 1);
-         declare
-            Result : Integer;
-         begin
-            Stmt.Execute (Result);
-            if Result /= 1 then
-               if Result /= 0 then
-                  raise ADO.Objects.UPDATE_ERROR;
-               else
-                  raise ADO.Objects.LAZY_LOCK;
-               end if;
-            end if;
-            ADO.Audits.Save (Object, Session);
-         end;
-      end if;
-   end Save;
-
-   procedure Create (Object  : in out Build_Config_Impl;
-                     Session : in out ADO.Sessions.Master_Session'Class) is
-      Query : ADO.Statements.Insert_Statement
-                  := Session.Create_Statement (BUILD_CONFIG_DEF'Access);
-      Result : Integer;
-   begin
-      Object.Version := 1;
-      Session.Allocate (Id => Object);
-      Query.Save_Field (Name  => COL_0_1_NAME, --  id
-                        Value => Object.Get_Key);
-      Query.Save_Field (Name  => COL_1_1_NAME, --  version
-                        Value => Object.Version);
-      Query.Save_Field (Name  => COL_2_1_NAME, --  name
-                        Value => Object.Name);
-      Query.Save_Field (Name  => COL_3_1_NAME, --  description
-                        Value => Object.Description);
-      Query.Save_Field (Name  => COL_4_1_NAME, --  status
-                        Value => Integer (Porion.Builds.Models.Config_Status_Type'Pos (Object.Status)));
-      Query.Save_Field (Name  => COL_5_1_NAME, --  rate_factor
-                        Value => Object.Rate_Factor);
-      Query.Save_Field (Name  => COL_6_1_NAME, --  node_id
-                        Value => Object.Node);
-      Query.Save_Field (Name  => COL_7_1_NAME, --  branch_id
-                        Value => Object.Branch);
-      Query.Save_Field (Name  => COL_8_1_NAME, --  project_id
-                        Value => Object.Project);
-      Query.Execute (Result);
-      if Result /= 1 then
-         raise ADO.Objects.INSERT_ERROR;
-      end if;
-      ADO.Objects.Set_Created (Object);
-      ADO.Audits.Save (Object, Session);
-   end Create;
-
-   procedure Delete (Object  : in out Build_Config_Impl;
-                     Session : in out ADO.Sessions.Master_Session'Class) is
-      Stmt : ADO.Statements.Delete_Statement
-         := Session.Create_Statement (BUILD_CONFIG_DEF'Access);
-   begin
-      Stmt.Set_Filter (Filter => "id = ?");
-      Stmt.Add_Param (Value => Object.Get_Key);
-      Stmt.Execute;
-   end Delete;
-
-   --  ------------------------------
-   --  Get the bean attribute identified by the name.
-   --  ------------------------------
-   overriding
-   function Get_Value (From : in Build_Config_Ref;
-                       Name : in String) return Util.Beans.Objects.Object is
-      Obj  : ADO.Objects.Object_Record_Access;
-      Impl : access Build_Config_Impl;
-   begin
-      if From.Is_Null then
-         return Util.Beans.Objects.Null_Object;
-      end if;
-      Obj := From.Get_Load_Object;
-      Impl := Build_Config_Impl (Obj.all)'Access;
-      if Name = "id" then
-         return ADO.Objects.To_Object (Impl.Get_Key);
-      elsif Name = "name" then
-         return Util.Beans.Objects.To_Object (Impl.Name);
-      elsif Name = "description" then
-         return Util.Beans.Objects.To_Object (Impl.Description);
-      elsif Name = "status" then
-         return Porion.Builds.Models.Config_Status_Type_Objects.To_Object (Impl.Status);
-      elsif Name = "rate_factor" then
-         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Rate_Factor));
-      end if;
-      return Util.Beans.Objects.Null_Object;
-   end Get_Value;
-
-
-   procedure List (Object  : in out Build_Config_Vector;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Query   : in ADO.SQL.Query'Class) is
-      Stmt : ADO.Statements.Query_Statement
-        := Session.Create_Statement (Query, BUILD_CONFIG_DEF'Access);
-   begin
-      Stmt.Execute;
-      Build_Config_Vectors.Clear (Object);
-      while Stmt.Has_Elements loop
-         declare
-            Item : Build_Config_Ref;
-            Impl : constant Build_Config_Access := new Build_Config_Impl;
-         begin
-            Impl.Load (Stmt, Session);
-            ADO.Objects.Set_Object (Item, Impl.all'Access);
-            Object.Append (Item);
-         end;
-         Stmt.Next;
-      end loop;
-   end List;
-
-   --  ------------------------------
-   --  Load the object from current iterator position
-   --  ------------------------------
-   procedure Load (Object  : in out Build_Config_Impl;
-                   Stmt    : in out ADO.Statements.Query_Statement'Class;
-                   Session : in out ADO.Sessions.Session'Class) is
-   begin
-      Object.Set_Key_Value (Stmt.Get_Identifier (0));
-      Object.Name := Stmt.Get_Unbounded_String (2);
-      Object.Description := Stmt.Get_Unbounded_String (3);
-      Object.Status := Porion.Builds.Models.Config_Status_Type'Val (Stmt.Get_Integer (4));
-      Object.Rate_Factor := Stmt.Get_Integer (5);
-      if not Stmt.Is_Null (6) then
-         Object.Node.Set_Key_Value (Stmt.Get_Identifier (6), Session);
-      end if;
-      if not Stmt.Is_Null (7) then
-         Object.Branch.Set_Key_Value (Stmt.Get_Identifier (7), Session);
-      end if;
-      if not Stmt.Is_Null (8) then
-         Object.Project.Set_Key_Value (Stmt.Get_Identifier (8), Session);
-      end if;
-      Object.Version := Stmt.Get_Integer (1);
-      ADO.Objects.Set_Created (Object);
-   end Load;
    function Build_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key is
       Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
                                        Of_Class => BUILD_DEF'Access);
@@ -846,21 +296,21 @@ package body Porion.Builds.Models is
    end Get_Branch;
 
 
-   procedure Set_Build_Config (Object : in out Build_Ref;
-                               Value  : in Porion.Builds.Models.Build_Config_Ref'Class) is
+   procedure Set_Recipe (Object : in out Build_Ref;
+                         Value  : in Porion.Builds.Models.Recipe_Ref'Class) is
       Impl : Build_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 13, Impl.Build_Config, Value);
-   end Set_Build_Config;
+      ADO.Objects.Set_Field_Object (Impl.all, 13, Impl.Recipe, Value);
+   end Set_Recipe;
 
-   function Get_Build_Config (Object : in Build_Ref)
-                  return Porion.Builds.Models.Build_Config_Ref'Class is
+   function Get_Recipe (Object : in Build_Ref)
+                  return Porion.Builds.Models.Recipe_Ref'Class is
       Impl : constant Build_Access
          := Build_Impl (Object.Get_Load_Object.all)'Access;
    begin
-      return Impl.Build_Config;
-   end Get_Build_Config;
+      return Impl.Recipe;
+   end Get_Recipe;
 
 
    procedure Set_Node (Object : in out Build_Ref;
@@ -921,7 +371,7 @@ package body Porion.Builds.Models is
             Copy.Status := Impl.Status;
             Copy.Tag := Impl.Tag;
             Copy.Branch := Impl.Branch;
-            Copy.Build_Config := Impl.Build_Config;
+            Copy.Recipe := Impl.Recipe;
             Copy.Node := Impl.Node;
             Copy.Project := Impl.Project;
          end;
@@ -1054,62 +504,62 @@ package body Porion.Builds.Models is
          := Session.Create_Statement (BUILD_DEF'Access);
    begin
       if Object.Is_Modified (1) then
-         Stmt.Save_Field (Name  => COL_0_2_NAME, --  id
+         Stmt.Save_Field (Name  => COL_0_1_NAME, --  id
                           Value => Object.Get_Key);
          Object.Clear_Modified (1);
       end if;
       if Object.Is_Modified (5) then
-         Stmt.Save_Field (Name  => COL_4_2_NAME, --  finish_date
+         Stmt.Save_Field (Name  => COL_4_1_NAME, --  finish_date
                           Value => Object.Finish_Date);
          Object.Clear_Modified (5);
       end if;
       if Object.Is_Modified (6) then
-         Stmt.Save_Field (Name  => COL_5_2_NAME, --  pass_count
+         Stmt.Save_Field (Name  => COL_5_1_NAME, --  pass_count
                           Value => Object.Pass_Count);
          Object.Clear_Modified (6);
       end if;
       if Object.Is_Modified (7) then
-         Stmt.Save_Field (Name  => COL_6_2_NAME, --  fail_count
+         Stmt.Save_Field (Name  => COL_6_1_NAME, --  fail_count
                           Value => Object.Fail_Count);
          Object.Clear_Modified (7);
       end if;
       if Object.Is_Modified (8) then
-         Stmt.Save_Field (Name  => COL_7_2_NAME, --  timeout_count
+         Stmt.Save_Field (Name  => COL_7_1_NAME, --  timeout_count
                           Value => Object.Timeout_Count);
          Object.Clear_Modified (8);
       end if;
       if Object.Is_Modified (9) then
-         Stmt.Save_Field (Name  => COL_8_2_NAME, --  test_duration
+         Stmt.Save_Field (Name  => COL_8_1_NAME, --  test_duration
                           Value => Object.Test_Duration);
          Object.Clear_Modified (9);
       end if;
       if Object.Is_Modified (10) then
-         Stmt.Save_Field (Name  => COL_9_2_NAME, --  status
+         Stmt.Save_Field (Name  => COL_9_1_NAME, --  status
                           Value => Integer (Porion.Builds.Models.Build_Status_Type'Pos (Object.Status)));
          Object.Clear_Modified (10);
       end if;
       if Object.Is_Modified (11) then
-         Stmt.Save_Field (Name  => COL_10_2_NAME, --  tag
+         Stmt.Save_Field (Name  => COL_10_1_NAME, --  tag
                           Value => Object.Tag);
          Object.Clear_Modified (11);
       end if;
       if Object.Is_Modified (12) then
-         Stmt.Save_Field (Name  => COL_11_2_NAME, --  branch_id
+         Stmt.Save_Field (Name  => COL_11_1_NAME, --  branch_id
                           Value => Object.Branch);
          Object.Clear_Modified (12);
       end if;
       if Object.Is_Modified (13) then
-         Stmt.Save_Field (Name  => COL_12_2_NAME, --  build_config_id
-                          Value => Object.Build_Config);
+         Stmt.Save_Field (Name  => COL_12_1_NAME, --  recipe_id
+                          Value => Object.Recipe);
          Object.Clear_Modified (13);
       end if;
       if Object.Is_Modified (14) then
-         Stmt.Save_Field (Name  => COL_13_2_NAME, --  node_id
+         Stmt.Save_Field (Name  => COL_13_1_NAME, --  node_id
                           Value => Object.Node);
          Object.Clear_Modified (14);
       end if;
       if Object.Is_Modified (15) then
-         Stmt.Save_Field (Name  => COL_14_2_NAME, --  project_id
+         Stmt.Save_Field (Name  => COL_14_1_NAME, --  project_id
                           Value => Object.Project);
          Object.Clear_Modified (15);
       end if;
@@ -1143,35 +593,35 @@ package body Porion.Builds.Models is
    begin
       Object.Version := 1;
       Session.Allocate (Id => Object);
-      Query.Save_Field (Name  => COL_0_2_NAME, --  id
+      Query.Save_Field (Name  => COL_0_1_NAME, --  id
                         Value => Object.Get_Key);
-      Query.Save_Field (Name  => COL_1_2_NAME, --  version
+      Query.Save_Field (Name  => COL_1_1_NAME, --  version
                         Value => Object.Version);
-      Query.Save_Field (Name  => COL_2_2_NAME, --  number
+      Query.Save_Field (Name  => COL_2_1_NAME, --  number
                         Value => Object.Number);
-      Query.Save_Field (Name  => COL_3_2_NAME, --  create_date
+      Query.Save_Field (Name  => COL_3_1_NAME, --  create_date
                         Value => Object.Create_Date);
-      Query.Save_Field (Name  => COL_4_2_NAME, --  finish_date
+      Query.Save_Field (Name  => COL_4_1_NAME, --  finish_date
                         Value => Object.Finish_Date);
-      Query.Save_Field (Name  => COL_5_2_NAME, --  pass_count
+      Query.Save_Field (Name  => COL_5_1_NAME, --  pass_count
                         Value => Object.Pass_Count);
-      Query.Save_Field (Name  => COL_6_2_NAME, --  fail_count
+      Query.Save_Field (Name  => COL_6_1_NAME, --  fail_count
                         Value => Object.Fail_Count);
-      Query.Save_Field (Name  => COL_7_2_NAME, --  timeout_count
+      Query.Save_Field (Name  => COL_7_1_NAME, --  timeout_count
                         Value => Object.Timeout_Count);
-      Query.Save_Field (Name  => COL_8_2_NAME, --  test_duration
+      Query.Save_Field (Name  => COL_8_1_NAME, --  test_duration
                         Value => Object.Test_Duration);
-      Query.Save_Field (Name  => COL_9_2_NAME, --  status
+      Query.Save_Field (Name  => COL_9_1_NAME, --  status
                         Value => Integer (Porion.Builds.Models.Build_Status_Type'Pos (Object.Status)));
-      Query.Save_Field (Name  => COL_10_2_NAME, --  tag
+      Query.Save_Field (Name  => COL_10_1_NAME, --  tag
                         Value => Object.Tag);
-      Query.Save_Field (Name  => COL_11_2_NAME, --  branch_id
+      Query.Save_Field (Name  => COL_11_1_NAME, --  branch_id
                         Value => Object.Branch);
-      Query.Save_Field (Name  => COL_12_2_NAME, --  build_config_id
-                        Value => Object.Build_Config);
-      Query.Save_Field (Name  => COL_13_2_NAME, --  node_id
+      Query.Save_Field (Name  => COL_12_1_NAME, --  recipe_id
+                        Value => Object.Recipe);
+      Query.Save_Field (Name  => COL_13_1_NAME, --  node_id
                         Value => Object.Node);
-      Query.Save_Field (Name  => COL_14_2_NAME, --  project_id
+      Query.Save_Field (Name  => COL_14_1_NAME, --  project_id
                         Value => Object.Project);
       Query.Execute (Result);
       if Result /= 1 then
@@ -1255,7 +705,7 @@ package body Porion.Builds.Models is
          Object.Branch.Set_Key_Value (Stmt.Get_Identifier (11), Session);
       end if;
       if not Stmt.Is_Null (12) then
-         Object.Build_Config.Set_Key_Value (Stmt.Get_Identifier (12), Session);
+         Object.Recipe.Set_Key_Value (Stmt.Get_Identifier (12), Session);
       end if;
       if not Stmt.Is_Null (13) then
          Object.Node.Set_Key_Value (Stmt.Get_Identifier (13), Session);
@@ -1264,555 +714,6 @@ package body Porion.Builds.Models is
          Object.Project.Set_Key_Value (Stmt.Get_Identifier (14), Session);
       end if;
       Object.Version := Stmt.Get_Integer (1);
-      ADO.Objects.Set_Created (Object);
-   end Load;
-   function Build_Config_Step_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key is
-      Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
-                                       Of_Class => BUILD_CONFIG_STEP_DEF'Access);
-   begin
-      ADO.Objects.Set_Value (Result, Id);
-      return Result;
-   end Build_Config_Step_Key;
-
-   function Build_Config_Step_Key (Id : in String) return ADO.Objects.Object_Key is
-      Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
-                                       Of_Class => BUILD_CONFIG_STEP_DEF'Access);
-   begin
-      ADO.Objects.Set_Value (Result, Id);
-      return Result;
-   end Build_Config_Step_Key;
-
-   function "=" (Left, Right : Build_Config_Step_Ref'Class) return Boolean is
-   begin
-      return ADO.Objects.Object_Ref'Class (Left) = ADO.Objects.Object_Ref'Class (Right);
-   end "=";
-
-   procedure Set_Field (Object : in out Build_Config_Step_Ref'Class;
-                        Impl   : out Build_Config_Step_Access) is
-      Result : ADO.Objects.Object_Record_Access;
-   begin
-      Object.Prepare_Modify (Result);
-      Impl := Build_Config_Step_Impl (Result.all)'Access;
-   end Set_Field;
-
-   --  Internal method to allocate the Object_Record instance
-   procedure Allocate (Object : in out Build_Config_Step_Ref) is
-      Impl : Build_Config_Step_Access;
-   begin
-      Impl := new Build_Config_Step_Impl;
-      Impl.Number := 0;
-      Impl.Builder := Porion.Builds.Models.Builder_Type'First;
-      Impl.Timeout := 0;
-      Impl.Step := Porion.Builds.Step_Type'First;
-      Impl.Version := 0;
-      Impl.Execution := Porion.Builds.Models.Execution_Type'First;
-      ADO.Objects.Set_Object (Object, Impl.all'Access);
-   end Allocate;
-
-   -- ----------------------------------------
-   --  Data object: Build_Config_Step
-   -- ----------------------------------------
-
-   procedure Set_Id (Object : in out Build_Config_Step_Ref;
-                     Value  : in ADO.Identifier) is
-      Impl : Build_Config_Step_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Key_Value (Impl.all, 1, Value);
-   end Set_Id;
-
-   function Get_Id (Object : in Build_Config_Step_Ref)
-                  return ADO.Identifier is
-      Impl : constant Build_Config_Step_Access
-         := Build_Config_Step_Impl (Object.Get_Object.all)'Access;
-   begin
-      return Impl.Get_Key_Value;
-   end Get_Id;
-
-
-   procedure Set_Parameters (Object : in out Build_Config_Step_Ref;
-                              Value : in String) is
-      Impl : Build_Config_Step_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_String (Impl.all, 2, Impl.Parameters, Value);
-   end Set_Parameters;
-
-   procedure Set_Parameters (Object : in out Build_Config_Step_Ref;
-                             Value  : in Ada.Strings.Unbounded.Unbounded_String) is
-      Impl : Build_Config_Step_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Unbounded_String (Impl.all, 2, Impl.Parameters, Value);
-   end Set_Parameters;
-
-   function Get_Parameters (Object : in Build_Config_Step_Ref)
-                 return String is
-   begin
-      return Ada.Strings.Unbounded.To_String (Object.Get_Parameters);
-   end Get_Parameters;
-   function Get_Parameters (Object : in Build_Config_Step_Ref)
-                  return Ada.Strings.Unbounded.Unbounded_String is
-      Impl : constant Build_Config_Step_Access
-         := Build_Config_Step_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Parameters;
-   end Get_Parameters;
-
-
-   procedure Set_Number (Object : in out Build_Config_Step_Ref;
-                         Value  : in Integer) is
-      Impl : Build_Config_Step_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Integer (Impl.all, 3, Impl.Number, Value);
-   end Set_Number;
-
-   function Get_Number (Object : in Build_Config_Step_Ref)
-                  return Integer is
-      Impl : constant Build_Config_Step_Access
-         := Build_Config_Step_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Number;
-   end Get_Number;
-
-
-   procedure Set_Builder (Object : in out Build_Config_Step_Ref;
-                          Value  : in Porion.Builds.Models.Builder_Type) is
-      procedure Set_Field_Enum is
-        new ADO.Objects.Set_Field_Operation
-          (Porion.Builds.Models.Builder_Type);
-      Impl : Build_Config_Step_Access;
-   begin
-      Set_Field (Object, Impl);
-      Set_Field_Enum (Impl.all, 4, Impl.Builder, Value);
-   end Set_Builder;
-
-   function Get_Builder (Object : in Build_Config_Step_Ref)
-                  return Porion.Builds.Models.Builder_Type is
-      Impl : constant Build_Config_Step_Access
-         := Build_Config_Step_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Builder;
-   end Get_Builder;
-
-
-   procedure Set_Timeout (Object : in out Build_Config_Step_Ref;
-                          Value  : in Integer) is
-      Impl : Build_Config_Step_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Integer (Impl.all, 5, Impl.Timeout, Value);
-   end Set_Timeout;
-
-   function Get_Timeout (Object : in Build_Config_Step_Ref)
-                  return Integer is
-      Impl : constant Build_Config_Step_Access
-         := Build_Config_Step_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Timeout;
-   end Get_Timeout;
-
-
-   procedure Set_Step (Object : in out Build_Config_Step_Ref;
-                       Value  : in Porion.Builds.Step_Type) is
-      procedure Set_Field_Enum is
-        new ADO.Objects.Set_Field_Operation
-          (Porion.Builds.Step_Type);
-      Impl : Build_Config_Step_Access;
-   begin
-      Set_Field (Object, Impl);
-      Set_Field_Enum (Impl.all, 6, Impl.Step, Value);
-   end Set_Step;
-
-   function Get_Step (Object : in Build_Config_Step_Ref)
-                  return Porion.Builds.Step_Type is
-      Impl : constant Build_Config_Step_Access
-         := Build_Config_Step_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Step;
-   end Get_Step;
-
-
-   procedure Set_Version (Object : in out Build_Config_Step_Ref;
-                          Value  : in Integer) is
-      Impl : Build_Config_Step_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Integer (Impl.all, 7, Impl.Version, Value);
-   end Set_Version;
-
-   function Get_Version (Object : in Build_Config_Step_Ref)
-                  return Integer is
-      Impl : constant Build_Config_Step_Access
-         := Build_Config_Step_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Version;
-   end Get_Version;
-
-
-   procedure Set_Execution (Object : in out Build_Config_Step_Ref;
-                            Value  : in Porion.Builds.Models.Execution_Type) is
-      procedure Set_Field_Enum is
-        new ADO.Objects.Set_Field_Operation
-          (Porion.Builds.Models.Execution_Type);
-      Impl : Build_Config_Step_Access;
-   begin
-      Set_Field (Object, Impl);
-      Set_Field_Enum (Impl.all, 8, Impl.Execution, Value);
-   end Set_Execution;
-
-   function Get_Execution (Object : in Build_Config_Step_Ref)
-                  return Porion.Builds.Models.Execution_Type is
-      Impl : constant Build_Config_Step_Access
-         := Build_Config_Step_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Execution;
-   end Get_Execution;
-
-
-   procedure Set_Previous_Version (Object : in out Build_Config_Step_Ref;
-                                   Value  : in Porion.Builds.Models.Build_Config_Step_Ref'Class) is
-      Impl : Build_Config_Step_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 9, Impl.Previous_Version, Value);
-   end Set_Previous_Version;
-
-   function Get_Previous_Version (Object : in Build_Config_Step_Ref)
-                  return Porion.Builds.Models.Build_Config_Step_Ref'Class is
-      Impl : constant Build_Config_Step_Access
-         := Build_Config_Step_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Previous_Version;
-   end Get_Previous_Version;
-
-
-   procedure Set_Build_Config (Object : in out Build_Config_Step_Ref;
-                               Value  : in Porion.Builds.Models.Build_Config_Ref'Class) is
-      Impl : Build_Config_Step_Access;
-   begin
-      Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 10, Impl.Build_Config, Value);
-   end Set_Build_Config;
-
-   function Get_Build_Config (Object : in Build_Config_Step_Ref)
-                  return Porion.Builds.Models.Build_Config_Ref'Class is
-      Impl : constant Build_Config_Step_Access
-         := Build_Config_Step_Impl (Object.Get_Load_Object.all)'Access;
-   begin
-      return Impl.Build_Config;
-   end Get_Build_Config;
-
-   --  Copy of the object.
-   procedure Copy (Object : in Build_Config_Step_Ref;
-                   Into   : in out Build_Config_Step_Ref) is
-      Result : Build_Config_Step_Ref;
-   begin
-      if not Object.Is_Null then
-         declare
-            Impl : constant Build_Config_Step_Access
-              := Build_Config_Step_Impl (Object.Get_Load_Object.all)'Access;
-            Copy : constant Build_Config_Step_Access
-              := new Build_Config_Step_Impl;
-         begin
-            ADO.Objects.Set_Object (Result, Copy.all'Access);
-            Copy.Copy (Impl.all);
-            Copy.Parameters := Impl.Parameters;
-            Copy.Number := Impl.Number;
-            Copy.Builder := Impl.Builder;
-            Copy.Timeout := Impl.Timeout;
-            Copy.Step := Impl.Step;
-            Copy.Version := Impl.Version;
-            Copy.Execution := Impl.Execution;
-            Copy.Previous_Version := Impl.Previous_Version;
-            Copy.Build_Config := Impl.Build_Config;
-         end;
-      end if;
-      Into := Result;
-   end Copy;
-
-   procedure Find (Object  : in out Build_Config_Step_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Query   : in ADO.SQL.Query'Class;
-                   Found   : out Boolean) is
-      Impl  : constant Build_Config_Step_Access := new Build_Config_Step_Impl;
-   begin
-      Impl.Find (Session, Query, Found);
-      if Found then
-         ADO.Objects.Set_Object (Object, Impl.all'Access);
-      else
-         ADO.Objects.Set_Object (Object, null);
-         Destroy (Impl);
-      end if;
-   end Find;
-
-   procedure Load (Object  : in out Build_Config_Step_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Id      : in ADO.Identifier) is
-      Impl  : constant Build_Config_Step_Access := new Build_Config_Step_Impl;
-      Found : Boolean;
-      Query : ADO.SQL.Query;
-   begin
-      Query.Bind_Param (Position => 1, Value => Id);
-      Query.Set_Filter ("id = ?");
-      Impl.Find (Session, Query, Found);
-      if not Found then
-         Destroy (Impl);
-         raise ADO.Objects.NOT_FOUND;
-      end if;
-      ADO.Objects.Set_Object (Object, Impl.all'Access);
-   end Load;
-
-   procedure Load (Object  : in out Build_Config_Step_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Id      : in ADO.Identifier;
-                   Found   : out Boolean) is
-      Impl  : constant Build_Config_Step_Access := new Build_Config_Step_Impl;
-      Query : ADO.SQL.Query;
-   begin
-      Query.Bind_Param (Position => 1, Value => Id);
-      Query.Set_Filter ("id = ?");
-      Impl.Find (Session, Query, Found);
-      if not Found then
-         Destroy (Impl);
-      else
-         ADO.Objects.Set_Object (Object, Impl.all'Access);
-      end if;
-   end Load;
-
-   procedure Save (Object  : in out Build_Config_Step_Ref;
-                   Session : in out ADO.Sessions.Master_Session'Class) is
-      Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;
-   begin
-      if Impl = null then
-         Impl := new Build_Config_Step_Impl;
-         ADO.Objects.Set_Object (Object, Impl);
-      end if;
-      if not ADO.Objects.Is_Created (Impl.all) then
-         Impl.Create (Session);
-      else
-         Impl.Save (Session);
-      end if;
-   end Save;
-
-   procedure Delete (Object  : in out Build_Config_Step_Ref;
-                     Session : in out ADO.Sessions.Master_Session'Class) is
-      Impl : constant ADO.Objects.Object_Record_Access := Object.Get_Object;
-   begin
-      if Impl /= null then
-         Impl.Delete (Session);
-      end if;
-   end Delete;
-
-   --  --------------------
-   --  Free the object
-   --  --------------------
-   procedure Destroy (Object : access Build_Config_Step_Impl) is
-      type Build_Config_Step_Impl_Ptr is access all Build_Config_Step_Impl;
-      procedure Unchecked_Free is new Ada.Unchecked_Deallocation
-              (Build_Config_Step_Impl, Build_Config_Step_Impl_Ptr);
-      pragma Warnings (Off, "*redundant conversion*");
-      Ptr : Build_Config_Step_Impl_Ptr := Build_Config_Step_Impl (Object.all)'Access;
-      pragma Warnings (On, "*redundant conversion*");
-   begin
-      Unchecked_Free (Ptr);
-   end Destroy;
-
-   procedure Find (Object  : in out Build_Config_Step_Impl;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Query   : in ADO.SQL.Query'Class;
-                   Found   : out Boolean) is
-      Stmt : ADO.Statements.Query_Statement
-          := Session.Create_Statement (Query, BUILD_CONFIG_STEP_DEF'Access);
-   begin
-      Stmt.Execute;
-      if Stmt.Has_Elements then
-         Object.Load (Stmt, Session);
-         Stmt.Next;
-         Found := not Stmt.Has_Elements;
-      else
-         Found := False;
-      end if;
-   end Find;
-
-   overriding
-   procedure Load (Object  : in out Build_Config_Step_Impl;
-                   Session : in out ADO.Sessions.Session'Class) is
-      Found : Boolean;
-      Query : ADO.SQL.Query;
-      Id    : constant ADO.Identifier := Object.Get_Key_Value;
-   begin
-      Query.Bind_Param (Position => 1, Value => Id);
-      Query.Set_Filter ("id = ?");
-      Object.Find (Session, Query, Found);
-      if not Found then
-         raise ADO.Objects.NOT_FOUND;
-      end if;
-   end Load;
-
-   procedure Save (Object  : in out Build_Config_Step_Impl;
-                   Session : in out ADO.Sessions.Master_Session'Class) is
-      Stmt : ADO.Statements.Update_Statement
-         := Session.Create_Statement (BUILD_CONFIG_STEP_DEF'Access);
-   begin
-      if Object.Is_Modified (7) then
-         Stmt.Save_Field (Name  => COL_6_3_NAME, --  version
-                          Value => Object.Version);
-         Object.Clear_Modified (7);
-      end if;
-      if Object.Is_Modified (8) then
-         Stmt.Save_Field (Name  => COL_7_3_NAME, --  execution
-                          Value => Integer (Porion.Builds.Models.Execution_Type'Pos (Object.Execution)));
-         Object.Clear_Modified (8);
-      end if;
-      if Object.Is_Modified (9) then
-         Stmt.Save_Field (Name  => COL_8_3_NAME, --  previous_version_id
-                          Value => Object.Previous_Version);
-         Object.Clear_Modified (9);
-      end if;
-      if Object.Is_Modified (10) then
-         Stmt.Save_Field (Name  => COL_9_3_NAME, --  build_config_id
-                          Value => Object.Build_Config);
-         Object.Clear_Modified (10);
-      end if;
-      if Stmt.Has_Save_Fields then
-         Stmt.Set_Filter (Filter => "id = ?");
-         Stmt.Add_Param (Value => Object.Get_Key);
-         declare
-            Result : Integer;
-         begin
-            Stmt.Execute (Result);
-            if Result /= 1 then
-               if Result /= 0 then
-                  raise ADO.Objects.UPDATE_ERROR;
-               end if;
-            end if;
-         end;
-      end if;
-   end Save;
-
-   procedure Create (Object  : in out Build_Config_Step_Impl;
-                     Session : in out ADO.Sessions.Master_Session'Class) is
-      Query : ADO.Statements.Insert_Statement
-                  := Session.Create_Statement (BUILD_CONFIG_STEP_DEF'Access);
-      Result : Integer;
-   begin
-      Session.Allocate (Id => Object);
-      Query.Save_Field (Name  => COL_0_3_NAME, --  id
-                        Value => Object.Get_Key);
-      Query.Save_Field (Name  => COL_1_3_NAME, --  parameters
-                        Value => Object.Parameters);
-      Query.Save_Field (Name  => COL_2_3_NAME, --  number
-                        Value => Object.Number);
-      Query.Save_Field (Name  => COL_3_3_NAME, --  builder
-                        Value => Integer (Porion.Builds.Models.Builder_Type'Pos (Object.Builder)));
-      Query.Save_Field (Name  => COL_4_3_NAME, --  timeout
-                        Value => Object.Timeout);
-      Query.Save_Field (Name  => COL_5_3_NAME, --  step
-                        Value => Integer (Porion.Builds.Step_Type'Pos (Object.Step)));
-      Query.Save_Field (Name  => COL_6_3_NAME, --  version
-                        Value => Object.Version);
-      Query.Save_Field (Name  => COL_7_3_NAME, --  execution
-                        Value => Integer (Porion.Builds.Models.Execution_Type'Pos (Object.Execution)));
-      Query.Save_Field (Name  => COL_8_3_NAME, --  previous_version_id
-                        Value => Object.Previous_Version);
-      Query.Save_Field (Name  => COL_9_3_NAME, --  build_config_id
-                        Value => Object.Build_Config);
-      Query.Execute (Result);
-      if Result /= 1 then
-         raise ADO.Objects.INSERT_ERROR;
-      end if;
-      ADO.Objects.Set_Created (Object);
-   end Create;
-
-   procedure Delete (Object  : in out Build_Config_Step_Impl;
-                     Session : in out ADO.Sessions.Master_Session'Class) is
-      Stmt : ADO.Statements.Delete_Statement
-         := Session.Create_Statement (BUILD_CONFIG_STEP_DEF'Access);
-   begin
-      Stmt.Set_Filter (Filter => "id = ?");
-      Stmt.Add_Param (Value => Object.Get_Key);
-      Stmt.Execute;
-   end Delete;
-
-   --  ------------------------------
-   --  Get the bean attribute identified by the name.
-   --  ------------------------------
-   overriding
-   function Get_Value (From : in Build_Config_Step_Ref;
-                       Name : in String) return Util.Beans.Objects.Object is
-      Obj  : ADO.Objects.Object_Record_Access;
-      Impl : access Build_Config_Step_Impl;
-   begin
-      if From.Is_Null then
-         return Util.Beans.Objects.Null_Object;
-      end if;
-      Obj := From.Get_Load_Object;
-      Impl := Build_Config_Step_Impl (Obj.all)'Access;
-      if Name = "id" then
-         return ADO.Objects.To_Object (Impl.Get_Key);
-      elsif Name = "parameters" then
-         return Util.Beans.Objects.To_Object (Impl.Parameters);
-      elsif Name = "number" then
-         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Number));
-      elsif Name = "builder" then
-         return Porion.Builds.Models.Builder_Type_Objects.To_Object (Impl.Builder);
-      elsif Name = "timeout" then
-         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Timeout));
-      elsif Name = "step" then
-         return Porion.Builds.Step_Type_Objects.To_Object (Impl.Step);
-      elsif Name = "version" then
-         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Version));
-      elsif Name = "execution" then
-         return Porion.Builds.Models.Execution_Type_Objects.To_Object (Impl.Execution);
-      end if;
-      return Util.Beans.Objects.Null_Object;
-   end Get_Value;
-
-
-   procedure List (Object  : in out Build_Config_Step_Vector;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Query   : in ADO.SQL.Query'Class) is
-      Stmt : ADO.Statements.Query_Statement
-        := Session.Create_Statement (Query, BUILD_CONFIG_STEP_DEF'Access);
-   begin
-      Stmt.Execute;
-      Build_Config_Step_Vectors.Clear (Object);
-      while Stmt.Has_Elements loop
-         declare
-            Item : Build_Config_Step_Ref;
-            Impl : constant Build_Config_Step_Access := new Build_Config_Step_Impl;
-         begin
-            Impl.Load (Stmt, Session);
-            ADO.Objects.Set_Object (Item, Impl.all'Access);
-            Object.Append (Item);
-         end;
-         Stmt.Next;
-      end loop;
-   end List;
-
-   --  ------------------------------
-   --  Load the object from current iterator position
-   --  ------------------------------
-   procedure Load (Object  : in out Build_Config_Step_Impl;
-                   Stmt    : in out ADO.Statements.Query_Statement'Class;
-                   Session : in out ADO.Sessions.Session'Class) is
-   begin
-      Object.Set_Key_Value (Stmt.Get_Identifier (0));
-      Object.Parameters := Stmt.Get_Unbounded_String (1);
-      Object.Number := Stmt.Get_Integer (2);
-      Object.Builder := Porion.Builds.Models.Builder_Type'Val (Stmt.Get_Integer (3));
-      Object.Timeout := Stmt.Get_Integer (4);
-      Object.Step := Porion.Builds.Step_Type'Val (Stmt.Get_Integer (5));
-      Object.Version := Stmt.Get_Integer (6);
-      Object.Execution := Porion.Builds.Models.Execution_Type'Val (Stmt.Get_Integer (7));
-      if not Stmt.Is_Null (8) then
-         Object.Previous_Version.Set_Key_Value (Stmt.Get_Identifier (8), Session);
-      end if;
-      if not Stmt.Is_Null (9) then
-         Object.Build_Config.Set_Key_Value (Stmt.Get_Identifier (9), Session);
-      end if;
       ADO.Objects.Set_Created (Object);
    end Load;
    function Build_Executor_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key is
@@ -2102,27 +1003,27 @@ package body Porion.Builds.Models is
          := Session.Create_Statement (BUILD_EXECUTOR_DEF'Access);
    begin
       if Object.Is_Modified (1) then
-         Stmt.Save_Field (Name  => COL_0_4_NAME, --  id
+         Stmt.Save_Field (Name  => COL_0_2_NAME, --  id
                           Value => Object.Get_Key);
          Object.Clear_Modified (1);
       end if;
       if Object.Is_Modified (3) then
-         Stmt.Save_Field (Name  => COL_2_4_NAME, --  pid
+         Stmt.Save_Field (Name  => COL_2_2_NAME, --  pid
                           Value => Object.Pid);
          Object.Clear_Modified (3);
       end if;
       if Object.Is_Modified (4) then
-         Stmt.Save_Field (Name  => COL_3_4_NAME, --  start_date
+         Stmt.Save_Field (Name  => COL_3_2_NAME, --  start_date
                           Value => Object.Start_Date);
          Object.Clear_Modified (4);
       end if;
       if Object.Is_Modified (5) then
-         Stmt.Save_Field (Name  => COL_4_4_NAME, --  port
+         Stmt.Save_Field (Name  => COL_4_2_NAME, --  port
                           Value => Object.Port);
          Object.Clear_Modified (5);
       end if;
       if Object.Is_Modified (6) then
-         Stmt.Save_Field (Name  => COL_5_4_NAME, --  node_id
+         Stmt.Save_Field (Name  => COL_5_2_NAME, --  node_id
                           Value => Object.Node);
          Object.Clear_Modified (6);
       end if;
@@ -2156,17 +1057,17 @@ package body Porion.Builds.Models is
    begin
       Object.Version := 1;
       Session.Allocate (Id => Object);
-      Query.Save_Field (Name  => COL_0_4_NAME, --  id
+      Query.Save_Field (Name  => COL_0_2_NAME, --  id
                         Value => Object.Get_Key);
-      Query.Save_Field (Name  => COL_1_4_NAME, --  version
+      Query.Save_Field (Name  => COL_1_2_NAME, --  version
                         Value => Object.Version);
-      Query.Save_Field (Name  => COL_2_4_NAME, --  pid
+      Query.Save_Field (Name  => COL_2_2_NAME, --  pid
                         Value => Object.Pid);
-      Query.Save_Field (Name  => COL_3_4_NAME, --  start_date
+      Query.Save_Field (Name  => COL_3_2_NAME, --  start_date
                         Value => Object.Start_Date);
-      Query.Save_Field (Name  => COL_4_4_NAME, --  port
+      Query.Save_Field (Name  => COL_4_2_NAME, --  port
                         Value => Object.Port);
-      Query.Save_Field (Name  => COL_5_4_NAME, --  node_id
+      Query.Save_Field (Name  => COL_5_2_NAME, --  node_id
                         Value => Object.Node);
       Query.Execute (Result);
       if Result /= 1 then
@@ -2246,6 +1147,556 @@ package body Porion.Builds.Models is
       Object.Port := Stmt.Get_Integer (4);
       if not Stmt.Is_Null (5) then
          Object.Node.Set_Key_Value (Stmt.Get_Identifier (5), Session);
+      end if;
+      Object.Version := Stmt.Get_Integer (1);
+      ADO.Objects.Set_Created (Object);
+   end Load;
+   function Recipe_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key is
+      Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
+                                       Of_Class => RECIPE_DEF'Access);
+   begin
+      ADO.Objects.Set_Value (Result, Id);
+      return Result;
+   end Recipe_Key;
+
+   function Recipe_Key (Id : in String) return ADO.Objects.Object_Key is
+      Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
+                                       Of_Class => RECIPE_DEF'Access);
+   begin
+      ADO.Objects.Set_Value (Result, Id);
+      return Result;
+   end Recipe_Key;
+
+   function "=" (Left, Right : Recipe_Ref'Class) return Boolean is
+   begin
+      return ADO.Objects.Object_Ref'Class (Left) = ADO.Objects.Object_Ref'Class (Right);
+   end "=";
+
+   procedure Set_Field (Object : in out Recipe_Ref'Class;
+                        Impl   : out Recipe_Access) is
+      Result : ADO.Objects.Object_Record_Access;
+   begin
+      Object.Prepare_Modify (Result);
+      Impl := Recipe_Impl (Result.all)'Access;
+   end Set_Field;
+
+   --  Internal method to allocate the Object_Record instance
+   procedure Allocate (Object : in out Recipe_Ref) is
+      Impl : Recipe_Access;
+   begin
+      Impl := new Recipe_Impl;
+      Impl.Version := 0;
+      Impl.Status := Porion.Builds.Models.Config_Status_Type'First;
+      Impl.Rate_Factor := 0;
+      ADO.Objects.Set_Object (Object, Impl.all'Access);
+   end Allocate;
+
+   -- ----------------------------------------
+   --  Data object: Recipe
+   -- ----------------------------------------
+
+   procedure Set_Id (Object : in out Recipe_Ref;
+                     Value  : in ADO.Identifier) is
+      Impl : Recipe_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Key_Value (Impl.all, 1, Value);
+   end Set_Id;
+
+   function Get_Id (Object : in Recipe_Ref)
+                  return ADO.Identifier is
+      Impl : constant Recipe_Access
+         := Recipe_Impl (Object.Get_Object.all)'Access;
+   begin
+      return Impl.Get_Key_Value;
+   end Get_Id;
+
+
+   function Get_Version (Object : in Recipe_Ref)
+                  return Integer is
+      Impl : constant Recipe_Access
+         := Recipe_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Version;
+   end Get_Version;
+
+
+   procedure Set_Name (Object : in out Recipe_Ref;
+                        Value : in String) is
+      Impl : Recipe_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Audits.Set_Field_String (Impl.all, 3, Impl.Name, Value);
+   end Set_Name;
+
+   procedure Set_Name (Object : in out Recipe_Ref;
+                       Value  : in Ada.Strings.Unbounded.Unbounded_String) is
+      Impl : Recipe_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Audits.Set_Field_Unbounded_String (Impl.all, 3, Impl.Name, Value);
+   end Set_Name;
+
+   function Get_Name (Object : in Recipe_Ref)
+                 return String is
+   begin
+      return Ada.Strings.Unbounded.To_String (Object.Get_Name);
+   end Get_Name;
+   function Get_Name (Object : in Recipe_Ref)
+                  return Ada.Strings.Unbounded.Unbounded_String is
+      Impl : constant Recipe_Access
+         := Recipe_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Name;
+   end Get_Name;
+
+
+   procedure Set_Description (Object : in out Recipe_Ref;
+                               Value : in String) is
+      Impl : Recipe_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Audits.Set_Field_String (Impl.all, 4, Impl.Description, Value);
+   end Set_Description;
+
+   procedure Set_Description (Object : in out Recipe_Ref;
+                              Value  : in Ada.Strings.Unbounded.Unbounded_String) is
+      Impl : Recipe_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Audits.Set_Field_Unbounded_String (Impl.all, 4, Impl.Description, Value);
+   end Set_Description;
+
+   function Get_Description (Object : in Recipe_Ref)
+                 return String is
+   begin
+      return Ada.Strings.Unbounded.To_String (Object.Get_Description);
+   end Get_Description;
+   function Get_Description (Object : in Recipe_Ref)
+                  return Ada.Strings.Unbounded.Unbounded_String is
+      Impl : constant Recipe_Access
+         := Recipe_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Description;
+   end Get_Description;
+
+
+   procedure Set_Status (Object : in out Recipe_Ref;
+                         Value  : in Porion.Builds.Models.Config_Status_Type) is
+      procedure Set_Field_Enum is
+        new ADO.Audits.Set_Field_Operation
+          (Porion.Builds.Models.Config_Status_Type,
+           Porion.Builds.Models.Config_Status_Type_Objects.To_Object);
+      Impl : Recipe_Access;
+   begin
+      Set_Field (Object, Impl);
+      Set_Field_Enum (Impl.all, 5, Impl.Status, Value);
+   end Set_Status;
+
+   function Get_Status (Object : in Recipe_Ref)
+                  return Porion.Builds.Models.Config_Status_Type is
+      Impl : constant Recipe_Access
+         := Recipe_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Status;
+   end Get_Status;
+
+
+   procedure Set_Rate_Factor (Object : in out Recipe_Ref;
+                              Value  : in Integer) is
+      Impl : Recipe_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Audits.Set_Field_Integer (Impl.all, 6, Impl.Rate_Factor, Value);
+   end Set_Rate_Factor;
+
+   function Get_Rate_Factor (Object : in Recipe_Ref)
+                  return Integer is
+      Impl : constant Recipe_Access
+         := Recipe_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Rate_Factor;
+   end Get_Rate_Factor;
+
+
+   procedure Set_Node (Object : in out Recipe_Ref;
+                       Value  : in Porion.Nodes.Models.Node_Ref'Class) is
+      Impl : Recipe_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Object (Impl.all, 7, Impl.Node, Value);
+   end Set_Node;
+
+   function Get_Node (Object : in Recipe_Ref)
+                  return Porion.Nodes.Models.Node_Ref'Class is
+      Impl : constant Recipe_Access
+         := Recipe_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Node;
+   end Get_Node;
+
+
+   procedure Set_Branch (Object : in out Recipe_Ref;
+                         Value  : in Porion.Projects.Models.Branch_Ref'Class) is
+      Impl : Recipe_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Object (Impl.all, 8, Impl.Branch, Value);
+   end Set_Branch;
+
+   function Get_Branch (Object : in Recipe_Ref)
+                  return Porion.Projects.Models.Branch_Ref'Class is
+      Impl : constant Recipe_Access
+         := Recipe_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Branch;
+   end Get_Branch;
+
+
+   procedure Set_Project (Object : in out Recipe_Ref;
+                          Value  : in Porion.Projects.Models.Project_Ref'Class) is
+      Impl : Recipe_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Object (Impl.all, 9, Impl.Project, Value);
+   end Set_Project;
+
+   function Get_Project (Object : in Recipe_Ref)
+                  return Porion.Projects.Models.Project_Ref'Class is
+      Impl : constant Recipe_Access
+         := Recipe_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Project;
+   end Get_Project;
+
+   --  Copy of the object.
+   procedure Copy (Object : in Recipe_Ref;
+                   Into   : in out Recipe_Ref) is
+      Result : Recipe_Ref;
+   begin
+      if not Object.Is_Null then
+         declare
+            Impl : constant Recipe_Access
+              := Recipe_Impl (Object.Get_Load_Object.all)'Access;
+            Copy : constant Recipe_Access
+              := new Recipe_Impl;
+         begin
+            ADO.Objects.Set_Object (Result, Copy.all'Access);
+            Copy.Copy (Impl.all);
+            Copy.Version := Impl.Version;
+            Copy.Name := Impl.Name;
+            Copy.Description := Impl.Description;
+            Copy.Status := Impl.Status;
+            Copy.Rate_Factor := Impl.Rate_Factor;
+            Copy.Node := Impl.Node;
+            Copy.Branch := Impl.Branch;
+            Copy.Project := Impl.Project;
+         end;
+      end if;
+      Into := Result;
+   end Copy;
+
+   procedure Find (Object  : in out Recipe_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class;
+                   Found   : out Boolean) is
+      Impl  : constant Recipe_Access := new Recipe_Impl;
+   begin
+      Impl.Find (Session, Query, Found);
+      if Found then
+         ADO.Objects.Set_Object (Object, Impl.all'Access);
+      else
+         ADO.Objects.Set_Object (Object, null);
+         Destroy (Impl);
+      end if;
+   end Find;
+
+   procedure Load (Object  : in out Recipe_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Id      : in ADO.Identifier) is
+      Impl  : constant Recipe_Access := new Recipe_Impl;
+      Found : Boolean;
+      Query : ADO.SQL.Query;
+   begin
+      Query.Bind_Param (Position => 1, Value => Id);
+      Query.Set_Filter ("id = ?");
+      Impl.Find (Session, Query, Found);
+      if not Found then
+         Destroy (Impl);
+         raise ADO.Objects.NOT_FOUND;
+      end if;
+      ADO.Objects.Set_Object (Object, Impl.all'Access);
+   end Load;
+
+   procedure Load (Object  : in out Recipe_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Id      : in ADO.Identifier;
+                   Found   : out Boolean) is
+      Impl  : constant Recipe_Access := new Recipe_Impl;
+      Query : ADO.SQL.Query;
+   begin
+      Query.Bind_Param (Position => 1, Value => Id);
+      Query.Set_Filter ("id = ?");
+      Impl.Find (Session, Query, Found);
+      if not Found then
+         Destroy (Impl);
+      else
+         ADO.Objects.Set_Object (Object, Impl.all'Access);
+      end if;
+   end Load;
+
+   procedure Save (Object  : in out Recipe_Ref;
+                   Session : in out ADO.Sessions.Master_Session'Class) is
+      Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;
+   begin
+      if Impl = null then
+         Impl := new Recipe_Impl;
+         ADO.Objects.Set_Object (Object, Impl);
+      end if;
+      if not ADO.Objects.Is_Created (Impl.all) then
+         Impl.Create (Session);
+      else
+         Impl.Save (Session);
+      end if;
+   end Save;
+
+   procedure Delete (Object  : in out Recipe_Ref;
+                     Session : in out ADO.Sessions.Master_Session'Class) is
+      Impl : constant ADO.Objects.Object_Record_Access := Object.Get_Object;
+   begin
+      if Impl /= null then
+         Impl.Delete (Session);
+      end if;
+   end Delete;
+
+   --  --------------------
+   --  Free the object
+   --  --------------------
+   procedure Destroy (Object : access Recipe_Impl) is
+      type Recipe_Impl_Ptr is access all Recipe_Impl;
+      procedure Unchecked_Free is new Ada.Unchecked_Deallocation
+              (Recipe_Impl, Recipe_Impl_Ptr);
+      pragma Warnings (Off, "*redundant conversion*");
+      Ptr : Recipe_Impl_Ptr := Recipe_Impl (Object.all)'Access;
+      pragma Warnings (On, "*redundant conversion*");
+   begin
+      Unchecked_Free (Ptr);
+   end Destroy;
+
+   procedure Find (Object  : in out Recipe_Impl;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class;
+                   Found   : out Boolean) is
+      Stmt : ADO.Statements.Query_Statement
+          := Session.Create_Statement (Query, RECIPE_DEF'Access);
+   begin
+      Stmt.Execute;
+      if Stmt.Has_Elements then
+         Object.Load (Stmt, Session);
+         Stmt.Next;
+         Found := not Stmt.Has_Elements;
+      else
+         Found := False;
+      end if;
+   end Find;
+
+   overriding
+   procedure Load (Object  : in out Recipe_Impl;
+                   Session : in out ADO.Sessions.Session'Class) is
+      Found : Boolean;
+      Query : ADO.SQL.Query;
+      Id    : constant ADO.Identifier := Object.Get_Key_Value;
+   begin
+      Query.Bind_Param (Position => 1, Value => Id);
+      Query.Set_Filter ("id = ?");
+      Object.Find (Session, Query, Found);
+      if not Found then
+         raise ADO.Objects.NOT_FOUND;
+      end if;
+   end Load;
+
+   procedure Save (Object  : in out Recipe_Impl;
+                   Session : in out ADO.Sessions.Master_Session'Class) is
+      Stmt : ADO.Statements.Update_Statement
+         := Session.Create_Statement (RECIPE_DEF'Access);
+   begin
+      if Object.Is_Modified (1) then
+         Stmt.Save_Field (Name  => COL_0_3_NAME, --  id
+                          Value => Object.Get_Key);
+         Object.Clear_Modified (1);
+      end if;
+      if Object.Is_Modified (3) then
+         Stmt.Save_Field (Name  => COL_2_3_NAME, --  name
+                          Value => Object.Name);
+         Object.Clear_Modified (3);
+      end if;
+      if Object.Is_Modified (4) then
+         Stmt.Save_Field (Name  => COL_3_3_NAME, --  description
+                          Value => Object.Description);
+         Object.Clear_Modified (4);
+      end if;
+      if Object.Is_Modified (5) then
+         Stmt.Save_Field (Name  => COL_4_3_NAME, --  status
+                          Value => Integer (Porion.Builds.Models.Config_Status_Type'Pos (Object.Status)));
+         Object.Clear_Modified (5);
+      end if;
+      if Object.Is_Modified (6) then
+         Stmt.Save_Field (Name  => COL_5_3_NAME, --  rate_factor
+                          Value => Object.Rate_Factor);
+         Object.Clear_Modified (6);
+      end if;
+      if Object.Is_Modified (7) then
+         Stmt.Save_Field (Name  => COL_6_3_NAME, --  node_id
+                          Value => Object.Node);
+         Object.Clear_Modified (7);
+      end if;
+      if Object.Is_Modified (8) then
+         Stmt.Save_Field (Name  => COL_7_3_NAME, --  branch_id
+                          Value => Object.Branch);
+         Object.Clear_Modified (8);
+      end if;
+      if Object.Is_Modified (9) then
+         Stmt.Save_Field (Name  => COL_8_3_NAME, --  project_id
+                          Value => Object.Project);
+         Object.Clear_Modified (9);
+      end if;
+      if Stmt.Has_Save_Fields then
+         Object.Version := Object.Version + 1;
+         Stmt.Save_Field (Name  => "version",
+                          Value => Object.Version);
+         Stmt.Set_Filter (Filter => "id = ? and version = ?");
+         Stmt.Add_Param (Value => Object.Get_Key);
+         Stmt.Add_Param (Value => Object.Version - 1);
+         declare
+            Result : Integer;
+         begin
+            Stmt.Execute (Result);
+            if Result /= 1 then
+               if Result /= 0 then
+                  raise ADO.Objects.UPDATE_ERROR;
+               else
+                  raise ADO.Objects.LAZY_LOCK;
+               end if;
+            end if;
+            ADO.Audits.Save (Object, Session);
+         end;
+      end if;
+   end Save;
+
+   procedure Create (Object  : in out Recipe_Impl;
+                     Session : in out ADO.Sessions.Master_Session'Class) is
+      Query : ADO.Statements.Insert_Statement
+                  := Session.Create_Statement (RECIPE_DEF'Access);
+      Result : Integer;
+   begin
+      Object.Version := 1;
+      Session.Allocate (Id => Object);
+      Query.Save_Field (Name  => COL_0_3_NAME, --  id
+                        Value => Object.Get_Key);
+      Query.Save_Field (Name  => COL_1_3_NAME, --  version
+                        Value => Object.Version);
+      Query.Save_Field (Name  => COL_2_3_NAME, --  name
+                        Value => Object.Name);
+      Query.Save_Field (Name  => COL_3_3_NAME, --  description
+                        Value => Object.Description);
+      Query.Save_Field (Name  => COL_4_3_NAME, --  status
+                        Value => Integer (Porion.Builds.Models.Config_Status_Type'Pos (Object.Status)));
+      Query.Save_Field (Name  => COL_5_3_NAME, --  rate_factor
+                        Value => Object.Rate_Factor);
+      Query.Save_Field (Name  => COL_6_3_NAME, --  node_id
+                        Value => Object.Node);
+      Query.Save_Field (Name  => COL_7_3_NAME, --  branch_id
+                        Value => Object.Branch);
+      Query.Save_Field (Name  => COL_8_3_NAME, --  project_id
+                        Value => Object.Project);
+      Query.Execute (Result);
+      if Result /= 1 then
+         raise ADO.Objects.INSERT_ERROR;
+      end if;
+      ADO.Objects.Set_Created (Object);
+      ADO.Audits.Save (Object, Session);
+   end Create;
+
+   procedure Delete (Object  : in out Recipe_Impl;
+                     Session : in out ADO.Sessions.Master_Session'Class) is
+      Stmt : ADO.Statements.Delete_Statement
+         := Session.Create_Statement (RECIPE_DEF'Access);
+   begin
+      Stmt.Set_Filter (Filter => "id = ?");
+      Stmt.Add_Param (Value => Object.Get_Key);
+      Stmt.Execute;
+   end Delete;
+
+   --  ------------------------------
+   --  Get the bean attribute identified by the name.
+   --  ------------------------------
+   overriding
+   function Get_Value (From : in Recipe_Ref;
+                       Name : in String) return Util.Beans.Objects.Object is
+      Obj  : ADO.Objects.Object_Record_Access;
+      Impl : access Recipe_Impl;
+   begin
+      if From.Is_Null then
+         return Util.Beans.Objects.Null_Object;
+      end if;
+      Obj := From.Get_Load_Object;
+      Impl := Recipe_Impl (Obj.all)'Access;
+      if Name = "id" then
+         return ADO.Objects.To_Object (Impl.Get_Key);
+      elsif Name = "name" then
+         return Util.Beans.Objects.To_Object (Impl.Name);
+      elsif Name = "description" then
+         return Util.Beans.Objects.To_Object (Impl.Description);
+      elsif Name = "status" then
+         return Porion.Builds.Models.Config_Status_Type_Objects.To_Object (Impl.Status);
+      elsif Name = "rate_factor" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Rate_Factor));
+      end if;
+      return Util.Beans.Objects.Null_Object;
+   end Get_Value;
+
+
+   procedure List (Object  : in out Recipe_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class) is
+      Stmt : ADO.Statements.Query_Statement
+        := Session.Create_Statement (Query, RECIPE_DEF'Access);
+   begin
+      Stmt.Execute;
+      Recipe_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         declare
+            Item : Recipe_Ref;
+            Impl : constant Recipe_Access := new Recipe_Impl;
+         begin
+            Impl.Load (Stmt, Session);
+            ADO.Objects.Set_Object (Item, Impl.all'Access);
+            Object.Append (Item);
+         end;
+         Stmt.Next;
+      end loop;
+   end List;
+
+   --  ------------------------------
+   --  Load the object from current iterator position
+   --  ------------------------------
+   procedure Load (Object  : in out Recipe_Impl;
+                   Stmt    : in out ADO.Statements.Query_Statement'Class;
+                   Session : in out ADO.Sessions.Session'Class) is
+   begin
+      Object.Set_Key_Value (Stmt.Get_Identifier (0));
+      Object.Name := Stmt.Get_Unbounded_String (2);
+      Object.Description := Stmt.Get_Unbounded_String (3);
+      Object.Status := Porion.Builds.Models.Config_Status_Type'Val (Stmt.Get_Integer (4));
+      Object.Rate_Factor := Stmt.Get_Integer (5);
+      if not Stmt.Is_Null (6) then
+         Object.Node.Set_Key_Value (Stmt.Get_Identifier (6), Session);
+      end if;
+      if not Stmt.Is_Null (7) then
+         Object.Branch.Set_Key_Value (Stmt.Get_Identifier (7), Session);
+      end if;
+      if not Stmt.Is_Null (8) then
+         Object.Project.Set_Key_Value (Stmt.Get_Identifier (8), Session);
       end if;
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);
@@ -2389,21 +1840,21 @@ package body Porion.Builds.Models is
    end Get_Node;
 
 
-   procedure Set_Build_Config (Object : in out Build_Queue_Ref;
-                               Value  : in Porion.Builds.Models.Build_Config_Ref'Class) is
+   procedure Set_Recipe (Object : in out Build_Queue_Ref;
+                         Value  : in Porion.Builds.Models.Recipe_Ref'Class) is
       Impl : Build_Queue_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 7, Impl.Build_Config, Value);
-   end Set_Build_Config;
+      ADO.Objects.Set_Field_Object (Impl.all, 7, Impl.Recipe, Value);
+   end Set_Recipe;
 
-   function Get_Build_Config (Object : in Build_Queue_Ref)
-                  return Porion.Builds.Models.Build_Config_Ref'Class is
+   function Get_Recipe (Object : in Build_Queue_Ref)
+                  return Porion.Builds.Models.Recipe_Ref'Class is
       Impl : constant Build_Queue_Access
          := Build_Queue_Impl (Object.Get_Load_Object.all)'Access;
    begin
-      return Impl.Build_Config;
-   end Get_Build_Config;
+      return Impl.Recipe;
+   end Get_Recipe;
 
    --  Copy of the object.
    procedure Copy (Object : in Build_Queue_Ref;
@@ -2424,7 +1875,7 @@ package body Porion.Builds.Models is
             Copy.Update_Date := Impl.Update_Date;
             Copy.Order := Impl.Order;
             Copy.Node := Impl.Node;
-            Copy.Build_Config := Impl.Build_Config;
+            Copy.Recipe := Impl.Recipe;
          end;
       end if;
       Into := Result;
@@ -2555,28 +2006,28 @@ package body Porion.Builds.Models is
          := Session.Create_Statement (BUILD_QUEUE_DEF'Access);
    begin
       if Object.Is_Modified (1) then
-         Stmt.Save_Field (Name  => COL_0_5_NAME, --  id
+         Stmt.Save_Field (Name  => COL_0_4_NAME, --  id
                           Value => Object.Get_Key);
          Object.Clear_Modified (1);
       end if;
       if Object.Is_Modified (4) then
-         Stmt.Save_Field (Name  => COL_3_5_NAME, --  update_date
+         Stmt.Save_Field (Name  => COL_3_4_NAME, --  update_date
                           Value => Object.Update_Date);
          Object.Clear_Modified (4);
       end if;
       if Object.Is_Modified (5) then
-         Stmt.Save_Field (Name  => COL_4_5_NAME, --  order
+         Stmt.Save_Field (Name  => COL_4_4_NAME, --  order
                           Value => Object.Order);
          Object.Clear_Modified (5);
       end if;
       if Object.Is_Modified (6) then
-         Stmt.Save_Field (Name  => COL_5_5_NAME, --  node_id
+         Stmt.Save_Field (Name  => COL_5_4_NAME, --  node_id
                           Value => Object.Node);
          Object.Clear_Modified (6);
       end if;
       if Object.Is_Modified (7) then
-         Stmt.Save_Field (Name  => COL_6_5_NAME, --  build_config_id
-                          Value => Object.Build_Config);
+         Stmt.Save_Field (Name  => COL_6_4_NAME, --  recipe_id
+                          Value => Object.Recipe);
          Object.Clear_Modified (7);
       end if;
       if Stmt.Has_Save_Fields then
@@ -2609,20 +2060,20 @@ package body Porion.Builds.Models is
    begin
       Object.Version := 1;
       Session.Allocate (Id => Object);
-      Query.Save_Field (Name  => COL_0_5_NAME, --  id
+      Query.Save_Field (Name  => COL_0_4_NAME, --  id
                         Value => Object.Get_Key);
-      Query.Save_Field (Name  => COL_1_5_NAME, --  version
+      Query.Save_Field (Name  => COL_1_4_NAME, --  version
                         Value => Object.Version);
-      Query.Save_Field (Name  => COL_2_5_NAME, --  creation_date
+      Query.Save_Field (Name  => COL_2_4_NAME, --  creation_date
                         Value => Object.Creation_Date);
-      Query.Save_Field (Name  => COL_3_5_NAME, --  update_date
+      Query.Save_Field (Name  => COL_3_4_NAME, --  update_date
                         Value => Object.Update_Date);
-      Query.Save_Field (Name  => COL_4_5_NAME, --  order
+      Query.Save_Field (Name  => COL_4_4_NAME, --  order
                         Value => Object.Order);
-      Query.Save_Field (Name  => COL_5_5_NAME, --  node_id
+      Query.Save_Field (Name  => COL_5_4_NAME, --  node_id
                         Value => Object.Node);
-      Query.Save_Field (Name  => COL_6_5_NAME, --  build_config_id
-                        Value => Object.Build_Config);
+      Query.Save_Field (Name  => COL_6_4_NAME, --  recipe_id
+                        Value => Object.Recipe);
       Query.Execute (Result);
       if Result /= 1 then
          raise ADO.Objects.INSERT_ERROR;
@@ -2703,9 +2154,558 @@ package body Porion.Builds.Models is
          Object.Node.Set_Key_Value (Stmt.Get_Identifier (5), Session);
       end if;
       if not Stmt.Is_Null (6) then
-         Object.Build_Config.Set_Key_Value (Stmt.Get_Identifier (6), Session);
+         Object.Recipe.Set_Key_Value (Stmt.Get_Identifier (6), Session);
       end if;
       Object.Version := Stmt.Get_Integer (1);
+      ADO.Objects.Set_Created (Object);
+   end Load;
+   function Recipe_Step_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key is
+      Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
+                                       Of_Class => RECIPE_STEP_DEF'Access);
+   begin
+      ADO.Objects.Set_Value (Result, Id);
+      return Result;
+   end Recipe_Step_Key;
+
+   function Recipe_Step_Key (Id : in String) return ADO.Objects.Object_Key is
+      Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.KEY_INTEGER,
+                                       Of_Class => RECIPE_STEP_DEF'Access);
+   begin
+      ADO.Objects.Set_Value (Result, Id);
+      return Result;
+   end Recipe_Step_Key;
+
+   function "=" (Left, Right : Recipe_Step_Ref'Class) return Boolean is
+   begin
+      return ADO.Objects.Object_Ref'Class (Left) = ADO.Objects.Object_Ref'Class (Right);
+   end "=";
+
+   procedure Set_Field (Object : in out Recipe_Step_Ref'Class;
+                        Impl   : out Recipe_Step_Access) is
+      Result : ADO.Objects.Object_Record_Access;
+   begin
+      Object.Prepare_Modify (Result);
+      Impl := Recipe_Step_Impl (Result.all)'Access;
+   end Set_Field;
+
+   --  Internal method to allocate the Object_Record instance
+   procedure Allocate (Object : in out Recipe_Step_Ref) is
+      Impl : Recipe_Step_Access;
+   begin
+      Impl := new Recipe_Step_Impl;
+      Impl.Number := 0;
+      Impl.Builder := Porion.Builds.Models.Builder_Type'First;
+      Impl.Timeout := 0;
+      Impl.Step := Porion.Builds.Step_Type'First;
+      Impl.Version := 0;
+      Impl.Execution := Porion.Builds.Models.Execution_Type'First;
+      ADO.Objects.Set_Object (Object, Impl.all'Access);
+   end Allocate;
+
+   -- ----------------------------------------
+   --  Data object: Recipe_Step
+   -- ----------------------------------------
+
+   procedure Set_Id (Object : in out Recipe_Step_Ref;
+                     Value  : in ADO.Identifier) is
+      Impl : Recipe_Step_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Key_Value (Impl.all, 1, Value);
+   end Set_Id;
+
+   function Get_Id (Object : in Recipe_Step_Ref)
+                  return ADO.Identifier is
+      Impl : constant Recipe_Step_Access
+         := Recipe_Step_Impl (Object.Get_Object.all)'Access;
+   begin
+      return Impl.Get_Key_Value;
+   end Get_Id;
+
+
+   procedure Set_Parameters (Object : in out Recipe_Step_Ref;
+                              Value : in String) is
+      Impl : Recipe_Step_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_String (Impl.all, 2, Impl.Parameters, Value);
+   end Set_Parameters;
+
+   procedure Set_Parameters (Object : in out Recipe_Step_Ref;
+                             Value  : in Ada.Strings.Unbounded.Unbounded_String) is
+      Impl : Recipe_Step_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Unbounded_String (Impl.all, 2, Impl.Parameters, Value);
+   end Set_Parameters;
+
+   function Get_Parameters (Object : in Recipe_Step_Ref)
+                 return String is
+   begin
+      return Ada.Strings.Unbounded.To_String (Object.Get_Parameters);
+   end Get_Parameters;
+   function Get_Parameters (Object : in Recipe_Step_Ref)
+                  return Ada.Strings.Unbounded.Unbounded_String is
+      Impl : constant Recipe_Step_Access
+         := Recipe_Step_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Parameters;
+   end Get_Parameters;
+
+
+   procedure Set_Number (Object : in out Recipe_Step_Ref;
+                         Value  : in Integer) is
+      Impl : Recipe_Step_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Integer (Impl.all, 3, Impl.Number, Value);
+   end Set_Number;
+
+   function Get_Number (Object : in Recipe_Step_Ref)
+                  return Integer is
+      Impl : constant Recipe_Step_Access
+         := Recipe_Step_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Number;
+   end Get_Number;
+
+
+   procedure Set_Builder (Object : in out Recipe_Step_Ref;
+                          Value  : in Porion.Builds.Models.Builder_Type) is
+      procedure Set_Field_Enum is
+        new ADO.Objects.Set_Field_Operation
+          (Porion.Builds.Models.Builder_Type);
+      Impl : Recipe_Step_Access;
+   begin
+      Set_Field (Object, Impl);
+      Set_Field_Enum (Impl.all, 4, Impl.Builder, Value);
+   end Set_Builder;
+
+   function Get_Builder (Object : in Recipe_Step_Ref)
+                  return Porion.Builds.Models.Builder_Type is
+      Impl : constant Recipe_Step_Access
+         := Recipe_Step_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Builder;
+   end Get_Builder;
+
+
+   procedure Set_Timeout (Object : in out Recipe_Step_Ref;
+                          Value  : in Integer) is
+      Impl : Recipe_Step_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Integer (Impl.all, 5, Impl.Timeout, Value);
+   end Set_Timeout;
+
+   function Get_Timeout (Object : in Recipe_Step_Ref)
+                  return Integer is
+      Impl : constant Recipe_Step_Access
+         := Recipe_Step_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Timeout;
+   end Get_Timeout;
+
+
+   procedure Set_Step (Object : in out Recipe_Step_Ref;
+                       Value  : in Porion.Builds.Step_Type) is
+      procedure Set_Field_Enum is
+        new ADO.Objects.Set_Field_Operation
+          (Porion.Builds.Step_Type);
+      Impl : Recipe_Step_Access;
+   begin
+      Set_Field (Object, Impl);
+      Set_Field_Enum (Impl.all, 6, Impl.Step, Value);
+   end Set_Step;
+
+   function Get_Step (Object : in Recipe_Step_Ref)
+                  return Porion.Builds.Step_Type is
+      Impl : constant Recipe_Step_Access
+         := Recipe_Step_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Step;
+   end Get_Step;
+
+
+   procedure Set_Version (Object : in out Recipe_Step_Ref;
+                          Value  : in Integer) is
+      Impl : Recipe_Step_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Integer (Impl.all, 7, Impl.Version, Value);
+   end Set_Version;
+
+   function Get_Version (Object : in Recipe_Step_Ref)
+                  return Integer is
+      Impl : constant Recipe_Step_Access
+         := Recipe_Step_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Version;
+   end Get_Version;
+
+
+   procedure Set_Execution (Object : in out Recipe_Step_Ref;
+                            Value  : in Porion.Builds.Models.Execution_Type) is
+      procedure Set_Field_Enum is
+        new ADO.Objects.Set_Field_Operation
+          (Porion.Builds.Models.Execution_Type);
+      Impl : Recipe_Step_Access;
+   begin
+      Set_Field (Object, Impl);
+      Set_Field_Enum (Impl.all, 8, Impl.Execution, Value);
+   end Set_Execution;
+
+   function Get_Execution (Object : in Recipe_Step_Ref)
+                  return Porion.Builds.Models.Execution_Type is
+      Impl : constant Recipe_Step_Access
+         := Recipe_Step_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Execution;
+   end Get_Execution;
+
+
+   procedure Set_Previous_Version (Object : in out Recipe_Step_Ref;
+                                   Value  : in Porion.Builds.Models.Recipe_Step_Ref'Class) is
+      Impl : Recipe_Step_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Object (Impl.all, 9, Impl.Previous_Version, Value);
+   end Set_Previous_Version;
+
+   function Get_Previous_Version (Object : in Recipe_Step_Ref)
+                  return Porion.Builds.Models.Recipe_Step_Ref'Class is
+      Impl : constant Recipe_Step_Access
+         := Recipe_Step_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Previous_Version;
+   end Get_Previous_Version;
+
+
+   procedure Set_Recipe (Object : in out Recipe_Step_Ref;
+                         Value  : in Porion.Builds.Models.Recipe_Ref'Class) is
+      Impl : Recipe_Step_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Object (Impl.all, 10, Impl.Recipe, Value);
+   end Set_Recipe;
+
+   function Get_Recipe (Object : in Recipe_Step_Ref)
+                  return Porion.Builds.Models.Recipe_Ref'Class is
+      Impl : constant Recipe_Step_Access
+         := Recipe_Step_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Recipe;
+   end Get_Recipe;
+
+   --  Copy of the object.
+   procedure Copy (Object : in Recipe_Step_Ref;
+                   Into   : in out Recipe_Step_Ref) is
+      Result : Recipe_Step_Ref;
+   begin
+      if not Object.Is_Null then
+         declare
+            Impl : constant Recipe_Step_Access
+              := Recipe_Step_Impl (Object.Get_Load_Object.all)'Access;
+            Copy : constant Recipe_Step_Access
+              := new Recipe_Step_Impl;
+         begin
+            ADO.Objects.Set_Object (Result, Copy.all'Access);
+            Copy.Copy (Impl.all);
+            Copy.Parameters := Impl.Parameters;
+            Copy.Number := Impl.Number;
+            Copy.Builder := Impl.Builder;
+            Copy.Timeout := Impl.Timeout;
+            Copy.Step := Impl.Step;
+            Copy.Version := Impl.Version;
+            Copy.Execution := Impl.Execution;
+            Copy.Previous_Version := Impl.Previous_Version;
+            Copy.Recipe := Impl.Recipe;
+         end;
+      end if;
+      Into := Result;
+   end Copy;
+
+   procedure Find (Object  : in out Recipe_Step_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class;
+                   Found   : out Boolean) is
+      Impl  : constant Recipe_Step_Access := new Recipe_Step_Impl;
+   begin
+      Impl.Find (Session, Query, Found);
+      if Found then
+         ADO.Objects.Set_Object (Object, Impl.all'Access);
+      else
+         ADO.Objects.Set_Object (Object, null);
+         Destroy (Impl);
+      end if;
+   end Find;
+
+   procedure Load (Object  : in out Recipe_Step_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Id      : in ADO.Identifier) is
+      Impl  : constant Recipe_Step_Access := new Recipe_Step_Impl;
+      Found : Boolean;
+      Query : ADO.SQL.Query;
+   begin
+      Query.Bind_Param (Position => 1, Value => Id);
+      Query.Set_Filter ("id = ?");
+      Impl.Find (Session, Query, Found);
+      if not Found then
+         Destroy (Impl);
+         raise ADO.Objects.NOT_FOUND;
+      end if;
+      ADO.Objects.Set_Object (Object, Impl.all'Access);
+   end Load;
+
+   procedure Load (Object  : in out Recipe_Step_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Id      : in ADO.Identifier;
+                   Found   : out Boolean) is
+      Impl  : constant Recipe_Step_Access := new Recipe_Step_Impl;
+      Query : ADO.SQL.Query;
+   begin
+      Query.Bind_Param (Position => 1, Value => Id);
+      Query.Set_Filter ("id = ?");
+      Impl.Find (Session, Query, Found);
+      if not Found then
+         Destroy (Impl);
+      else
+         ADO.Objects.Set_Object (Object, Impl.all'Access);
+      end if;
+   end Load;
+
+   procedure Save (Object  : in out Recipe_Step_Ref;
+                   Session : in out ADO.Sessions.Master_Session'Class) is
+      Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;
+   begin
+      if Impl = null then
+         Impl := new Recipe_Step_Impl;
+         ADO.Objects.Set_Object (Object, Impl);
+      end if;
+      if not ADO.Objects.Is_Created (Impl.all) then
+         Impl.Create (Session);
+      else
+         Impl.Save (Session);
+      end if;
+   end Save;
+
+   procedure Delete (Object  : in out Recipe_Step_Ref;
+                     Session : in out ADO.Sessions.Master_Session'Class) is
+      Impl : constant ADO.Objects.Object_Record_Access := Object.Get_Object;
+   begin
+      if Impl /= null then
+         Impl.Delete (Session);
+      end if;
+   end Delete;
+
+   --  --------------------
+   --  Free the object
+   --  --------------------
+   procedure Destroy (Object : access Recipe_Step_Impl) is
+      type Recipe_Step_Impl_Ptr is access all Recipe_Step_Impl;
+      procedure Unchecked_Free is new Ada.Unchecked_Deallocation
+              (Recipe_Step_Impl, Recipe_Step_Impl_Ptr);
+      pragma Warnings (Off, "*redundant conversion*");
+      Ptr : Recipe_Step_Impl_Ptr := Recipe_Step_Impl (Object.all)'Access;
+      pragma Warnings (On, "*redundant conversion*");
+   begin
+      Unchecked_Free (Ptr);
+   end Destroy;
+
+   procedure Find (Object  : in out Recipe_Step_Impl;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class;
+                   Found   : out Boolean) is
+      Stmt : ADO.Statements.Query_Statement
+          := Session.Create_Statement (Query, RECIPE_STEP_DEF'Access);
+   begin
+      Stmt.Execute;
+      if Stmt.Has_Elements then
+         Object.Load (Stmt, Session);
+         Stmt.Next;
+         Found := not Stmt.Has_Elements;
+      else
+         Found := False;
+      end if;
+   end Find;
+
+   overriding
+   procedure Load (Object  : in out Recipe_Step_Impl;
+                   Session : in out ADO.Sessions.Session'Class) is
+      Found : Boolean;
+      Query : ADO.SQL.Query;
+      Id    : constant ADO.Identifier := Object.Get_Key_Value;
+   begin
+      Query.Bind_Param (Position => 1, Value => Id);
+      Query.Set_Filter ("id = ?");
+      Object.Find (Session, Query, Found);
+      if not Found then
+         raise ADO.Objects.NOT_FOUND;
+      end if;
+   end Load;
+
+   procedure Save (Object  : in out Recipe_Step_Impl;
+                   Session : in out ADO.Sessions.Master_Session'Class) is
+      Stmt : ADO.Statements.Update_Statement
+         := Session.Create_Statement (RECIPE_STEP_DEF'Access);
+   begin
+      if Object.Is_Modified (7) then
+         Stmt.Save_Field (Name  => COL_6_5_NAME, --  version
+                          Value => Object.Version);
+         Object.Clear_Modified (7);
+      end if;
+      if Object.Is_Modified (8) then
+         Stmt.Save_Field (Name  => COL_7_5_NAME, --  execution
+                          Value => Integer (Porion.Builds.Models.Execution_Type'Pos (Object.Execution)));
+         Object.Clear_Modified (8);
+      end if;
+      if Object.Is_Modified (9) then
+         Stmt.Save_Field (Name  => COL_8_5_NAME, --  previous_version_id
+                          Value => Object.Previous_Version);
+         Object.Clear_Modified (9);
+      end if;
+      if Object.Is_Modified (10) then
+         Stmt.Save_Field (Name  => COL_9_5_NAME, --  recipe_id
+                          Value => Object.Recipe);
+         Object.Clear_Modified (10);
+      end if;
+      if Stmt.Has_Save_Fields then
+         Stmt.Set_Filter (Filter => "id = ?");
+         Stmt.Add_Param (Value => Object.Get_Key);
+         declare
+            Result : Integer;
+         begin
+            Stmt.Execute (Result);
+            if Result /= 1 then
+               if Result /= 0 then
+                  raise ADO.Objects.UPDATE_ERROR;
+               end if;
+            end if;
+         end;
+      end if;
+   end Save;
+
+   procedure Create (Object  : in out Recipe_Step_Impl;
+                     Session : in out ADO.Sessions.Master_Session'Class) is
+      Query : ADO.Statements.Insert_Statement
+                  := Session.Create_Statement (RECIPE_STEP_DEF'Access);
+      Result : Integer;
+   begin
+      Session.Allocate (Id => Object);
+      Query.Save_Field (Name  => COL_0_5_NAME, --  id
+                        Value => Object.Get_Key);
+      Query.Save_Field (Name  => COL_1_5_NAME, --  parameters
+                        Value => Object.Parameters);
+      Query.Save_Field (Name  => COL_2_5_NAME, --  number
+                        Value => Object.Number);
+      Query.Save_Field (Name  => COL_3_5_NAME, --  builder
+                        Value => Integer (Porion.Builds.Models.Builder_Type'Pos (Object.Builder)));
+      Query.Save_Field (Name  => COL_4_5_NAME, --  timeout
+                        Value => Object.Timeout);
+      Query.Save_Field (Name  => COL_5_5_NAME, --  step
+                        Value => Integer (Porion.Builds.Step_Type'Pos (Object.Step)));
+      Query.Save_Field (Name  => COL_6_5_NAME, --  version
+                        Value => Object.Version);
+      Query.Save_Field (Name  => COL_7_5_NAME, --  execution
+                        Value => Integer (Porion.Builds.Models.Execution_Type'Pos (Object.Execution)));
+      Query.Save_Field (Name  => COL_8_5_NAME, --  previous_version_id
+                        Value => Object.Previous_Version);
+      Query.Save_Field (Name  => COL_9_5_NAME, --  recipe_id
+                        Value => Object.Recipe);
+      Query.Execute (Result);
+      if Result /= 1 then
+         raise ADO.Objects.INSERT_ERROR;
+      end if;
+      ADO.Objects.Set_Created (Object);
+   end Create;
+
+   procedure Delete (Object  : in out Recipe_Step_Impl;
+                     Session : in out ADO.Sessions.Master_Session'Class) is
+      Stmt : ADO.Statements.Delete_Statement
+         := Session.Create_Statement (RECIPE_STEP_DEF'Access);
+   begin
+      Stmt.Set_Filter (Filter => "id = ?");
+      Stmt.Add_Param (Value => Object.Get_Key);
+      Stmt.Execute;
+   end Delete;
+
+   --  ------------------------------
+   --  Get the bean attribute identified by the name.
+   --  ------------------------------
+   overriding
+   function Get_Value (From : in Recipe_Step_Ref;
+                       Name : in String) return Util.Beans.Objects.Object is
+      Obj  : ADO.Objects.Object_Record_Access;
+      Impl : access Recipe_Step_Impl;
+   begin
+      if From.Is_Null then
+         return Util.Beans.Objects.Null_Object;
+      end if;
+      Obj := From.Get_Load_Object;
+      Impl := Recipe_Step_Impl (Obj.all)'Access;
+      if Name = "id" then
+         return ADO.Objects.To_Object (Impl.Get_Key);
+      elsif Name = "parameters" then
+         return Util.Beans.Objects.To_Object (Impl.Parameters);
+      elsif Name = "number" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Number));
+      elsif Name = "builder" then
+         return Porion.Builds.Models.Builder_Type_Objects.To_Object (Impl.Builder);
+      elsif Name = "timeout" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Timeout));
+      elsif Name = "step" then
+         return Porion.Builds.Step_Type_Objects.To_Object (Impl.Step);
+      elsif Name = "version" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Version));
+      elsif Name = "execution" then
+         return Porion.Builds.Models.Execution_Type_Objects.To_Object (Impl.Execution);
+      end if;
+      return Util.Beans.Objects.Null_Object;
+   end Get_Value;
+
+
+   procedure List (Object  : in out Recipe_Step_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class) is
+      Stmt : ADO.Statements.Query_Statement
+        := Session.Create_Statement (Query, RECIPE_STEP_DEF'Access);
+   begin
+      Stmt.Execute;
+      Recipe_Step_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         declare
+            Item : Recipe_Step_Ref;
+            Impl : constant Recipe_Step_Access := new Recipe_Step_Impl;
+         begin
+            Impl.Load (Stmt, Session);
+            ADO.Objects.Set_Object (Item, Impl.all'Access);
+            Object.Append (Item);
+         end;
+         Stmt.Next;
+      end loop;
+   end List;
+
+   --  ------------------------------
+   --  Load the object from current iterator position
+   --  ------------------------------
+   procedure Load (Object  : in out Recipe_Step_Impl;
+                   Stmt    : in out ADO.Statements.Query_Statement'Class;
+                   Session : in out ADO.Sessions.Session'Class) is
+   begin
+      Object.Set_Key_Value (Stmt.Get_Identifier (0));
+      Object.Parameters := Stmt.Get_Unbounded_String (1);
+      Object.Number := Stmt.Get_Integer (2);
+      Object.Builder := Porion.Builds.Models.Builder_Type'Val (Stmt.Get_Integer (3));
+      Object.Timeout := Stmt.Get_Integer (4);
+      Object.Step := Porion.Builds.Step_Type'Val (Stmt.Get_Integer (5));
+      Object.Version := Stmt.Get_Integer (6);
+      Object.Execution := Porion.Builds.Models.Execution_Type'Val (Stmt.Get_Integer (7));
+      if not Stmt.Is_Null (8) then
+         Object.Previous_Version.Set_Key_Value (Stmt.Get_Identifier (8), Session);
+      end if;
+      if not Stmt.Is_Null (9) then
+         Object.Recipe.Set_Key_Value (Stmt.Get_Identifier (9), Session);
+      end if;
       ADO.Objects.Set_Created (Object);
    end Load;
    function Build_Step_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key is
@@ -2837,21 +2837,21 @@ package body Porion.Builds.Models is
    end Get_Build;
 
 
-   procedure Set_Config (Object : in out Build_Step_Ref;
-                         Value  : in Porion.Builds.Models.Build_Config_Step_Ref'Class) is
+   procedure Set_Recipe_Step (Object : in out Build_Step_Ref;
+                              Value  : in Porion.Builds.Models.Recipe_Step_Ref'Class) is
       Impl : Build_Step_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 6, Impl.Config, Value);
-   end Set_Config;
+      ADO.Objects.Set_Field_Object (Impl.all, 6, Impl.Recipe_Step, Value);
+   end Set_Recipe_Step;
 
-   function Get_Config (Object : in Build_Step_Ref)
-                  return Porion.Builds.Models.Build_Config_Step_Ref'Class is
+   function Get_Recipe_Step (Object : in Build_Step_Ref)
+                  return Porion.Builds.Models.Recipe_Step_Ref'Class is
       Impl : constant Build_Step_Access
          := Build_Step_Impl (Object.Get_Load_Object.all)'Access;
    begin
-      return Impl.Config;
-   end Get_Config;
+      return Impl.Recipe_Step;
+   end Get_Recipe_Step;
 
    --  Copy of the object.
    procedure Copy (Object : in Build_Step_Ref;
@@ -2871,7 +2871,7 @@ package body Porion.Builds.Models is
             Copy.End_Date := Impl.End_Date;
             Copy.Exit_Status := Impl.Exit_Status;
             Copy.Build := Impl.Build;
-            Copy.Config := Impl.Config;
+            Copy.Recipe_Step := Impl.Recipe_Step;
          end;
       end if;
       Into := Result;
@@ -3017,8 +3017,8 @@ package body Porion.Builds.Models is
          Object.Clear_Modified (5);
       end if;
       if Object.Is_Modified (6) then
-         Stmt.Save_Field (Name  => COL_5_6_NAME, --  config_id
-                          Value => Object.Config);
+         Stmt.Save_Field (Name  => COL_5_6_NAME, --  recipe_step_id
+                          Value => Object.Recipe_Step);
          Object.Clear_Modified (6);
       end if;
       if Stmt.Has_Save_Fields then
@@ -3054,8 +3054,8 @@ package body Porion.Builds.Models is
                         Value => Object.Exit_Status);
       Query.Save_Field (Name  => COL_4_6_NAME, --  build_id
                         Value => Object.Build);
-      Query.Save_Field (Name  => COL_5_6_NAME, --  config_id
-                        Value => Object.Config);
+      Query.Save_Field (Name  => COL_5_6_NAME, --  recipe_step_id
+                        Value => Object.Recipe_Step);
       Query.Execute (Result);
       if Result /= 1 then
          raise ADO.Objects.INSERT_ERROR;
@@ -3140,7 +3140,7 @@ package body Porion.Builds.Models is
          Object.Build.Set_Key_Value (Stmt.Get_Identifier (4), Session);
       end if;
       if not Stmt.Is_Null (5) then
-         Object.Config.Set_Key_Value (Stmt.Get_Identifier (5), Session);
+         Object.Recipe_Step.Set_Key_Value (Stmt.Get_Identifier (5), Session);
       end if;
       ADO.Objects.Set_Created (Object);
    end Load;
@@ -3289,21 +3289,21 @@ package body Porion.Builds.Models is
    end Get_Node;
 
 
-   procedure Set_Build_Config (Object : in out Environment_Ref;
-                               Value  : in Porion.Builds.Models.Build_Config_Ref'Class) is
+   procedure Set_Recipe (Object : in out Environment_Ref;
+                         Value  : in Porion.Builds.Models.Recipe_Ref'Class) is
       Impl : Environment_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 6, Impl.Build_Config, Value);
-   end Set_Build_Config;
+      ADO.Objects.Set_Field_Object (Impl.all, 6, Impl.Recipe, Value);
+   end Set_Recipe;
 
-   function Get_Build_Config (Object : in Environment_Ref)
-                  return Porion.Builds.Models.Build_Config_Ref'Class is
+   function Get_Recipe (Object : in Environment_Ref)
+                  return Porion.Builds.Models.Recipe_Ref'Class is
       Impl : constant Environment_Access
          := Environment_Impl (Object.Get_Load_Object.all)'Access;
    begin
-      return Impl.Build_Config;
-   end Get_Build_Config;
+      return Impl.Recipe;
+   end Get_Recipe;
 
    --  Copy of the object.
    procedure Copy (Object : in Environment_Ref;
@@ -3323,7 +3323,7 @@ package body Porion.Builds.Models is
             Copy.Name := Impl.Name;
             Copy.Value := Impl.Value;
             Copy.Node := Impl.Node;
-            Copy.Build_Config := Impl.Build_Config;
+            Copy.Recipe := Impl.Recipe;
          end;
       end if;
       Into := Result;
@@ -3469,8 +3469,8 @@ package body Porion.Builds.Models is
          Object.Clear_Modified (5);
       end if;
       if Object.Is_Modified (6) then
-         Stmt.Save_Field (Name  => COL_5_7_NAME, --  build_config_id
-                          Value => Object.Build_Config);
+         Stmt.Save_Field (Name  => COL_5_7_NAME, --  recipe_id
+                          Value => Object.Recipe);
          Object.Clear_Modified (6);
       end if;
       if Stmt.Has_Save_Fields then
@@ -3514,8 +3514,8 @@ package body Porion.Builds.Models is
                         Value => Object.Value);
       Query.Save_Field (Name  => COL_4_7_NAME, --  node_id
                         Value => Object.Node);
-      Query.Save_Field (Name  => COL_5_7_NAME, --  build_config_id
-                        Value => Object.Build_Config);
+      Query.Save_Field (Name  => COL_5_7_NAME, --  recipe_id
+                        Value => Object.Recipe);
       Query.Execute (Result);
       if Result /= 1 then
          raise ADO.Objects.INSERT_ERROR;
@@ -3594,7 +3594,7 @@ package body Porion.Builds.Models is
          Object.Node.Set_Key_Value (Stmt.Get_Identifier (4), Session);
       end if;
       if not Stmt.Is_Null (5) then
-         Object.Build_Config.Set_Key_Value (Stmt.Get_Identifier (5), Session);
+         Object.Recipe.Set_Key_Value (Stmt.Get_Identifier (5), Session);
       end if;
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);
@@ -3722,21 +3722,21 @@ package body Porion.Builds.Models is
    end Get_Branch;
 
 
-   procedure Set_Build_Config (Object : in out Last_Build_Ref;
-                               Value  : in Porion.Builds.Models.Build_Config_Ref'Class) is
+   procedure Set_Recipe (Object : in out Last_Build_Ref;
+                         Value  : in Porion.Builds.Models.Recipe_Ref'Class) is
       Impl : Last_Build_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 6, Impl.Build_Config, Value);
-   end Set_Build_Config;
+      ADO.Objects.Set_Field_Object (Impl.all, 6, Impl.Recipe, Value);
+   end Set_Recipe;
 
-   function Get_Build_Config (Object : in Last_Build_Ref)
-                  return Porion.Builds.Models.Build_Config_Ref'Class is
+   function Get_Recipe (Object : in Last_Build_Ref)
+                  return Porion.Builds.Models.Recipe_Ref'Class is
       Impl : constant Last_Build_Access
          := Last_Build_Impl (Object.Get_Load_Object.all)'Access;
    begin
-      return Impl.Build_Config;
-   end Get_Build_Config;
+      return Impl.Recipe;
+   end Get_Recipe;
 
    --  Copy of the object.
    procedure Copy (Object : in Last_Build_Ref;
@@ -3756,7 +3756,7 @@ package body Porion.Builds.Models is
             Copy.Version := Impl.Version;
             Copy.Build := Impl.Build;
             Copy.Branch := Impl.Branch;
-            Copy.Build_Config := Impl.Build_Config;
+            Copy.Recipe := Impl.Recipe;
          end;
       end if;
       Into := Result;
@@ -3902,8 +3902,8 @@ package body Porion.Builds.Models is
          Object.Clear_Modified (5);
       end if;
       if Object.Is_Modified (6) then
-         Stmt.Save_Field (Name  => COL_5_8_NAME, --  build_config_id
-                          Value => Object.Build_Config);
+         Stmt.Save_Field (Name  => COL_5_8_NAME, --  recipe_id
+                          Value => Object.Recipe);
          Object.Clear_Modified (6);
       end if;
       if Stmt.Has_Save_Fields then
@@ -3946,8 +3946,8 @@ package body Porion.Builds.Models is
                         Value => Object.Build);
       Query.Save_Field (Name  => COL_4_8_NAME, --  branch_id
                         Value => Object.Branch);
-      Query.Save_Field (Name  => COL_5_8_NAME, --  build_config_id
-                        Value => Object.Build_Config);
+      Query.Save_Field (Name  => COL_5_8_NAME, --  recipe_id
+                        Value => Object.Recipe);
       Query.Execute (Result);
       if Result /= 1 then
          raise ADO.Objects.INSERT_ERROR;
@@ -4025,7 +4025,7 @@ package body Porion.Builds.Models is
          Object.Branch.Set_Key_Value (Stmt.Get_Identifier (4), Session);
       end if;
       if not Stmt.Is_Null (5) then
-         Object.Build_Config.Set_Key_Value (Stmt.Get_Identifier (5), Session);
+         Object.Recipe.Set_Key_Value (Stmt.Get_Identifier (5), Session);
       end if;
       Object.Version := Stmt.Get_Integer (2);
       ADO.Objects.Set_Created (Object);

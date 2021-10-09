@@ -41,7 +41,7 @@ package body Porion.Commands.Build is
             Name          : constant String := Args.Get_Argument (I);
             Source_Status : Porion.Sources.Status_Type;
             Executor      : Porion.Executors.Executor_Type;
-            Build_Configs : Porion.Builds.Models.Build_Config_Vector;
+            Build_Configs : Porion.Builds.Models.Recipe_Vector;
          begin
             Context.Project_Service.Load_Project (Name);
 

@@ -50,7 +50,7 @@ package body Porion.Commands.Steps is
 
          Context.Build_Service.Open (Context.Project_Service);
 
-         Context.Build_Service.Load_Config;
+         Context.Build_Service.Load_Recipe;
 
          if Command.Delete_Pos > 0 then
             Context.Build_Service.Delete_Step (Command.Delete_Pos);

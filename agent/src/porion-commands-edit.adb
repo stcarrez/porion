@@ -62,7 +62,7 @@ package body Porion.Commands.Edit is
    begin
       Context.Project_Service.Load_Project (Name);
       Context.Build_Service.Open (Context.Project_Service);
-      Context.Build_Service.Load_Config;
+      Context.Build_Service.Load_Recipe;
 
       Buffer.Initialize (Output => File'Unchecked_Access,
                          Size   => 4096);

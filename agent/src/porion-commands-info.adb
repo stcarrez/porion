@@ -88,7 +88,7 @@ package body Porion.Commands.Info is
 
             Last_Builds   : Porion.Builds.Models.Last_Build_Vector;
             Executor      : Porion.Executors.Executor_Type;
-            Build_Configs : Porion.Builds.Models.Build_Config_Vector;
+            Build_Configs : Porion.Builds.Models.Recipe_Vector;
          begin
             Context.Project_Service.Load_Project (Project_Name);
             Context.Build_Service.Open (Context.Project_Service);

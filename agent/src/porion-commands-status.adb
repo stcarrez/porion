@@ -43,7 +43,7 @@ package body Porion.Commands.Status is
          begin
             Context.Project_Service.Load_Project (Name);
             Context.Build_Service.Open (Context.Project_Service);
-            Context.Build_Service.Load_Config;
+            Context.Build_Service.Load_Recipe;
 
             Output.Initialize (Size => 100000);
             if Command.Json then

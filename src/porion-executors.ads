@@ -119,7 +119,7 @@ private
       Output_Log : Boolean := False;
       Commands   : Command_Vector;
       Status     : Integer := 0;
-      Step       : Porion.Builds.Step_Type;
+      Step       : Porion.Builds.Step_Type := Porion.Builds.STEP_CHECKOUT;
       Logger     : Porion.Loggers.Logger_Type;
       Controller : Porion.Nodes.Controller_Access;
       Local      : Porion.Nodes.Controller_Access;

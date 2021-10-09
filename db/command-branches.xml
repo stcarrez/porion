@@ -14,8 +14,8 @@
         <property type='String' name="branch_tag">
             <comment>the branch tag.</comment>
         </property>
-        <property type='Integer' name="config_count">
-            <comment>the number of build config for this branch.</comment>
+        <property type='Integer' name="recipe_count">
+            <comment>the number of build recipes for this branch.</comment>
         </property>
     </class>
 
@@ -26,9 +26,9 @@
             branch.name AS name,
             branch.status AS status,
             branch.tag AS tag,
-            COUNT(build_config.id) AS config_count
+            COUNT(recipe.id) AS recipe_count
             FROM porion_branch AS branch
-            LEFT JOIN porion_build_config AS build_config ON build_config.branch_id = branch.id
+            LEFT JOIN porion_recipe AS recipe ON recipe.branch_id = branch.id
             WHERE branch.project_id = :project_id
             GROUP BY branch.id
         </sql>

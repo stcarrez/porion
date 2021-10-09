@@ -17,8 +17,8 @@
         <property type='Porion.Projects.Models.Branch_Status_Type' name="branch_status">
             <comment>the branch status.</comment>
         </property>
-        <property type='String' name="config_name">
-            <comment>the config name.</comment>
+        <property type='String' name="recipe_name">
+            <comment>the recipe name.</comment>
         </property>
         <property type='Integer' name="build_id">
             <comment>the build id.</comment>
@@ -57,7 +57,7 @@
             project.status AS status,
             branch.name AS branch_name,
             branch.status AS branch_status,
-            config.name AS config_name,
+            recipe.name AS recipe_name,
             build.id AS build_id,
             build.number AS number,
             build.tag AS tag,
@@ -70,7 +70,7 @@
             FROM porion_build AS build
             INNER JOIN porion_project AS project ON build.project_id = project.id
             INNER JOIN porion_branch AS branch ON branch.id = build.branch_id
-            INNER JOIN porion_build_config AS config ON build.build_config_id = config.id
+            INNER JOIN porion_recipe AS recipe ON build.recipe_id = recipe.id
             ORDER BY finish_date DESC
         </sql>
         <sql-count>
@@ -88,7 +88,7 @@
             project.status AS status,
             branch.name AS branch_name,
             branch.status AS branch_status,
-            config.name AS config_name,
+            recipe.name AS recipe_name,
             build.id AS build_id,
             build.number AS number,
             build.tag AS tag,
@@ -102,7 +102,7 @@
             INNER JOIN porion_build AS build ON last_build.build_id = build.id
             INNER JOIN porion_project AS project ON build.project_id = project.id
             INNER JOIN porion_branch AS branch ON branch.id = build.branch_id
-            INNER JOIN porion_build_config AS config ON build.build_config_id = config.id
+            INNER JOIN porion_recipe AS recipe ON build.recipe_id = config.id
             WHERE project.id = :project_id
             ORDER BY finish_date DESC
         </sql>

@@ -47,8 +47,8 @@
     <query name='cleanup-project-last-build'>
        <comment>Cleanup the project last build references of a project.</comment>
        <sql>
-    DELETE FROM porion_last_build WHERE build_config_id IN
-      (SELECT id FROM porion_build_config WHERE project_id = :project_id)
+    DELETE FROM porion_last_build WHERE recipe_id IN
+      (SELECT id FROM porion_recipe WHERE project_id = :project_id)
        </sql>
     </query>
 
@@ -62,23 +62,23 @@
     <query name='cleanup-project-environment'>
        <comment>Cleanup the project specific environment.</comment>
        <sql>
-    DELETE FROM porion_environment WHERE build_config_id IN
-      (SELECT id FROM porion_build_config WHERE project_id = :project_id)
+    DELETE FROM porion_environment WHERE recipe_id IN
+      (SELECT id FROM porion_recipe WHERE project_id = :project_id)
        </sql>
     </query>
 
     <query name='cleanup-project-build-config-step'>
        <comment>Cleanup the project build config of a project.</comment>
        <sql>
-    DELETE FROM porion_build_config_step WHERE build_config_id IN
-      (SELECT id FROM porion_build_config WHERE project_id = :project_id)
+    DELETE FROM porion_recipe_step WHERE recipe_id IN
+      (SELECT id FROM porion_recipe WHERE project_id = :project_id)
        </sql>
     </query>
 
     <query name='cleanup-project-build-config'>
-       <comment>Cleanup the project build config of a project.</comment>
+       <comment>Cleanup the project build recipe of a project.</comment>
        <sql>
-    DELETE FROM porion_build_config WHERE project_id = :project_id
+    DELETE FROM porion_recipe WHERE project_id = :project_id
        </sql>
     </query>
 

@@ -5,8 +5,8 @@
 
     <class name="Porion.Builds.Models.Build_Status" bean="yes">
         <comment>Summary of information about last builds of a project.</comment>
-        <property type='ADO.Identifier' name="config_id">
-            <comment>the build config id.</comment>
+        <property type='ADO.Identifier' name="recipe_id">
+            <comment>the build recipe id.</comment>
         </property>
         <property type='Porion.Builds.Models.Build_Status_Type' name="build_status">
             <comment>the last build status.</comment>
@@ -32,10 +32,10 @@
     </class>
 
     <query name='project-build-status'>
-        <comment>Get the build status of every configuration of a project</comment>
+        <comment>Get the build status of every recipes of a project</comment>
         <sql>
           SELECT
-          config.id,
+          recipe.id,
           build.status,
           build.tag,
           build.number,
@@ -43,11 +43,11 @@
           build.fail_count,
           build.timeout_count,
           build.finish_date
-          FROM porion_build_config AS config
-          INNER JOIN porion_last_build AS last_build ON last_build.build_config_id = config.id
+          FROM porion_recipe AS recipe
+          INNER JOIN porion_last_build AS last_build ON last_build.recipe_id = recipe.id
           INNER JOIN porion_build AS build ON last_build.build_id = build.id
-          WHERE config.project_id = 1 AND
-             build.id IN (SELECT MAX(sb.build_id) FROM porion_last_build AS sb WHERE sb.build_config_id = config.id)
+          WHERE recipe.project_id = 1 AND
+             build.id IN (SELECT MAX(sb.build_id) FROM porion_last_build AS sb WHERE sb.recipe_id = recipe.id)
         </sql>
     </query>
 

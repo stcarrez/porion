@@ -35,6 +35,9 @@ package Porion.Projects is
    --  Raises the Invalid_Ident exception if the format is invalid.
    function Parse (Ident : in String) return Ident_Type;
 
+   --  Get a printable represnetation of the split identification string.
+   function To_String (Ident : in Ident_Type) return String;
+
    type Project_Type is record
       Name    : UString;
       Path    : UString;

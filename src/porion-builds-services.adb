@@ -728,6 +728,68 @@ package body Porion.Builds.Services is
       Service.Guess (Path, Executor);
    end Make_Build_Config;
 
+   procedure Copy_Recipe (Service  : in out Context_Type;
+                          Branch   : in String;
+                          Node     : in String) is
+      Name    : constant String := Service.Project.Get_Name;
+      Query   : ADO.SQL.Query;
+      Found   : Boolean;
+   begin
+      Log.Info ("Copy build recipe {0} for branch {1} and node {2}", Name, Branch, Node);
+
+      Service.Load_Build_Steps;
+
+      if Branch'Length > 0 then
+         Query.Set_Filter ("o.project_id = :project_id and o.name = :branch");
+         Query.Bind_Param ("project_id", Service.Project.Get_Id);
+         Query.Bind_Param ("branch", Branch);
+         Service.Branch.Find (Service.DB, Query, Found);
+         if not Found then
+            Log.Error ("Branch {0} not found in database", Branch);
+            return;
+         end if;
+      end if;
+
+      if Node'Length > 0 then
+         Service.Load_Node (Node);
+      end if;
+
+      if Service.Build_Node.Is_Null then
+         Service.Load_Node ("localhost");
+      end if;
+
+      Service.DB.Begin_Transaction;
+      declare
+         New_Config : Models.Build_Config_Ref;
+      begin
+         New_Config.Set_Name (String '(Service.Build_Config.Get_Name));
+         New_Config.Set_Description (String '(Service.Build_Config.Get_Description));
+         New_Config.Set_Rate_Factor (Service.Build_Config.Get_Rate_Factor);
+         New_Config.Set_Status (Builds.Models.CONFIG_BUILD_REQUIRED);
+         New_Config.Set_Node (Service.Build_Node);
+         New_Config.Set_Project (Service.Project);
+         New_Config.Set_Branch (Service.Branch);
+         New_Config.Save (Service.DB);
+
+         for Step of Service.Steps loop
+            declare
+               Src_Step : constant Models.Build_Config_Step_Ref := Step.Step;
+               New_Step : Models.Build_Config_Step_Ref;
+            begin
+               New_Step.Set_Parameters (String '(Src_Step.Get_Parameters));
+               New_Step.Set_Number (Src_Step.Get_Number);
+               New_Step.Set_Timeout (Src_Step.Get_Timeout);
+               New_Step.Set_Build_Config (New_Config);
+               New_Step.Set_Builder (Src_Step.Get_Builder);
+               New_Step.Set_Execution (Src_Step.Get_Execution);
+               New_Step.Set_Step (Src_Step.Get_Step);
+               New_Step.Save (Service.DB);
+            end;
+         end loop;
+      end;
+      Service.DB.Commit;
+   end Copy_Recipe;
+
    procedure Guess (Service  : in out Context_Type;
                     Path     : in String;
                     Executor : in out Porion.Executors.Executor_Type'Class) is

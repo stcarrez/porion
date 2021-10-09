@@ -81,6 +81,33 @@ package body Porion.Projects is
       return Result;
    end Parse;
 
+   --  ------------------------------
+   --  Get a printable represnetation of the split identification string.
+   --  ------------------------------
+   function To_String (Ident : in Ident_Type) return String is
+      use Ada.Strings.Unbounded;
+
+      Result : UString;
+   begin
+      Append (Result, Ident.Name);
+      if Length (Ident.Branch) > 0 then
+         Append (Result, "^");
+         Append (Result, Ident.Branch);
+      end if;
+
+      if Length (Ident.Recipe) > 0 then
+         Append (Result, "~");
+         Append (Result, Ident.Recipe);
+      end if;
+
+      if Length (Ident.Node) > 0 then
+         Append (Result, "@");
+         Append (Result, Ident.Node);
+      end if;
+
+      return To_String (Result);
+   end To_String;
+
    --  Load the project description.
    procedure Load_Project (Name    : in String;
                            Project : in out Project_Type) is

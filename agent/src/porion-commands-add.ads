@@ -35,8 +35,18 @@ private package Porion.Commands.Add is
 
 private
 
+   --  Add a project with source control described by the URI.
+   procedure Add_Project (Command : in out Command_Type;
+                          URI     : in String;
+                          Context : in out Context_Type);
+
+   --  Add a recipe to build an existing project.
+   procedure Add_Recipe (Command : in out Command_Type;
+                         Name    : in String;
+                         Context : in out Context_Type);
+
    type Command_Type is new Porion.Commands.Drivers.Command_Type with record
-      Json : aliased Boolean := False;
+      Recipe : aliased Boolean := False;
    end record;
 
 end Porion.Commands.Add;

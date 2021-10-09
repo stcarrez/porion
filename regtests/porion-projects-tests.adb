@@ -27,9 +27,13 @@ package body Porion.Projects.Tests is
    begin
       Caller.Add_Test (Suite, "Test Porion.Projects.Parse",
                        Test_Parse'Access);
+      Caller.Add_Test (Suite, "Test Porion.Projects.To_String",
+                       Test_To_String'Access);
    end Add_Tests;
 
+   --  ------------------------------
    --  Test parsing a project identification string.
+   --  ------------------------------
    procedure Test_Parse (T : in out Test) is
       procedure Check (Ident, Name, Branch, Recipe, Node : in String);
 
@@ -61,5 +65,25 @@ package body Porion.Projects.Tests is
       Check ("prj~3@host", "prj", "", "3", "host");
 
    end Test_Parse;
+
+   --  ------------------------------
+   --  Test converting the Ident_Type back to a string.
+   --  ------------------------------
+   procedure Test_To_String (T : in out Test) is
+      procedure Check (Ident : in String);
+
+      procedure Check (Ident : in String) is
+         Result : Ident_Type;
+      begin
+         Result := Parse (Ident);
+         Assert_Equals (T, Ident, To_String (Result), "invalid To_String");
+      end Check;
+
+   begin
+      Check ("project@host");
+      Check ("prj^branch");
+      Check ("prj~config");
+      Check ("prj^branch@hostname");
+   end Test_To_String;
 
 end Porion.Projects.Tests;

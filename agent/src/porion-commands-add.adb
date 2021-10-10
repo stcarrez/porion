@@ -18,6 +18,7 @@
 with Porion.Projects.Services;
 with Porion.Configs;
 with Porion.Executors;
+with Porion.Services;
 with Porion.Sources.Factories;
 package body Porion.Commands.Add is
 
@@ -38,12 +39,12 @@ package body Porion.Commands.Add is
                                       Result   => Info,
                                       Executor => Executor);
 
-      Context.Project_Service.Add_Project (Info);
+      Projects.Services.Add_Project (Context.Project_Service, Info);
       Context.Console.Notice (N_INFO, Format (-("Project {0} - {1} added"),
                               To_String (Info.Name), URI));
 
       --  Step 2: identify the branches of the project (only the main branch is enabled).
-      Context.Project_Service.Check_Sources (Status, Executor);
+      Projects.Services.Check_Sources (Context.Project_Service, Status, Executor);
 
       Context.Build_Service.Open (Context.Project_Service);
 
@@ -65,17 +66,52 @@ package body Porion.Commands.Add is
    --  Add a recipe to build an existing project.
    --  ------------------------------
    procedure Add_Recipe (Command : in out Command_Type;
-                         Name    : in String;
+                         Target  : in String;
+                         Source  : in String;
                          Context : in out Context_Type) is
-      Sep : constant Natural := Util.Strings.Index (Name, '@');
+      Ident : Porion.Projects.Ident_Type;
    begin
-      if Sep = 0 then
-         return;
+      if Source'Length > 0 then
+         begin
+            Ident := Porion.Projects.Parse (Source);
+
+         exception
+            when Porion.Projects.Invalid_Ident =>
+               Commands.Error (-("invalid source identification '{0}'"), Source);
+               return;
+         end;
+
+         begin
+            Context.Project_Service.Load (Ident);
+
+         exception
+            when Porion.Services.Not_Found =>
+               Commands.Error (-("source project '{0}' not found"),
+                               To_String (Ident.Name));
+               return;
+         end;
       end if;
 
-      Context.Project_Service.Load_Project (Name (Name'First .. Sep - 1));
+      Ident := Porion.Projects.Parse (Target);
 
-      Context.Project_Service.Load_Node (Name (Sep + 1 .. Name'Last));
+      begin
+         Context.Project_Service.Load_Project (To_String (Ident.Name));
+
+      exception
+         when Porion.Services.Not_Found =>
+            Commands.Error (-("project '{0}' not found"),
+                            To_String (Ident.Name));
+            return;
+      end;
+
+      Context.Build_Service.Copy_Recipe (To_String (Ident.Name),
+                                         To_String (Ident.Branch),
+                                         To_String (Ident.Node),
+                                         Context.Project_Service.Build_Config);
+
+   exception
+      when Porion.Projects.Invalid_Ident =>
+         Commands.Error (-("invalid project identification '{0}'"), Target);
    end Add_Recipe;
 
    --  ------------------------------
@@ -98,7 +134,11 @@ package body Porion.Commands.Add is
          URI : constant String := Args.Get_Argument (1);
       begin
          if Command.Recipe then
-            Command.Add_Recipe (URI, Context);
+            if Args.Get_Count = 2 then
+               Command.Add_Recipe (URI, Args.Get_Argument (2), Context);
+            else
+               Command.Add_Recipe (URI, "", Context);
+            end if;
          else
             Command.Add_Project (URI, Context);
          end if;

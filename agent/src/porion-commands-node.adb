@@ -16,6 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Porion.Projects.Services;
+with Porion.Nodes.Services;
 with Porion.Services;
 package body Porion.Commands.Node is
 
@@ -130,7 +131,7 @@ package body Porion.Commands.Node is
       if Command.Remove then
          return;
       else
-         Context.Node_Service.Open (Context.Project_Service);
+         Context.Project_Service.Open (Context.Project_Service);
 
          declare
             URI       : constant String := Args.Get_Argument (1);
@@ -139,12 +140,13 @@ package body Porion.Commands.Node is
             Hostname  : constant String := Get_Hostname (URI);
             Directory : constant String := Get_Path (URI);
          begin
-            Context.Node_Service.Add_Node (Kind       => Get_Type (Scheme),
-                                           Hostname   => Hostname,
-                                           Login      => Login,
-                                           Repository => Directory);
+            Nodes.Services.Add_Node (Context.Project_Service,
+                                     Kind       => Get_Type (Scheme),
+                                     Hostname   => Hostname,
+                                     Login      => Login,
+                                     Repository => Directory);
 
-            Context.Node_Service.Probe_Node;
+            Nodes.Services.Probe_Node (Context.Project_Service);
 
          exception
             when Porion.Nodes.Services.Name_Used =>

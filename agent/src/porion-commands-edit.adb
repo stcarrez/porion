@@ -71,7 +71,7 @@ package body Porion.Commands.Edit is
 
       File.Create (Mode => Ada.Streams.Stream_IO.Out_File,
                    Name => Path);
-      Context.Project_Service.Export (Stream, Process'Access);
+      Projects.Services.Export (Context.Project_Service, Stream, Process'Access);
       Stream.Flush;
       File.Close;
    end Export_Value;

@@ -42,7 +42,8 @@ private
 
    --  Add a recipe to build an existing project.
    procedure Add_Recipe (Command : in out Command_Type;
-                         Name    : in String;
+                         Target  : in String;
+                         Source  : in String;
                          Context : in out Context_Type);
 
    type Command_Type is new Porion.Commands.Drivers.Command_Type with record

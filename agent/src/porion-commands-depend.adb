@@ -44,9 +44,9 @@ package body Porion.Commands.Depend is
                Depend_Name : constant String := Args.Get_Argument (I);
             begin
                if not Command.Remove then
-                  Context.Project_Service.Add_Dependency (Depend_Name);
+                  Projects.Services.Add_Dependency (Context.Project_Service, Depend_Name);
                else
-                  Context.Project_Service.Remove_Dependency (Depend_Name);
+                  Projects.Services.Remove_Dependency (Context.Project_Service, Depend_Name);
                end if;
 
             exception

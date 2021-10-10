@@ -79,7 +79,7 @@ package body Porion.Commands.Status is
 
    begin
       Stream.Start_Document;
-      Context.Project_Service.Export (Stream, Process'Access);
+      Projects.Services.Export (Context.Project_Service, Stream, Process'Access);
       Stream.End_Document;
    end Stats;
 

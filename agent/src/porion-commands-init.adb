@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 with Ada.Directories;
 with Porion.Configs;
+with Porion.Nodes.Services;
 with Porion.Resources.Queries;
 with Porion.Resources.Schema;
 package body Porion.Commands.Init is
@@ -53,8 +54,9 @@ package body Porion.Commands.Init is
             Porion.Configs.Save;
          end;
          Context.Project_Service.Open (Resources.Queries.Get_Content'Access, Schema);
-         Context.Project_Service.Add_Node (Hostname => "localhost",
-                                           Login    => "");
+         Nodes.Services.Add_Default_Node (Context.Project_Service,
+                                          Hostname => "localhost",
+                                          Login    => "");
       end if;
    end Execute;
 

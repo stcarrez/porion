@@ -45,7 +45,7 @@ package body Porion.Commands.Build is
          begin
             Context.Project_Service.Load_Project (Name);
 
-            Context.Project_Service.Check_Sources (Source_Status, Executor);
+            Projects.Services.Check_Sources (Context.Project_Service, Source_Status, Executor);
 
             Context.Build_Service.Open (Context.Project_Service);
 

@@ -16,6 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Text_IO;
+with Ada.Directories;
 
 with ADO.Sessions.Sources;
 with ADO.Sessions.Factory;
@@ -25,7 +26,11 @@ with Util.Processes;
 with Util.Streams.Pipes;
 with Util.Streams.Buffered;
 
+with Porion.Configs;
+with Porion.Resources.Queries;
+with Porion.Resources.Schema;
 with Porion.Tests;
+with Porion.Nodes.Tests;
 with Porion.Projects.Tests;
 with Porion.Sources.Tests;
 with Porion.Tools.Tests;
@@ -64,12 +69,33 @@ package body Porion.Testsuite is
                                 Source, Line);
    end Execute;
 
+   --  ------------------------------
+   --  Open and create the database.
+   --  ------------------------------
+   procedure Create (Service : in out Porion.Services.Context_Type;
+                     Path    : in String;
+                     Remove  : in Boolean) is
+      Schema : constant Porion.Resources.Content_Access
+        := Porion.Resources.Schema.Get_Content ("create-porion_agent-sqlite");
+   begin
+      if Ada.Directories.Exists (Path) and Remove then
+         Ada.Directories.Delete_Tree (Path);
+      end if;
+
+      if not Ada.Directories.Exists (Path) then
+         Ada.Directories.Create_Path (Path);
+      end if;
+      Porion.Configs.Set (Porion.Configs.WORKSPACE_DIR_NAME, Path);
+      Service.Open (Porion.Resources.Queries.Get_Content'Access, Schema);
+   end Create;
+
    function Suite return Util.Tests.Access_Test_Suite is
    begin
       Porion.Tests.Add_Tests (Tests'Access);
       Porion.Tools.Tests.Add_Tests (Tests'Access);
       Porion.XUnit.Tests.Add_Tests (Tests'Access);
       Porion.Sources.Tests.Add_Tests (Tests'Access);
+      Porion.Nodes.Tests.Add_Tests (Tests'Access);
       Porion.Projects.Tests.Add_Tests (Tests'Access);
       return Tests'Access;
    end Suite;

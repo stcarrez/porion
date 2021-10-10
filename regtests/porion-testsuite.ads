@@ -21,6 +21,7 @@ with Ada.Strings.Unbounded;
 with Util.Tests;
 
 with ADO.Sessions;
+with Porion.Services;
 package Porion.Testsuite is
 
    type Test is new Util.Tests.Test with null record;
@@ -32,6 +33,11 @@ package Porion.Testsuite is
                       Status  : in Natural := 0;
                       Source  : in String := GNAT.Source_Info.File;
                       Line    : in Natural := GNAT.Source_Info.Line);
+
+   --  Open and create the database.
+   procedure Create (Service : in out Porion.Services.Context_Type;
+                     Path    : in String;
+                     Remove  : in Boolean);
 
    function Suite return Util.Tests.Access_Test_Suite;
 

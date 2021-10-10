@@ -62,11 +62,6 @@ package Porion.Services is
    procedure Open (Service : in out Context_Type;
                    From    : in out Context_Type'Class);
 
-   function Create_Query (Service : in out Context_Type;
-                          Query   : in ADO.Queries.Context) return Ado.Statements.Query_Statement;
-
-   function Get_Database (Service : in Context_Type) return ADO.Sessions.Master_Session;
-
    procedure Import (Service : in out Context_Type;
                      Path    : in String);
 

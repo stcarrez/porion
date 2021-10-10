@@ -109,18 +109,6 @@ package body Porion.Services is
       end if;
    end Load;
 
-   function Create_Query (Service : in out Context_Type;
-                          Query   : in ADO.Queries.Context)
-                          return Ado.Statements.Query_Statement is
-   begin
-      return Service.DB.Create_Statement (Query);
-   end Create_Query;
-
-   function Get_Database (Service : in Context_Type) return ADO.Sessions.Master_Session is
-   begin
-      return Service.DB;
-   end Get_Database;
-
    procedure Open (Service  : in out Context_Type;
                    Resource : in Resources.Get_Resource_Access;
                    Schema   : in Resources.Content_Access) is
@@ -168,17 +156,9 @@ package body Porion.Services is
    begin
       Porion.Services.Parsers.Parse (Service, Path, Content);
 
-      declare
-         Project_Service : Porion.Projects.Services.Context_Type;
-         Build_Service   : Porion.Builds.Services.Context_Type;
-      begin
-         Project_Service.Open (Service);
+      Projects.Services.Update (Service, Content.Project);
 
-         Projects.Services.Update (Project_Service, Content.Project);
-
-         Build_Service.Open (Project_Service);
-         Build_Service.Update (Content.Build_Configs);
-      end;
+      Builds.Services.Update (Service, Content.Build_Configs);
    end Import;
 
 end Porion.Services;

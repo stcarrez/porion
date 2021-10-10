@@ -16,6 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with PT;
+with Porion.Nodes;
 with Porion.Queries;
 with Porion.Services;
 with Porion.Executors;
@@ -28,6 +29,9 @@ package Porion.Reports is
       Success  : PT.Style_Type;
       Disabled : PT.Style_Type;
    end record;
+
+   --  Get a printable name for the node status.
+   function Get_Status (Status : in Porion.Nodes.Node_Status_Type) return String;
 
    --  Create a report about the builds.  If the service is configured with
    --  a project, the report only indicates the builds of the project.

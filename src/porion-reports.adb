@@ -20,7 +20,6 @@ with Ada.Calendar.Time_Zones;
 with Util.Strings;
 with PT.Texts;
 with ADO.Queries;
-with Porion.Nodes;
 with Porion.Builds.Models;
 with Porion.Projects.Models;
 package body Porion.Reports is
@@ -29,7 +28,6 @@ package body Porion.Reports is
    function Format (Date : in Ada.Calendar.Time) return String;
    function Get_Image (Step : in Porion.Builds.Step_Type) return String;
    function Get_Kind (Kind : in Porion.Nodes.Node_Type) return String;
-   function Get_Status (Status : in Porion.Nodes.Node_Status_Type) return String;
 
    function Format (Date : in Ada.Calendar.Time) return String is
       use Ada.Calendar;

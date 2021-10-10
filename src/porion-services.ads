@@ -39,18 +39,21 @@ package Porion.Services is
       Dry_Run           : Boolean := False;
    end record;
 
+   --  Returns True if the service is opened.
+   function Is_Open (Service : in Context_Type) return Boolean;
+
    function Has_Project (Service : in Context_Type) return Boolean is
       (not Service.Project.Is_Null);
 
-   --  Load the build node corresponding to the given hostname.
-   procedure Load_Node (Service  : in out Context_Type;
-                        Hostname : in String);
 
    --  Get the current project id.
    function Get_Project_Id (Service : in Context_Type) return ADO.Identifier;
 
    procedure Load_Project (Service : in out Context_Type;
                            Name    : in String);
+
+   procedure Load (Service : in out Context_Type;
+                   Ident   : in Porion.Projects.Ident_Type);
 
    procedure Open (Service  : in out Context_Type;
                    Resource : in Resources.Get_Resource_Access;

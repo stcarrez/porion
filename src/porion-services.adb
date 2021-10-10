@@ -26,10 +26,20 @@ with ADO.SQL;
 with Porion.Configs;
 with Porion.Services.Parsers;
 with Porion.Builds.Services;
+with Porion.Nodes.Services;
 with Porion.Projects.Services;
 package body Porion.Services is
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Services");
+
+   --  ------------------------------
+   --  Returns True if the service is opened.
+   --  ------------------------------
+   function Is_Open (Service : in Context_Type) return Boolean is
+      use type ADO.Sessions.Connection_Status;
+   begin
+      return Service.DB.Get_Status = ADO.Sessions.OPEN;
+   end Is_Open;
 
    --  ------------------------------
    --  Get the current project id.
@@ -54,27 +64,50 @@ package body Porion.Services is
          raise Not_Found;
       end if;
 
+      Log.Info ("Project {0} loaded", Name);
    end Load_Project;
 
-   --  ------------------------------
-   --  Load the build node corresponding to the given hostname.
-   --  ------------------------------
-   procedure Load_Node (Service  : in out Context_Type;
-                        Hostname : in String) is
-      Query : ADO.SQL.Query;
+   procedure Load (Service : in out Context_Type;
+                   Ident   : in Porion.Projects.Ident_Type) is
+      Query : ADO.Queries.Context;
       Found : Boolean;
    begin
-      Log.Debug ("Load build node {0}", Hostname);
+      Service.Load_Project (To_String (Ident.Name));
 
-      Query.Bind_Param (1, Hostname);
-      Query.Set_Filter ("o.name = ? AND o.deleted = 0");
-      Service.Build_Node.Find (Service.DB, Query, Found);
-      if not Found then
-         Log.Warn ("Build node {0} does not exist", Hostname);
-         raise Not_Found;
+      if Length (Ident.Branch) > 0 then
+         Query.Set_Filter ("o.project_id = :project_id and o.name = :branch");
+         Query.Bind_Param ("project_id", Service.Project.Get_Id);
+         Query.Bind_Param ("branch", Ident.Branch);
+         Service.Branch.Find (Service.DB, Query, Found);
+         if not Found then
+            Log.Error ("Branch {0} not found in database", To_String (Ident.Branch));
+            return;
+         end if;
       end if;
 
-   end Load_Node;
+      if Length (Ident.Node) > 0 then
+         Nodes.Services.Load_Node (Service, To_String (Ident.Node));
+      end if;
+
+      if Service.Build_Node.Is_Null then
+         Nodes.Services.Load_Default_Node (Service);
+      end if;
+
+      Query.Clear;
+      Query.Bind_Param ("project_id", Service.Project.Get_Id);
+      Query.Bind_Param ("node_id", Service.Build_Node.Get_Id);
+      if not Service.Branch.Is_Null and not Service.Build_Node.Is_Null then
+         Query.Set_Filter ("o.project_id = :project_id AND o.node_id = :node_id "
+                           & " AND o.branch_id = :branch_id");
+         Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
+      else
+         Query.Set_Filter ("o.project_id = :project_id AND o.node_id = :node_id");
+      end if;
+      Service.Build_Config.Find (Service.DB, Query, Found);
+      if not Found then
+         Log.Error ("Recipe not found");
+      end if;
+   end Load;
 
    function Create_Query (Service : in out Context_Type;
                           Query   : in ADO.Queries.Context)
@@ -141,7 +174,7 @@ package body Porion.Services is
       begin
          Project_Service.Open (Service);
 
-         Project_Service.Update (Content.Project);
+         Projects.Services.Update (Project_Service, Content.Project);
 
          Build_Service.Open (Project_Service);
          Build_Service.Update (Content.Build_Configs);

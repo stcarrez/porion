@@ -104,8 +104,10 @@ package Porion.Builds.Services is
                                 Executor : in out Porion.Executors.Executor_Type'Class);
 
    procedure Copy_Recipe (Service  : in out Context_Type;
+                          Project  : in String;
                           Branch   : in String;
-                          Node     : in String);
+                          Node     : in String;
+                          Recipe   : in out Models.Recipe_Ref);
 
    procedure Guess (Service  : in out Context_Type;
                     Path     : in String;
@@ -136,7 +138,8 @@ private
 
    procedure Load_Environment (Service : in out Context_Type);
 
-   procedure Load_Build_Steps (Service : in out Context_Type) with
+   procedure Load_Recipe (Service : in out Context_Type;
+                          Recipe  : in Models.Recipe_Ref) with
      Pre => Service.Has_Project;
 
 end Porion.Builds.Services;

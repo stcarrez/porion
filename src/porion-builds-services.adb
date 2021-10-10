@@ -31,6 +31,7 @@ with ADO.Queries;
 with ADO.SQL;
 with Porion.Sources.Factories;
 with Porion.Nodes.Models;
+with Porion.Nodes.Services;
 with Porion.Builders.Factories;
 package body Porion.Builds.Services is
 
@@ -55,7 +56,7 @@ package body Porion.Builds.Services is
       Service.Build_Node := Porion.Nodes.Models.Node_Ref (Recipe.Get_Node);
       Service.Branch := Porion.Projects.Models.Branch_Ref (Recipe.Get_Branch);
       if Service.Build_Node.Is_Null then
-         Service.Load_Node ("localhost");
+         Nodes.Services.Load_Default_Node (Service);
       end if;
 
       Query.Set_Query (Projects.Models.Query_Project_Last_Build);
@@ -91,7 +92,7 @@ package body Porion.Builds.Services is
       Start_Build (Service, Recipe, Executor);
 
       Service.Load_Environment;
-      Service.Load_Build_Steps;
+      Service.Load_Recipe (Recipe);
 
       Build (Service, Executor);
    end Build;
@@ -227,7 +228,7 @@ package body Porion.Builds.Services is
       Found : Boolean;
    begin
       if Service.Build_Node.Is_Null then
-         Service.Load_Node ("localhost");
+         Nodes.Services.Load_Default_Node (Service);
       end if;
 
       if Service.Build_Config.Is_Null then
@@ -242,7 +243,7 @@ package body Porion.Builds.Services is
          end if;
       end if;
 
-      Service.Load_Build_Steps;
+      Service.Load_Recipe (Service.Build_Config);
       Service.Load_Environment;
    end Load_Recipe;
 
@@ -260,14 +261,15 @@ package body Porion.Builds.Services is
 
    end Load_Environment;
 
-   procedure Load_Build_Steps (Service : in out Context_Type) is
-      Steps : Porion.Builds.Models.Recipe_Step_Vector;
+   procedure Load_Recipe (Service : in out Context_Type;
+                          Recipe  : in Models.Recipe_Ref) is
+      Steps : Models.Recipe_Step_Vector;
       Query : ADO.Queries.Context;
    begin
       Service.Steps.Clear;
-      Query.Set_Filter ("o.recipe_id = :config_id ORDER BY o.number");
-      Query.Bind_Param ("config_id", Service.Build_Config.Get_Id);
-      Porion.Builds.Models.List (Steps, Service.DB, Query);
+      Query.Set_Filter ("o.recipe_id = :recipe_id ORDER BY o.number");
+      Query.Bind_Param ("recipe_id", Recipe.Get_Id);
+      Models.List (Steps, Service.DB, Query);
 
       for DB_Step of Steps loop
          declare
@@ -284,7 +286,7 @@ package body Porion.Builds.Services is
 
       Log.Info ("Loaded{0} build steps",
                 Ada.Containers.Count_Type'Image (Service.Steps.Length));
-   end Load_Build_Steps;
+   end Load_Recipe;
 
    --  Delete the build step at the given execution order.
    procedure Delete_Step (Service  : in out Context_Type;
@@ -713,28 +715,31 @@ package body Porion.Builds.Services is
       Service.Source_Controller.Checkout (Path, Executor);
 
       if Service.Build_Node.Is_Null then
-         Service.Load_Node ("localhost");
+         Nodes.Services.Load_Default_Node (Service);
       end if;
 
       Service.Build_Config.Set_Project (Service.Project);
       Service.Build_Config.Set_Node (Service.Build_Node);
       Service.Build_Config.Set_Status (Builds.Models.CONFIG_BUILD_REQUIRED);
       Service.Build_Config.Set_Branch (Service.Branch);
+      Service.Build_Config.Set_Main_Recipe (True);
       Service.Build_Config.Save (Service.DB);
       Service.Guess (Path, Executor);
    end Make_Build_Config;
 
    procedure Copy_Recipe (Service  : in out Context_Type;
+                          Project  : in String;
                           Branch   : in String;
-                          Node     : in String) is
-      Name    : constant String := Service.Project.Get_Name;
+                          Node     : in String;
+                          Recipe   : in out Models.Recipe_Ref) is
       Query   : ADO.SQL.Query;
       Found   : Boolean;
    begin
-      Log.Info ("Copy build recipe {0} for branch {1} and node {2}", Name, Branch, Node);
+      Log.Info ("Copy build recipe {0} for branch {1} and node {2}", Project, Branch, Node);
 
-      Service.Load_Build_Steps;
+      Service.Load_Project (Project);
 
+      --  Find the project branch when specified.
       if Branch'Length > 0 then
          Query.Set_Filter ("o.project_id = :project_id and o.name = :branch");
          Query.Bind_Param ("project_id", Service.Project.Get_Id);
@@ -746,21 +751,48 @@ package body Porion.Builds.Services is
          end if;
       end if;
 
+      --  Find the main project branch.
+      if Service.Branch.Is_Null then
+         Query.Set_Filter ("o.project_id = :project_id AND o.main_branch = 1");
+         Query.Bind_Param ("project_id", Service.Project.Get_Id);
+         Service.Branch.Find (Service.DB, Query, Found);
+         if not Found then
+            Log.Error ("No main branch for project {0}", Project);
+            return;
+         end if;
+      end if;
+
+      --  Find the main project recipe for the branch.
+      if Recipe.Is_Null then
+         Query.Set_Filter ("o.project_id = :project_id AND o.branch_id = :branch_id"
+                           & " AND o.main_recipe = 1");
+         Query.Bind_Param ("project_id", Service.Project.Get_Id);
+         Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
+         Recipe.Find (Service.DB, Query, Found);
+         if not Found then
+            Log.Error ("No main recipe for project {0}", Project);
+            return;
+         end if;
+      end if;
+
+      --  Find the build node or use the current recipe's build node.
       if Node'Length > 0 then
-         Service.Load_Node (Node);
+         Nodes.Services.Load_Node (Service, Node);
+      else
+         Service.Build_Node := Nodes.Models.Node_Ref (Recipe.Get_Node);
       end if;
 
-      if Service.Build_Node.Is_Null then
-         Service.Load_Node ("localhost");
-      end if;
+      --  Load the recipe steps.
+      Service.Load_Recipe (Recipe);
 
+      --  Create the new recipe and copy the build steps.
       Service.DB.Begin_Transaction;
       declare
          New_Config : Models.Recipe_Ref;
       begin
-         New_Config.Set_Name (String '(Service.Build_Config.Get_Name));
-         New_Config.Set_Description (String '(Service.Build_Config.Get_Description));
-         New_Config.Set_Rate_Factor (Service.Build_Config.Get_Rate_Factor);
+         New_Config.Set_Name (String '(Recipe.Get_Name));
+         New_Config.Set_Description (String '(Recipe.Get_Description));
+         New_Config.Set_Rate_Factor (Recipe.Get_Rate_Factor);
          New_Config.Set_Status (Builds.Models.CONFIG_BUILD_REQUIRED);
          New_Config.Set_Node (Service.Build_Node);
          New_Config.Set_Project (Service.Project);

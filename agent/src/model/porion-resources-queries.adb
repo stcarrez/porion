@@ -208,7 +208,7 @@ package body Porion.Resources.Queries is
        & "            INNER JOIN porion_project AS project ON build.project_id = p"
        & "roject.id" & ASCII.LF & "            INNER JOIN porion_branch AS branch "
        & "ON branch.id = build.branch_id" & ASCII.LF & "            INNER JOIN por"
-       & "ion_recipe AS recipe ON build.recipe_id = config.id" & ASCII.LF & "     "
+       & "ion_recipe AS recipe ON build.recipe_id = recipe.id" & ASCII.LF & "     "
        & "       WHERE project.id = :project_id" & ASCII.LF & "            ORDER B"
        & "Y finish_date DESC" & ASCII.LF & "        </sql>" & ASCII.LF & "    </qu"
        & "ery>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
@@ -285,7 +285,7 @@ package body Porion.Resources.Queries is
        & "ild AS build WHERE build.node_id = node.id AND build.project_id = :proje"
        & "ct_id) AS bld_count" & ASCII.LF & "            FROM porion_node AS node" & ASCII.LF
        & "            INNER JOIN porion_recipe AS recipe ON recipe.node_id = node."
-       & "id" & ASCII.LF & "            WHERE node.deleted = 0 AND config.project_"
+       & "id" & ASCII.LF & "            WHERE node.deleted = 0 AND recipe.project_"
        & "id = :project_id" & ASCII.LF & "            GROUP BY node.id" & ASCII.LF
        & "            ORDER BY node.name" & ASCII.LF & "        </sql>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;

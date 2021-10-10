@@ -29,7 +29,7 @@ package Porion.Nodes.Services is
 
    Invalid_Name : exception;
 
-   Not_Found    : exception renames Porion.Services.Not_Found;
+   Not_Found    : exception;
 
    subtype Context_Type is Porion.Services.Context_Type;
 

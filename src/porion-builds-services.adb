@@ -775,6 +775,7 @@ package body Porion.Builds.Services is
 
       --  Find the main project branch.
       if Service.Branch.Is_Null then
+         Query.Clear;
          Query.Set_Filter ("o.project_id = :project_id AND o.main_branch = 1");
          Query.Bind_Param ("project_id", Service.Project.Get_Id);
          Service.Branch.Find (Service.DB, Query, Found);
@@ -786,14 +787,21 @@ package body Porion.Builds.Services is
 
       --  Find the main project recipe for the branch.
       if Recipe.Is_Null then
+         Query.Clear;
          Query.Set_Filter ("o.project_id = :project_id AND o.branch_id = :branch_id"
                            & " AND o.main_recipe = 1");
          Query.Bind_Param ("project_id", Service.Project.Get_Id);
          Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
          Recipe.Find (Service.DB, Query, Found);
          if not Found then
-            Log.Error ("No main recipe for project {0}", Project);
-            return;
+            Query.Clear;
+            Query.Set_Filter ("o.project_id = :project_id AND o.main_recipe = 1");
+            Query.Bind_Param ("project_id", Service.Project.Get_Id);
+            Recipe.Find (Service.DB, Query, Found);
+            if not Found then
+               Log.Error ("No main recipe for project {0}", Project);
+               return;
+            end if;
          end if;
       end if;
 

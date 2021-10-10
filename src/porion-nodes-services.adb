@@ -48,6 +48,46 @@ package body Porion.Nodes.Services is
    end Create_Controller;
 
    --  ------------------------------
+   --  Load the build node corresponding to the given hostname.
+   --  ------------------------------
+   procedure Load_Node (Service  : in out Context_Type'Class;
+                        Hostname : in String) is
+      Query : ADO.SQL.Query;
+      Found : Boolean;
+   begin
+      Log.Debug ("Load build node {0}", Hostname);
+
+      Query.Bind_Param (1, Hostname);
+      Query.Set_Filter ("o.name = ? AND o.deleted = 0");
+      Service.Build_Node.Find (Service.DB, Query, Found);
+      if not Found then
+         Log.Warn ("Build node {0} does not exist", Hostname);
+         raise Not_Found;
+      end if;
+
+      Log.Info ("Build node {0} loaded", Hostname);
+   end Load_Node;
+
+   --  ------------------------------
+   --  Load the default build node.
+   --  ------------------------------
+   procedure Load_Default_Node (Service  : in out Context_Type'Class) is
+      Query : ADO.SQL.Query;
+      Found : Boolean;
+   begin
+      Log.Debug ("Load default build node");
+
+      Query.Set_filter ("o.main_node AND o.deleted = 0");
+      Service.Build_Node.Find (Service.DB, Query, Found);
+      if not Found then
+         Log.Warn ("Default build node does not exist");
+         raise Not_Found;
+      end if;
+
+      Log.Info ("Default build node {0} loaded", String '(Service.Build_Node.Get_Name));
+   end Load_Default_Node;
+
+   --  ------------------------------
    --  Probe the current node to check and update its status.
    --  ------------------------------
    procedure Probe_Node (Service : in out Context_Type) is
@@ -200,8 +240,42 @@ package body Porion.Nodes.Services is
          Probe_Os_Release (Controller);
       end if;
 
+      Service.Build_Node.Set_Info_Date ((Is_Null => False,
+                                         Value   => Ada.Calendar.Clock));
       Service.Build_Node.Save (Service.DB);
    end Probe_Node;
+
+   --  ------------------------------
+   --  Add a default build node.
+   --  ------------------------------
+   procedure Add_Default_Node (Service   : in out Context_Type;
+                               Hostname  : in String;
+                               Login     : in String) is
+      Query : ADO.SQL.Query;
+      Found : Boolean;
+   begin
+      Log.Debug ("Add build node {0} with {1}", Hostname, Login);
+
+      Service.DB.Begin_Transaction;
+      Query.Bind_Param (1, Hostname);
+      Query.Set_Filter ("o.name = ? AND o.deleted = 0");
+      Service.Build_Node.Find (Service.DB, Query, Found);
+      if Found then
+         Log.Warn ("Build node name {0} already used", Hostname);
+         raise Not_Found;
+      end if;
+      Service.Build_Node.Set_Name (Hostname);
+      Service.Build_Node.Set_Login (Login);
+      Service.Build_Node.Set_Create_Date (Ada.Calendar.Clock);
+      Service.Build_Node.Set_Kind (Porion.Nodes.NODE_LOCAL);
+      Service.Build_Node.Set_Status (NODE_ENABLED);
+      Service.Build_Node.Set_Repository_Dir (Porion.Configs.Get_Porion_Directory);
+      Service.Build_Node.Set_Main_Node (True);
+      Service.Build_Node.Save (Service.DB);
+      Service.DB.Commit;
+
+      Log.Info ("Default build node {0} added", Hostname);
+   end Add_Default_Node;
 
    --  ------------------------------
    --  Add a build node

@@ -21,7 +21,8 @@ package Porion.Sources.Git is
 
    GIT_TEST_COMMAND        : constant String := "git ls-remote -h -- #{repository_url}";
    GIT_SHOW_REMOTE_COMMAND : constant String := "git remote show #{repository_url}";
-   GIT_CHECKOUT_COMMAND    : constant String := "git clone --recursive #{repository_url} #{build_dir}";
+   GIT_CHECKOUT_COMMAND    : constant String := "git clone "
+     & "#{not empty branch ? '-b' : ''} #{branch} --recursive #{repository_url} #{build_dir}";
    GIT_GUESS_COMMAND       : constant String := "git -C #{path} config remote.origin.url";
 
    type Controller_Type is limited new Porion.Sources.Controller_Type with private;

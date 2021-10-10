@@ -515,36 +515,44 @@ package body Porion.Builds.Services is
                                    Status  : in Porion.Builds.Models.Config_Status_Type;
                                    Session : in out ADO.Sessions.Master_Session) is
       use Porion.Builds.Models;
-      Build_Configs : Porion.Builds.Models.Recipe_Vector;
+
+      function Get_Name return String is
+         Project_Name  : constant String := Branch.Get_Project.Get_Name;
+         Branch_Name   : constant String := Branch.Get_Name;
+      begin
+         return Project_Name & "^" & Branch_Name;
+      end Get_Name;
+
+      Recipes       : Porion.Builds.Models.Recipe_Vector;
       Build_Queues  : Porion.Builds.Models.Build_Queue_Vector;
       Query         : ADO.Queries.Context;
    begin
-      Query.Set_Filter ("o.branch_id = :branch_id AND o.status != 0 AND o.status != :status");
+      Query.Set_Filter ("o.branch_id = :branch_id AND o.status = :status");
       Query.Bind_Param ("branch_id", Branch.Get_Id);
       Query.Bind_Param ("status", Integer (Builds.Models.Config_Status_Type'Pos (Status)));
-      Porion.Builds.Models.List (Build_Configs, Session, Query);
+      Porion.Builds.Models.List (Recipes, Session, Query);
 
-      for Iter in Build_Configs.Iterate loop
+      for Iter in Recipes.Iterate loop
          declare
-            Config : constant Models.Recipe_Vectors.Reference_Type
-              := Models.Recipe_Vectors.Reference (Build_Configs, Iter);
+            Recipe : constant Models.Recipe_Vectors.Reference_Type
+              := Models.Recipe_Vectors.Reference (Recipes, Iter);
             Queue  : Models.Build_Queue_Ref;
             Found  : Boolean;
-            Id     : constant ADO.Identifier := Config.Get_Id;
+            Id     : constant ADO.Identifier := Recipe.Get_Id;
          begin
-            Config.Set_Status (Status);
-            Config.Save (Session);
+            Recipe.Set_Status (Status);
+            Recipe.Save (Session);
 
             Query.Clear;
-            Query.Set_Filter ("o.recipe_id = :config_id");
-            Query.Bind_Param ("config_id", Id);
+            Query.Set_Filter ("o.recipe_id = :recipe_id");
+            Query.Bind_Param ("recipe_id", Id);
             Queue.Find (Session, Query, Found);
             if not Found then
-               Queue.Set_Recipe (Config);
-               Queue.Set_Node (Config.Get_Node);
+               Queue.Set_Recipe (Recipe);
+               Queue.Set_Node (Recipe.Get_Node);
                Queue.Set_Creation_Date (Ada.Calendar.Clock);
 
-               Log.Info ("Add build queue for{0}",
+               Log.Info ("Add build queue for {0} as{1}", Get_Name,
                          ADO.Identifier'Image (Id));
             end if;
             Queue.Save (Session);
@@ -706,6 +714,10 @@ package body Porion.Builds.Services is
       Service.Recipe.Set_Main_Recipe (True);
       Service.Recipe.Save (Service.DB);
       Guess (Service, Path, Executor);
+
+      Update_Branch_Config (Service.Branch,
+                            Builds.Models.CONFIG_BUILD_REQUIRED,
+                            Service.DB);
    end Make_Recipes;
 
    --  Load the recipes of a project according to the identification.
@@ -853,6 +865,9 @@ package body Porion.Builds.Services is
             end;
          end loop;
 
+         Update_Branch_Config (Service.Branch,
+                               Models.CONFIG_BUILD_REQUIRED,
+                               Service.DB);
          Recipe := New_Recipe;
       end;
       Service.DB.Commit;

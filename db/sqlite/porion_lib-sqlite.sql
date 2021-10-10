@@ -135,6 +135,8 @@ CREATE TABLE IF NOT EXISTS porion_recipe (
   `status` INTEGER NOT NULL,
   /* a rate factor to apply on the build for this build configuration. */
   `rate_factor` INTEGER NOT NULL,
+  /* the main recipe. */
+  `main_recipe` TINYINT NOT NULL,
   /*  */
   `node_id` BIGINT ,
   /*  */
@@ -233,6 +235,8 @@ CREATE TABLE IF NOT EXISTS porion_branch (
   `build_rate` INTEGER NOT NULL,
   /* a rate factor to apply when consolidating results on the project */
   `rate_factor` INTEGER NOT NULL,
+  /* indicates whether this is considered as the main project branch. */
+  `main_branch` TINYINT NOT NULL,
   /*  */
   `project_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`)
@@ -406,6 +410,8 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_recipe"), "rate_factor");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_recipe"), "main_recipe");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "name");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "login");
@@ -419,6 +425,8 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "tag");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "last_date");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "main_branch");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "name");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)

@@ -28,12 +28,7 @@ package Porion.Projects.Services is
 
    Not_Found    : exception renames Porion.Services.Not_Found;
 
-   type Context_Type is limited new Porion.Services.Context_Type with private;
-
-   --  Add a build node
-   procedure Add_Node (Service   : in out Context_Type;
-                       Hostname  : in String;
-                       Login     : in String);
+   subtype Context_Type is Porion.Services.Context_Type;
 
    --  Add a project with the source information.
    procedure Add_Project (Service   : in out Context_Type;
@@ -68,11 +63,5 @@ package Porion.Projects.Services is
 
    procedure Update (Service : in out Context_Type;
                      Project : in out Porion.Projects.Models.Project_Ref);
-
-private
-
-   type Context_Type is limited new Porion.Services.Context_Type with record
-      Source_Controller : Porion.Sources.Controller_Access;
-   end record;
 
 end Porion.Projects.Services;

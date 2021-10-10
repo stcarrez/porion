@@ -34,33 +34,6 @@ package body Porion.Projects.Services is
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Projects.Services");
 
-   --  ------------------------------
-   --  Add a build node
-   --  ------------------------------
-   procedure Add_Node (Service   : in out Context_Type;
-                       Hostname  : in String;
-                       Login     : in String) is
-      Query : ADO.SQL.Query;
-      Found : Boolean;
-   begin
-      Log.Debug ("Add build node {0} with {1}", Hostname, Login);
-
-      Service.DB.Begin_Transaction;
-      Query.Bind_Param (1, Hostname);
-      Query.Set_Filter ("o.name = ?");
-      Service.Build_Node.Find (Service.DB, Query, Found);
-      if Found then
-         Log.Warn ("Build node name {0} already used", Hostname);
-         raise Not_Found;
-      end if;
-      Service.Build_Node.Set_Name (Hostname);
-      Service.Build_Node.Set_Login (Login);
-      Service.Build_Node.Save (Service.DB);
-      Service.DB.Commit;
-
-      Log.Info ("Build node {0} added", Hostname);
-   end Add_Node;
-
    procedure Add_Project (Service   : in out Context_Type;
                           Info      : in Porion.Sources.Source_Info_Type) is
       Name  : constant String := To_String (Info.Name);
@@ -113,6 +86,7 @@ package body Porion.Projects.Services is
       if not Found then
          Service.Branch.Set_Project (Service.Project);
          Service.Branch.Set_Name (Name);
+         Service.Branch.Set_Main_Branch (Is_Head);
          Service.Branch.Set_Tag (Item.Tag);
          if Is_Head then
             Service.Branch.Set_Status (Models.BUILD_REQUIRED);
@@ -279,6 +253,7 @@ package body Porion.Projects.Services is
       Logger     : Porion.Loggers.Logger_Type;
       Branches   : Porion.Projects.Models.Branch_Vector;
       Src_Status : Porion.Sources.Status_Type;
+      Source_Controller : Porion.Sources.Controller_Access;
    begin
       if Service.Project.Is_Null then
          raise Invalid_Name;
@@ -294,9 +269,9 @@ package body Porion.Projects.Services is
       Executor.Set_Step (Builds.STEP_CHECKOUT);
 
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
-      Service.Source_Controller := Sources.Factories.Create (Service.Project.Get_Scm, Config);
+      Source_Controller := Sources.Factories.Create (Service.Project.Get_Scm, Config);
 
-      Service.Source_Controller.Check (Src_Status, Executor);
+      Source_Controller.Check (Src_Status, Executor);
 
       --  Get the current known branches.
       Query.Bind_Param ("project_id", Service.Project.Get_Id);

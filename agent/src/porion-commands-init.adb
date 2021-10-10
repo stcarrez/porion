@@ -57,6 +57,7 @@ package body Porion.Commands.Init is
             Nodes.Services.Add_Default_Node (Context.Project_Service,
                                              Hostname => "localhost",
                                              Login    => "");
+            Nodes.Services.Probe_Node (Context.Project_Service);
          end;
 
       end if;

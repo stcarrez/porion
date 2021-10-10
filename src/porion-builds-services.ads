@@ -51,7 +51,7 @@ package Porion.Builds.Services is
    subtype Build_Config_Vector is Build_Config_Vectors.Vector;
    subtype Build_Config_Cursor is Build_Config_Vectors.Cursor;
 
-   type Context_Type is limited new Porion.Services.Context_Type with private;
+   subtype Context_Type is Porion.Services.Context_Type;
 
    procedure Build (Service     : in out Context_Type;
                     Recipe      : in Porion.Builds.Models.Recipe_Ref;
@@ -63,17 +63,17 @@ package Porion.Builds.Services is
                           Executor    : in out Porion.Executors.Executor_Type'Class) with
      Pre => Service.Has_Project;
 
-   function Get_Build (Service : in Context_Type) return Porion.Builds.Models.Build_Ref;
-
    procedure Load_Recipe (Service : in out Context_Type) with
      Pre => Service.Has_Project;
 
    --  Delete the build step at the given execution order.
    procedure Delete_Step (Service  : in out Context_Type;
+                          Steps    : in out Build_Step_Vector;
                           Position : in Natural) with
      Pre => Service.Has_Project;
 
    procedure Insert_Step (Service   : in out Context_Type;
+                          Steps     : in out Build_Step_Vector;
                           Position  : in Natural;
                           Kind      : in Porion.Builds.Models.Builder_Type;
                           Step      : in Porion.Builds.Step_Type;
@@ -123,14 +123,8 @@ package Porion.Builds.Services is
 
 private
 
-   type Context_Type is limited new Porion.Services.Context_Type with record
-      Source_Controller : Porion.Sources.Controller_Access;
-      Build_Controller  : Porion.Builders.Controller_Access;
-      Environments      : Util.Strings.Maps.Map;
-      Steps             : Build_Step_Vector;
-   end record;
-
    procedure Build (Service     : in out Context_Type;
+                    Steps       : in Build_Step_Vector;
                     Executor    : in out Porion.Executors.Executor_Type'Class);
 
    procedure Update_Build (Service : in out Context_Type;
@@ -139,7 +133,8 @@ private
    procedure Load_Environment (Service : in out Context_Type);
 
    procedure Load_Recipe (Service : in out Context_Type;
-                          Recipe  : in Models.Recipe_Ref) with
+                          Recipe  : in Models.Recipe_Ref;
+                          Steps   : in out Build_Step_Vector) with
      Pre => Service.Has_Project;
 
 end Porion.Builds.Services;

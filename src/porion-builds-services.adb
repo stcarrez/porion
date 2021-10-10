@@ -88,16 +88,18 @@ package body Porion.Builds.Services is
    procedure Build (Service  : in out Context_Type;
                     Recipe   : in Porion.Builds.Models.Recipe_Ref;
                     Executor : in out Porion.Executors.Executor_Type'Class) is
+      Steps : Build_Step_Vector;
    begin
       Start_Build (Service, Recipe, Executor);
 
-      Service.Load_Environment;
-      Service.Load_Recipe (Recipe);
+      Load_Environment (Service);
+      Load_Recipe (Service, Recipe, Steps);
 
-      Build (Service, Executor);
+      Build (Service, Steps, Executor);
    end Build;
 
    procedure Build (Service     : in out Context_Type;
+                    Steps       : in Build_Step_Vector;
                     Executor    : in out Porion.Executors.Executor_Type'Class) is
       Number  : constant Positive := Service.Build.Get_Number;
       Name    : constant String := Service.Project.Get_Name;
@@ -106,6 +108,7 @@ package body Porion.Builds.Services is
       Log_Dir : constant String := Configs.Get_Build_Log_Directory (Name, Branch_Name, Number);
       Config  : Util.Properties.Manager;
       Status  : Builds.Models.Build_Status_Type := Builds.Models.BUILD_RUNNING;
+      Source_Controller : Porion.Sources.Controller_Access;
    begin
       Log.Info ("Build {0} in {1}", Name, Path);
 
@@ -117,17 +120,18 @@ package body Porion.Builds.Services is
       end if;
 
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
-      Service.Source_Controller := Sources.Factories.Create (Service.Project.Get_Scm, Config);
+      Source_Controller := Sources.Factories.Create (Service.Project.Get_Scm, Config);
 
       Executor.Create_Logger (Log_Dir, "build.log");
-      Service.Source_Controller.Checkout (Path, Executor);
+      Source_Controller.Checkout (Path, Executor);
 
       Config.Set ("build_dir", Path);
-      for Step of Service.Steps loop
+      for Step of Steps loop
          if Step.Step.Get_Execution /= Builds.Models.EXEC_DISABLED then
             declare
                Exec_Step   : Builds.Models.Build_Step_Ref;
                Step_Status : Integer;
+               Build_Controller : Porion.Builders.Controller_Access;
             begin
                if not Executor.Is_Dry_Run then
                   Exec_Step.Set_Start_Date (Ada.Calendar.Clock);
@@ -137,9 +141,9 @@ package body Porion.Builds.Services is
                end if;
                Executor.Set_Step (Step.Step.Get_Step);
                Executor.Set_Status (0);
-               Service.Build_Controller
+               Build_Controller
                  := Builders.Factories.Create (Step.Step.Get_Builder, Service.DB, Step.Config);
-               Service.Build_Controller.Build (Service.Build, Path, Executor);
+               Build_Controller.Build (Service.Build, Path, Executor);
 
                if not Executor.Is_Dry_Run then
                   Step_Status := Executor.Get_Status;
@@ -160,7 +164,7 @@ package body Porion.Builds.Services is
          if Status = Builds.Models.BUILD_RUNNING then
             Status := Builds.Models.BUILD_PASS;
          end if;
-         Service.Update_Build (Status);
+         Update_Build (Service, Status);
       end if;
    end Build;
 
@@ -243,15 +247,15 @@ package body Porion.Builds.Services is
          end if;
       end if;
 
-      Service.Load_Recipe (Service.Build_Config);
-      Service.Load_Environment;
+      --  Load_Recipe (Service, Service.Build_Config);
+      Load_Environment (Service);
    end Load_Recipe;
 
    procedure Load_Environment (Service : in out Context_Type) is
       Envs  : Porion.Builds.Models.Environment_Vector;
       Query : ADO.Queries.Context;
    begin
-      Service.Environments.Clear;
+      --  Service.Environments.Clear;
       Query.Set_Filter ("(o.recipe_id = :config_id OR o.node_id = :node_id)"
                         & " OR (o.recipe_id IS NULL AND o.node_id IS NULL)");
       Query.Bind_Param ("config_id", Service.Build_Config.Get_Id);
@@ -262,16 +266,17 @@ package body Porion.Builds.Services is
    end Load_Environment;
 
    procedure Load_Recipe (Service : in out Context_Type;
-                          Recipe  : in Models.Recipe_Ref) is
-      Steps : Models.Recipe_Step_Vector;
+                          Recipe  : in Models.Recipe_Ref;
+                          Steps   : in out Build_Step_Vector) is
+      List  : Models.Recipe_Step_Vector;
       Query : ADO.Queries.Context;
    begin
-      Service.Steps.Clear;
+      Steps.Clear;
       Query.Set_Filter ("o.recipe_id = :recipe_id ORDER BY o.number");
       Query.Bind_Param ("recipe_id", Recipe.Get_Id);
-      Models.List (Steps, Service.DB, Query);
+      Models.List (List, Service.DB, Query);
 
-      for DB_Step of Steps loop
+      for DB_Step of List loop
          declare
             Step : Build_Step;
             Params : constant String := DB_Step.Get_Parameters;
@@ -280,18 +285,19 @@ package body Porion.Builds.Services is
             if Params'Length > 0 then
                Step.Config := Util.Serialize.IO.JSON.Read (Params);
             end if;
-            Service.Steps.Append (Step);
+            Steps.Append (Step);
          end;
       end loop;
 
       Log.Info ("Loaded{0} build steps",
-                Ada.Containers.Count_Type'Image (Service.Steps.Length));
+                Ada.Containers.Count_Type'Image (Steps.Length));
    end Load_Recipe;
 
    --  Delete the build step at the given execution order.
    procedure Delete_Step (Service  : in out Context_Type;
+                          Steps    : in out Build_Step_Vector;
                           Position : in Natural) is
-      Last : constant Natural := Natural (Service.Steps.Length);
+      Last : constant Natural := Natural (Steps.Length);
    begin
       if Position > Last then
          raise Program_Error;
@@ -299,14 +305,14 @@ package body Porion.Builds.Services is
 
       Service.DB.Begin_Transaction;
       declare
-         Step : Build_Step := Service.Steps.Element (Position);
+         Step : Build_Step := Steps.Element (Position);
       begin
          Step.Step.Delete (Service.DB);
-         Service.Steps.Delete (Position);
+         Steps.Delete (Position);
       end;
       for I in Position .. Last - 1 loop
          declare
-            Step : Build_Step := Service.Steps.Element (I);
+            Step : Build_Step := Steps.Element (I);
          begin
             Step.Step.Set_Number (I);
             Step.Step.Save (Service.DB);
@@ -316,6 +322,7 @@ package body Porion.Builds.Services is
    end Delete_Step;
 
    procedure Insert_Step (Service   : in out Context_Type;
+                          Steps     : in out Build_Step_Vector;
                           Position  : in Natural;
                           Kind      : in Porion.Builds.Models.Builder_Type;
                           Step      : in Porion.Builds.Step_Type;
@@ -347,9 +354,9 @@ package body Porion.Builds.Services is
          Pos  : Natural := Position;
       begin
          if Pos = 0 then
-            Pos := Natural (Service.Steps.Length);
+            Pos := Natural (Steps.Length);
          end if;
-         Service.Steps.Insert (Pos, New_Step);
+         Steps.Insert (Pos, New_Step);
          New_Step.Step.Set_Parameters (Util.Streams.Texts.To_String (Output));
          New_Step.Step.Set_Builder (Kind);
          New_Step.Step.Set_Number (Pos);
@@ -359,9 +366,9 @@ package body Porion.Builds.Services is
          New_Step.Step.Save (Service.DB);
 
          Pos := Pos + 1;
-         while Pos < Natural (Service.Steps.Length) loop
+         while Pos < Natural (Steps.Length) loop
             declare
-               Next_Step : Build_Step := Service.Steps.Element (Pos);
+               Next_Step : Build_Step := Steps.Element (Pos);
             begin
                Next_Step.Step.Set_Number (Pos);
                Next_Step.Step.Save (Service.DB);
@@ -370,11 +377,6 @@ package body Porion.Builds.Services is
          end loop;
       end;
    end Insert_Step;
-
-   function Get_Build (Service : in Context_Type) return Porion.Builds.Models.Build_Ref is
-   begin
-      return Service.Build;
-   end Get_Build;
 
    --  Export some information about the project in the output stream.
    procedure Export (Service : in out Context_Type;
@@ -388,7 +390,7 @@ package body Porion.Builds.Services is
 
       Stream.Start_Array ("recipes");
       for Build_Config of Build_Configs loop
-         Service.Export (Build_Config, Stream);
+         Export (Service, Build_Config, Stream);
       end loop;
       Stream.End_Array ("recipes");
    end Export;
@@ -608,7 +610,7 @@ package body Porion.Builds.Services is
          begin
             Rank := Rank + 1;
             Step_Ref.Step.Set_Number (Rank);
-            Service.Update_Parameters (Step_Ref.Step, Step_Ref.Config);
+            Update_Parameters (Service, Step_Ref.Step, Step_Ref.Config);
             if Step_Ref.Step.Is_Loaded then
                if Step_Ref.Step.Is_Modified then
                   Step_Ref.Step.Save (Service.DB);
@@ -669,7 +671,7 @@ package body Porion.Builds.Services is
                   Config_Ref.Config.Save (Service.DB);
                end if;
 
-               Service.Update (Config_Ref.Element.all);
+               Update (Service, Config_Ref.Element.all);
                Remove (Build_Configs, Config_Ref.Config.Get_Id);
             else
                Config_Ref.Config.Save (Service.DB);
@@ -692,6 +694,7 @@ package body Porion.Builds.Services is
       Config  : Util.Properties.Manager;
       Query   : ADO.SQL.Query;
       Found   : Boolean;
+      Source_Controller : Porion.Sources.Controller_Access;
    begin
       Log.Info ("Make build config {0} for branch {1} in {2}", Name, Branch, Path);
 
@@ -709,10 +712,10 @@ package body Porion.Builds.Services is
       end if;
 
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
-      Service.Source_Controller := Sources.Factories.Create (Service.Project.Get_Scm, Config);
+      Source_Controller := Sources.Factories.Create (Service.Project.Get_Scm, Config);
 
       --  Logger.Create (Log_Dir, "build.log");
-      Service.Source_Controller.Checkout (Path, Executor);
+      Source_Controller.Checkout (Path, Executor);
 
       if Service.Build_Node.Is_Null then
          Nodes.Services.Load_Default_Node (Service);
@@ -724,7 +727,7 @@ package body Porion.Builds.Services is
       Service.Build_Config.Set_Branch (Service.Branch);
       Service.Build_Config.Set_Main_Recipe (True);
       Service.Build_Config.Save (Service.DB);
-      Service.Guess (Path, Executor);
+      Guess (Service, Path, Executor);
    end Make_Build_Config;
 
    procedure Copy_Recipe (Service  : in out Context_Type;
@@ -734,6 +737,7 @@ package body Porion.Builds.Services is
                           Recipe   : in out Models.Recipe_Ref) is
       Query   : ADO.SQL.Query;
       Found   : Boolean;
+      Steps   : Build_Step_Vector;
    begin
       Log.Info ("Copy build recipe {0} for branch {1} and node {2}", Project, Branch, Node);
 
@@ -783,7 +787,7 @@ package body Porion.Builds.Services is
       end if;
 
       --  Load the recipe steps.
-      Service.Load_Recipe (Recipe);
+      Load_Recipe (Service, Recipe, Steps);
 
       --  Create the new recipe and copy the build steps.
       Service.DB.Begin_Transaction;
@@ -799,7 +803,7 @@ package body Porion.Builds.Services is
          New_Config.Set_Branch (Service.Branch);
          New_Config.Save (Service.DB);
 
-         for Step of Service.Steps loop
+         for Step of Steps loop
             declare
                Src_Step : constant Models.Recipe_Step_Ref := Step.Step;
                New_Step : Models.Recipe_Step_Ref;
@@ -856,7 +860,7 @@ package body Porion.Builds.Services is
       begin
          Config.Set ("command", Command);
          Step.Set_Builder (Builds.Models.BUILDER_SCRIPT);
-         Service.Update_Parameters (Step, Config);
+         Update_Parameters (Service, Step, Config);
          Add_Step (Step, Builds.Models.BUILDER_SCRIPT, Kind);
       end Add_Step;
 

@@ -84,16 +84,15 @@ package body Porion.XUnit.Tests is
       Recipe.Set_Branch (Service.Branch);
       Recipe.Set_Project (Service.Project);
       Recipe.Save (Service.DB);
-      Builder.Start_Build (Recipe      => Recipe,
-                           Executor    => Executor);
+      Builds.Services.Start_Build (Service  => Service,
+                                   Recipe   => Recipe,
+                                   Executor => Executor);
       Porion.XUnit.Parsers.Scan (Path, Results);
       Porion.XUnit.Parsers.Scan (Path2, Results);
       --  Porion.XUnit.Parsers.Scan ("regtests/files/many", "*.xml", Results);
-      Build := Builder.Get_Build;
-      Session := Service.Get_Database;
       Porion.XUnit.Analysis.Save (Results => Results,
-                                  Build   => Build,
-                                  Session => Session);
+                                  Build   => Service.Build,
+                                  Session => Service.DB);
       T.Assert (True, "Foo is ok");
    end Test_Scanner;
 

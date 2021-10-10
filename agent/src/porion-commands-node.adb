@@ -18,6 +18,7 @@
 with Porion.Projects.Services;
 with Porion.Nodes.Services;
 with Porion.Services;
+with Porion.Reports;
 package body Porion.Commands.Node is
 
    --  ------------------------------
@@ -30,6 +31,9 @@ package body Porion.Commands.Node is
                       Context   : in out Context_Type) is
       pragma Unreferenced (Name);
       Count : constant Natural := Args.Get_Count;
+
+      function Get_Node_Status return String is
+         (Porion.Reports.Get_Status (Context.Project_Service.Build_Node.Get_Status));
 
       function Get_Scheme (URI : in String) return String is
          Sep : constant Natural := Util.Strings.Index (URI, ':');
@@ -130,9 +134,22 @@ package body Porion.Commands.Node is
 
       if Command.Remove then
          return;
-      else
-         Context.Project_Service.Open (Context.Project_Service);
+      elsif Command.Probe then
+         for I in 1 .. Count loop
+            declare
+               Name : constant String := Args.Get_Argument (I);
+            begin
+               Nodes.Services.Load_Node (Context.Project_Service, Name);
+               Nodes.Services.Probe_Node (Context.Project_Service);
+               Context.Console.Notice (N_INFO, Format (-("Node {0} is {1}"),
+                                       Name, Get_Node_Status));
 
+            exception
+               when Porion.Nodes.Services.Not_Found =>
+                  Porion.Commands.Error (-("build node '{0}' not found"), Name);
+            end;
+         end loop;
+      else
          declare
             URI       : constant String := Args.Get_Argument (1);
             Scheme    : constant String := Get_Scheme (URI);
@@ -168,6 +185,8 @@ package body Porion.Commands.Node is
       Drivers.Command_Type (Command).Setup (Config, Context);
       GC.Define_Switch (Config, Command.Remove'Access,
                         "-r", "--remove", -("remove the build node"));
+      GC.Define_Switch (Config, Command.Probe'Access,
+                        "-p", "--probe", -("probe the build node"));
    end Setup;
 
 end Porion.Commands.Node;

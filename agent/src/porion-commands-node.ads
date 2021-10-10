@@ -37,6 +37,7 @@ private
 
    type Command_Type is new Porion.Commands.Drivers.Command_Type with record
       Remove : aliased Boolean := False;
+      Probe  : aliased Boolean := False;
    end record;
 
 end Porion.Commands.Node;

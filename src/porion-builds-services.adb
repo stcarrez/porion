@@ -662,9 +662,9 @@ package body Porion.Builds.Services is
       Service.DB.Commit;
    end Update;
 
-   procedure Make_Build_Config (Service  : in out Context_Type;
-                                Branch   : in String;
-                                Executor : in out Porion.Executors.Executor_Type'Class) is
+   procedure Make_Recipes (Service  : in out Context_Type;
+                           Branch   : in String;
+                           Executor : in out Porion.Executors.Executor_Type'Class) is
       Name    : constant String := Service.Project.Get_Name;
       Path    : constant String := Configs.Get_Build_Directory (Name, Branch);
       Config  : Util.Properties.Manager;
@@ -704,7 +704,7 @@ package body Porion.Builds.Services is
       Service.Recipe.Set_Main_Recipe (True);
       Service.Recipe.Save (Service.DB);
       Guess (Service, Path, Executor);
-   end Make_Build_Config;
+   end Make_Recipes;
 
    --  Load the recipes of a project according to the identification.
    procedure Load_Recipes (Service : in out Context_Type;

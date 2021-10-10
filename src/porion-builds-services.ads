@@ -99,9 +99,10 @@ package Porion.Builds.Services is
    procedure Update (Service : in out Context_Type;
                      Configs : in out Build_Config_Vector);
 
-   procedure Make_Build_Config (Service  : in out Context_Type;
-                                Branch   : in String;
-                                Executor : in out Porion.Executors.Executor_Type'Class);
+   procedure Make_Recipes (Service  : in out Context_Type;
+                           Branch   : in String;
+                           Executor : in out Porion.Executors.Executor_Type'Class) with
+     Pre => Service.Is_Open and Service.Has_Project;
 
    --  Load the recipes of a project according to the identification.
    procedure Load_Recipes (Service : in out Context_Type;

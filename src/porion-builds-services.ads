@@ -137,7 +137,8 @@ private
    procedure Update_Build (Service : in out Context_Type;
                            Status  : in Builds.Models.Build_Status_Type);
 
-   procedure Load_Environment (Service : in out Context_Type);
+   procedure Load_Environment (Service : in out Context_Type;
+                               Recipe  : in Models.Recipe_Ref);
 
    procedure Load_Recipe (Service : in out Context_Type;
                           Recipe  : in Models.Recipe_Ref;

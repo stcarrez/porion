@@ -92,7 +92,7 @@ package body Porion.Builds.Services is
    begin
       Start_Build (Service, Recipe, Executor);
 
-      Load_Environment (Service);
+      Load_Environment (Service, Recipe);
       Load_Recipe (Service, Recipe, Steps);
 
       Build (Service, Steps, Executor);
@@ -227,15 +227,16 @@ package body Porion.Builds.Services is
       end case;
    end Update_Build;
 
-   procedure Load_Environment (Service : in out Context_Type) is
+   procedure Load_Environment (Service : in out Context_Type;
+                               Recipe  : in Models.Recipe_Ref) is
       Envs  : Porion.Builds.Models.Environment_Vector;
       Query : ADO.Queries.Context;
    begin
       --  Service.Environments.Clear;
-      Query.Set_Filter ("(o.recipe_id = :recipe OR o.node_id = :node_id)"
+      Query.Set_Filter ("(o.recipe_id = :recipe_id OR o.node_id = :node_id)"
                         & " OR (o.recipe_id IS NULL AND o.node_id IS NULL)");
-      Query.Bind_Param ("recipe_id", Service.Recipe.Get_Id);
-      Query.Bind_Param ("node_id", Service.Recipe.Get_Id);
+      Query.Bind_Param ("recipe_id", Recipe.Get_Id);
+      Query.Bind_Param ("node_id", Recipe.Get_Id);
       Porion.Builds.Models.List (Envs, Service.DB, Query);
 
 

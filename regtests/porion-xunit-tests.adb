@@ -64,7 +64,7 @@ package body Porion.XUnit.Tests is
          Nodes.Services.Load_Default_Node (Service);
 
       exception
-         when Porion.Services.Not_Found =>
+         when Porion.Nodes.Services.Not_Found =>
             Nodes.Services.Add_Default_Node (Service, Hostname => "localhost",
                                              Login    => "porion");
       end;

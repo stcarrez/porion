@@ -439,7 +439,7 @@ package body Porion.Reports is
          Writer.Set_Justify (Style2, PT.J_RIGHT);
          Writer.Put (Fields (1), Get_Kind (Node.Kind));
          Writer.Put (Fields (2), Get_Status (Node.Status));
-         Writer.Put_Int (Fields (3), Node.Config_Count);
+         Writer.Put_Int (Fields (3), Node.Recipe_Count);
          Writer.Put_Int (Fields (4), Node.Build_Count);
          if Ada.Strings.Unbounded.Length (Node.Os_Version) > 0 then
             Writer.Put (Fields (5), To_String (Node.OS_Name)

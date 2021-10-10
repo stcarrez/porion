@@ -205,6 +205,8 @@ CREATE TABLE IF NOT EXISTS porion_node (
   `info_date` DATETIME ,
   /* the CPU type on this build node. */
   `cpu_type` VARCHAR(255) NOT NULL,
+  /*  */
+  `main_node` TINYINT NOT NULL,
   PRIMARY KEY (`id`)
 );
 /*  */
@@ -421,6 +423,8 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "kind");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "deleted");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "main_node");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "tag");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)

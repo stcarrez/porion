@@ -119,6 +119,7 @@ package body Porion.Builds.Services is
          Ada.Directories.Create_Path (Path);
       end if;
 
+      Config.Set ("branch", Branch_Name);
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
       Source_Controller := Sources.Factories.Create (Service.Project.Get_Scm, Config);
 
@@ -753,6 +754,8 @@ package body Porion.Builds.Services is
                           Branch   : in String;
                           Node     : in String;
                           Recipe   : in out Models.Recipe_Ref) is
+      use type Porion.Projects.Models.Branch_Status_Type;
+
       Query   : ADO.SQL.Query;
       Found   : Boolean;
       Steps   : Build_Step_Vector;
@@ -829,6 +832,11 @@ package body Porion.Builds.Services is
          New_Recipe.Set_Branch (Service.Branch);
          New_Recipe.Save (Service.DB);
 
+         if Service.Branch.Get_Status = Porion.Projects.Models.BUILD_DISABLED then
+            Service.Branch.Set_Status (Porion.Projects.Models.BUILD_REQUIRED);
+            Service.Branch.Save (Service.DB);
+         end if;
+
          for Step of Steps loop
             declare
                Src_Step : constant Models.Recipe_Step_Ref := Step.Step;
@@ -844,6 +852,8 @@ package body Porion.Builds.Services is
                New_Step.Save (Service.DB);
             end;
          end loop;
+
+         Recipe := New_Recipe;
       end;
       Service.DB.Commit;
    end Copy_Recipe;

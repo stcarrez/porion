@@ -73,7 +73,7 @@
             (SELECT COUNT(build.id) FROM porion_build AS build WHERE build.node_id = node.id AND build.project_id = :project_id) AS bld_count
             FROM porion_node AS node
             INNER JOIN porion_recipe AS recipe ON recipe.node_id = node.id
-            WHERE node.deleted = 0 AND config.project_id = :project_id
+            WHERE node.deleted = 0 AND recipe.project_id = :project_id
             GROUP BY node.id
             ORDER BY node.name
         </sql>

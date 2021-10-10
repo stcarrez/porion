@@ -102,7 +102,7 @@
             INNER JOIN porion_build AS build ON last_build.build_id = build.id
             INNER JOIN porion_project AS project ON build.project_id = project.id
             INNER JOIN porion_branch AS branch ON branch.id = build.branch_id
-            INNER JOIN porion_recipe AS recipe ON build.recipe_id = config.id
+            INNER JOIN porion_recipe AS recipe ON build.recipe_id = recipe.id
             WHERE project.id = :project_id
             ORDER BY finish_date DESC
         </sql>

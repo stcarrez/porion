@@ -50,7 +50,7 @@ package body Porion.Queries is
          Into.Name := Stmt.Get_Unbounded_String (0);
          Into.Branch_Status := Porion.Projects.Models.Branch_Status_Type'Val (Stmt.Get_Integer (1));
          Into.Branch_Tag := Stmt.Get_Unbounded_String (2);
-         Into.Config_Count := Stmt.Get_Integer (3);
+         Into.Recipe_Count := Stmt.Get_Integer (3);
       end Read;
    begin
       Stmt.Execute;
@@ -80,7 +80,7 @@ package body Porion.Queries is
          Into.Project_Status := Porion.Projects.Models.Project_Status_Type'Val (Stmt.Get_Integer (1));
          Into.Branch_Name := Stmt.Get_Unbounded_String (2);
          Into.Branch_Status := Porion.Projects.Models.Branch_Status_Type'Val (Stmt.Get_Integer (3));
-         Into.Config_Name := Stmt.Get_Unbounded_String (4);
+         Into.Recipe_Name := Stmt.Get_Unbounded_String (4);
          Into.Build_Id := Stmt.Get_Integer (5);
          Into.Build_Number := Stmt.Get_Integer (6);
          Into.Build_Tag := Stmt.Get_Unbounded_String (7);
@@ -150,7 +150,7 @@ package body Porion.Queries is
          Into.Repository_Dir := Stmt.Get_Unbounded_String (5);
          Into.Kind := Porion.Nodes.Node_Type'Val (Stmt.Get_Integer (6));
          Into.Status := Porion.Nodes.Node_Status_Type'Val (Stmt.Get_Integer (7));
-         Into.Config_Count := Stmt.Get_Integer (8);
+         Into.Recipe_Count := Stmt.Get_Integer (8);
          Into.Build_Count := Stmt.Get_Integer (9);
       end Read;
    begin

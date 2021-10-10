@@ -451,6 +451,14 @@ package Porion.Builds.Models is
    function Get_Rate_Factor (Object : in Recipe_Ref)
                  return Integer;
 
+   --  Set the main recipe.
+   procedure Set_Main_Recipe (Object : in out Recipe_Ref;
+                              Value  : in Boolean);
+
+   --  Get the main recipe.
+   function Get_Main_Recipe (Object : in Recipe_Ref)
+                 return Boolean;
+
    --
    procedure Set_Node (Object : in out Recipe_Ref;
                        Value  : in Porion.Nodes.Models.Node_Ref'Class);
@@ -1154,8 +1162,8 @@ package Porion.Builds.Models is
    type Build_Status is
      new Util.Beans.Basic.Bean with  record
 
-      --  the build config id.
-      Config_Id : ADO.Identifier;
+      --  the build recipe id.
+      Recipe_Id : ADO.Identifier;
 
       --  the last build status.
       Build_Status : Porion.Builds.Models.Build_Status_Type;
@@ -1385,12 +1393,13 @@ private
    COL_3_3_NAME : aliased constant String := "description";
    COL_4_3_NAME : aliased constant String := "status";
    COL_5_3_NAME : aliased constant String := "rate_factor";
-   COL_6_3_NAME : aliased constant String := "node_id";
-   COL_7_3_NAME : aliased constant String := "branch_id";
-   COL_8_3_NAME : aliased constant String := "project_id";
+   COL_6_3_NAME : aliased constant String := "main_recipe";
+   COL_7_3_NAME : aliased constant String := "node_id";
+   COL_8_3_NAME : aliased constant String := "branch_id";
+   COL_9_3_NAME : aliased constant String := "project_id";
 
    RECIPE_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 9,
+     (Count   => 10,
       Table   => RECIPE_NAME'Access,
       Members => (
          1 => COL_0_3_NAME'Access,
@@ -1401,19 +1410,21 @@ private
          6 => COL_5_3_NAME'Access,
          7 => COL_6_3_NAME'Access,
          8 => COL_7_3_NAME'Access,
-         9 => COL_8_3_NAME'Access)
+         9 => COL_8_3_NAME'Access,
+         10 => COL_9_3_NAME'Access)
      );
    RECIPE_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := RECIPE_DEF'Access;
 
    RECIPE_AUDIT_DEF : aliased constant ADO.Audits.Auditable_Mapping :=
-     (Count    => 4,
+     (Count    => 5,
       Of_Class => RECIPE_DEF'Access,
       Members  => (
          1 => 2,
          2 => 3,
          3 => 4,
-         4 => 5)
+         4 => 5,
+         5 => 6)
      );
    RECIPE_AUDIT_TABLE : constant ADO.Audits.Auditable_Mapping_Access
       := RECIPE_AUDIT_DEF'Access;
@@ -1431,6 +1442,7 @@ private
        Description : Ada.Strings.Unbounded.Unbounded_String;
        Status : Porion.Builds.Models.Config_Status_Type;
        Rate_Factor : Integer;
+       Main_Recipe : Boolean;
        Node : Porion.Nodes.Models.Node_Ref;
        Branch : Porion.Projects.Models.Branch_Ref;
        Project : Porion.Projects.Models.Project_Ref;
@@ -1834,7 +1846,7 @@ private
 
    package File_1 is
       new ADO.Queries.Loaders.File (Path => "project-update-status.xml",
-                                    Sha1 => "12E8716B81E3076E43615C32ABC39F612180D441");
+                                    Sha1 => "03F01F9286F11CEED70B7A03E1A2947B8D8FBF4C");
 
    package Def_Buildstatus_Project_Build_Status is
       new ADO.Queries.Loaders.Query (Name => "project-build-status",

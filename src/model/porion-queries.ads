@@ -56,8 +56,8 @@ package Porion.Queries is
       --  the branch tag.
       Branch_Tag : Ada.Strings.Unbounded.Unbounded_String;
 
-      --  the number of build config for this branch.
-      Config_Count : Integer;
+      --  the number of build recipes for this branch.
+      Recipe_Count : Integer;
    end record;
 
    package Branch_Info_Vectors is
@@ -91,8 +91,8 @@ package Porion.Queries is
       --  the branch status.
       Branch_Status : Porion.Projects.Models.Branch_Status_Type;
 
-      --  the config name.
-      Config_Name : Ada.Strings.Unbounded.Unbounded_String;
+      --  the recipe name.
+      Recipe_Name : Ada.Strings.Unbounded.Unbounded_String;
 
       --  the build id.
       Build_Id : Integer;
@@ -195,8 +195,8 @@ package Porion.Queries is
       --  the node status.
       Status : Porion.Nodes.Node_Status_Type;
 
-      --  the number of configuration that use this node.
-      Config_Count : Integer;
+      --  the number of build recipes that use this node.
+      Recipe_Count : Integer;
 
       --  the number of builds for this node.
       Build_Count : Integer;
@@ -299,7 +299,7 @@ private
 
    package File_1 is
       new ADO.Queries.Loaders.File (Path => "command-branches.xml",
-                                    Sha1 => "E39222B78D5C1AEE0AB9068F03EF25846E4BDA59");
+                                    Sha1 => "B6EDC8D19F6B7809C35609778C713B225AC31600");
 
    package Def_Branchinfo_Branch_List is
       new ADO.Queries.Loaders.Query (Name => "branch-list",
@@ -309,7 +309,7 @@ private
 
    package File_2 is
       new ADO.Queries.Loaders.File (Path => "command-builds.xml",
-                                    Sha1 => "9B56535CDCB576A7AD90CB37BE76B178545A79CE");
+                                    Sha1 => "C03901267E0F4C88A14F4616A352385D8C7C6710");
 
    package Def_Buildinfo_Build_List is
       new ADO.Queries.Loaders.Query (Name => "build-list",
@@ -341,7 +341,7 @@ private
 
    package File_4 is
       new ADO.Queries.Loaders.File (Path => "command-nodes.xml",
-                                    Sha1 => "DECF963F46AF0AAD8077BBC027B129720EBB3655");
+                                    Sha1 => "C415C6088AFE424A4C27990F658A1FA3111DA129");
 
    package Def_Nodeinfo_Node_List is
       new ADO.Queries.Loaders.Query (Name => "node-list",

@@ -743,6 +743,7 @@ package body Porion.Projects.Models is
       Impl.Timeout_Rate := 0;
       Impl.Build_Rate := 0;
       Impl.Rate_Factor := 0;
+      Impl.Main_Branch := False;
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Allocate;
 
@@ -992,12 +993,29 @@ package body Porion.Projects.Models is
    end Get_Rate_Factor;
 
 
+   procedure Set_Main_Branch (Object : in out Branch_Ref;
+                              Value  : in Boolean) is
+      Impl : Branch_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Audits.Set_Field_Boolean (Impl.all, 14, Impl.Main_Branch, Value);
+   end Set_Main_Branch;
+
+   function Get_Main_Branch (Object : in Branch_Ref)
+                  return Boolean is
+      Impl : constant Branch_Access
+         := Branch_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Main_Branch;
+   end Get_Main_Branch;
+
+
    procedure Set_Project (Object : in out Branch_Ref;
                           Value  : in Porion.Projects.Models.Project_Ref'Class) is
       Impl : Branch_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 14, Impl.Project, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 15, Impl.Project, Value);
    end Set_Project;
 
    function Get_Project (Object : in Branch_Ref)
@@ -1034,6 +1052,7 @@ package body Porion.Projects.Models is
             Copy.Timeout_Rate := Impl.Timeout_Rate;
             Copy.Build_Rate := Impl.Build_Rate;
             Copy.Rate_Factor := Impl.Rate_Factor;
+            Copy.Main_Branch := Impl.Main_Branch;
             Copy.Project := Impl.Project;
          end;
       end if;
@@ -1220,9 +1239,14 @@ package body Porion.Projects.Models is
          Object.Clear_Modified (13);
       end if;
       if Object.Is_Modified (14) then
-         Stmt.Save_Field (Name  => COL_13_2_NAME, --  project_id
-                          Value => Object.Project);
+         Stmt.Save_Field (Name  => COL_13_2_NAME, --  main_branch
+                          Value => Object.Main_Branch);
          Object.Clear_Modified (14);
+      end if;
+      if Object.Is_Modified (15) then
+         Stmt.Save_Field (Name  => COL_14_2_NAME, --  project_id
+                          Value => Object.Project);
+         Object.Clear_Modified (15);
       end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
@@ -1281,7 +1305,9 @@ package body Porion.Projects.Models is
                         Value => Object.Build_Rate);
       Query.Save_Field (Name  => COL_12_2_NAME, --  rate_factor
                         Value => Object.Rate_Factor);
-      Query.Save_Field (Name  => COL_13_2_NAME, --  project_id
+      Query.Save_Field (Name  => COL_13_2_NAME, --  main_branch
+                        Value => Object.Main_Branch);
+      Query.Save_Field (Name  => COL_14_2_NAME, --  project_id
                         Value => Object.Project);
       Query.Execute (Result);
       if Result /= 1 then
@@ -1343,6 +1369,8 @@ package body Porion.Projects.Models is
          return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Build_Rate));
       elsif Name = "rate_factor" then
          return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Rate_Factor));
+      elsif Name = "main_branch" then
+         return Util.Beans.Objects.To_Object (Impl.Main_Branch);
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -1388,8 +1416,9 @@ package body Porion.Projects.Models is
       Object.Timeout_Rate := Stmt.Get_Integer (10);
       Object.Build_Rate := Stmt.Get_Integer (11);
       Object.Rate_Factor := Stmt.Get_Integer (12);
-      if not Stmt.Is_Null (13) then
-         Object.Project.Set_Key_Value (Stmt.Get_Identifier (13), Session);
+      Object.Main_Branch := Stmt.Get_Boolean (13);
+      if not Stmt.Is_Null (14) then
+         Object.Project.Set_Key_Value (Stmt.Get_Identifier (14), Session);
       end if;
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);

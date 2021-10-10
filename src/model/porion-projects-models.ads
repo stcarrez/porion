@@ -350,6 +350,14 @@ package Porion.Projects.Models is
    function Get_Rate_Factor (Object : in Branch_Ref)
                  return Integer;
 
+   --  Set indicates whether this is considered as the main project branch.
+   procedure Set_Main_Branch (Object : in out Branch_Ref;
+                              Value  : in Boolean);
+
+   --  Get indicates whether this is considered as the main project branch.
+   function Get_Main_Branch (Object : in Branch_Ref)
+                 return Boolean;
+
    --
    procedure Set_Project (Object : in out Branch_Ref;
                           Value  : in Porion.Projects.Models.Project_Ref'Class);
@@ -651,10 +659,11 @@ private
    COL_10_2_NAME : aliased constant String := "timeout_rate";
    COL_11_2_NAME : aliased constant String := "build_rate";
    COL_12_2_NAME : aliased constant String := "rate_factor";
-   COL_13_2_NAME : aliased constant String := "project_id";
+   COL_13_2_NAME : aliased constant String := "main_branch";
+   COL_14_2_NAME : aliased constant String := "project_id";
 
    BRANCH_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 14,
+     (Count   => 15,
       Table   => BRANCH_NAME'Access,
       Members => (
          1 => COL_0_2_NAME'Access,
@@ -670,17 +679,19 @@ private
          11 => COL_10_2_NAME'Access,
          12 => COL_11_2_NAME'Access,
          13 => COL_12_2_NAME'Access,
-         14 => COL_13_2_NAME'Access)
+         14 => COL_13_2_NAME'Access,
+         15 => COL_14_2_NAME'Access)
      );
    BRANCH_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := BRANCH_DEF'Access;
 
    BRANCH_AUDIT_DEF : aliased constant ADO.Audits.Auditable_Mapping :=
-     (Count    => 2,
+     (Count    => 3,
       Of_Class => BRANCH_DEF'Access,
       Members  => (
          1 => 3,
-         2 => 4)
+         2 => 4,
+         3 => 13)
      );
    BRANCH_AUDIT_TABLE : constant ADO.Audits.Auditable_Mapping_Access
       := BRANCH_AUDIT_DEF'Access;
@@ -705,6 +716,7 @@ private
        Timeout_Rate : Integer;
        Build_Rate : Integer;
        Rate_Factor : Integer;
+       Main_Branch : Boolean;
        Project : Porion.Projects.Models.Project_Ref;
    end record;
 

@@ -52,7 +52,7 @@ package body Porion.Builds.Services is
       Query : ADO.Queries.Context;
       Stmt  : ADO.Statements.Query_Statement;
    begin
-      Service.Build_Config := Recipe;
+      Service.Recipe := Recipe;
       Service.Build_Node := Porion.Nodes.Models.Node_Ref (Recipe.Get_Node);
       Service.Branch := Porion.Projects.Models.Branch_Ref (Recipe.Get_Branch);
       if Service.Build_Node.Is_Null then
@@ -71,7 +71,7 @@ package body Porion.Builds.Services is
       Service.Build.Set_Project (Service.Project);
       Service.Build.Set_Branch (Service.Branch);
       Service.Build.Set_Node (Service.Build_Node);
-      Service.Build.Set_Recipe (Service.Build_Config);
+      Service.Build.Set_Recipe (Service.Recipe);
       Service.Build.Set_Tag (String '(Service.Branch.Get_Tag));
       Service.Build.Set_Create_Date (Ada.Calendar.Clock);
       if not Executor.Is_Dry_Run then
@@ -192,7 +192,7 @@ package body Porion.Builds.Services is
          begin
             Last_Build.Set_Status (Status);
             Last_Build.Set_Build (Service.Build);
-            Last_Build.Set_Recipe (Service.Build_Config);
+            Last_Build.Set_Recipe (Service.Recipe);
             Last_Build.Set_Branch (Service.Branch);
             Last_Build.Save (Service.DB);
          end;
@@ -206,7 +206,7 @@ package body Porion.Builds.Services is
 
       Query.Set_Filter ("o.recipe_id = :config_id"
                         & " AND o.branch_id = :branch_id");
-      Query.Bind_Param ("config_id", Service.Build_Config.Get_Id);
+      Query.Bind_Param ("config_id", Service.Recipe.Get_Id);
       Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
       Porion.Builds.Models.List (Last_Builds, Service.DB, Query);
 
@@ -214,12 +214,12 @@ package body Porion.Builds.Services is
 
       case Status is
          when Builds.Models.BUILD_PASS =>
-            Service.Build_Config.Set_Status (Builds.Models.CONFIG_BUILD_PASS);
-            Service.Build_Config.Save (Service.DB);
+            Service.Recipe.Set_Status (Builds.Models.CONFIG_BUILD_PASS);
+            Service.Recipe.Save (Service.DB);
 
          when Builds.Models.BUILD_FAIL =>
-            Service.Build_Config.Set_Status (Builds.Models.CONFIG_BUILD_FAIL);
-            Service.Build_Config.Save (Service.DB);
+            Service.Recipe.Set_Status (Builds.Models.CONFIG_BUILD_FAIL);
+            Service.Recipe.Save (Service.DB);
 
          when others =>
             null;
@@ -227,39 +227,15 @@ package body Porion.Builds.Services is
       end case;
    end Update_Build;
 
-   procedure Load_Recipe (Service : in out Context_Type) is
-      Query : ADO.Queries.Context;
-      Found : Boolean;
-   begin
-      if Service.Build_Node.Is_Null then
-         Nodes.Services.Load_Default_Node (Service);
-      end if;
-
-      if Service.Build_Config.Is_Null then
-         Query.Bind_Param (1, Service.Project.Get_Id);
-         Query.Bind_Param (2, Service.Build_Node.Get_Id);
-         Query.Set_Filter ("o.project_id = ? AND o.node_id = ?");
-         Service.Build_Config.Find (Service.DB, Query, Found);
-         if not Found then
-            Service.Build_Config.Set_Node (Service.Build_Node);
-            Service.Build_Config.Set_Project (Service.Project);
-            Service.Build_Config.Save (Service.DB);
-         end if;
-      end if;
-
-      --  Load_Recipe (Service, Service.Build_Config);
-      Load_Environment (Service);
-   end Load_Recipe;
-
    procedure Load_Environment (Service : in out Context_Type) is
       Envs  : Porion.Builds.Models.Environment_Vector;
       Query : ADO.Queries.Context;
    begin
       --  Service.Environments.Clear;
-      Query.Set_Filter ("(o.recipe_id = :config_id OR o.node_id = :node_id)"
+      Query.Set_Filter ("(o.recipe_id = :recipe OR o.node_id = :node_id)"
                         & " OR (o.recipe_id IS NULL AND o.node_id IS NULL)");
-      Query.Bind_Param ("config_id", Service.Build_Config.Get_Id);
-      Query.Bind_Param ("node_id", Service.Build_Node.Get_Id);
+      Query.Bind_Param ("recipe_id", Service.Recipe.Get_Id);
+      Query.Bind_Param ("node_id", Service.Recipe.Get_Id);
       Porion.Builds.Models.List (Envs, Service.DB, Query);
 
 
@@ -362,7 +338,7 @@ package body Porion.Builds.Services is
          New_Step.Step.Set_Number (Pos);
          New_Step.Step.Set_Step (Step);
          New_Step.Step.Set_Execution (Builds.Models.EXEC_NO_ERROR);
-         New_Step.Step.Set_Recipe (Service.Build_Config);
+         New_Step.Step.Set_Recipe (Service.Recipe);
          New_Step.Step.Save (Service.DB);
 
          Pos := Pos + 1;
@@ -464,8 +440,8 @@ package body Porion.Builds.Services is
          Envs  : Porion.Builds.Models.Environment_Vector;
          Query : ADO.Queries.Context;
       begin
-         Query.Set_Filter ("o.recipe_id = :config_id");
-         Query.Bind_Param ("config_id", Service.Build_Config.Get_Id);
+         Query.Set_Filter ("o.recipe_id = :recipe_id");
+         Query.Bind_Param ("recipe_id", Service.Recipe.Get_Id);
          Porion.Builds.Models.List (Envs, Service.DB, Query);
 
          if not Envs.Is_Empty then
@@ -721,14 +697,55 @@ package body Porion.Builds.Services is
          Nodes.Services.Load_Default_Node (Service);
       end if;
 
-      Service.Build_Config.Set_Project (Service.Project);
-      Service.Build_Config.Set_Node (Service.Build_Node);
-      Service.Build_Config.Set_Status (Builds.Models.CONFIG_BUILD_REQUIRED);
-      Service.Build_Config.Set_Branch (Service.Branch);
-      Service.Build_Config.Set_Main_Recipe (True);
-      Service.Build_Config.Save (Service.DB);
+      Service.Recipe.Set_Project (Service.Project);
+      Service.Recipe.Set_Node (Service.Build_Node);
+      Service.Recipe.Set_Status (Builds.Models.CONFIG_BUILD_REQUIRED);
+      Service.Recipe.Set_Branch (Service.Branch);
+      Service.Recipe.Set_Main_Recipe (True);
+      Service.Recipe.Save (Service.DB);
       Guess (Service, Path, Executor);
    end Make_Build_Config;
+
+   --  Load the recipes of a project according to the identification.
+   procedure Load_Recipes (Service : in out Context_Type;
+                           Ident   : in Porion.Projects.Ident_Type;
+                           List    : in out Porion.Builds.Models.Recipe_Vector) is
+      Query : ADO.Queries.Context;
+      Found : Boolean;
+   begin
+      Service.Load_Project (To_String (Ident.Name));
+
+      if Length (Ident.Branch) > 0 then
+         Query.Set_Filter ("o.project_id = :project_id and o.name = :branch");
+         Query.Bind_Param ("project_id", Service.Project.Get_Id);
+         Query.Bind_Param ("branch", Ident.Branch);
+         Service.Branch.Find (Service.DB, Query, Found);
+         if not Found then
+            Log.Error ("Branch {0} not found in database", To_String (Ident.Branch));
+            return;
+         end if;
+      end if;
+
+      if Length (Ident.Node) > 0 then
+         Nodes.Services.Load_Node (Service, To_String (Ident.Node));
+      end if;
+
+      if Service.Build_Node.Is_Null then
+         Nodes.Services.Load_Default_Node (Service);
+      end if;
+
+      Query.Clear;
+      Query.Bind_Param ("project_id", Service.Project.Get_Id);
+      Query.Bind_Param ("node_id", Service.Build_Node.Get_Id);
+      if not Service.Branch.Is_Null and not Service.Build_Node.Is_Null then
+         Query.Set_Filter ("o.project_id = :project_id AND o.node_id = :node_id "
+                           & " AND o.branch_id = :branch_id");
+         Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
+      else
+         Query.Set_Filter ("o.project_id = :project_id AND o.node_id = :node_id");
+      end if;
+      Builds.Models.List (List, Service.DB, Query);
+   end Load_Recipes;
 
    procedure Copy_Recipe (Service  : in out Context_Type;
                           Project  : in String;
@@ -792,16 +809,16 @@ package body Porion.Builds.Services is
       --  Create the new recipe and copy the build steps.
       Service.DB.Begin_Transaction;
       declare
-         New_Config : Models.Recipe_Ref;
+         New_Recipe : Models.Recipe_Ref;
       begin
-         New_Config.Set_Name (String '(Recipe.Get_Name));
-         New_Config.Set_Description (String '(Recipe.Get_Description));
-         New_Config.Set_Rate_Factor (Recipe.Get_Rate_Factor);
-         New_Config.Set_Status (Builds.Models.CONFIG_BUILD_REQUIRED);
-         New_Config.Set_Node (Service.Build_Node);
-         New_Config.Set_Project (Service.Project);
-         New_Config.Set_Branch (Service.Branch);
-         New_Config.Save (Service.DB);
+         New_Recipe.Set_Name (String '(Recipe.Get_Name));
+         New_Recipe.Set_Description (String '(Recipe.Get_Description));
+         New_Recipe.Set_Rate_Factor (Recipe.Get_Rate_Factor);
+         New_Recipe.Set_Status (Builds.Models.CONFIG_BUILD_REQUIRED);
+         New_Recipe.Set_Node (Service.Build_Node);
+         New_Recipe.Set_Project (Service.Project);
+         New_Recipe.Set_Branch (Service.Branch);
+         New_Recipe.Save (Service.DB);
 
          for Step of Steps loop
             declare
@@ -811,7 +828,7 @@ package body Porion.Builds.Services is
                New_Step.Set_Parameters (String '(Src_Step.Get_Parameters));
                New_Step.Set_Number (Src_Step.Get_Number);
                New_Step.Set_Timeout (Src_Step.Get_Timeout);
-               New_Step.Set_Recipe (New_Config);
+               New_Step.Set_Recipe (New_Recipe);
                New_Step.Set_Builder (Src_Step.Get_Builder);
                New_Step.Set_Execution (Src_Step.Get_Execution);
                New_Step.Set_Step (Src_Step.Get_Step);
@@ -847,7 +864,7 @@ package body Porion.Builds.Services is
          Step.Set_Builder (Builder);
          Step.Set_Timeout (10 * 60);
          Step.Set_Number (Current_Step);
-         Step.Set_Recipe (Service.Build_Config);
+         Step.Set_Recipe (Service.Recipe);
          Step.Set_Version (1);
          Step.Save (Service.DB);
          Current_Step := Current_Step + 1;

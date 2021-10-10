@@ -63,8 +63,8 @@ package Porion.Builds.Services is
                           Executor    : in out Porion.Executors.Executor_Type'Class) with
      Pre => Service.Has_Project;
 
-   procedure Load_Recipe (Service : in out Context_Type) with
-     Pre => Service.Has_Project;
+  -- procedure Load_Recipe (Service : in out Context_Type) with
+  --   Pre => Service.Has_Project;
 
    --  Delete the build step at the given execution order.
    procedure Delete_Step (Service  : in out Context_Type;
@@ -102,6 +102,12 @@ package Porion.Builds.Services is
    procedure Make_Build_Config (Service  : in out Context_Type;
                                 Branch   : in String;
                                 Executor : in out Porion.Executors.Executor_Type'Class);
+
+   --  Load the recipes of a project according to the identification.
+   procedure Load_Recipes (Service : in out Context_Type;
+                           Ident   : in Porion.Projects.Ident_Type;
+                           List    : in out Porion.Builds.Models.Recipe_Vector) with
+     Pre => Service.Is_Open;
 
    procedure Copy_Recipe (Service  : in out Context_Type;
                           Project  : in String;

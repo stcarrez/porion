@@ -15,8 +15,6 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with ADO.Statements;
-with ADO.Queries;
 with ADO.Sessions;
 with ADO.Sessions.Factory;
 
@@ -35,7 +33,7 @@ package Porion.Services is
       Branch            : Porion.Projects.Models.Branch_Ref;
       Build             : Porion.Builds.Models.Build_Ref;
       Build_Node        : Porion.Nodes.Models.Node_Ref;
-      Build_Config      : Porion.Builds.Models.Recipe_Ref;
+      Recipe            : Porion.Builds.Models.Recipe_Ref;
       Dry_Run           : Boolean := False;
    end record;
 

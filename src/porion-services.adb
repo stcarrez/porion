@@ -22,6 +22,8 @@ with Util.Properties;
 with ADO.Configs;
 with ADO.Sqlite;
 with ADO.SQL;
+with ADO.Queries;
+with ADO.Statements;
 
 with Porion.Configs;
 with Porion.Services.Parsers;
@@ -103,7 +105,7 @@ package body Porion.Services is
       else
          Query.Set_Filter ("o.project_id = :project_id AND o.node_id = :node_id");
       end if;
-      Service.Build_Config.Find (Service.DB, Query, Found);
+      Service.Recipe.Find (Service.DB, Query, Found);
       if not Found then
          Log.Error ("Recipe not found");
       end if;

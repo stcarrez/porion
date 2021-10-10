@@ -115,6 +115,8 @@ package body Porion.Commands.Add is
                                    To_String (Ident.Branch),
                                    To_String (Ident.Node),
                                    Context.Project_Service.Recipe);
+      Context.Console.Notice (N_INFO, Format (-("New recipe added to project {0} branch {1}"),
+                              To_String (Ident.Name), Context.Project_Service.Branch.Get_Name));
 
    exception
       when Porion.Projects.Invalid_Ident =>

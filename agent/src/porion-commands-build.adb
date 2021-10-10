@@ -39,12 +39,14 @@ package body Porion.Commands.Build is
 
       for I in 1 .. Count loop
          declare
-            Name          : constant String := Args.Get_Argument (I);
-            Source_Status : Porion.Sources.Status_Type;
-            Executor      : Porion.Executors.Executor_Type;
-            Build_Configs : Porion.Builds.Models.Recipe_Vector;
+            Identification : constant String := Args.Get_Argument (I);
+            Source_Status  : Porion.Sources.Status_Type;
+            Executor       : Porion.Executors.Executor_Type;
+            Recipes        : Porion.Builds.Models.Recipe_Vector;
+            Ident          : Porion.Projects.Ident_Type;
          begin
-            Context.Project_Service.Load_Project (Name);
+            Ident := Porion.Projects.Parse (Identification);
+            Porion.Builds.Services.Load_Recipes (Context.Project_Service, Ident, Recipes);
 
             Projects.Services.Check_Sources (Context.Project_Service, Source_Status, Executor);
 
@@ -55,13 +57,13 @@ package body Porion.Commands.Build is
                Executor.Enable_Log;
             end if;
 
-            Builds.Services.Find_Build_Configs (Context.Project_Service, Command.Force, Build_Configs);
+            Builds.Services.Find_Build_Configs (Context.Project_Service, Command.Force, Recipes);
 
-            if Build_Configs.Is_Empty then
+            if Recipes.Is_Empty then
                Context.Notice (Format (-("no change for {0}"), Name));
             end if;
 
-            for Build_Config of Build_Configs loop
+            for Build_Config of Recipes loop
                Porion.Builds.Services.Build (Context.Project_Service, Build_Config, Executor);
                if Command.Dry_Run then
                   declare

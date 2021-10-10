@@ -19,6 +19,7 @@ with Porion.Projects.Services;
 with Porion.Configs;
 with Porion.Executors;
 with Porion.Services;
+with Porion.Builds.Models;
 with Porion.Builds.Services;
 with Porion.Sources.Factories;
 package body Porion.Commands.Add is
@@ -48,7 +49,7 @@ package body Porion.Commands.Add is
       Projects.Services.Check_Sources (Context.Project_Service, Status, Executor);
 
       --  Step 3: make a default build config for the branch.
-      Builds.Services.Make_Build_Config (Context.Project_Service, To_String (Status.Head), Executor);
+      Builds.Services.Make_Recipes (Context.Project_Service, To_String (Status.Head), Executor);
 
    exception
       when Porion.Projects.Services.Name_Used =>
@@ -68,7 +69,8 @@ package body Porion.Commands.Add is
                          Target  : in String;
                          Source  : in String;
                          Context : in out Context_Type) is
-      Ident : Porion.Projects.Ident_Type;
+      Ident   : Porion.Projects.Ident_Type;
+      Recipes : Porion.Builds.Models.Recipe_Vector;
    begin
       if Source'Length > 0 then
          begin
@@ -76,12 +78,12 @@ package body Porion.Commands.Add is
 
          exception
             when Porion.Projects.Invalid_Ident =>
-               Commands.Error (-("invalid source identification '{0}'"), Source);
+               Commands.Error (-("invalid source '{0}'"), Source);
                return;
          end;
 
          begin
-            Context.Project_Service.Load (Ident);
+            Porion.Builds.Services.Load_Recipes (Context.Project_Service, Ident, Recipes);
 
          exception
             when Porion.Services.Not_Found =>
@@ -89,6 +91,11 @@ package body Porion.Commands.Add is
                                To_String (Ident.Name));
                return;
          end;
+
+         if Recipes.Is_Empty then
+            Commands.Error (-("no recipe found for source '{0}'"), Source);
+            return;
+         end if;
       end if;
 
       Ident := Porion.Projects.Parse (Target);
@@ -130,19 +137,15 @@ package body Porion.Commands.Add is
       end if;
       Context.Open;
 
-      declare
-         URI : constant String := Args.Get_Argument (1);
-      begin
-         if Command.Recipe then
-            if Args.Get_Count = 2 then
-               Command.Add_Recipe (URI, Args.Get_Argument (2), Context);
-            else
-               Command.Add_Recipe (URI, "", Context);
-            end if;
+      if Command.Recipe then
+         if Args.Get_Count = 2 then
+            Command.Add_Recipe (Args.Get_Argument (1), Args.Get_Argument (2), Context);
          else
-            Command.Add_Project (URI, Context);
+            Command.Add_Recipe (Args.Get_Argument (1), "", Context);
          end if;
-      end;
+      else
+         Command.Add_Project (Args.Get_Argument (1), Context);
+      end if;
    end Execute;
 
    --  ------------------------------

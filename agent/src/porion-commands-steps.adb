@@ -18,6 +18,7 @@
 with Util.Strings.Vectors;
 with Porion.Builds.Models;
 with Porion.Services;
+with Porion.Projects;
 with Porion.Builds.Services;
 package body Porion.Commands.Steps is
 
@@ -45,14 +46,15 @@ package body Porion.Commands.Steps is
       Context.Open;
 
       declare
-         Name          : constant String := Args.Get_Argument (1);
+         Name    : constant String := Args.Get_Argument (1);
+         Ident   : Porion.Projects.Ident_Type;
+         Recipes : Porion.Builds.Models.Recipe_Vector;
       begin
-         Context.Project_Service.Load_Project (Name);
-
-         Builds.Services.Load_Recipe (Context.Project_Service);
+         Ident := Porion.Projects.Parse (Name);
+         Builds.Services.Load_Recipes (Context.Project_Service, Ident, Recipes);
 
          if Command.Delete_Pos > 0 then
-            --  Builds.Services.Delete_Step (Context.Project_Service, Command.Delete_Pos);
+            --  Builds.Services.Delete_Step (Context.Project_Service, Recipes, Command.Delete_Pos);
             return;
          end if;
 

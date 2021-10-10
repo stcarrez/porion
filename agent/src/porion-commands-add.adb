@@ -107,7 +107,7 @@ package body Porion.Commands.Add is
                                    To_String (Ident.Name),
                                    To_String (Ident.Branch),
                                    To_String (Ident.Node),
-                                   Context.Project_Service.Build_Config);
+                                   Context.Project_Service.Recipe);
 
    exception
       when Porion.Projects.Invalid_Ident =>

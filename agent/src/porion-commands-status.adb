@@ -20,6 +20,7 @@ with Util.Streams.Texts;
 with Util.Serialize.IO.XML;
 with Util.Serialize.IO.JSON;
 with Porion.Configs;
+with Porion.Builds.Models;
 with Porion.Builds.Services;
 package body Porion.Commands.Status is
 
@@ -41,9 +42,11 @@ package body Porion.Commands.Status is
          declare
             Name      : constant String := Args.Get_Argument (1);
             Output    : aliased Util.Streams.Texts.Print_Stream;
+            Recipes   : Porion.Builds.Models.Recipe_Vector;
+            Ident   : Porion.Projects.Ident_Type;
          begin
-            Context.Project_Service.Load_Project (Name);
-            Builds.Services.Load_Recipe (Context.Project_Service);
+            Ident := Porion.Projects.Parse (Name);
+            Builds.Services.Load_Recipes (Context.Project_Service, Ident, Recipes);
 
             Output.Initialize (Size => 100000);
             if Command.Json then

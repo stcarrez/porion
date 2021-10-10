@@ -23,7 +23,7 @@ package Porion.Nodes.SSH is
    SSH_COMMAND_NAME : constant String := "command_ssh";
 
    SSH_COMMAND      : constant String := "ssh "
-     & "#{identity ? '-i' : ''} #{identity} -x -l #{login} #{hostname}";
+     & "#{identity ? '-i' : ''} #{identity} -x #{login ? '-l' : ''} #{login} #{hostname}";
 
    type Controller_Type is limited new Local.Controller_Type with private;
    type Controller_Access is access all Controller_Type'Class;

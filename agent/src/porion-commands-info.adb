@@ -25,6 +25,7 @@ with Porion.Executors;
 with Porion.Configs;
 with ADO.Queries;
 with PT.Texts;
+with Porion.Builds.Services;
 package body Porion.Commands.Info is
 
    --  ------------------------------
@@ -91,7 +92,6 @@ package body Porion.Commands.Info is
             Build_Configs : Porion.Builds.Models.Recipe_Vector;
          begin
             Context.Project_Service.Load_Project (Project_Name);
-            Context.Build_Service.Open (Context.Project_Service);
 
             Printer.Layout_Fields (Fields (1 .. 2));
             Printer.Put (Fields (1), -("Project"));
@@ -201,9 +201,9 @@ package body Porion.Commands.Info is
             end;
 
             Executor.Enable_Dry_Run;
-            Context.Build_Service.Find_Build_Configs (True, Build_Configs);
+            Builds.Services.Find_Build_Configs (Context.Project_Service, True, Build_Configs);
             for Build_Config of Build_Configs loop
-               Porion.Builds.Services.Build (Context.Build_Service, Build_Config, Executor);
+               Porion.Builds.Services.Build (Context.Project_Service, Build_Config, Executor);
                declare
                   Commands : Porion.Executors.Command_Vector;
                begin

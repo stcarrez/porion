@@ -20,6 +20,7 @@ with Util.Streams.Texts;
 with Util.Serialize.IO.XML;
 with Util.Serialize.IO.JSON;
 with Porion.Configs;
+with Porion.Builds.Services;
 package body Porion.Commands.Status is
 
    --  Get a value from the keystore.
@@ -42,8 +43,7 @@ package body Porion.Commands.Status is
             Output    : aliased Util.Streams.Texts.Print_Stream;
          begin
             Context.Project_Service.Load_Project (Name);
-            Context.Build_Service.Open (Context.Project_Service);
-            Context.Build_Service.Load_Recipe;
+            Builds.Services.Load_Recipe (Context.Project_Service);
 
             Output.Initialize (Size => 100000);
             if Command.Json then
@@ -74,7 +74,7 @@ package body Porion.Commands.Status is
 
       procedure Process (Stream : in out Util.Serialize.IO.Output_Stream'Class) is
       begin
-         Context.Build_Service.Export (Stream);
+         Builds.Services.Export (Context.Project_Service, Stream);
       end Process;
 
    begin

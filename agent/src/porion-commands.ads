@@ -23,7 +23,6 @@ private with Ada.Finalization;
 private with GNAT.Command_Line;
 private with GNAT.Strings;
 private with Porion.Projects.Services;
-private with Porion.Builds.Services;
 private with Util.Commands.Consoles.Text;
 private with Util.Strings.Formats;
 package Porion.Commands is
@@ -86,7 +85,6 @@ private
       Command_Config    : GC.Command_Line_Configuration;
       First_Arg         : Positive := 1;
       Project_Service   : Porion.Projects.Services.Context_Type;
-      Build_Service     : Porion.Builds.Services.Context_Type;
       Styles            : Porion.Reports.Style_Configuration;
       Printer           : PT.Printer_Access;
    end record;

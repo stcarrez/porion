@@ -18,6 +18,7 @@
 
 with Porion.Executors;
 with Porion.Sources;
+with Porion.Builds.Services;
 with Porion.Builds.Models;
 package body Porion.Commands.Build is
 
@@ -47,8 +48,6 @@ package body Porion.Commands.Build is
 
             Projects.Services.Check_Sources (Context.Project_Service, Source_Status, Executor);
 
-            Context.Build_Service.Open (Context.Project_Service);
-
             if Command.Dry_Run then
                Executor.Enable_Dry_Run;
             end if;
@@ -56,14 +55,14 @@ package body Porion.Commands.Build is
                Executor.Enable_Log;
             end if;
 
-            Context.Build_Service.Find_Build_Configs (Command.Force, Build_Configs);
+            Builds.Services.Find_Build_Configs (Context.Project_Service, Command.Force, Build_Configs);
 
             if Build_Configs.Is_Empty then
                Context.Notice (Format (-("no change for {0}"), Name));
             end if;
 
             for Build_Config of Build_Configs loop
-               Porion.Builds.Services.Build (Context.Build_Service, Build_Config, Executor);
+               Porion.Builds.Services.Build (Context.Project_Service, Build_Config, Executor);
                if Command.Dry_Run then
                   declare
                      Commands : Porion.Executors.Command_Vector;

@@ -27,6 +27,7 @@ with Util.Streams.Files;
 with Util.Streams.Texts;
 with Util.Serialize.IO.XML;
 with Keystore.Random;
+with Porion.Builds.Services;
 package body Porion.Commands.Edit is
 
    use GNAT.Strings;
@@ -53,7 +54,7 @@ package body Porion.Commands.Edit is
 
       procedure Process (Stream : in out Util.Serialize.IO.Output_Stream'Class) is
       begin
-         Context.Build_Service.Export (Stream);
+         Builds.Services.Export (Context.Project_Service, Stream);
       end Process;
 
       File   : aliased Util.Streams.Files.File_Stream;
@@ -61,8 +62,7 @@ package body Porion.Commands.Edit is
       Stream : Util.Serialize.IO.XML.Output_Stream;
    begin
       Context.Project_Service.Load_Project (Name);
-      Context.Build_Service.Open (Context.Project_Service);
-      Context.Build_Service.Load_Recipe;
+      Builds.Services.Load_Recipe (Context.Project_Service);
 
       Buffer.Initialize (Output => File'Unchecked_Access,
                          Size   => 4096);

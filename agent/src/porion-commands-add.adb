@@ -19,6 +19,7 @@ with Porion.Projects.Services;
 with Porion.Configs;
 with Porion.Executors;
 with Porion.Services;
+with Porion.Builds.Services;
 with Porion.Sources.Factories;
 package body Porion.Commands.Add is
 
@@ -46,10 +47,8 @@ package body Porion.Commands.Add is
       --  Step 2: identify the branches of the project (only the main branch is enabled).
       Projects.Services.Check_Sources (Context.Project_Service, Status, Executor);
 
-      Context.Build_Service.Open (Context.Project_Service);
-
       --  Step 3: make a default build config for the branch.
-      Context.Build_Service.Make_Build_Config (To_String (Status.Head), Executor);
+      Builds.Services.Make_Build_Config (Context.Project_Service, To_String (Status.Head), Executor);
 
    exception
       when Porion.Projects.Services.Name_Used =>
@@ -104,10 +103,11 @@ package body Porion.Commands.Add is
             return;
       end;
 
-      Context.Build_Service.Copy_Recipe (To_String (Ident.Name),
-                                         To_String (Ident.Branch),
-                                         To_String (Ident.Node),
-                                         Context.Project_Service.Build_Config);
+      Builds.Services.Copy_Recipe (Context.Project_Service,
+                                   To_String (Ident.Name),
+                                   To_String (Ident.Branch),
+                                   To_String (Ident.Node),
+                                   Context.Project_Service.Build_Config);
 
    exception
       when Porion.Projects.Invalid_Ident =>

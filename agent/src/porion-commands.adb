@@ -332,7 +332,6 @@ package body Porion.Commands is
    procedure Open (Context : in out Context_Type) is
    begin
       Context.Project_Service.Open (Porion.Resources.Queries.Get_Content'Access, null);
-      Context.Build_Service.Open (Context.Project_Service);
    end Open;
 
    overriding

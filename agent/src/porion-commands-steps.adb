@@ -18,6 +18,7 @@
 with Util.Strings.Vectors;
 with Porion.Builds.Models;
 with Porion.Services;
+with Porion.Builds.Services;
 package body Porion.Commands.Steps is
 
    --  ------------------------------
@@ -48,12 +49,10 @@ package body Porion.Commands.Steps is
       begin
          Context.Project_Service.Load_Project (Name);
 
-         Context.Build_Service.Open (Context.Project_Service);
-
-         Context.Build_Service.Load_Recipe;
+         Builds.Services.Load_Recipe (Context.Project_Service);
 
          if Command.Delete_Pos > 0 then
-            Context.Build_Service.Delete_Step (Command.Delete_Pos);
+            --  Builds.Services.Delete_Step (Context.Project_Service, Command.Delete_Pos);
             return;
          end if;
 
@@ -82,7 +81,8 @@ package body Porion.Commands.Steps is
             Params.Append (Args.Get_Argument (Pos));
             Pos := Pos + 1;
          end loop;
-         Context.Build_Service.Insert_Step (Command.Insert_Pos, Kind, Step, Params);
+         --  Builds.Services.Insert_Step (Context.Project_Service,
+         --                             Command.Insert_Pos, Kind, Step, Params);
       end;
    end Execute;
 

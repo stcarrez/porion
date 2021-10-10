@@ -192,6 +192,14 @@ package Porion.Nodes.Models is
    function Get_Cpu_Type (Object : in Node_Ref)
                  return String;
 
+   --
+   procedure Set_Main_Node (Object : in out Node_Ref;
+                            Value  : in Boolean);
+
+   --
+   function Get_Main_Node (Object : in Node_Ref)
+                 return Boolean;
+
    --  Load the entity identified by 'Id'.
    --  Raises the NOT_FOUND exception if it does not exist.
    procedure Load (Object  : in out Node_Ref;
@@ -259,9 +267,10 @@ private
    COL_12_1_NAME : aliased constant String := "os_version";
    COL_13_1_NAME : aliased constant String := "info_date";
    COL_14_1_NAME : aliased constant String := "cpu_type";
+   COL_15_1_NAME : aliased constant String := "main_node";
 
    NODE_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 15,
+     (Count   => 16,
       Table   => NODE_NAME'Access,
       Members => (
          1 => COL_0_1_NAME'Access,
@@ -278,20 +287,22 @@ private
          12 => COL_11_1_NAME'Access,
          13 => COL_12_1_NAME'Access,
          14 => COL_13_1_NAME'Access,
-         15 => COL_14_1_NAME'Access)
+         15 => COL_14_1_NAME'Access,
+         16 => COL_15_1_NAME'Access)
      );
    NODE_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := NODE_DEF'Access;
 
    NODE_AUDIT_DEF : aliased constant ADO.Audits.Auditable_Mapping :=
-     (Count    => 5,
+     (Count    => 6,
       Of_Class => NODE_DEF'Access,
       Members  => (
          1 => 2,
          2 => 3,
          3 => 4,
          4 => 8,
-         5 => 9)
+         5 => 9,
+         6 => 15)
      );
    NODE_AUDIT_TABLE : constant ADO.Audits.Auditable_Mapping_Access
       := NODE_AUDIT_DEF'Access;
@@ -318,6 +329,7 @@ private
        Os_Version : Ada.Strings.Unbounded.Unbounded_String;
        Info_Date : ADO.Nullable_Time;
        Cpu_Type : Ada.Strings.Unbounded.Unbounded_String;
+       Main_Node : Boolean;
    end record;
 
    type Node_Access is access all Node_Impl;

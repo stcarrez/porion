@@ -75,6 +75,7 @@ package body Porion.Nodes.Models is
       Impl.Deleted := False;
       Impl.Status := Porion.Nodes.Node_Status_Type'First;
       Impl.Info_Date.Is_Null := True;
+      Impl.Main_Node := False;
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Allocate;
 
@@ -426,6 +427,23 @@ package body Porion.Nodes.Models is
       return Impl.Cpu_Type;
    end Get_Cpu_Type;
 
+
+   procedure Set_Main_Node (Object : in out Node_Ref;
+                            Value  : in Boolean) is
+      Impl : Node_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Audits.Set_Field_Boolean (Impl.all, 16, Impl.Main_Node, Value);
+   end Set_Main_Node;
+
+   function Get_Main_Node (Object : in Node_Ref)
+                  return Boolean is
+      Impl : constant Node_Access
+         := Node_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Main_Node;
+   end Get_Main_Node;
+
    --  Copy of the object.
    procedure Copy (Object : in Node_Ref;
                    Into   : in out Node_Ref) is
@@ -454,6 +472,7 @@ package body Porion.Nodes.Models is
             Copy.Os_Version := Impl.Os_Version;
             Copy.Info_Date := Impl.Info_Date;
             Copy.Cpu_Type := Impl.Cpu_Type;
+            Copy.Main_Node := Impl.Main_Node;
          end;
       end if;
       Into := Result;
@@ -653,6 +672,11 @@ package body Porion.Nodes.Models is
                           Value => Object.Cpu_Type);
          Object.Clear_Modified (15);
       end if;
+      if Object.Is_Modified (16) then
+         Stmt.Save_Field (Name  => COL_15_1_NAME, --  main_node
+                          Value => Object.Main_Node);
+         Object.Clear_Modified (16);
+      end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
          Stmt.Save_Field (Name  => "version",
@@ -714,6 +738,8 @@ package body Porion.Nodes.Models is
                         Value => Object.Info_Date);
       Query.Save_Field (Name  => COL_14_1_NAME, --  cpu_type
                         Value => Object.Cpu_Type);
+      Query.Save_Field (Name  => COL_15_1_NAME, --  main_node
+                        Value => Object.Main_Node);
       Query.Execute (Result);
       if Result /= 1 then
          raise ADO.Objects.INSERT_ERROR;
@@ -782,6 +808,8 @@ package body Porion.Nodes.Models is
          end if;
       elsif Name = "cpu_type" then
          return Util.Beans.Objects.To_Object (Impl.Cpu_Type);
+      elsif Name = "main_node" then
+         return Util.Beans.Objects.To_Object (Impl.Main_Node);
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -810,6 +838,7 @@ package body Porion.Nodes.Models is
       Object.Os_Version := Stmt.Get_Unbounded_String (12);
       Object.Info_Date := Stmt.Get_Nullable_Time (13);
       Object.Cpu_Type := Stmt.Get_Unbounded_String (14);
+      Object.Main_Node := Stmt.Get_Boolean (15);
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);
    end Load;

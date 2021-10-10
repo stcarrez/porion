@@ -19,6 +19,7 @@ with Porion.Projects.Services;
 with Porion.Configs;
 with Porion.Executors;
 with Porion.Services;
+with Porion.Nodes.Services;
 with Porion.Builds.Models;
 with Porion.Builds.Services;
 with Porion.Sources.Factories;
@@ -115,10 +116,20 @@ package body Porion.Commands.Add is
                                    To_String (Ident.Branch),
                                    To_String (Ident.Node),
                                    Context.Project_Service.Recipe);
+
+      if Context.Project_Service.Branch.Is_Null then
+         Commands.Error (-("branch '{0}' not found for project '{1}'"),
+                         To_String (Ident.Branch), To_String (Ident.Name));
+         return;
+      end if;
+
       Context.Console.Notice (N_INFO, Format (-("New recipe added to project {0} branch {1}"),
                               To_String (Ident.Name), Context.Project_Service.Branch.Get_Name));
 
    exception
+      when Porion.Nodes.Services.Not_Found =>
+         Commands.Error (-("invalid build node '{0}'"), To_String (Ident.Node));
+
       when Porion.Projects.Invalid_Ident =>
          Commands.Error (-("invalid project identification '{0}'"), Target);
    end Add_Recipe;

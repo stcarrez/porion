@@ -20,7 +20,6 @@ with Util.Log.Loggers;
 with Util.Properties;
 with Util.Dates.ISO8601;
 with Porion.Configs;
-with Porion.Loggers;
 with Porion.Sources.Factories;
 with Porion.Builds.Models;
 with ADO.SQL;
@@ -250,7 +249,6 @@ package body Porion.Projects.Services is
 
       Config     : Porion.Configs.Config_Type;
       Query      : ADO.Queries.Context;
-      Logger     : Porion.Loggers.Logger_Type;
       Branches   : Porion.Projects.Models.Branch_Vector;
       Src_Status : Porion.Sources.Status_Type;
       Source_Controller : Porion.Sources.Controller_Access;
@@ -263,9 +261,8 @@ package body Porion.Projects.Services is
          Name    : constant String := Service.Project.Get_Name;
          Log_Dir : constant String := Configs.Get_Source_Log_Directory (Name, "master");
       begin
-         Logger.Create (Log_Dir, "source.log");
+         Executor.Create_Logger (Log_Dir, "source.log");
       end;
-
       Executor.Set_Step (Builds.STEP_CHECKOUT);
 
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));

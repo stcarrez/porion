@@ -60,11 +60,13 @@ package body Porion.Commands.Build is
             Builds.Services.Find_Build_Configs (Context.Project_Service, Command.Force, Recipes);
 
             if Recipes.Is_Empty then
-               Context.Notice (Format (-("no change for {0}"), Name));
+               Context.Notice (-("no change for {0}"), Name);
             end if;
 
-            for Build_Config of Recipes loop
-               Porion.Builds.Services.Build (Context.Project_Service, Build_Config, Executor);
+            for Recipe of Recipes loop
+               Context.Notice (-("building {0}^{1}@{2}"), Context.Project_Service.Project.Get_Name,
+                               Recipe.Get_Branch.Get_Name, Recipe.Get_Node.Get_Name);
+               Porion.Builds.Services.Build (Context.Project_Service, Recipe, Executor);
                if Command.Dry_Run then
                   declare
                      Commands : Porion.Executors.Command_Vector;

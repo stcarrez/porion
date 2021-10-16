@@ -43,8 +43,7 @@ package body Porion.Commands.Add is
                                       Executor => Executor);
 
       Projects.Services.Add_Project (Context.Project_Service, Info);
-      Context.Console.Notice (N_INFO, Format (-("Project {0} - {1} added"),
-                              To_String (Info.Name), URI));
+      Context.Notice (-("Project {0} - {1} added"), To_String (Info.Name), URI);
 
       --  Step 2: identify the branches of the project (only the main branch is enabled).
       Projects.Services.Check_Sources (Context.Project_Service, Status, Executor);
@@ -123,8 +122,8 @@ package body Porion.Commands.Add is
          return;
       end if;
 
-      Context.Console.Notice (N_INFO, Format (-("New recipe added to project {0} branch {1}"),
-                              To_String (Ident.Name), Context.Project_Service.Branch.Get_Name));
+      Context.Notice (-("New recipe added to project {0} branch {1}"),
+                      To_String (Ident.Name), Context.Project_Service.Branch.Get_Name);
 
    exception
       when Porion.Nodes.Services.Not_Found =>

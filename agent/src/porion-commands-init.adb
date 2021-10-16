@@ -53,7 +53,7 @@ package body Porion.Commands.Init is
             Porion.Configs.Set (Porion.Configs.WORKSPACE_DIR_NAME, Path);
             Porion.Configs.Save;
             Context.Project_Service.Open (Resources.Queries.Get_Content'Access, Schema);
-            Context.Console.Notice (N_INFO, Format (-("Porion workspace created in {0}"), Path));
+            Context.Notice (-("Porion workspace created in {0}"), Path);
             Nodes.Services.Add_Default_Node (Context.Project_Service,
                                              Hostname => "localhost",
                                              Login    => "");

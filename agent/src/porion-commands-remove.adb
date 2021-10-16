@@ -45,8 +45,7 @@ package body Porion.Commands.Remove is
             then
                Context.Project_Service.Load_Project (Project_Name);
                Projects.Services.Remove_Project (Context.Project_Service, Project_Name);
-               Context.Console.Notice (N_INFO, Format (-("Project {0} is removed"),
-                                       Project_Name));
+               Context.Notice (-("Project {0} is removed"), Project_Name);
             end if;
 
          exception

@@ -15,9 +15,7 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Porion.Projects.Services;
 with Porion.Nodes.Services;
-with Porion.Services;
 with Porion.Reports;
 package body Porion.Commands.Node is
 
@@ -141,8 +139,7 @@ package body Porion.Commands.Node is
             begin
                Nodes.Services.Load_Node (Context.Project_Service, Name);
                Nodes.Services.Probe_Node (Context.Project_Service);
-               Context.Console.Notice (N_INFO, Format (-("Node {0} is {1}"),
-                                       Name, Get_Node_Status));
+               Context.Notice (-("Node {0} is {1}"), Name, Get_Node_Status);
 
             exception
                when Porion.Nodes.Services.Not_Found =>
@@ -164,11 +161,11 @@ package body Porion.Commands.Node is
                                      Repository => Directory);
 
             Nodes.Services.Probe_Node (Context.Project_Service);
+            Context.Notice (-("Node {0} is {1}"), Hostname, Get_Node_Status);
 
          exception
             when Porion.Nodes.Services.Name_Used =>
-               Porion.Commands.Error (-("node '{0}' already exists"),
-                                      Hostname);
+               Commands.Error (-("node '{0}' already exists"), Hostname);
 
          end;
       end if;

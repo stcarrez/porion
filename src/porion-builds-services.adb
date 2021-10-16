@@ -98,13 +98,25 @@ package body Porion.Builds.Services is
       Build (Service, Steps, Executor);
    end Build;
 
+   function Get_Build_Directory (Service : in Context_Type) return String is
+      Name        : constant String := Service.Project.Get_Name;
+      Branch_Name : constant String := Service.Branch.Get_Name;
+      Repository  : constant String := Service.Build_Node.Get_Repository_Dir;
+   begin
+      if Repository'Length > 0 then
+         return Util.Files.Compose (Repository, Util.Files.Compose (Name, Branch_Name));
+      else
+         return Configs.Get_Build_Directory (Name, Branch_Name);
+      end if;
+   end Get_Build_Directory;
+
    procedure Build (Service     : in out Context_Type;
                     Steps       : in Build_Step_Vector;
                     Executor    : in out Porion.Executors.Executor_Type'Class) is
       Number  : constant Positive := Service.Build.Get_Number;
       Name    : constant String := Service.Project.Get_Name;
       Branch_Name : constant String := Service.Branch.Get_Name;
-      Path    : constant String := Configs.Get_Build_Directory (Name, Branch_Name);
+      Path    : constant String := Get_Build_Directory (Service);
       Log_Dir : constant String := Configs.Get_Build_Log_Directory (Name, Branch_Name, Number);
       Config  : Util.Properties.Manager;
       Status  : Builds.Models.Build_Status_Type := Builds.Models.BUILD_RUNNING;
@@ -115,8 +127,8 @@ package body Porion.Builds.Services is
       Executor.Set_Build_Node (Service.Build_Node);
 
       Executor.Set_Step (Builds.STEP_CHECKOUT);
-      if not Executor.Is_Dry_Run and then not Ada.Directories.Exists (Path) then
-         Ada.Directories.Create_Path (Path);
+      if not Executor.Is_Dry_Run then
+         Executor.Create_Directory (Path, False);
       end if;
 
       Config.Set ("branch", Branch_Name);
@@ -693,8 +705,8 @@ package body Porion.Builds.Services is
          return;
       end if;
 
-      if not Executor.Is_Dry_Run and then not Ada.Directories.Exists (Path) then
-         Ada.Directories.Create_Path (Path);
+      if not Executor.Is_Dry_Run then
+         Executor.Create_Directory (Path, False);
       end if;
 
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));

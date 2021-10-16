@@ -24,6 +24,9 @@ package body Porion.Loggers is
    procedure Create (Logger : in out Logger_Type;
                      Path   : in String) is
    begin
+      if Ada.Text_IO.Is_Open (Logger.File) then
+         Ada.Text_IO.Close (Logger.File);
+      end if;
       Ada.Text_IO.Create (File => Logger.File,
                           Mode => Ada.Text_IO.Out_File,
                           Name => Path);
@@ -35,6 +38,9 @@ package body Porion.Loggers is
    begin
       if not Ada.Directories.Exists (Dir) then
          Ada.Directories.Create_Path (Dir);
+      end if;
+      if Ada.Text_IO.Is_Open (Logger.File) then
+         Ada.Text_IO.Close (Logger.File);
       end if;
       Logger.Create (Util.Files.Compose (Dir, Name));
    end Create;

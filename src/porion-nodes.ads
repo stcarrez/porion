@@ -16,7 +16,9 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Finalization;
+with Ada.Containers.Indefinite_Vectors;
 with Util.Beans.Objects.Enums;
+with Porion.Builds;
 package Porion.Nodes is
 
    type Node_Type is (NODE_LOCAL, NODE_SSH, NODE_DOCKER, NODE_VIRSH);
@@ -49,7 +51,18 @@ package Porion.Nodes is
 
    package Node_Status_Type_Objects is new Util.Beans.Objects.Enums (Node_Status_Type);
 
-   type Controller_Type is abstract tagged limited private;
+   type Listener_Type is limited interface;
+   type Listener_Access is access all Listener_Type'Class;
+
+   --  Returns true if commands are not executed but collected.
+   function Is_Dry_Run (Listener : in Listener_Type) return Boolean is abstract;
+
+   --  Record a command that is executed during the build step.
+   --  The command is not executed but added to the list of commands.
+   procedure Record_Command (Listener : in out Listener_Type;
+                             Command  : in String) is abstract;
+
+   type Controller_Type is abstract limited new Ada.Finalization.Limited_Controlled with private;
    type Controller_Access is access all Controller_Type'Class;
 
    procedure Start (Controller : in out Controller_Type) is null;
@@ -75,7 +88,19 @@ package Porion.Nodes is
 private
 
    type Controller_Type is abstract limited new Ada.Finalization.Limited_Controlled with record
-      Ready : Boolean := True;
+      Listener : Listener_Access;
    end record;
+
+   --  Returns true if commands are not executed but collected.
+   function Is_Dry_Run (Controller : in Controller_Type'Class) return Boolean;
+
+   --  Record a command that is executed during the build step.
+   --  The command is not executed but added to the list of commands.
+   procedure Record_Command (Controller : in out Controller_Type'Class;
+                             Command    : in String);
+
+   --  Set the listener instance.
+   procedure Set_Listener (Controller : in out Controller_Type'Class;
+                           Listener   : in Listener_Access);
 
 end Porion.Nodes;

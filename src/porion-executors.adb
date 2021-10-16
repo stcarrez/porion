@@ -97,6 +97,31 @@ package body Porion.Executors is
       end case;
    end Set_Build_Node;
 
+   --  ------------------------------
+   --  Create the directory and optionally make sure it is cleaned.
+   --  ------------------------------
+   procedure Create_Directory (Executor : in out Executor_Type;
+                               Path     : in String;
+                               Clean    : in Boolean) is
+      procedure Process (Line : in String);
+
+      procedure Process (Line : in String) is
+      begin
+         Executor_Type'Class (Executor).Log (Line (Line'First .. Line'Last - 1));
+      end Process;
+
+   begin
+      if Executor.Controller /= null then
+         Executor.Controller.Create_Directory (Path, Clean, Process'Access);
+      else
+         if Executor.Local = null then
+            Executor.Local := Nodes.Local.Create;
+         end if;
+
+         Executor.Local.Create_Directory (Path, Clean, Process'Access);
+      end if;
+   end Create_Directory;
+
    procedure Execute (Executor    : in out Executor_Type;
                       Command     : in EL.Expressions.Expression;
                       Parameters  : in Util.Properties.Manager;

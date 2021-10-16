@@ -1,0 +1,137 @@
+<query-mapping package='Porion.Queries'>
+    <description>
+        List the build queues
+    </description>
+
+    <class name="Porion.Queries.Queue_Info" bean="yes">
+        <comment>Information about a build queue.</comment>
+        <property type='ADO.Identifier' name="id">
+            <comment>the build queue id.</comment>
+        </property>
+        <property type='Integer' name="order">
+            <comment>the build queue order.</comment>
+        </property>
+        <property type='Date' name="creation_date" not-null="yes">
+            <comment>the date when the recipe was inserted in the queue.</comment>
+        </property>
+        <property type='String' name="project_name">
+            <comment>the project name.</comment>
+        </property>
+        <property type='Porion.Projects.Models.Project_Status_Type' name="project_status">
+            <comment>the project status.</comment>
+        </property>
+        <property type='String' name="branch_name">
+            <comment>the branch name.</comment>
+        </property>
+        <property type='String' name="branch_tag">
+            <comment>the branch tag.</comment>
+        </property>
+        <property type='Porion.Projects.Models.Branch_Status_Type' name="branch_status">
+            <comment>the branch status.</comment>
+        </property>
+        <property type='ADO.Identifier' name="recipe_id">
+            <comment>the build recipe id.</comment>
+        </property>
+        <property type='String' name="recipe_name">
+            <comment>the recipe name.</comment>
+        </property>
+        <property type='Porion.Builds.Models.Config_Status_Type' name="recipe_status">
+            <comment>the recipe status.</comment>
+        </property>
+        <property type='Boolean' name="main_recipe">
+            <comment>whether this is the main recipe.</comment>
+        </property>
+        <property type='String' name="node_name">
+            <comment>the node name where the build is executed.</comment>
+        </property>
+        <property type='Porion.Nodes.Node_Status_Type' name="node_status">
+            <comment>the current node status.</comment>
+        </property>
+    </class>
+
+    <query name='build-queue-list'>
+        <comment>Get a description of the build queue</comment>
+        <sql>
+            SELECT
+            queue.id AS id,
+            queue.`order` AS `order`,
+            queue.creation_date AS create_date,
+            project.name AS name,
+            project.status AS status,
+            branch.name AS branch_name,
+            branch.tag AS branch_tag,
+            branch.status AS branch_status,
+            recipe.id AS recipe_id,
+            recipe.name AS recipe_name,
+            recipe.status AS recipe_status,
+            recipe.main_recipe AS main_recipe,
+            node.name AS node_name,
+            node.status AS node_status
+            FROM porion_build_queue AS queue
+            INNER JOIN porion_node AS node ON queue.node_id = node.id
+            INNER JOIN porion_recipe AS recipe ON queue.recipe_id = recipe.id
+            INNER JOIN porion_project AS project ON recipe.project_id = project.id
+            INNER JOIN porion_branch AS branch ON recipe.branch_id = branch.id
+        </sql>
+        <sql-count>
+            SELECT
+            count(queue.id)
+            FROM porion_build_queue AS queue
+        </sql-count>
+    </query>
+
+    <query name='project-build-queue-list'>
+        <comment>Get a description of the build queue for a given project</comment>
+        <sql>
+            SELECT
+            queue.id AS id,
+            queue.`order` AS `order`,
+            queue.creation_date AS create_date,
+            project.name AS name,
+            project.status AS status,
+            branch.name AS branch_name,
+            branch.tag AS branch_tag,
+            branch.status AS branch_status,
+            recipe.id AS recipe_id,
+            recipe.name AS recipe_name,
+            recipe.status AS recipe_status,
+            recipe.main_recipe AS main_recipe,
+            node.name AS node_name,
+            node.status AS node_status
+            FROM porion_build_queue AS queue
+            INNER JOIN porion_node AS node ON queue.node_id = node.id
+            INNER JOIN porion_recipe AS recipe ON queue.recipe_id = recipe.id
+            INNER JOIN porion_project AS project ON recipe.project_id = project.id
+            INNER JOIN porion_branch AS branch ON recipe.branch_id = branch.id
+            WHERE project.id = :project_id
+        </sql>
+    </query>
+
+    <query name='node-build-queue-list'>
+        <comment>Get a description of the build queue for a given build node</comment>
+        <sql>
+            SELECT
+            queue.id AS id,
+            queue.`order` AS `order`,
+            queue.creation_date AS create_date,
+            project.name AS name,
+            project.status AS status,
+            branch.name AS branch_name,
+            branch.tag AS branch_tag,
+            branch.status AS branch_status,
+            recipe.id AS recipe_id,
+            recipe.name AS recipe_name,
+            recipe.status AS recipe_status,
+            recipe.main_recipe AS main_recipe,
+            node.name AS node_name,
+            node.status AS node_status
+            FROM porion_build_queue AS queue
+            INNER JOIN porion_node AS node ON queue.node_id = node.id
+            INNER JOIN porion_recipe AS recipe ON queue.recipe_id = recipe.id
+            INNER JOIN porion_project AS project ON recipe.project_id = project.id
+            INNER JOIN porion_branch AS branch ON recipe.branch_id = branch.id
+            WHERE node.id = :node_id
+        </sql>
+    </query>
+
+</query-mapping>

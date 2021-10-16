@@ -59,6 +59,10 @@ package body Porion.Builds.Services is
          Nodes.Services.Load_Default_Node (Service);
       end if;
 
+      Service.Ident.Name := To_UString (Service.Project.Get_Name);
+      Service.Ident.Branch := To_UString (Service.Branch.get_Name);
+      Service.Ident.Recipe := To_UString (Service.Recipe.Get_Name);
+      Service.Ident.Node := To_UString (Service.Build_Node.get_Name);
       Query.Set_Query (Projects.Models.Query_Project_Last_Build);
       Query.Bind_Param ("project_id", Service.Project.Get_Id);
       Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
@@ -113,6 +117,7 @@ package body Porion.Builds.Services is
    procedure Build (Service     : in out Context_Type;
                     Steps       : in Build_Step_Vector;
                     Executor    : in out Porion.Executors.Executor_Type'Class) is
+      Ident   : constant String := Projects.To_String (Service.Ident);
       Number  : constant Positive := Service.Build.Get_Number;
       Name    : constant String := Service.Project.Get_Name;
       Branch_Name : constant String := Service.Branch.Get_Name;
@@ -122,7 +127,7 @@ package body Porion.Builds.Services is
       Status  : Builds.Models.Build_Status_Type := Builds.Models.BUILD_RUNNING;
       Source_Controller : Porion.Sources.Controller_Access;
    begin
-      Log.Info ("Build {0} in {1}", Name, Path);
+      Log.Info ("Build {0} in {1}", Ident, Path);
 
       Executor.Set_Build_Node (Service.Build_Node);
 
@@ -136,6 +141,7 @@ package body Porion.Builds.Services is
       Source_Controller := Sources.Factories.Create (Service.Project.Get_Scm, Config);
 
       Executor.Create_Logger (Log_Dir, "build.log");
+      Executor.Log ("Build '" & Ident & "' in " & Path);
       Source_Controller.Checkout (Path, Executor);
 
       Config.Set ("build_dir", Path);

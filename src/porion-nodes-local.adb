@@ -15,6 +15,7 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Ada.Directories;
 with Util.Processes;
 with Util.Log.Loggers;
 with Util.Streams;
@@ -120,5 +121,22 @@ package body Porion.Nodes.Local is
                     Integer'Image (Status));
       end if;
    end Execute;
+
+   --  ------------------------------
+   --  Create the directory and optionally make sure it is cleaned.
+   --  ------------------------------
+   overriding
+   procedure Create_Directory (Controller : in out Controller_Type;
+                               Path       : in String;
+                               Clean      : in Boolean;
+                               Process    : not null access
+                                 procedure (Line : in String)) is
+   begin
+      if Clean and then Ada.Directories.Exists (Path) then
+         Ada.Directories.Delete_Tree (Path);
+      end if;
+
+      Ada.Directories.Create_Path (Path);
+   end Create_Directory;
 
 end Porion.Nodes.Local;

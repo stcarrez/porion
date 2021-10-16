@@ -78,9 +78,32 @@ package body Porion.Nodes.SSH is
             Args.Append (Ssh (First .. Pos - 1));
             First := Pos;
          end loop;
-         Args.Append (Command);
-         Controller.Execute (Args, Working_Dir, Process, Strip_Crlf, Status);
+         --  cd <working_dir> && <command>
+         if Working_Dir'Length > 0 then
+            Args.Append ("cd " & Working_Dir & " && " & Command);
+         else
+            Args.Append (Command);
+         end if;
+         Controller.Execute (Args, "", Process, Strip_Crlf, Status);
       end;
    end Execute;
+
+   --  ------------------------------
+   --  Create the directory and optionally make sure it is cleaned.
+   --  ------------------------------
+   overriding
+   procedure Create_Directory (Controller : in out Controller_Type;
+                               Path       : in String;
+                               Clean      : in Boolean;
+                               Process    : not null access
+                                 procedure (Line : in String)) is
+      Status : Integer;
+   begin
+      Controller.Execute (Command => "mkdir -p " & Path,
+                          Working_Dir => "",
+                          Process => Process,
+                          Strip_Crlf => False,
+                          Status => Status);
+   end Create_Directory;
 
 end Porion.Nodes.SSH;

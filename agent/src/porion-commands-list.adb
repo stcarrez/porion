@@ -29,7 +29,9 @@ package body Porion.Commands.List is
    begin
       Context.Open;
 
-      if not Command.List_Projects and not Command.List_Nodes and not Command.List_Builds then
+      if not Command.List_Projects and not Command.List_Nodes and not Command.List_Builds
+        and not Command.List_Queues
+      then
          Command.List_Projects := True;
       end if;
 
@@ -47,6 +49,12 @@ package body Porion.Commands.List is
 
       if Command.List_Builds then
          Porion.Reports.List_Builds (Service => Context.Project_Service,
+                                     Printer => Context.Printer.all,
+                                     Styles  => Context.Styles);
+      end if;
+
+      if Command.List_Queues then
+         Porion.Reports.List_Queues (Service => Context.Project_Service,
                                      Printer => Context.Printer.all,
                                      Styles  => Context.Styles);
       end if;
@@ -74,6 +82,11 @@ package body Porion.Commands.List is
                         Switch => "-b",
                         Long_Switch => "--builds",
                         Help => -("List the builds"));
+      GC.Define_Switch (Config => Config,
+                        Output => Command.List_Queues'Access,
+                        Switch => "-Q",
+                        Long_Switch => "--queue",
+                        Help => -("List the content of build queue"));
    end Setup;
 
 end Porion.Commands.List;

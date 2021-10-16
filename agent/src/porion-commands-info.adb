@@ -87,9 +87,9 @@ package body Porion.Commands.Info is
                return Result;
             end Count_Active_Branches;
 
-            Last_Builds   : Porion.Builds.Models.Last_Build_Vector;
-            Executor      : Porion.Executors.Executor_Type;
-            Build_Configs : Porion.Builds.Models.Recipe_Vector;
+            Last_Builds : Porion.Builds.Models.Last_Build_Vector;
+            Executor    : Porion.Executors.Executor_Type;
+            Recipes     : Porion.Builds.Models.Recipe_Vector;
          begin
             Context.Project_Service.Load_Project (Project_Name);
 
@@ -215,15 +215,20 @@ package body Porion.Commands.Info is
                end if;
             end;
 
+            Printer.Layout_Fields (Fields (3 .. 3));
             Executor.Enable_Dry_Run;
-            Builds.Services.Find_Build_Configs (Context.Project_Service, True, Build_Configs);
-            for Build_Config of Build_Configs loop
-               Porion.Builds.Services.Build (Context.Project_Service, Build_Config, Executor);
+            Builds.Services.Find_Build_Configs (Context.Project_Service, True, Recipes);
+            for Recipe of Recipes loop
+               Porion.Builds.Services.Build (Context.Project_Service, Recipe, Executor);
                declare
-                  Commands : Porion.Executors.Command_Vector;
+                  Commands    : Porion.Executors.Command_Vector;
+                  Branch_Name : constant String := Context.Project_Service.Branch.Get_Name;
+                  Hostname    : constant String := Context.Project_Service.Build_Node.Get_Name;
                begin
                   Printer.New_Line;
                   Executor.Fetch_Commands (Commands);
+                  Printer.Put (Fields (3), Format ("Recipe: {0}@{1}", Branch_Name, Hostname));
+                  Printer.New_Line;
                   Porion.Reports.List_Commands (Commands, Context.Printer.all, Context.Styles);
                end;
             end loop;

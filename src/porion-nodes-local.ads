@@ -16,7 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Util.Strings.Vectors;
-package Porion.Nodes.Local is
+private package Porion.Nodes.Local is
 
    type Controller_Type is limited new Porion.Nodes.Controller_Type with private;
    type Controller_Access is access all Controller_Type'Class;

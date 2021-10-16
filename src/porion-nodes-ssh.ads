@@ -18,7 +18,7 @@
 with Porion.Nodes.Local;
 with Porion.Nodes.Models;
 private with EL.Expressions;
-package Porion.Nodes.SSH is
+private package Porion.Nodes.SSH is
 
    SSH_COMMAND_NAME : constant String := "command_ssh";
 

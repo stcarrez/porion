@@ -26,11 +26,13 @@ package body Porion.Nodes.SSH is
    --  ------------------------------
    --  Create the controller for the management of the given build node.
    --  ------------------------------
-   function Create (Node : in Models.Node_Ref) return Nodes.Controller_Access is
+   function Create (Listener : in Listener_Access;
+                    Node     : in Models.Node_Ref) return Nodes.Controller_Access is
       Controller : constant Controller_Access := new Controller_Type;
       Cmd        : constant String := Configs.Get (SSH_COMMAND_NAME, SSH_COMMAND);
       Ctx        : EL.Contexts.Default.Default_Context;
    begin
+      Porion.Nodes.Set_Listener (Controller.all, Listener);
       Controller.Hostname := Node.Get_Name;
       Controller.Login := Node.Get_Login;
       Controller.Command := EL.Expressions.Create_Expression (Cmd, Ctx);

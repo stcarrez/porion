@@ -293,6 +293,92 @@ package Porion.Queries is
 
    Query_Project_Dependency_List : constant ADO.Queries.Query_Definition_Access;
 
+   --  --------------------
+   --    Information about a build queue.
+   --  --------------------
+   type Queue_Info is
+     new Util.Beans.Basic.Bean with  record
+
+      --  the build queue id.
+      Id : ADO.Identifier;
+
+      --  the build queue order.
+      Order : Integer;
+
+      --  the date when the recipe was inserted in the queue.
+      Creation_Date : Ada.Calendar.Time;
+
+      --  the project name.
+      Project_Name : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the project status.
+      Project_Status : Porion.Projects.Models.Project_Status_Type;
+
+      --  the branch name.
+      Branch_Name : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the branch tag.
+      Branch_Tag : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the branch status.
+      Branch_Status : Porion.Projects.Models.Branch_Status_Type;
+
+      --  the build recipe id.
+      Recipe_Id : ADO.Identifier;
+
+      --  the recipe name.
+      Recipe_Name : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the recipe status.
+      Recipe_Status : Porion.Builds.Models.Config_Status_Type;
+
+      --  whether this is the main recipe.
+      Main_Recipe : Boolean;
+
+      --  the node name where the build is executed.
+      Node_Name : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the current node status.
+      Node_Status : Porion.Nodes.Node_Status_Type;
+   end record;
+
+   --  Get the bean attribute identified by the name.
+   overriding
+   function Get_Value (From : in Queue_Info;
+                       Name : in String) return Util.Beans.Objects.Object;
+
+   --  Set the bean attribute identified by the name.
+   overriding
+   procedure Set_Value (Item  : in out Queue_Info;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object);
+
+
+   package Queue_Info_Beans is
+      new Util.Beans.Basic.Lists (Element_Type => Queue_Info);
+   package Queue_Info_Vectors renames Queue_Info_Beans.Vectors;
+   subtype Queue_Info_List_Bean is Queue_Info_Beans.List_Bean;
+
+   type Queue_Info_List_Bean_Access is access all Queue_Info_List_Bean;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Queue_Info_List_Bean'Class;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
+
+   subtype Queue_Info_Vector is Queue_Info_Vectors.Vector;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Queue_Info_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
+
+   Query_Build_Queue_List : constant ADO.Queries.Query_Definition_Access;
+
+   Query_Project_Build_Queue_List : constant ADO.Queries.Query_Definition_Access;
+
+   Query_Node_Build_Queue_List : constant ADO.Queries.Query_Definition_Access;
+
 
 
 private
@@ -370,4 +456,26 @@ private
                                      File => File_5.File'Access);
    Query_Project_Dependency_List : constant ADO.Queries.Query_Definition_Access
    := Def_Projectinfo_Project_Dependency_List.Query'Access;
+
+   package File_6 is
+      new ADO.Queries.Loaders.File (Path => "report-build-queue.xml",
+                                    Sha1 => "9B8605FB258746A91644D0297B106A8C80AD8418");
+
+   package Def_Queueinfo_Build_Queue_List is
+      new ADO.Queries.Loaders.Query (Name => "build-queue-list",
+                                     File => File_6.File'Access);
+   Query_Build_Queue_List : constant ADO.Queries.Query_Definition_Access
+   := Def_Queueinfo_Build_Queue_List.Query'Access;
+
+   package Def_Queueinfo_Project_Build_Queue_List is
+      new ADO.Queries.Loaders.Query (Name => "project-build-queue-list",
+                                     File => File_6.File'Access);
+   Query_Project_Build_Queue_List : constant ADO.Queries.Query_Definition_Access
+   := Def_Queueinfo_Project_Build_Queue_List.Query'Access;
+
+   package Def_Queueinfo_Node_Build_Queue_List is
+      new ADO.Queries.Loaders.Query (Name => "node-build-queue-list",
+                                     File => File_6.File'Access);
+   Query_Node_Build_Queue_List : constant ADO.Queries.Query_Definition_Access
+   := Def_Queueinfo_Node_Build_Queue_List.Query'Access;
 end Porion.Queries;

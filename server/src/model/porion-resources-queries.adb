@@ -8,13 +8,13 @@ package body Porion.Resources.Queries is
      (1, 9, 10);
 
    T1 : constant array (0 .. 2) of Unsigned_8 :=
-     (4, 19, 18);
+     (18, 13, 22);
 
    T2 : constant array (0 .. 2) of Unsigned_8 :=
-     (4, 6, 5);
+     (5, 13, 8);
 
-   G : constant array (0 .. 20) of Unsigned_8 :=
-     (0, 0, 0, 3, 0, 1, 7, 0, 0, 8, 6, 4, 9, 0, 0, 0, 0, 2, 0, 5, 0);
+   G : constant array (0 .. 22) of Unsigned_8 :=
+     (0, 0, 0, 3, 0, 0, 0, 0, 0, 6, 7, 1, 0, 0, 0, 0, 6, 0, 2, 4, 0, 1, 0);
 
    function Hash (S : String) return Natural is
       F : constant Natural := S'First - 1;
@@ -25,10 +25,10 @@ package body Porion.Resources.Queries is
       for K in P'Range loop
          exit when L < P (K);
          J  := Character'Pos (S (P (K) + F));
-         F1 := (F1 + Natural (T1 (K)) * J) mod 21;
-         F2 := (F2 + Natural (T2 (K)) * J) mod 21;
+         F1 := (F1 + Natural (T1 (K)) * J) mod 23;
+         F2 := (F2 + Natural (T2 (K)) * J) mod 23;
       end loop;
-      return (Natural (G (F1)) + Natural (G (F2))) mod 10;
+      return (Natural (G (F1)) + Natural (G (F2))) mod 11;
    end Hash;
 
    C_0 : aliased constant String := "<query-mapping package='Porion.Projects.M"
@@ -439,6 +439,113 @@ package body Porion.Resources.Queries is
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
    C_9 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+       & "    <description>" & ASCII.LF & "        List the build queues" & ASCII.LF
+       & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
+       & "ueries.Queue_Info"" bean=""yes"">" & ASCII.LF & "        <comment>Inform"
+       & "ation about a build queue.</comment>" & ASCII.LF & "        <property ty"
+       & "pe='ADO.Identifier' name=""id"">" & ASCII.LF & "            <comment>the"
+       & " build queue id.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Integer' name=""order"">" & ASCII.LF & "        "
+       & "    <comment>the build queue order.</comment>" & ASCII.LF & "        </p"
+       & "roperty>" & ASCII.LF & "        <property type='Date' name=""creation_da"
+       & "te"" not-null=""yes"">" & ASCII.LF & "            <comment>the date when"
+       & " the recipe was inserted in the queue.</comment>" & ASCII.LF & "        "
+       & "</property>" & ASCII.LF & "        <property type='String' name=""projec"
+       & "t_name"">" & ASCII.LF & "            <comment>the project name.</comment"
+       & ">" & ASCII.LF & "        </property>" & ASCII.LF & "        <property ty"
+       & "pe='Porion.Projects.Models.Project_Status_Type' name=""project_status"">"
+       & ASCII.LF & "            <comment>the project status.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='String' name="
+       & """branch_name"">" & ASCII.LF & "            <comment>the branch name.</c"
+       & "omment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <prope"
+       & "rty type='String' name=""branch_tag"">" & ASCII.LF & "            <comme"
+       & "nt>the branch tag.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Porion.Projects.Models.Branch_Status_Type' name="
+       & """branch_status"">" & ASCII.LF & "            <comment>the branch status"
+       & ".</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <p"
+       & "roperty type='ADO.Identifier' name=""recipe_id"">" & ASCII.LF & "       "
+       & "     <comment>the build recipe id.</comment>" & ASCII.LF & "        </pr"
+       & "operty>" & ASCII.LF & "        <property type='String' name=""recipe_nam"
+       & "e"">" & ASCII.LF & "            <comment>the recipe name.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Porion.Builds"
+       & ".Models.Config_Status_Type' name=""recipe_status"">" & ASCII.LF & "     "
+       & "       <comment>the recipe status.</comment>" & ASCII.LF & "        </pr"
+       & "operty>" & ASCII.LF & "        <property type='Boolean' name=""main_reci"
+       & "pe"">" & ASCII.LF & "            <comment>whether this is the main recip"
+       & "e.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <"
+       & "property type='String' name=""node_name"">" & ASCII.LF & "            <c"
+       & "omment>the node name where the build is executed.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Porion.Nodes."
+       & "Node_Status_Type' name=""node_status"">" & ASCII.LF & "            <comm"
+       & "ent>the current node status.</comment>" & ASCII.LF & "        </property"
+       & ">" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF & "    <query name"
+       & "='build-queue-list'>" & ASCII.LF & "        <comment>Get a description o"
+       & "f the build queue</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & " "
+       & "           SELECT" & ASCII.LF & "            queue.id AS id," & ASCII.LF
+       & "            queue.`order` AS `order`," & ASCII.LF & "            queue.c"
+       & "reation_date AS create_date," & ASCII.LF & "            project.name AS "
+       & "name," & ASCII.LF & "            project.status AS status," & ASCII.LF & " "
+       & "           branch.name AS branch_name," & ASCII.LF & "            branch"
+       & ".tag AS branch_tag," & ASCII.LF & "            branch.status AS branch_s"
+       & "tatus," & ASCII.LF & "            recipe.id AS recipe_id," & ASCII.LF & " "
+       & "           recipe.name AS recipe_name," & ASCII.LF & "            recipe"
+       & ".status AS recipe_status," & ASCII.LF & "            recipe.main_recipe "
+       & "AS main_recipe," & ASCII.LF & "            node.name AS node_name," & ASCII.LF
+       & "            node.status AS node_status" & ASCII.LF & "            FROM p"
+       & "orion_build_queue AS queue" & ASCII.LF & "            INNER JOIN porion_"
+       & "node AS node ON queue.node_id = node.id" & ASCII.LF & "            INNER"
+       & " JOIN porion_recipe AS recipe ON queue.recipe_id = recipe.id" & ASCII.LF
+       & "            INNER JOIN porion_project AS project ON recipe.project_id = "
+       & "project.id" & ASCII.LF & "            INNER JOIN porion_branch AS branch"
+       & " ON recipe.branch_id = branch.id" & ASCII.LF & "        </sql>" & ASCII.LF
+       & "        <sql-count>" & ASCII.LF & "            SELECT" & ASCII.LF & "   "
+       & "         count(queue.id)" & ASCII.LF & "            FROM porion_build_qu"
+       & "eue AS queue" & ASCII.LF & "        </sql-count>" & ASCII.LF & "    </qu"
+       & "ery>" & ASCII.LF & ASCII.LF & "    <query name='project-build-queue-lis"
+       & "t'>" & ASCII.LF & "        <comment>Get a description of the build queue"
+       & " for a given project</comment>" & ASCII.LF & "        <sql>" & ASCII.LF
+       & "            SELECT" & ASCII.LF & "            queue.id AS id," & ASCII.LF
+       & "            queue.`order` AS `order`," & ASCII.LF & "            queue.c"
+       & "reation_date AS create_date," & ASCII.LF & "            project.name AS "
+       & "name," & ASCII.LF & "            project.status AS status," & ASCII.LF & " "
+       & "           branch.name AS branch_name," & ASCII.LF & "            branch"
+       & ".tag AS branch_tag," & ASCII.LF & "            branch.status AS branch_s"
+       & "tatus," & ASCII.LF & "            recipe.id AS recipe_id," & ASCII.LF & " "
+       & "           recipe.name AS recipe_name," & ASCII.LF & "            recipe"
+       & ".status AS recipe_status," & ASCII.LF & "            recipe.main_recipe "
+       & "AS main_recipe," & ASCII.LF & "            node.name AS node_name," & ASCII.LF
+       & "            node.status AS node_status" & ASCII.LF & "            FROM p"
+       & "orion_build_queue AS queue" & ASCII.LF & "            INNER JOIN porion_"
+       & "node AS node ON queue.node_id = node.id" & ASCII.LF & "            INNER"
+       & " JOIN porion_recipe AS recipe ON queue.recipe_id = recipe.id" & ASCII.LF
+       & "            INNER JOIN porion_project AS project ON recipe.project_id = "
+       & "project.id" & ASCII.LF & "            INNER JOIN porion_branch AS branch"
+       & " ON recipe.branch_id = branch.id" & ASCII.LF & "            WHERE projec"
+       & "t.id = :project_id" & ASCII.LF & "        </sql>" & ASCII.LF & "    </qu"
+       & "ery>" & ASCII.LF & ASCII.LF & "    <query name='node-build-queue-list'>"
+       & ASCII.LF & "        <comment>Get a description of the build queue for a "
+       & "given build node</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & " "
+       & "           SELECT" & ASCII.LF & "            queue.id AS id," & ASCII.LF
+       & "            queue.`order` AS `order`," & ASCII.LF & "            queue.c"
+       & "reation_date AS create_date," & ASCII.LF & "            project.name AS "
+       & "name," & ASCII.LF & "            project.status AS status," & ASCII.LF & " "
+       & "           branch.name AS branch_name," & ASCII.LF & "            branch"
+       & ".tag AS branch_tag," & ASCII.LF & "            branch.status AS branch_s"
+       & "tatus," & ASCII.LF & "            recipe.id AS recipe_id," & ASCII.LF & " "
+       & "           recipe.name AS recipe_name," & ASCII.LF & "            recipe"
+       & ".status AS recipe_status," & ASCII.LF & "            recipe.main_recipe "
+       & "AS main_recipe," & ASCII.LF & "            node.name AS node_name," & ASCII.LF
+       & "            node.status AS node_status" & ASCII.LF & "            FROM p"
+       & "orion_build_queue AS queue" & ASCII.LF & "            INNER JOIN porion_"
+       & "node AS node ON queue.node_id = node.id" & ASCII.LF & "            INNER"
+       & " JOIN porion_recipe AS recipe ON queue.recipe_id = recipe.id" & ASCII.LF
+       & "            INNER JOIN porion_project AS project ON recipe.project_id = "
+       & "project.id" & ASCII.LF & "            INNER JOIN porion_branch AS branch"
+       & " ON recipe.branch_id = branch.id" & ASCII.LF & "            WHERE node.i"
+       & "d = :node_id" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF
+       & ASCII.LF & "</query-mapping>" & ASCII.LF;
+
+   C_10 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        Stats for the builds" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
        & "ueries.Build_Stat"" bean=""no"">" & ASCII.LF & "        <comment>Informa"
@@ -469,7 +576,7 @@ package body Porion.Resources.Queries is
    type Content_List_Array is array (Natural range <>) of access constant String;
    Contents : constant Content_List_Array := (
       C_0'Access, C_1'Access, C_2'Access, C_3'Access, C_4'Access, C_5'Access,
-      C_6'Access, C_7'Access, C_8'Access, C_9'Access);
+      C_6'Access, C_7'Access, C_8'Access, C_9'Access, C_10'Access);
 
    function Get_Content (Name : String) return access constant String is
       H : constant Natural := Hash (Name);

@@ -34,6 +34,7 @@ package Porion.Services is
       Build             : Porion.Builds.Models.Build_Ref;
       Build_Node        : Porion.Nodes.Models.Node_Ref;
       Recipe            : Porion.Builds.Models.Recipe_Ref;
+      Ident             : Porion.Projects.Ident_Type;
       Dry_Run           : Boolean := False;
    end record;
 

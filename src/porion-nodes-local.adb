@@ -79,6 +79,22 @@ package body Porion.Nodes.Local is
       end if;
    end Execute;
 
+   function To_String (Args : in Util.Strings.Vectors.Vector) return String is
+      use Ada.Strings.Unbounded;
+
+      Result : UString;
+      Empty  : Boolean := True;
+   begin
+      for Arg of Args loop
+         if not Empty then
+            Append (Result, " ");
+         end if;
+         Append (Result, Arg);
+         Empty := False;
+      end loop;
+      return To_String (Result);
+   end To_String;
+
    procedure Execute (Controller  : in out Controller_Type;
                       Args        : in Util.Strings.Vectors.Vector;
                       Working_Dir : in String := "";
@@ -86,7 +102,7 @@ package body Porion.Nodes.Local is
                       Strip_Crlf  : in Boolean := False;
                       Status      : out Integer) is
 
-      Command : constant String := Args.First_Element;
+      Command : constant String := To_String (Args);
       Proc    : Util.Processes.Process;
       Output  : Util.Streams.Input_Stream_Access;
       Input   : Util.Streams.Output_Stream_Access;

@@ -21,7 +21,7 @@ with Util.Log.Loggers;
 with Util.Beans.Objects;
 with Ada.Text_IO;
 with Porion.Nodes.Local;
-with Porion.Nodes.SSH;
+with Porion.Nodes.Services;
 package body Porion.Executors is
 
    use type Porion.Nodes.Controller_Access;
@@ -84,17 +84,7 @@ package body Porion.Executors is
    procedure Set_Build_Node (Executor : in out Executor_Type;
                              Node     : in Porion.Nodes.Models.Node_Ref) is
    begin
-      case Node.Get_Kind is
-         when Nodes.NODE_LOCAL =>
-            Executor.Controller := Nodes.Local.Create;
-
-         when Nodes.NODE_SSH =>
-            Executor.Controller := Nodes.SSH.Create (Node);
-
-         when others =>
-            Glog.Error ("Not supported");
-
-      end case;
+      Executor.Controller := Nodes.Services.Create_Controller (Executor'Unchecked_Access, Node);
    end Set_Build_Node;
 
    --  ------------------------------
@@ -115,7 +105,7 @@ package body Porion.Executors is
          Executor.Controller.Create_Directory (Path, Clean, Process'Access);
       else
          if Executor.Local = null then
-            Executor.Local := Nodes.Local.Create;
+            Executor.Local := Nodes.Local.Create (Executor'Unchecked_Access);
          end if;
 
          Executor.Local.Create_Directory (Path, Clean, Process'Access);
@@ -172,12 +162,6 @@ package body Porion.Executors is
                       Strip_Crlf  : in Boolean := False;
                       Status      : out Integer) is
    begin
-      if Executor.Dry_Run then
-         Status := 0;
-         Executor.Record_Command (Command);
-         return;
-      end if;
-
       if Executor.Controller /= null then
          Executor.Controller.Execute (Command     => Command,
                                       Working_Dir => Working_Dir,
@@ -186,7 +170,7 @@ package body Porion.Executors is
                                       Status      => Status);
       else
          if Executor.Local = null then
-            Executor.Local := Nodes.Local.Create;
+            Executor.Local := Nodes.Local.Create (Listener => Executor'Unchecked_Access);
          end if;
          Executor.Local.Execute (Command     => Command,
                                  Working_Dir => Working_Dir,

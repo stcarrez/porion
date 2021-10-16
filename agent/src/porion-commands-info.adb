@@ -200,6 +200,21 @@ package body Porion.Commands.Info is
                end if;
             end;
 
+            declare
+               List   : Porion.Queries.Queue_Info_Vector;
+               Query  : ADO.Queries.Context;
+            begin
+               Query.Set_Query (Porion.Queries.Query_Project_Build_Queue_List);
+               Query.Bind_Param ("project_id", Context.Project_Service.Project.Get_Id);
+               Porion.Queries.List (List, Context.Project_Service.DB, Query);
+
+               if not List.Is_Empty then
+                  Printer.New_Line;
+                  Porion.Reports.List_Queues (List, Printer, Context.Styles, -("Queues"),
+                                              Hide_Project => True);
+               end if;
+            end;
+
             Executor.Enable_Dry_Run;
             Builds.Services.Find_Build_Configs (Context.Project_Service, True, Build_Configs);
             for Build_Config of Build_Configs loop

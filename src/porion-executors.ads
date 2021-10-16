@@ -25,16 +25,6 @@ with Porion.Builds;
 with Porion.Nodes.Models;
 package Porion.Executors is
 
-   type Executor_Mode_Type is (EXECUTOR_LOCAL, EXECUTOR_SSH, EXECUTOR_DOCKER);
-
-   --  Use a fixed enum configuration because the value is stored in database.
-   for Executor_Mode_Type use (EXECUTOR_LOCAL => 0,
-                               EXECUTOR_SSH => 1,
-                               EXECUTOR_DOCKER => 2);
-
-   package Executor_Mode_Type_Objects is
-      new Util.Beans.Objects.Enums (Executor_Mode_Type);
-
    type Command_Type (Len : Positive) is record
       Step    : Porion.Builds.Step_Type;
       Command : String (1 .. Len);

@@ -22,7 +22,6 @@ with Util.Strings;
 with Util.Commands.Parsers.GNAT_Parser;
 with PT.Drivers.Texts;
 with PT.Colors;
-with PT.Texts;
 with Porion.Configs;
 with Porion.Resources.Queries;
 with Porion.Commands.Drivers;
@@ -320,12 +319,21 @@ package body Porion.Commands is
    end Error;
 
    --  ------------------------------
-   --  Report an information message.
+   --  Report an information message during or after executing some command.
    --  ------------------------------
    procedure Notice (Context : in out Context_Type;
                      Message : in String) is
    begin
       Ada.Text_IO.Put_Line (Message);
+   end Notice;
+
+   procedure Notice (Context : in out Context_Type;
+                     Message : in String;
+                     Arg1    : in String;
+                     Arg2    : in String := "";
+                     Arg3    : in String := "") is
+   begin
+      Ada.Text_IO.Put_Line (Format (Message, Arg1, Arg2, Arg3));
    end Notice;
 
    --  Open the database.

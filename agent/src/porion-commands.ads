@@ -112,9 +112,14 @@ private
                     Arg2    : in String := "";
                     Arg3    : in String := "");
 
-   --  Report an information message.
+   --  Report an information message during or after executing some command.
    procedure Notice (Context : in out Context_Type;
                      Message : in String);
+   procedure Notice (Context : in out Context_Type;
+                     Message : in String;
+                     Arg1    : in String;
+                     Arg2    : in String := "";
+                     Arg3    : in String := "");
 
    function Format (Message : in String;
                     Arg1    : in String) return String

@@ -57,7 +57,9 @@ package body Porion.Commands.Build is
                Executor.Enable_Log;
             end if;
 
-            Builds.Services.Find_Build_Configs (Context.Project_Service, Command.Force, Recipes);
+            if not Command.Force or Recipes.Is_Empty then
+               Builds.Services.Find_Build_Configs (Context.Project_Service, Command.Force, Recipes);
+            end if;
 
             if Recipes.Is_Empty then
                Context.Notice (-("no change for {0}"), Name);

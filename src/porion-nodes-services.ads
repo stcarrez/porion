@@ -23,7 +23,7 @@ package Porion.Nodes.Services is
    RELEASE_COMMAND_NAME : constant String := "command_cat_release";
 
    UNAME_COMMAND        : constant String := "uname -a";
-   RRELEASE_COMMAND     : constant String := "cat /etc/os-release";
+   RELEASE_COMMAND      : constant String := "cat /etc/os-release";
 
    Name_Used    : exception;
 
@@ -71,6 +71,7 @@ package Porion.Nodes.Services is
      Post => Service.Build_Node.Is_Null;
 
    --  Create the controller executor for the build node.
-   function Create_Controller (Node : in Models.Node_Ref) return Controller_Access;
+   function Create_Controller (Listener : in Listener_Access;
+                               Node     : in Models.Node_Ref) return Controller_Access;
 
 end Porion.Nodes.Services;

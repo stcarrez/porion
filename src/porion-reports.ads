@@ -67,4 +67,15 @@ package Porion.Reports is
                          Styles  : in Style_Configuration;
                          Label   : in String);
 
+   --  Create a report about the build queues.  If the service is configured with
+   --  a project, the report only indicates the build queued of the project.
+   procedure List_Queues (Service : in out Porion.Services.Context_Type'Class;
+                          Printer : in out PT.Printer_Type'Class;
+                          Styles  : in Style_Configuration);
+   procedure List_Queues (List    : in Porion.Queries.Queue_Info_Vector;
+                          Printer : in out PT.Printer_Type'Class;
+                          Styles  : in Style_Configuration;
+                          Label   : in String;
+                          Hide_Project : in Boolean := False);
+
 end Porion.Reports;

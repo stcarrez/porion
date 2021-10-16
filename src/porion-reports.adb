@@ -453,4 +453,85 @@ package body Porion.Reports is
       end loop;
    end List_Nodes;
 
+   --  ------------------------------
+   --  Create a report about the build queues.  If the service is configured with
+   --  a project, the report only indicates the build queued of the project.
+   --  ------------------------------
+   procedure List_Queues (Service : in out Porion.Services.Context_Type'Class;
+                          Printer : in out PT.Printer_Type'Class;
+                          Styles  : in Style_Configuration) is
+      List   : Porion.Queries.Queue_Info_Vector;
+      Query  : ADO.Queries.Context;
+   begin
+      if Service.Project.Is_Null then
+         Query.Set_Query (Porion.Queries.Query_Build_Queue_List);
+      else
+         Query.Set_Query (Porion.Queries.Query_Project_Build_Queue_List);
+         Query.Bind_Param ("project_id", Service.Project.Get_Id);
+      end if;
+      Porion.Queries.List (List, Service.DB, Query);
+
+      List_Queues (List, Printer, Styles, -("Create date"));
+   end List_Queues;
+
+   procedure List_Queues (List    : in Porion.Queries.Queue_Info_Vector;
+                          Printer : in out PT.Printer_Type'Class;
+                          Styles  : in Style_Configuration;
+                          Label   : in String;
+                          Hide_Project : in Boolean := False) is
+      use Porion.Nodes;
+
+      Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
+      Fields : PT.Texts.Field_Array (1 .. 7);
+      Style1 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
+      Style2 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
+   begin
+      Writer.Set_Justify (Style2, PT.J_RIGHT);
+      Writer.Create_Field (Fields (1), Style1, 20.0);
+      Writer.Create_Field (Fields (2), Style1, 0.0);
+      if Hide_Project then
+         Writer.Create_Field (Fields (3), Style1, 1.0);
+         Writer.Set_Max_Dimension (Fields (3), (0, 0));
+      else
+         Writer.Create_Field (Fields (3), Style1, 10.0);
+      end if;
+      Writer.Create_Field (Fields (4), Style1, 10.0);
+      Writer.Create_Field (Fields (5), Style1, 10.0);
+      Writer.Create_Field (Fields (6), Style1, 10.0);
+      Writer.Create_Field (Fields (7), Style1, 10.0);
+
+      Writer.Set_Max_Dimension (Fields (2), (8, 1));
+
+      Writer.Set_Bottom_Right_Padding (Fields (1), (1, 0));
+      Writer.Set_Bottom_Right_Padding (Fields (2), (1, 0));
+      Writer.Set_Bottom_Right_Padding (Fields (3), (1, 0));
+      Writer.Set_Bottom_Right_Padding (Fields (4), (1, 0));
+
+      Writer.Layout_Fields (Fields);
+      Writer.Put (Fields (1), Label);
+      Writer.Put (Fields (2), -("Order"));
+      if not Hide_Project then
+         Writer.Put (Fields (3), -("Project"));
+      end if;
+      Writer.Put (Fields (4), -("Branch"));
+      Writer.Put (Fields (5), -("Tag"));
+      Writer.Put (Fields (6), -("Recipe"));
+      Writer.Put (Fields (7), -("Hostname"));
+      Writer.New_Line;
+
+      for Queue of List loop
+         Writer.Set_Justify (Style2, PT.J_RIGHT);
+         Writer.Put (Fields (1), Format (Queue.Creation_Date));
+         Writer.Put_Int (Fields (2), Queue.Order);
+         if not Hide_Project then
+            Writer.Put_UString (Fields (3), Queue.Project_Name);
+         end if;
+         Writer.Put_UString (Fields (4), Queue.Branch_Name);
+         Writer.Put (Fields (5), Get_Tag (Queue.Branch_Tag));
+         Writer.Put_UString (Fields (6), Queue.Recipe_Name);
+         Writer.Put_UString (Fields (7), Queue.Node_Name);
+         Writer.New_Line;
+      end loop;
+   end List_Queues;
+
 end Porion.Reports;

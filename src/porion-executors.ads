@@ -19,7 +19,6 @@ with Ada.Finalization;
 with Ada.Containers.Indefinite_Vectors;
 with EL.Expressions;
 with Util.Properties;
-with Util.Beans.Objects.Enums;
 with Porion.Loggers;
 with Porion.Builds;
 with Porion.Nodes.Models;
@@ -37,9 +36,11 @@ package Porion.Executors is
    subtype Command_Vector is Command_Vectors.Vector;
    subtype Command_Cursor is Command_Vectors.Cursor;
 
-   type Executor_Type is limited new Ada.Finalization.Limited_Controlled with private;
+   type Executor_Type is limited new Ada.Finalization.Limited_Controlled
+     and Porion.Nodes.Listener_Type with private;
 
    --  Returns true if commands are not executed but collected.
+   overriding
    function Is_Dry_Run (Executor : in Executor_Type) return Boolean;
 
    --  Enable the dry run execution mode.
@@ -104,17 +105,20 @@ package Porion.Executors is
 
    --  Record a command that is executed during the build step.
    --  The command is not executed but added to the list of commands.
+   overriding
    procedure Record_Command (Executor : in out Executor_Type;
                              Command  : in String);
 
 private
 
-   type Executor_Type is limited new Ada.Finalization.Limited_Controlled with record
+   type Executor_Type is limited new Ada.Finalization.Limited_Controlled
+     and Porion.Nodes.Listener_Type with record
+      Listener   : Nodes.Listener_Access;
       Dry_Run    : Boolean := False;
       Output_Log : Boolean := False;
-      Commands   : Command_Vector;
       Status     : Integer := 0;
       Step       : Porion.Builds.Step_Type := Porion.Builds.STEP_CHECKOUT;
+      Commands   : Command_Vector;
       Logger     : Porion.Loggers.Logger_Type;
       Controller : Porion.Nodes.Controller_Access;
       Local      : Porion.Nodes.Controller_Access;

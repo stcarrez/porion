@@ -32,16 +32,18 @@ package body Porion.Nodes.Services is
    --  ------------------------------
    --  Create the controller executor for the build node.
    --  ------------------------------
-   function Create_Controller (Node : in Models.Node_Ref) return Controller_Access is
+   function Create_Controller (Listener : in Listener_Access;
+                               Node     : in Models.Node_Ref) return Controller_Access is
    begin
       case Node.Get_Kind is
          when Nodes.NODE_LOCAL =>
-            return Local.Create;
+            return Local.Create (Listener);
 
          when Nodes.NODE_SSH =>
-            return SSH.Create (Node);
+            return SSH.Create (Listener, Node);
 
          when others =>
+            log.Error ("Node type {0} supported", Node.Get_Kind'Image);
             return null;
 
       end case;
@@ -170,7 +172,7 @@ package body Porion.Nodes.Services is
 
          procedure Process (Line : in String);
 
-         Release_Cmd : constant String := Configs.Get (RELEASE_COMMAND_NAME, RRELEASE_COMMAND);
+         Release_Cmd : constant String := Configs.Get (RELEASE_COMMAND_NAME, RELEASE_COMMAND);
          Status      : Natural;
          Os_Name     : UString;
          Os_Version  : UString;
@@ -229,7 +231,7 @@ package body Porion.Nodes.Services is
          return;
       end if;
 
-      Controller := Create_Controller (Service.Build_Node);
+      Controller := Create_Controller (null, Service.Build_Node);
       if Controller = null then
          return;
       end if;
@@ -310,11 +312,22 @@ package body Porion.Nodes.Services is
       Log.Info ("Build node {0} added", Hostname);
    end Add_Node;
 
+   --  ------------------------------
    --  Remove the node with the given name.
+   --  ------------------------------
    procedure Remove_Node (Service : in out Context_Type;
                           Name    : in String) is
    begin
-      null;
+      Load_Node (Service, Name);
+
+      --  Mark the database node entry offline and deleted but keep the record.
+      Service.DB.Begin_Transaction;
+      Service.Build_Node.Set_Status (NODE_OFFLINE);
+      Service.Build_Node.Set_Deleted (True);
+      Service.Build_Node.Save (Service.DB);
+      Service.DB.Commit;
+
+      Log.Info ("Build node {0} removed", Name);
    end Remove_Node;
 
 end Porion.Nodes.Services;

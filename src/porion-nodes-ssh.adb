@@ -99,11 +99,19 @@ package body Porion.Nodes.SSH is
                                  procedure (Line : in String)) is
       Status : Integer;
    begin
-      Controller.Execute (Command => "mkdir -p " & Path,
-                          Working_Dir => "",
-                          Process => Process,
-                          Strip_Crlf => False,
-                          Status => Status);
+      if Clean then
+         Controller.Execute (Command => "rm -rf " & Path & " && mkdir -p " & Path,
+                             Working_Dir => "",
+                             Process => Process,
+                             Strip_Crlf => False,
+                             Status => Status);
+      else
+         Controller.Execute (Command => "mkdir -p " & Path,
+                             Working_Dir => "",
+                             Process => Process,
+                             Strip_Crlf => False,
+                             Status => Status);
+      end if;
    end Create_Directory;
 
 end Porion.Nodes.SSH;

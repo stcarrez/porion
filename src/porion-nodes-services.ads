@@ -71,6 +71,7 @@ package Porion.Nodes.Services is
      Post => Service.Build_Node.Is_Null;
 
    --  Create the controller executor for the build node.
+   function Create_Controller (Listener : in Listener_Access) return Controller_Access;
    function Create_Controller (Listener : in Listener_Access;
                                Node     : in Models.Node_Ref) return Controller_Access;
 

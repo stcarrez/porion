@@ -49,6 +49,11 @@ package body Porion.Nodes.Services is
       end case;
    end Create_Controller;
 
+   function Create_Controller (Listener : in Listener_Access) return Controller_Access is
+   begin
+      return Local.Create (Listener);
+   end Create_Controller;
+
    --  ------------------------------
    --  Load the build node corresponding to the given hostname.
    --  ------------------------------

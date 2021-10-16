@@ -22,7 +22,7 @@ package Porion.Nodes.Local is
    type Controller_Access is access all Controller_Type'Class;
 
    --  Create the controller for the management of the given build node.
-   function Create return Nodes.Controller_Access;
+   function Create (Listener : in Listener_Access) return Nodes.Controller_Access;
 
    --  Execute the command in the working directory and for each output
    --  line produced by the command call the Process procedure.

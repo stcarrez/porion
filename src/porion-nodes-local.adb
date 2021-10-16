@@ -27,9 +27,10 @@ package body Porion.Nodes.Local is
    --  ------------------------------
    --  Create the controller for the management of the given build node.
    --  ------------------------------
-   function Create return Nodes.Controller_Access is
+   function Create (Listener : in Listener_Access) return Nodes.Controller_Access is
       Controller : constant Controller_Access := new Controller_Type;
    begin
+      Controller.Listener := Listener;
       return Controller.all'Access;
    end Create;
 
@@ -44,39 +45,48 @@ package body Porion.Nodes.Local is
                       Process     : not null access procedure (Line : in String);
                       Strip_Crlf  : in Boolean := False;
                       Status      : out Integer) is
-      Proc    : Util.Processes.Process;
-      Output  : Util.Streams.Input_Stream_Access;
-      Input   : Util.Streams.Output_Stream_Access;
-      Reader  : Util.Streams.Texts.Reader_Stream;
    begin
-      if Working_Dir'Length > 0 then
-         Log.Info ("Running '{0}' in '{1}'", Command, Working_Dir);
-         Util.Processes.Set_Working_Directory (Proc, Working_Dir);
-      else
-         Log.Info ("Running '{0}'", Command);
+      if Controller.Is_Dry_Run then
+         Controller.Record_Command (Command);
+         Status := 0;
+         return;
       end if;
 
-      Util.Processes.Spawn (Proc    => Proc,
-                            Command => Command,
-                            Mode    => Util.Processes.READ_WRITE_ALL);
-      Input := Util.Processes.Get_Input_Stream (Proc);
-      Output := Util.Processes.Get_Output_Stream (Proc);
-      Reader.Initialize (Output, 4096);
-      Input.Close;
-      while not Reader.Is_Eof loop
-         declare
-            Line : Ada.Strings.Unbounded.Unbounded_String;
-         begin
-            Reader.Read_Line (Line, Strip_Crlf);
-            Process (Ada.Strings.Unbounded.To_String (Line));
-         end;
-      end loop;
-      Util.Processes.Wait (Proc);
-      Status := Util.Processes.Get_Exit_Status (Proc);
-      if Status /= 0 then
-         Log.Warn ("Command '{0}' terminated with exit code{1}", Command,
-                    Integer'Image (Status));
-      end if;
+      declare
+         Proc    : Util.Processes.Process;
+         Output  : Util.Streams.Input_Stream_Access;
+         Input   : Util.Streams.Output_Stream_Access;
+         Reader  : Util.Streams.Texts.Reader_Stream;
+      begin
+         if Working_Dir'Length > 0 then
+            Log.Info ("Running '{0}' in '{1}'", Command, Working_Dir);
+            Util.Processes.Set_Working_Directory (Proc, Working_Dir);
+         else
+            Log.Info ("Running '{0}'", Command);
+         end if;
+
+         Util.Processes.Spawn (Proc    => Proc,
+                               Command => Command,
+                               Mode    => Util.Processes.READ_WRITE_ALL);
+         Input := Util.Processes.Get_Input_Stream (Proc);
+         Output := Util.Processes.Get_Output_Stream (Proc);
+         Reader.Initialize (Output, 4096);
+         Input.Close;
+         while not Reader.Is_Eof loop
+            declare
+               Line : Ada.Strings.Unbounded.Unbounded_String;
+            begin
+               Reader.Read_Line (Line, Strip_Crlf);
+               Process (Ada.Strings.Unbounded.To_String (Line));
+            end;
+         end loop;
+         Util.Processes.Wait (Proc);
+         Status := Util.Processes.Get_Exit_Status (Proc);
+         if Status /= 0 then
+            Log.Warn ("Command '{0}' terminated with exit code{1}", Command,
+                      Integer'Image (Status));
+         end if;
+      end;
    end Execute;
 
    function To_String (Args : in Util.Strings.Vectors.Vector) return String is
@@ -103,39 +113,48 @@ package body Porion.Nodes.Local is
                       Status      : out Integer) is
 
       Command : constant String := To_String (Args);
-      Proc    : Util.Processes.Process;
-      Output  : Util.Streams.Input_Stream_Access;
-      Input   : Util.Streams.Output_Stream_Access;
-      Reader  : Util.Streams.Texts.Reader_Stream;
    begin
-      if Working_Dir'Length > 0 then
-         Log.Info ("Running '{0}' in '{1}'", Command, Working_Dir);
-         Util.Processes.Set_Working_Directory (Proc, Working_Dir);
-      else
-         Log.Info ("Running '{0}'", Command);
+      if Controller.Is_Dry_Run then
+         Controller.Record_Command (Command);
+         Status := 0;
+         return;
       end if;
 
-      Util.Processes.Spawn (Proc      => Proc,
-                            Arguments => Args,
-                            Mode      => Util.Processes.READ_WRITE_ALL);
-      Input := Util.Processes.Get_Input_Stream (Proc);
-      Output := Util.Processes.Get_Output_Stream (Proc);
-      Reader.Initialize (Output, 4096);
-      Input.Close;
-      while not Reader.Is_Eof loop
-         declare
-            Line : Ada.Strings.Unbounded.Unbounded_String;
-         begin
-            Reader.Read_Line (Line, Strip_Crlf);
-            Process (Ada.Strings.Unbounded.To_String (Line));
-         end;
-      end loop;
-      Util.Processes.Wait (Proc);
-      Status := Util.Processes.Get_Exit_Status (Proc);
-      if Status /= 0 then
-         Log.Warn ("Command '{0}' terminated with exit code{1}", Command,
-                    Integer'Image (Status));
-      end if;
+      declare
+         Proc    : Util.Processes.Process;
+         Output  : Util.Streams.Input_Stream_Access;
+         Input   : Util.Streams.Output_Stream_Access;
+         Reader  : Util.Streams.Texts.Reader_Stream;
+      begin
+         if Working_Dir'Length > 0 then
+            Log.Info ("Running '{0}' in '{1}'", Command, Working_Dir);
+            Util.Processes.Set_Working_Directory (Proc, Working_Dir);
+         else
+            Log.Info ("Running '{0}'", Command);
+         end if;
+
+         Util.Processes.Spawn (Proc      => Proc,
+                               Arguments => Args,
+                               Mode      => Util.Processes.READ_WRITE_ALL);
+         Input := Util.Processes.Get_Input_Stream (Proc);
+         Output := Util.Processes.Get_Output_Stream (Proc);
+         Reader.Initialize (Output, 4096);
+         Input.Close;
+         while not Reader.Is_Eof loop
+            declare
+               Line : Ada.Strings.Unbounded.Unbounded_String;
+            begin
+               Reader.Read_Line (Line, Strip_Crlf);
+               Process (Ada.Strings.Unbounded.To_String (Line));
+            end;
+         end loop;
+         Util.Processes.Wait (Proc);
+         Status := Util.Processes.Get_Exit_Status (Proc);
+         if Status /= 0 then
+            Log.Warn ("Command '{0}' terminated with exit code{1}", Command,
+                      Integer'Image (Status));
+         end if;
+      end;
    end Execute;
 
    --  ------------------------------

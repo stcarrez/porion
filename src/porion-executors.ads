@@ -73,6 +73,11 @@ package Porion.Executors is
    procedure Set_Build_Node (Executor : in out Executor_Type;
                              Node     : in Porion.Nodes.Models.Node_Ref);
 
+   --  Create the directory and optionally make sure it is cleaned.
+   procedure Create_Directory (Executor : in out Executor_Type;
+                               Path     : in String;
+                               Clean    : in Boolean);
+
    procedure Execute (Executor    : in out Executor_Type;
                       Command     : in EL.Expressions.Expression;
                       Parameters  : in Util.Properties.Manager;

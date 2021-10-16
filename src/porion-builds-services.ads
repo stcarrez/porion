@@ -130,6 +130,8 @@ package Porion.Builds.Services is
 
 private
 
+   function Get_Build_Directory (Service : in Context_Type) return String;
+
    procedure Build (Service     : in out Context_Type;
                     Steps       : in Build_Step_Vector;
                     Executor    : in out Porion.Executors.Executor_Type'Class);

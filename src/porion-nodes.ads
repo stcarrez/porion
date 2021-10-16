@@ -65,6 +65,13 @@ package Porion.Nodes is
                       Strip_Crlf  : in Boolean := False;
                       Status      : out Integer) is abstract;
 
+   --  Create the directory and optionally make sure it is cleaned.
+   procedure Create_Directory (Controller : in out Controller_Type;
+                               Path       : in String;
+                               Clean      : in Boolean;
+                               Process    : not null access
+                                 procedure (Line : in String)) is abstract;
+
 private
 
    type Controller_Type is abstract limited new Ada.Finalization.Limited_Controlled with record

@@ -20,7 +20,6 @@ with EL.Contexts.Default;
 with Util.Log.Loggers;
 with Util.Beans.Objects;
 with Ada.Text_IO;
-with Porion.Nodes.Local;
 with Porion.Nodes.Services;
 package body Porion.Executors is
 
@@ -105,7 +104,7 @@ package body Porion.Executors is
          Executor.Controller.Create_Directory (Path, Clean, Process'Access);
       else
          if Executor.Local = null then
-            Executor.Local := Nodes.Local.Create (Executor'Unchecked_Access);
+            Executor.Local := Nodes.Services.Create_Controller (Executor'Unchecked_Access);
          end if;
 
          Executor.Local.Create_Directory (Path, Clean, Process'Access);
@@ -170,7 +169,7 @@ package body Porion.Executors is
                                       Status      => Status);
       else
          if Executor.Local = null then
-            Executor.Local := Nodes.Local.Create (Listener => Executor'Unchecked_Access);
+            Executor.Local := Nodes.Services.Create_Controller (Listener => Executor'Unchecked_Access);
          end if;
          Executor.Local.Execute (Command     => Command,
                                  Working_Dir => Working_Dir,

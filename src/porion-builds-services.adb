@@ -26,6 +26,7 @@ with Util.Strings.Formats;
 with ADO.Statements;
 with ADO.Queries;
 with ADO.SQL;
+with Porion.Loggers;
 with Porion.Sources.Factories;
 with Porion.Nodes.Models;
 with Porion.Nodes.Services;
@@ -43,6 +44,7 @@ package body Porion.Builds.Services is
                           Executor    : in out Porion.Executors.Executor_Type'Class) is
       Query : ADO.Queries.Context;
       Stmt  : ADO.Statements.Query_Statement;
+      Found : Boolean;
    begin
       Service.Recipe := Recipe;
       Service.Build_Node := Porion.Nodes.Models.Node_Ref (Recipe.Get_Node);
@@ -72,9 +74,24 @@ package body Porion.Builds.Services is
       Service.Build.Set_Create_Date (Ada.Calendar.Clock);
       if not Executor.Is_Dry_Run then
          Service.Build.Save (Service.DB);
+
+         --  Get or create a build queue entry for the recipe.
+         Query.Clear;
+         Query.Set_filter ("o.recipe_id = :recipe_id");
+         Query.Bind_Param ("recipe_id", Recipe.Get_Id);
+         Service.Queue.Find (Service.DB, Query, Found);
+         if not Found then
+            Service.Queue.Set_Recipe (Service.Recipe);
+            Service.Queue.Set_Node (Service.Build_Node);
+            Service.Queue.Set_Create_Date (Service.Build.Get_Create_Date);
+         end if;
+         Service.Queue.Set_Update_Date (Service.Build.Get_Create_Date);
+         Service.Queue.Set_Building (True);
+         Service.Queue.Save (Service.DB);
          Service.DB.Commit;
       else
          Service.DB.Rollback;
+         Service.Queue := Porion.Builds.Models.Null_Build_Queue;
       end if;
 
       Log.Info ("Created build{0} for {1}", Natural'Image (Service.Build.Get_Number),
@@ -133,7 +150,7 @@ package body Porion.Builds.Services is
       Source_Controller := Sources.Factories.Create (Service.Project.Get_Scm, Config);
 
       Executor.Create_Logger (Log_Dir, "build.log");
-      Executor.Log ("Build '" & Ident & "' in " & Path);
+      Executor.Log (Porion.Loggers.LOG_INFO, "Build '" & Ident & "' in " & Path);
       Source_Controller.Checkout (Path, Executor);
 
       Config.Set ("build_dir", Path);
@@ -236,6 +253,12 @@ package body Porion.Builds.Services is
             null;
 
       end case;
+
+      --  Build is finished, remove the queue
+      if not Service.Queue.Is_Null then
+         Service.Queue.Delete (Service.DB);
+         Service.Queue := Porion.Builds.Models.Null_Build_Queue;
+      end if;
    end Update_Build;
 
    procedure Load_Environment (Service : in out Context_Type;
@@ -523,7 +546,8 @@ package body Porion.Builds.Services is
             if not Found then
                Queue.Set_Recipe (Recipe);
                Queue.Set_Node (Recipe.Get_Node);
-               Queue.Set_Creation_Date (Ada.Calendar.Clock);
+               Queue.Set_Create_Date (Ada.Calendar.Clock);
+               Queue.Set_Update_Date (Queue.Get_Create_Date);
 
                Log.Info ("Add build queue for {0} as{1}", Get_Name,
                          ADO.Identifier'Image (Id));
@@ -673,7 +697,6 @@ package body Porion.Builds.Services is
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
       Source_Controller := Sources.Factories.Create (Service.Project.Get_Scm, Config);
 
-      --  Logger.Create (Log_Dir, "build.log");
       Source_Controller.Checkout (Path, Executor);
 
       if Service.Build_Node.Is_Null then
@@ -685,6 +708,7 @@ package body Porion.Builds.Services is
       Service.Recipe.Set_Status (Builds.Models.CONFIG_BUILD_REQUIRED);
       Service.Recipe.Set_Branch (Service.Branch);
       Service.Recipe.Set_Main_Recipe (True);
+      Service.Recipe.Set_Name ("main");
       Service.Recipe.Save (Service.DB);
       Guess (Service, Path, Executor);
 
@@ -858,7 +882,8 @@ package body Porion.Builds.Services is
          File_Path : constant String := Util.Files.Compose (Path, File);
          Exists    : constant Boolean := Ada.Directories.Exists (File_Path);
       begin
-         Executor.Log (Format (Message, File, (if Exists then -("yes") else -("no")), "", ""));
+         Executor.Log (Porion.Loggers.LOG_INFO,
+                       Format (Message, File, (if Exists then -("yes") else -("no")), "", ""));
          return Exists;
       end Check;
 

@@ -15,6 +15,7 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Porion.Builds.Models;
 with Porion.Commands.Drivers;
 private package Porion.Commands.Steps is
 
@@ -45,5 +46,14 @@ private
      ((Command.Delete_Pos > 0 and Command.Update_Pos > 0)
       or (Command.Delete_Pos > 0 and Command.Insert_Pos > 0)
       or (Command.Update_Pos > 0 and Command.Insert_Pos > 0));
+
+   procedure Add_Step (Command : in out Command_Type;
+                       Recipe  : in Porion.Builds.Models.Recipe_Ref;
+                       Args    : in Argument_List'Class;
+                       Context : in out Context_Type);
+
+   procedure Delete_Step (Command : in out Command_Type;
+                          Recipe  : in Porion.Builds.Models.Recipe_Ref;
+                          Context : in out Context_Type);
 
 end Porion.Commands.Steps;

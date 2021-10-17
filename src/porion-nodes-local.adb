@@ -20,6 +20,7 @@ with Util.Processes;
 with Util.Log.Loggers;
 with Util.Streams;
 with Util.Streams.Texts;
+with Porion.Tools;
 package body Porion.Nodes.Local is
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Nodes.Local");
@@ -89,22 +90,6 @@ package body Porion.Nodes.Local is
       end;
    end Execute;
 
-   function To_String (Args : in Util.Strings.Vectors.Vector) return String is
-      use Ada.Strings.Unbounded;
-
-      Result : UString;
-      Empty  : Boolean := True;
-   begin
-      for Arg of Args loop
-         if not Empty then
-            Append (Result, " ");
-         end if;
-         Append (Result, Arg);
-         Empty := False;
-      end loop;
-      return To_String (Result);
-   end To_String;
-
    procedure Execute (Controller  : in out Controller_Type;
                       Args        : in Util.Strings.Vectors.Vector;
                       Working_Dir : in String := "";
@@ -112,7 +97,7 @@ package body Porion.Nodes.Local is
                       Strip_Crlf  : in Boolean := False;
                       Status      : out Integer) is
 
-      Command : constant String := To_String (Args);
+      Command : constant String := Porion.Tools.To_String (Args);
    begin
       if Controller.Is_Dry_Run then
          Controller.Record_Command (Command);

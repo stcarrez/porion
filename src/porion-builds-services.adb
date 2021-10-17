@@ -372,16 +372,16 @@ package body Porion.Builds.Services is
    --  Export some information about the project in the output stream.
    procedure Export (Service : in out Context_Type;
                      Stream  : in out Util.Serialize.IO.Output_Stream'Class) is
-      Build_Configs : Porion.Builds.Models.Recipe_Vector;
-      Query         : ADO.Queries.Context;
+      Recipes : Porion.Builds.Models.Recipe_Vector;
+      Query   : ADO.Queries.Context;
    begin
       Query.Set_Filter ("o.project_id = :project_id");
       Query.Bind_Param ("project_id", Service.Project.Get_Id);
-      Porion.Builds.Models.List (Build_Configs, Service.DB, Query);
+      Porion.Builds.Models.List (Recipes, Service.DB, Query);
 
       Stream.Start_Array ("recipes");
-      for Build_Config of Build_Configs loop
-         Export (Service, Build_Config, Stream);
+      for Recipe of Recipes loop
+         Export (Service, Recipe, Stream);
       end loop;
       Stream.End_Array ("recipes");
    end Export;
@@ -456,7 +456,7 @@ package body Porion.Builds.Services is
          Query : ADO.Queries.Context;
       begin
          Query.Set_Filter ("o.recipe_id = :recipe_id");
-         Query.Bind_Param ("recipe_id", Service.Recipe.Get_Id);
+         Query.Bind_Param ("recipe_id", Recipe.Get_Id);
          Porion.Builds.Models.List (Envs, Service.DB, Query);
 
          if not Envs.Is_Empty then

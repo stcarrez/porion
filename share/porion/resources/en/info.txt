@@ -1,0 +1,14 @@
+porion info: report some information about a project
+
+Usage: porion info [--all] [--recipes] [--nodes] [--builds] project...
+
+  For each project, report a short description of the project and its branches.
+  If the project has been built, report the last build of the project.
+
+  The --nodes option activates the report to list the build nodes where the
+  project is built.
+
+  The --recipes option provides a list of the recipes to build the project.
+
+  The --builds option gives the list of builds of the project.
+

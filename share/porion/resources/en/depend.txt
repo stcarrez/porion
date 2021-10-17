@@ -1,0 +1,9 @@
+porion depend: manage project dependencies
+
+Usage: porion depend [-r|--remove] project dependency1 [dependency2 ...]
+
+  Add or remove a project dependency.  When a dependency project is modified
+  this triggers a build of the project.
+
+  The --remove option allows to remove one or several project dependencies.
+

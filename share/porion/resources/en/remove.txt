@@ -1,0 +1,6 @@
+porion remove: remove a project and its build data
+
+Usage: porion remove [--force] [--interactive] project1 [project2 ...]
+
+  Remove a project and all its build and test data.
+

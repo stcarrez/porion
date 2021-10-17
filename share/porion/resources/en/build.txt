@@ -1,0 +1,9 @@
+porion build: build a project
+
+Usage: porion build [-f|--force] [-n|--dry-run] [-c|--clean] [--modified] project1 [project2 ...]
+
+  For each active branch of the project, check if some changes are pending
+  or if a build is required and build the project on the branch.
+  When --force is given, run the build even if no changes are detected.
+  When --dry-run is given, don't build but print the commands that are
+  executed to build the project.

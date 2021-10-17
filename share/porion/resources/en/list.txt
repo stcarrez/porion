@@ -1,0 +1,6 @@
+porion list: list the projects, nodes, builds and queues
+
+Usage: porion list [--projects] [--nodes] [--builds] [--queues]
+
+  By default list the projects that are registered.
+

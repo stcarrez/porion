@@ -98,9 +98,15 @@ package body Porion.Commands.Info is
             Printer.Put (Fields (2), Project_Name);
             Printer.New_Line;
 
-            Printer.Put (Fields (1), -("Description:"));
-            Printer.Put (Fields (2), Context.Project_Service.Project.Get_Description);
-            Printer.New_Line;
+            declare
+               Description : constant String := Context.Project_Service.Project.Get_Description;
+            begin
+               if Description'Length > 0 then
+                  Printer.Put (Fields (1), -("Description:"));
+                  Printer.Put (Fields (2), Description);
+                  Printer.New_Line;
+               end if;
+            end;
 
             Query.Set_Query (Porion.Queries.Query_Branch_List);
             Query.Bind_Param ("project_id", Context.Project_Service.Project.Get_Id);
@@ -124,6 +130,12 @@ package body Porion.Commands.Info is
             end;
             Printer.New_Line;
 
+            Query.Clear;
+            Query.Set_Join ("INNER JOIN porion_branch AS b ON o.branch_id = b.id");
+            Query.Set_Filter ("b.project_id = :project_id");
+            Query.Bind_Param ("project_id", Context.Project_Service.Project.Get_Id);
+            Porion.Builds.Models.List (Last_Builds, Context.Project_Service.DB, Query);
+
             --  Printer.Set_Max_Dimension (Fields (2), (3, 1));
             --  Printer.Set_Max_Dimension (Fields (4), (3, 1));
             -- Printer.Set_Max_Dimension (Fields (3), Branch_Name);
@@ -134,21 +146,38 @@ package body Porion.Commands.Info is
                   Branch_Name : constant String := To_String (Branch.Name);
                   Build_Dir   : constant String
                     := Porion.Configs.Get_Build_Directory (Project_Name, Branch_Name);
-                  Log_Dir : constant String
-                    := Porion.Configs.Get_Build_Log_Directory (Project_NAme, Branch_Name, 3);
+
                begin
                   if Branch.Branch_Status /= Porion.Projects.Models.BUILD_DISABLED then
                      Printer.Put (Fields (3), Format (-("Path ({0})"), Branch_Name));
                      Printer.Put (Fields (4), Build_Dir);
                      Printer.New_Line;
-
-                     Printer.Put (Fields (3), Format (-("Logs ({0})"), Branch_Name));
-                     Printer.Put (Fields (4), Log_Dir);
-                     Printer.New_Line;
-
                   end if;
                end;
             end loop;
+
+            if not Last_Builds.Is_Empty then
+               Printer.New_Line;
+
+               Printer.Put (Fields (3), -("Last builds"));
+               Printer.New_Line;
+               Printer.Layout_Fields (Fields (3 .. 5));
+               for Build of Last_Builds loop
+                  declare
+                     Branch_Name  : constant String := Build.Get_Branch.Get_Name;
+                     Build_Number : constant Integer := Build.Get_Build.Get_Number;
+                     Log_Dir      : constant String
+                       := Configs.Get_Build_Log_Directory (Project_Name,
+                                                           Branch_Name,
+                                                           Build_Number);
+                  begin
+                     Printer.Put (Fields (3), Branch_Name);
+                     Printer.Put_Int (Fields (4), Build_Number);
+                     Printer.Put (Fields (5), Log_Dir);
+                     Printer.New_Line;
+                  end;
+               end loop;
+            end if;
 
             declare
                List   : Porion.Queries.Project_Info_Vector;
@@ -178,11 +207,6 @@ package body Porion.Commands.Info is
                end if;
             end;
 
-            Query.Clear;
-            Query.Set_Join ("INNER JOIN porion_branch AS b ON o.branch_id = b.id");
-            Query.Set_Filter ("b.project_id = :project_id");
-            Query.Bind_Param ("project_id", Context.Project_Service.Project.Get_Id);
-            Porion.Builds.Models.List (Last_Builds, Context.Project_Service.DB, Query);
             declare
                List   : Porion.Queries.Build_Info_Vector;
                Query  : ADO.Queries.Context;

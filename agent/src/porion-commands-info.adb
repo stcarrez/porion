@@ -222,12 +222,13 @@ package body Porion.Commands.Info is
                Porion.Builds.Services.Build (Context.Project_Service, Recipe, Executor);
                declare
                   Commands    : Porion.Executors.Command_Vector;
+                  Ident       : constant String := Projects.To_String (Context.Project_Service.Ident);
                   Branch_Name : constant String := Context.Project_Service.Branch.Get_Name;
                   Hostname    : constant String := Context.Project_Service.Build_Node.Get_Name;
                begin
                   Printer.New_Line;
                   Executor.Fetch_Commands (Commands);
-                  Printer.Put (Fields (3), Format ("Recipe: {0}@{1}", Branch_Name, Hostname));
+                  Printer.Put (Fields (3), Format (-("Recipe: {0}"), Ident));
                   Printer.New_Line;
                   Porion.Reports.List_Commands (Commands, Context.Printer.all, Context.Styles);
                end;

@@ -391,7 +391,7 @@ package body Porion.Reports is
       Writer.Create_Field (Fields (3), Style1, 0.0);
       Writer.Create_Field (Fields (4), Style1, 0.0);
       Writer.Create_Field (Fields (5), Style1, 10.0);
-      Writer.Create_Field (Fields (6), Style1, 10.0);
+      Writer.Create_Field (Fields (6), Style2, 10.0);
       Writer.Create_Field (Fields (7), Style1, 10.0);
       Writer.Create_Field (Fields (8), Style1, 10.0);
       Writer.Create_Field (Fields (9), Style1, 20.0);
@@ -406,6 +406,7 @@ package body Porion.Reports is
       Writer.Set_Bottom_Right_Padding (Fields (2), (1, 0));
       Writer.Set_Bottom_Right_Padding (Fields (3), (1, 0));
       Writer.Set_Bottom_Right_Padding (Fields (4), (1, 0));
+      Writer.Set_Bottom_Right_Padding (Fields (6), (1, 0));
 
       Writer.Layout_Fields (Fields);
       Writer.Put (Fields (1), Label);

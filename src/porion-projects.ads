@@ -31,7 +31,7 @@ package Porion.Projects is
    end record;
 
    --  Parse an identification string with the format:
-   --   <project>[^<branch>][~<recipe>][@<node]
+   --   <project>[#<branch>][~<recipe>][@<node]
    --  Raises the Invalid_Ident exception if the format is invalid.
    function Parse (Ident : in String) return Ident_Type;
 

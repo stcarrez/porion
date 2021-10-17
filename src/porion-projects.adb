@@ -26,7 +26,7 @@ package body Porion.Projects is
 
    --  ------------------------------
    --  Parse an identification string with the format:
-   --   <project>[^<branch>][~<recipe>][@<node]
+   --   <project>[#<branch>][~<recipe>][@<node]
    --  Raises the Invalid_Ident exception if the format is invalid.
    --  ------------------------------
    function Parse (Ident : in String) return Ident_Type is
@@ -35,7 +35,7 @@ package body Porion.Projects is
       Tilde_Pos : Natural;
       At_Pos    : Natural;
    begin
-      Caret_Pos := Util.Strings.Index (Ident, '^');
+      Caret_Pos := Util.Strings.Index (Ident, '#');
       Tilde_Pos := Util.Strings.Index (Ident, '~');
       At_Pos := Util.Strings.Index (Ident, '@');
       if Caret_Pos > 0 then
@@ -91,7 +91,7 @@ package body Porion.Projects is
    begin
       Append (Result, Ident.Name);
       if Length (Ident.Branch) > 0 then
-         Append (Result, "^");
+         Append (Result, "#");
          Append (Result, Ident.Branch);
       end if;
 

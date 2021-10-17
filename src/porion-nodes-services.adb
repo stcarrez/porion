@@ -303,7 +303,7 @@ package body Porion.Nodes.Services is
       Service.Build_Node.Find (Service.DB, Query, Found);
       if Found then
          Log.Warn ("Build node name {0} already used", Hostname);
-         raise Not_Found;
+         raise Name_Used;
       end if;
       Service.Build_Node.Set_Name (Hostname);
       Service.Build_Node.Set_Login (Login);

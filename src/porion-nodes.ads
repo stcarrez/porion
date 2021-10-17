@@ -16,9 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Finalization;
-with Ada.Containers.Indefinite_Vectors;
 with Util.Beans.Objects.Enums;
-with Porion.Builds;
 package Porion.Nodes is
 
    type Node_Type is (NODE_LOCAL, NODE_SSH, NODE_DOCKER, NODE_VIRSH);

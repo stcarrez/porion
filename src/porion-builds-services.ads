@@ -19,14 +19,11 @@ with Ada.Containers.Vectors;
 with Util.Strings.Vectors;
 with Util.Serialize.IO;
 with ADO.Sessions;
-with Porion.Sources;
-with Porion.Builders;
 with Porion.Configs;
 with Porion.Builds.Models;
 with Porion.Projects.Models;
 with Porion.Services;
 with Porion.Executors;
-private with Util.Strings.Maps;
 package Porion.Builds.Services is
 
    type Build_Step is record

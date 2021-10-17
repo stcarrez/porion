@@ -19,7 +19,7 @@ with ADO.Sessions;
 
 with Porion.Configs;
 with Porion.Builds.Models;
-package Porion.Builders.Factories is
+private package Porion.Builders.Factories is
 
    --  Create a build controller of the given kind.
    function Create (Kind    : in Porion.Builds.Models.Builder_Type;

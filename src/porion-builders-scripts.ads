@@ -18,7 +18,7 @@
 with Porion.Configs;
 with Util.Strings.Vectors;
 with EL.Expressions;
-package Porion.Builders.Scripts is
+private package Porion.Builders.Scripts is
 
    type Controller_Type is limited new Porion.Builders.Controller_Type with private;
 

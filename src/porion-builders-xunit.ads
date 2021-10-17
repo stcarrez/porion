@@ -19,7 +19,7 @@ with Util.Strings.Vectors;
 with ADO.Sessions;
 with Porion.Configs;
 with Porion.Builds.Models;
-package Porion.Builders.XUnit is
+private package Porion.Builders.XUnit is
 
    NAME : constant String := "xunit";
 

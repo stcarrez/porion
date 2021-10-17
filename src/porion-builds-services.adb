@@ -17,12 +17,9 @@
 -----------------------------------------------------------------------
 with Ada.Calendar;
 with Ada.Directories;
-with Ada.Unchecked_Deallocation;
 with Util.Log.Loggers;
 with Util.Strings;
 with Util.Files;
-with Util.Streams;
-with Util.Streams.Texts;
 with Util.Serialize.IO.JSON;
 with Util.Properties;
 with Util.Strings.Formats;
@@ -32,19 +29,14 @@ with ADO.SQL;
 with Porion.Sources.Factories;
 with Porion.Nodes.Models;
 with Porion.Nodes.Services;
-with Porion.Builders.Factories;
+with Porion.Builders;
 package body Porion.Builds.Services is
 
    use type ADO.Identifier;
-   use type Porion.Builders.Controller_Access;
    use type Porion.Builds.Models.Execution_Type;
    use type Porion.Builds.Models.Build_Status_Type;
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Builds.Services");
-
-   procedure Free is
-     new Ada.Unchecked_Deallocation (Object => Porion.Builders.Controller_Type'Class,
-                                     Name   => Porion.Builders.Controller_Access);
 
    procedure Start_Build (Service     : in out Context_Type;
                           Recipe      : in Porion.Builds.Models.Recipe_Ref;
@@ -150,7 +142,6 @@ package body Porion.Builds.Services is
             declare
                Exec_Step   : Builds.Models.Build_Step_Ref;
                Step_Status : Integer;
-               Build_Controller : Porion.Builders.Controller_Access;
             begin
                if not Executor.Is_Dry_Run then
                   Exec_Step.Set_Start_Date (Ada.Calendar.Clock);
@@ -160,9 +151,8 @@ package body Porion.Builds.Services is
                end if;
                Executor.Set_Step (Step.Step.Get_Step);
                Executor.Set_Status (0);
-               Build_Controller
-                 := Builders.Factories.Create (Step.Step.Get_Builder, Service.DB, Step.Config);
-               Build_Controller.Build (Service.Build, Path, Executor);
+               Builders.Run (Step.Step.Get_Builder, Service.DB, Step.Config,
+                             Service.Build, Path, Executor);
 
                if not Executor.Is_Dry_Run then
                   Step_Status := Executor.Get_Status;
@@ -170,7 +160,9 @@ package body Porion.Builds.Services is
                   Exec_Step.Set_End_Date ((Is_Null => False,
                                            Value => Ada.Calendar.Clock));
                   Exec_Step.Save (Service.DB);
-                  if Step_Status /= 0 and Step.Step.Get_Execution = Builds.Models.EXEC_NO_ERROR then
+                  if Step_Status /= 0
+                    and Step.Step.Get_Execution = Builds.Models.EXEC_NO_ERROR
+                  then
                      Status := Porion.Builds.Models.BUILD_FAIL;
                      exit;
                   end if;
@@ -196,7 +188,7 @@ package body Porion.Builds.Services is
       begin
          for Iter in Last_Builds.Iterate loop
             declare
-               Last_Build : Models.Last_Build_Vectors.Reference_Type
+               Last_Build : constant Models.Last_Build_Vectors.Reference_Type
                  := Models.Last_Build_Vectors.Reference (Last_Builds, Iter);
             begin
                if Last_Build.Get_Status = Status then
@@ -324,27 +316,7 @@ package body Porion.Builds.Services is
                           Step      : in Porion.Builds.Step_Type;
                           Arguments : in Util.Strings.Vectors.Vector) is
       use Porion.Builds.Models;
-
-      Config     : Porion.Configs.Config_Type;
-      Controller : Porion.Builders.Controller_Access
-        := Porion.Builders.Factories.Create (Kind, Service.DB, Config);
-      Output : aliased Util.Streams.Texts.Print_Stream;
-      Stream : Util.Serialize.IO.JSON.Output_Stream;
    begin
-      if Controller = null then
-         Log.Error ("No builder for {0}", Builder_Type'Image (Kind));
-         return;
-      end if;
-      Controller.Configure (Arguments);
-
-      Output.Initialize (Size => 10000);
-      Stream.Initialize (Output => Output'Unchecked_Access);
-      Stream.Start_Document;
-      Controller.Print (Stream);
-      Stream.End_Document;
-
-      Free (Controller);
-
       declare
          New_Step : Build_Step;
          Pos  : Natural := Position;
@@ -353,7 +325,7 @@ package body Porion.Builds.Services is
             Pos := Natural (Steps.Length);
          end if;
          Steps.Insert (Pos, New_Step);
-         New_Step.Step.Set_Parameters (Util.Streams.Texts.To_String (Output));
+         New_Step.Step.Set_Parameters (Builders.Save_Configuration (Kind, Service.DB, Arguments));
          New_Step.Step.Set_Builder (Kind);
          New_Step.Step.Set_Number (Pos);
          New_Step.Step.Set_Step (Step);
@@ -484,26 +456,9 @@ package body Porion.Builds.Services is
    procedure Update_Parameters (Service : in out Context_Type;
                                 Step    : in out Builds.Models.Recipe_Step_Ref;
                                 Config  : in out Porion.Configs.Config_Type) is
-      Kind       : constant Models.Builder_Type := Step.Get_Builder;
-      Controller : Porion.Builders.Controller_Access;
-      Output     : aliased Util.Streams.Texts.Print_Stream;
-      Stream     : Util.Serialize.IO.JSON.Output_Stream;
+      Kind : constant Models.Builder_Type := Step.Get_Builder;
    begin
-      Controller := Builders.Factories.Create (Kind, Service.DB, Config);
-      if Controller = null then
-         Log.Error ("No builder for {0}", Models.Builder_Type'Image (Kind));
-         return;
-      end if;
-
-      Output.Initialize (Size => 10000);
-      Stream.Initialize (Output => Output'Unchecked_Access);
-      Stream.Start_Document;
-      Controller.Print (Stream);
-      Stream.End_Document;
-
-      Free (Controller);
-
-      Step.Set_Parameters (Util.Streams.Texts.To_String (Output));
+      Step.Set_Parameters (Builders.Save_Configuration (Kind, Service.DB, Config));
    end Update_Parameters;
 
    procedure Find_Build_Configs (Service : in out Context_Type;

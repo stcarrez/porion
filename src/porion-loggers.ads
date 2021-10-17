@@ -19,6 +19,12 @@ private with Ada.Finalization;
 private with Ada.Text_IO;
 package Porion.Loggers is
 
+   type Source_Type is (LOG_INFO,
+                        LOG_COMMAND,
+                        LOG_EXECUTION,
+                        LOG_RESULT,
+                        LOG_FAILURE);
+
    type Logger_Type is tagged limited private;
 
    --  Create and open the logger to write on the given path.
@@ -28,8 +34,9 @@ package Porion.Loggers is
                      Dir    : in String;
                      Name   : in String);
 
-   --  Write the line on the logger.
+   --  Write the line on the logger with the source to identify the producer.
    procedure Write (Logger : in out Logger_Type;
+                    Source : in Source_Type;
                     Line   : in String);
 
 private

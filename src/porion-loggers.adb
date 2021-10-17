@@ -20,7 +20,9 @@ with Ada.Directories;
 with Util.Files;
 package body Porion.Loggers is
 
+   --  ------------------------------
    --  Create and open the logger to write on the given path.
+   --  ------------------------------
    procedure Create (Logger : in out Logger_Type;
                      Path   : in String) is
    begin
@@ -45,11 +47,31 @@ package body Porion.Loggers is
       Logger.Create (Util.Files.Compose (Dir, Name));
    end Create;
 
-   --  Write the line on the logger.
+   --  ------------------------------
+   --  Write the line on the logger with the source to identify the producer.
+   --  ------------------------------
    procedure Write (Logger : in out Logger_Type;
+                    Source : in Source_Type;
                     Line   : in String) is
    begin
       if Ada.Text_IO.Is_Open (Logger.File) then
+         case Source is
+            when LOG_INFO =>
+               Ada.Text_IO.Put (Logger.File, "porion:inf: ");
+
+            when LOG_COMMAND =>
+               Ada.Text_IO.Put (Logger.File, "porion:cmd: ");
+
+            when LOG_RESULT =>
+               Ada.Text_IO.Put (Logger.File, "porion:oki: ");
+
+            when LOG_FAILURE =>
+               Ada.Text_IO.Put (Logger.File, "porion:nok: ");
+
+            when LOG_EXECUTION =>
+               null;
+
+         end case;
          Ada.Text_IO.Put_Line (Logger.File, Line);
       end if;
    end Write;

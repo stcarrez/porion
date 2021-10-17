@@ -479,8 +479,6 @@ package body Porion.Reports is
                           Styles  : in Style_Configuration;
                           Label   : in String;
                           Hide_Project : in Boolean := False) is
-      use Porion.Nodes;
-
       Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
       Fields : PT.Texts.Field_Array (1 .. 7);
       Style1 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);

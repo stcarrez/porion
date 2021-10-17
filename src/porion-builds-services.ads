@@ -26,6 +26,8 @@ with Porion.Services;
 with Porion.Executors;
 package Porion.Builds.Services is
 
+   Invalid_Position : exception;
+
    type Build_Step is record
       Step   : Porion.Builds.Models.Recipe_Step_Ref;
       Config : Porion.Configs.Config_Type;
@@ -60,22 +62,21 @@ package Porion.Builds.Services is
                           Executor    : in out Porion.Executors.Executor_Type'Class) with
      Pre => Service.Has_Project;
 
-  -- procedure Load_Recipe (Service : in out Context_Type) with
-  --   Pre => Service.Has_Project;
-
    --  Delete the build step at the given execution order.
+   --  Raises Invalid_Position if the position is invalid.
    procedure Delete_Step (Service  : in out Context_Type;
-                          Steps    : in out Build_Step_Vector;
-                          Position : in Natural) with
-     Pre => Service.Has_Project;
+                          Recipe   : in Porion.Builds.Models.Recipe_Ref;
+                          Position : in Positive) with
+     Pre => Service.Has_Project and Recipe.Is_Loaded;
 
+   --  Insert the build step in the recipe at the given position.
    procedure Insert_Step (Service   : in out Context_Type;
-                          Steps     : in out Build_Step_Vector;
+                          Recipe    : in Porion.Builds.Models.Recipe_Ref;
                           Position  : in Natural;
                           Kind      : in Porion.Builds.Models.Builder_Type;
                           Step      : in Porion.Builds.Step_Type;
                           Arguments : in Util.Strings.Vectors.Vector) with
-     Pre => Service.Has_Project;
+     Pre => Service.Has_Project and Recipe.Is_Loaded;
 
    --  Export some information about the project in the output stream.
    procedure Export (Service : in out Context_Type;

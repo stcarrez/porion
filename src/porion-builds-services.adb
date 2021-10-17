@@ -304,14 +304,22 @@ package body Porion.Builds.Services is
                 Ada.Containers.Count_Type'Image (Steps.Length));
    end Load_Recipe;
 
+   --  ------------------------------
    --  Delete the build step at the given execution order.
+   --  Raises Invalid_Position if the position is invalid.
+   --  ------------------------------
    procedure Delete_Step (Service  : in out Context_Type;
-                          Steps    : in out Build_Step_Vector;
-                          Position : in Natural) is
-      Last : constant Natural := Natural (Steps.Length);
+                          Recipe   : in Porion.Builds.Models.Recipe_Ref;
+                          Position : in Positive) is
+      Last  : Natural;
+      Steps : Build_Step_Vector;
    begin
+      Load_Recipe (Service, Recipe, Steps);
+
+      Last := Natural (Steps.Length);
       if Position > Last then
-         raise Program_Error;
+         Log.Warn ("Step position{0} is out of range", Natural'Image (Position));
+         raise Invalid_Position;
       end if;
 
       Service.DB.Begin_Transaction;
@@ -332,41 +340,56 @@ package body Porion.Builds.Services is
       Service.DB.Commit;
    end Delete_Step;
 
+   --  ------------------------------
+   --  Insert the build step in the recipe at the given position.
+   --  ------------------------------
    procedure Insert_Step (Service   : in out Context_Type;
-                          Steps     : in out Build_Step_Vector;
+                          Recipe    : in Porion.Builds.Models.Recipe_Ref;
                           Position  : in Natural;
                           Kind      : in Porion.Builds.Models.Builder_Type;
                           Step      : in Porion.Builds.Step_Type;
                           Arguments : in Util.Strings.Vectors.Vector) is
-      use Porion.Builds.Models;
+      Steps    : Build_Step_Vector;
+      New_Step : Build_Step;
+      Pos      : Natural := Position;
+      Last     : Natural;
    begin
-      declare
-         New_Step : Build_Step;
-         Pos  : Natural := Position;
-      begin
-         if Pos = 0 then
-            Pos := Natural (Steps.Length);
-         end if;
-         Steps.Insert (Pos, New_Step);
-         New_Step.Step.Set_Parameters (Builders.Save_Configuration (Kind, Service.DB, Arguments));
-         New_Step.Step.Set_Builder (Kind);
-         New_Step.Step.Set_Number (Pos);
-         New_Step.Step.Set_Step (Step);
-         New_Step.Step.Set_Execution (Builds.Models.EXEC_NO_ERROR);
-         New_Step.Step.Set_Recipe (Service.Recipe);
-         New_Step.Step.Save (Service.DB);
+      Load_Recipe (Service, Recipe, Steps);
 
+      Last := Natural (Steps.Length);
+
+      if Pos = 0 then
+         Pos := Last;
+      end if;
+
+      if Pos > Last then
+         Log.Warn ("Step position{0} is out of range", Natural'Image (Pos));
+         raise Invalid_Position;
+      end if;
+
+      Service.DB.Begin_Transaction;
+      Steps.Insert (Pos, New_Step);
+      Last := Last + 1;
+
+      New_Step.Step.Set_Parameters (Builders.Save_Configuration (Kind, Service.DB, Arguments));
+      New_Step.Step.Set_Builder (Kind);
+      New_Step.Step.Set_Number (Pos);
+      New_Step.Step.Set_Step (Step);
+      New_Step.Step.Set_Execution (Builds.Models.EXEC_NO_ERROR);
+      New_Step.Step.Set_Recipe (Recipe);
+      New_Step.Step.Save (Service.DB);
+
+      Pos := Pos + 1;
+      while Pos <= Last loop
+         declare
+            Next_Step : Build_Step := Steps.Element (Pos);
+         begin
+            Next_Step.Step.Set_Number (Pos);
+            Next_Step.Step.Save (Service.DB);
+         end;
          Pos := Pos + 1;
-         while Pos < Natural (Steps.Length) loop
-            declare
-               Next_Step : Build_Step := Steps.Element (Pos);
-            begin
-               Next_Step.Step.Set_Number (Pos);
-               Next_Step.Step.Save (Service.DB);
-            end;
-            Pos := Pos + 1;
-         end loop;
-      end;
+      end loop;
+      Service.DB.Commit;
    end Insert_Step;
 
    --  Export some information about the project in the output stream.

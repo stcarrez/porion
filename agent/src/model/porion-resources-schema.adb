@@ -26,10 +26,10 @@ package body Porion.Resources.Schema is
        & "R NOT NULL, `start_date` DATETIME NOT NULL, `port` INTEGER NOT NULL, `no"
        & "de_id` BIGINT NOT NULL, PRIMARY KEY (`id`))";
    L_9   : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_build_q"
-       & "ueue ( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `creation_date`"
-       & " DATETIME NOT NULL, `update_date` DATETIME NOT NULL, `order` INTEGER NOT"
-       & " NULL, `node_id` BIGINT NOT NULL, `recipe_id` BIGINT NOT NULL, PRIMARY K"
-       & "EY (`id`))";
+       & "ueue ( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `create_date` D"
+       & "ATETIME NOT NULL, `update_date` DATETIME NOT NULL, `order` INTEGER NOT N"
+       & "ULL, `building` TINYINT NOT NULL, `node_id` BIGINT NOT NULL, `recipe_id`"
+       & " BIGINT NOT NULL, PRIMARY KEY (`id`))";
    L_10  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_build_s"
        & "tep ( `id` BIGINT NOT NULL, `start_date` DATETIME NOT NULL, `end_date` D"
        & "ATETIME , `exit_status` INTEGER NOT NULL, `build_id` BIGINT NOT NULL, `r"

@@ -1765,9 +1765,10 @@ package body Porion.Builds.Models is
    begin
       Impl := new Build_Queue_Impl;
       Impl.Version := 0;
-      Impl.Creation_Date := ADO.DEFAULT_TIME;
+      Impl.Create_Date := ADO.DEFAULT_TIME;
       Impl.Update_Date := ADO.DEFAULT_TIME;
       Impl.Order := 0;
+      Impl.Building := False;
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Allocate;
 
@@ -1801,21 +1802,21 @@ package body Porion.Builds.Models is
    end Get_Version;
 
 
-   procedure Set_Creation_Date (Object : in out Build_Queue_Ref;
-                                Value  : in Ada.Calendar.Time) is
+   procedure Set_Create_Date (Object : in out Build_Queue_Ref;
+                              Value  : in Ada.Calendar.Time) is
       Impl : Build_Queue_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Time (Impl.all, 3, Impl.Creation_Date, Value);
-   end Set_Creation_Date;
+      ADO.Objects.Set_Field_Time (Impl.all, 3, Impl.Create_Date, Value);
+   end Set_Create_Date;
 
-   function Get_Creation_Date (Object : in Build_Queue_Ref)
+   function Get_Create_Date (Object : in Build_Queue_Ref)
                   return Ada.Calendar.Time is
       Impl : constant Build_Queue_Access
          := Build_Queue_Impl (Object.Get_Load_Object.all)'Access;
    begin
-      return Impl.Creation_Date;
-   end Get_Creation_Date;
+      return Impl.Create_Date;
+   end Get_Create_Date;
 
 
    procedure Set_Update_Date (Object : in out Build_Queue_Ref;
@@ -1852,12 +1853,29 @@ package body Porion.Builds.Models is
    end Get_Order;
 
 
+   procedure Set_Building (Object : in out Build_Queue_Ref;
+                           Value  : in Boolean) is
+      Impl : Build_Queue_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Boolean (Impl.all, 6, Impl.Building, Value);
+   end Set_Building;
+
+   function Get_Building (Object : in Build_Queue_Ref)
+                  return Boolean is
+      Impl : constant Build_Queue_Access
+         := Build_Queue_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Building;
+   end Get_Building;
+
+
    procedure Set_Node (Object : in out Build_Queue_Ref;
                        Value  : in Porion.Nodes.Models.Node_Ref'Class) is
       Impl : Build_Queue_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 6, Impl.Node, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 7, Impl.Node, Value);
    end Set_Node;
 
    function Get_Node (Object : in Build_Queue_Ref)
@@ -1874,7 +1892,7 @@ package body Porion.Builds.Models is
       Impl : Build_Queue_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 7, Impl.Recipe, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 8, Impl.Recipe, Value);
    end Set_Recipe;
 
    function Get_Recipe (Object : in Build_Queue_Ref)
@@ -1900,9 +1918,10 @@ package body Porion.Builds.Models is
             ADO.Objects.Set_Object (Result, Copy.all'Access);
             Copy.Copy (Impl.all);
             Copy.Version := Impl.Version;
-            Copy.Creation_Date := Impl.Creation_Date;
+            Copy.Create_Date := Impl.Create_Date;
             Copy.Update_Date := Impl.Update_Date;
             Copy.Order := Impl.Order;
+            Copy.Building := Impl.Building;
             Copy.Node := Impl.Node;
             Copy.Recipe := Impl.Recipe;
          end;
@@ -2050,14 +2069,19 @@ package body Porion.Builds.Models is
          Object.Clear_Modified (5);
       end if;
       if Object.Is_Modified (6) then
-         Stmt.Save_Field (Name  => COL_5_4_NAME, --  node_id
-                          Value => Object.Node);
+         Stmt.Save_Field (Name  => COL_5_4_NAME, --  building
+                          Value => Object.Building);
          Object.Clear_Modified (6);
       end if;
       if Object.Is_Modified (7) then
-         Stmt.Save_Field (Name  => COL_6_4_NAME, --  recipe_id
-                          Value => Object.Recipe);
+         Stmt.Save_Field (Name  => COL_6_4_NAME, --  node_id
+                          Value => Object.Node);
          Object.Clear_Modified (7);
+      end if;
+      if Object.Is_Modified (8) then
+         Stmt.Save_Field (Name  => COL_7_4_NAME, --  recipe_id
+                          Value => Object.Recipe);
+         Object.Clear_Modified (8);
       end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
@@ -2093,15 +2117,17 @@ package body Porion.Builds.Models is
                         Value => Object.Get_Key);
       Query.Save_Field (Name  => COL_1_4_NAME, --  version
                         Value => Object.Version);
-      Query.Save_Field (Name  => COL_2_4_NAME, --  creation_date
-                        Value => Object.Creation_Date);
+      Query.Save_Field (Name  => COL_2_4_NAME, --  create_date
+                        Value => Object.Create_Date);
       Query.Save_Field (Name  => COL_3_4_NAME, --  update_date
                         Value => Object.Update_Date);
       Query.Save_Field (Name  => COL_4_4_NAME, --  order
                         Value => Object.Order);
-      Query.Save_Field (Name  => COL_5_4_NAME, --  node_id
+      Query.Save_Field (Name  => COL_5_4_NAME, --  building
+                        Value => Object.Building);
+      Query.Save_Field (Name  => COL_6_4_NAME, --  node_id
                         Value => Object.Node);
-      Query.Save_Field (Name  => COL_6_4_NAME, --  recipe_id
+      Query.Save_Field (Name  => COL_7_4_NAME, --  recipe_id
                         Value => Object.Recipe);
       Query.Execute (Result);
       if Result /= 1 then
@@ -2136,12 +2162,14 @@ package body Porion.Builds.Models is
       Impl := Build_Queue_Impl (Obj.all)'Access;
       if Name = "id" then
          return ADO.Objects.To_Object (Impl.Get_Key);
-      elsif Name = "creation_date" then
-         return Util.Beans.Objects.Time.To_Object (Impl.Creation_Date);
+      elsif Name = "create_date" then
+         return Util.Beans.Objects.Time.To_Object (Impl.Create_Date);
       elsif Name = "update_date" then
          return Util.Beans.Objects.Time.To_Object (Impl.Update_Date);
       elsif Name = "order" then
          return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Order));
+      elsif Name = "building" then
+         return Util.Beans.Objects.To_Object (Impl.Building);
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -2176,14 +2204,15 @@ package body Porion.Builds.Models is
                    Session : in out ADO.Sessions.Session'Class) is
    begin
       Object.Set_Key_Value (Stmt.Get_Identifier (0));
-      Object.Creation_Date := Stmt.Get_Time (2);
+      Object.Create_Date := Stmt.Get_Time (2);
       Object.Update_Date := Stmt.Get_Time (3);
       Object.Order := Stmt.Get_Integer (4);
-      if not Stmt.Is_Null (5) then
-         Object.Node.Set_Key_Value (Stmt.Get_Identifier (5), Session);
-      end if;
+      Object.Building := Stmt.Get_Boolean (5);
       if not Stmt.Is_Null (6) then
-         Object.Recipe.Set_Key_Value (Stmt.Get_Identifier (6), Session);
+         Object.Node.Set_Key_Value (Stmt.Get_Identifier (6), Session);
+      end if;
+      if not Stmt.Is_Null (7) then
+         Object.Recipe.Set_Key_Value (Stmt.Get_Identifier (7), Session);
       end if;
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);

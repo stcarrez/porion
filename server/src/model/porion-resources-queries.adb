@@ -483,8 +483,8 @@ package body Porion.Resources.Queries is
        & "f the build queue</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & " "
        & "           SELECT" & ASCII.LF & "            queue.id AS id," & ASCII.LF
        & "            queue.`order` AS `order`," & ASCII.LF & "            queue.c"
-       & "reation_date AS create_date," & ASCII.LF & "            project.name AS "
-       & "name," & ASCII.LF & "            project.status AS status," & ASCII.LF & " "
+       & "reate_date AS create_date," & ASCII.LF & "            project.name AS na"
+       & "me," & ASCII.LF & "            project.status AS status," & ASCII.LF & " "
        & "           branch.name AS branch_name," & ASCII.LF & "            branch"
        & ".tag AS branch_tag," & ASCII.LF & "            branch.status AS branch_s"
        & "tatus," & ASCII.LF & "            recipe.id AS recipe_id," & ASCII.LF & " "
@@ -506,8 +506,8 @@ package body Porion.Resources.Queries is
        & " for a given project</comment>" & ASCII.LF & "        <sql>" & ASCII.LF
        & "            SELECT" & ASCII.LF & "            queue.id AS id," & ASCII.LF
        & "            queue.`order` AS `order`," & ASCII.LF & "            queue.c"
-       & "reation_date AS create_date," & ASCII.LF & "            project.name AS "
-       & "name," & ASCII.LF & "            project.status AS status," & ASCII.LF & " "
+       & "reate_date AS create_date," & ASCII.LF & "            project.name AS na"
+       & "me," & ASCII.LF & "            project.status AS status," & ASCII.LF & " "
        & "           branch.name AS branch_name," & ASCII.LF & "            branch"
        & ".tag AS branch_tag," & ASCII.LF & "            branch.status AS branch_s"
        & "tatus," & ASCII.LF & "            recipe.id AS recipe_id," & ASCII.LF & " "

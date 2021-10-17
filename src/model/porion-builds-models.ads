@@ -560,11 +560,11 @@ package Porion.Builds.Models is
                  return Integer;
 
    --  Set the creation date.
-   procedure Set_Creation_Date (Object : in out Build_Queue_Ref;
-                                Value  : in Ada.Calendar.Time);
+   procedure Set_Create_Date (Object : in out Build_Queue_Ref;
+                              Value  : in Ada.Calendar.Time);
 
    --  Get the creation date.
-   function Get_Creation_Date (Object : in Build_Queue_Ref)
+   function Get_Create_Date (Object : in Build_Queue_Ref)
                  return Ada.Calendar.Time;
 
    --  Set the last update date.
@@ -582,6 +582,14 @@ package Porion.Builds.Models is
    --  Get the builder order.
    function Get_Order (Object : in Build_Queue_Ref)
                  return Integer;
+
+   --  Set indicates whether a build is running.
+   procedure Set_Building (Object : in out Build_Queue_Ref;
+                           Value  : in Boolean);
+
+   --  Get indicates whether a build is running.
+   function Get_Building (Object : in Build_Queue_Ref)
+                 return Boolean;
 
    --  Set the node for which the build was queued.
    procedure Set_Node (Object : in out Build_Queue_Ref;
@@ -1482,14 +1490,15 @@ private
    BUILD_QUEUE_NAME : aliased constant String := "porion_build_queue";
    COL_0_4_NAME : aliased constant String := "id";
    COL_1_4_NAME : aliased constant String := "version";
-   COL_2_4_NAME : aliased constant String := "creation_date";
+   COL_2_4_NAME : aliased constant String := "create_date";
    COL_3_4_NAME : aliased constant String := "update_date";
    COL_4_4_NAME : aliased constant String := "order";
-   COL_5_4_NAME : aliased constant String := "node_id";
-   COL_6_4_NAME : aliased constant String := "recipe_id";
+   COL_5_4_NAME : aliased constant String := "building";
+   COL_6_4_NAME : aliased constant String := "node_id";
+   COL_7_4_NAME : aliased constant String := "recipe_id";
 
    BUILD_QUEUE_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 7,
+     (Count   => 8,
       Table   => BUILD_QUEUE_NAME'Access,
       Members => (
          1 => COL_0_4_NAME'Access,
@@ -1498,7 +1507,8 @@ private
          4 => COL_3_4_NAME'Access,
          5 => COL_4_4_NAME'Access,
          6 => COL_5_4_NAME'Access,
-         7 => COL_6_4_NAME'Access)
+         7 => COL_6_4_NAME'Access,
+         8 => COL_7_4_NAME'Access)
      );
    BUILD_QUEUE_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := BUILD_QUEUE_DEF'Access;
@@ -1512,9 +1522,10 @@ private
                                      Of_Class => BUILD_QUEUE_DEF'Access)
    with record
        Version : Integer;
-       Creation_Date : Ada.Calendar.Time;
+       Create_Date : Ada.Calendar.Time;
        Update_Date : Ada.Calendar.Time;
        Order : Integer;
+       Building : Boolean;
        Node : Porion.Nodes.Models.Node_Ref;
        Recipe : Porion.Builds.Models.Recipe_Ref;
    end record;

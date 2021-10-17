@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 with Util.Log.Loggers;
 with EL.Contexts.Default;
+with Porion.Tools;
 package body Porion.Builders.Scripts is
 
    --  The logger
@@ -34,6 +35,7 @@ package body Porion.Builders.Scripts is
                         Working_Dir => Path,
                         Strip_Crlf  => False,
                         Status      => Status);
+      Executor.Set_Status (Status);
    end Build;
 
    overriding
@@ -45,18 +47,10 @@ package body Porion.Builders.Scripts is
    overriding
    procedure Configure (Controller : in out Controller_Type;
                         Parameters : in Util.Strings.Vectors.Vector) is
-      use Ada.Strings.Unbounded;
-
       Ctx     : EL.Contexts.Default.Default_Context;
-      Command : UString;
+      Command : constant String := Porion.Tools.To_String (Parameters);
    begin
-      for Param of Parameters loop
-         if Length (Command) > 0 then
-            Append (Command, " ");
-         end if;
-         Append (Command, Param);
-      end loop;
-      Controller.Command := EL.Expressions.Create_Expression (To_String (Command), Ctx);
+      Controller.Command := EL.Expressions.Create_Expression (Command, Ctx);
    end Configure;
 
    overriding

@@ -72,6 +72,28 @@ package body Porion.Tests is
       T.Assert (Ada.Directories.Exists (Config),
                 "Porion config not created");
 
+      T.Execute (Command => Tool & " -c " & Config & " build aflex",
+                 Result  => Result,
+                 Status  => 0);
+
+      T.Execute (Command => Tool & " -c " & Config & " info aflex",
+                 Result  => Result,
+                 Status  => 0);
+      Util.Tests.Assert_Matches (T, "aflex", Result,
+                                 "Invalid project info");
+
+      T.Execute (Command => Tool & " -c " & Config & " info --recipes aflex",
+                 Result  => Result,
+                 Status  => 0);
+      Util.Tests.Assert_Matches (T, "aflex#master~main@localhost", Result,
+                                 "Invalid project info");
+
+      T.Execute (Command => Tool & " -c " & Config & " list --projects",
+                 Result  => Result,
+                 Status  => 0);
+
+      Util.Tests.Assert_Matches (T, "aflex", Result, "Invalid project list");
+
    end Test_Add;
 
 end Porion.Tests;

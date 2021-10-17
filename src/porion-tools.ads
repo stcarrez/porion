@@ -17,7 +17,11 @@
 -----------------------------------------------------------------------
 with Util.Properties;
 with EL.Expressions;
+with Util.Strings.Vectors;
 package Porion.Tools is
+
+   --  Return a string formed by a concatenation of strings in the vector.
+   function To_String (Args : in Util.Strings.Vectors.Vector) return String;
 
    procedure Execute (Command     : in EL.Expressions.Expression;
                       Parameters  : in Util.Properties.Manager;

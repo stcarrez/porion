@@ -27,6 +27,25 @@ package body Porion.Tools is
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Tools");
 
+   --  ------------------------------
+   --  Return a string formed by a concatenation of strings in the vector.
+   --  ------------------------------
+   function To_String (Args : in Util.Strings.Vectors.Vector) return String is
+      use Ada.Strings.Unbounded;
+
+      Result : UString;
+      Empty  : Boolean := True;
+   begin
+      for Arg of Args loop
+         if not Empty then
+            Append (Result, " ");
+         end if;
+         Append (Result, Arg);
+         Empty := False;
+      end loop;
+      return To_String (Result);
+   end To_String;
+
    procedure Execute (Command     : in EL.Expressions.Expression;
                       Parameters  : in Util.Properties.Manager;
                       Process     : not null access procedure (Line : in String);

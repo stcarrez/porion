@@ -80,11 +80,13 @@ CREATE TABLE IF NOT EXISTS porion_build_queue (
   /* the optimistic lock version. */
   `version` INTEGER NOT NULL,
   /* the creation date. */
-  `creation_date` DATETIME NOT NULL,
+  `create_date` DATETIME NOT NULL,
   /* the last update date. */
   `update_date` DATETIME NOT NULL,
   /* the builder order. */
   `order` INTEGER NOT NULL,
+  /* indicates whether a build is running. */
+  `building` TINYINT NOT NULL,
   /* the node for which the build was queued. */
   `node_id` BIGINT NOT NULL,
   /* the recipe that must be built. */

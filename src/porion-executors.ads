@@ -90,6 +90,7 @@ package Porion.Executors is
 
    --  Write the line on the logger.
    procedure Log (Executor : in out Executor_Type;
+                  Source   : in Porion.Loggers.Source_Type;
                   Line     : in String);
 
    --  Get the commands that were collected during execution and clear the current list.

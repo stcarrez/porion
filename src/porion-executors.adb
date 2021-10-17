@@ -96,7 +96,8 @@ package body Porion.Executors is
 
       procedure Process (Line : in String) is
       begin
-         Executor_Type'Class (Executor).Log (Line (Line'First .. Line'Last - 1));
+         Executor_Type'Class (Executor).Log (Porion.Loggers.LOG_EXECUTION,
+                                             Line (Line'First .. Line'Last - 1));
       end Process;
 
    begin
@@ -146,7 +147,8 @@ package body Porion.Executors is
          if Line'First + 1 < Line'Last then
             Glog.Info ("{0}", Line (Line'First .. Line'Last - 1));
          end if;
-         Executor_Type'Class (Executor).Log (Line (Line'First .. Line'Last - 1));
+         Executor_Type'Class (Executor).Log (Loggers.LOG_EXECUTION,
+                                             Line (Line'First .. Line'Last - 1));
       end Process;
 
    begin
@@ -169,7 +171,7 @@ package body Porion.Executors is
                                       Status      => Status);
       else
          if Executor.Local = null then
-            Executor.Local := Nodes.Services.Create_Controller (Listener => Executor'Unchecked_Access);
+            Executor.Local := Nodes.Services.Create_Controller (Executor'Unchecked_Access);
          end if;
          Executor.Local.Execute (Command     => Command,
                                  Working_Dir => Working_Dir,
@@ -179,8 +181,10 @@ package body Porion.Executors is
       end if;
 
       if Status /= 0 then
-         Executor.Log ("Command exit status:" & Integer'Image (Status) & ASCII.LF);
+         Executor.Log (Porion.Loggers.LOG_FAILURE, "exit status:" & Integer'Image (Status));
          Executor.Status := Status;
+      else
+         Executor.Log (Porion.Loggers.LOG_RESULT, "exit status: 0");
       end if;
    end Execute;
 
@@ -210,6 +214,7 @@ package body Porion.Executors is
    procedure Record_Command (Executor : in out Executor_Type;
                              Command  : in String) is
    begin
+      Executor.Log (Loggers.LOG_COMMAND, Command);
       Executor.Commands.Append ((Len     => Command'Length,
                                  Step    => Executor.Step,
                                  Command => Command));
@@ -219,11 +224,15 @@ package body Porion.Executors is
    --  Write the line on the logger.
    --  ------------------------------
    procedure Log (Executor : in out Executor_Type;
+                  Source   : in Porion.Loggers.Source_Type;
                   Line     : in String) is
       use type Porion.Builds.Step_Type;
+      use type Porion.Loggers.Source_Type;
    begin
-      Executor.Logger.Write (Line);
-      if Executor.Output_Log and Executor.Step /= Porion.Builds.STEP_CHECKOUT then
+      Executor.Logger.Write (Source, Line);
+      if Source /= Loggers.LOG_RESULT and Executor.Output_Log
+        and Executor.Step /= Porion.Builds.STEP_CHECKOUT
+      then
          Ada.Text_IO.Put_Line (Line);
       end if;
    end Log;

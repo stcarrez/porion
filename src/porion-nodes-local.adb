@@ -47,8 +47,8 @@ package body Porion.Nodes.Local is
                       Strip_Crlf  : in Boolean := False;
                       Status      : out Integer) is
    begin
+      Controller.Record_Command (Command);
       if Controller.Is_Dry_Run then
-         Controller.Record_Command (Command);
          Status := 0;
          return;
       end if;
@@ -99,8 +99,8 @@ package body Porion.Nodes.Local is
 
       Command : constant String := Porion.Tools.To_String (Args);
    begin
+      Controller.Record_Command (Command);
       if Controller.Is_Dry_Run then
-         Controller.Record_Command (Command);
          Status := 0;
          return;
       end if;

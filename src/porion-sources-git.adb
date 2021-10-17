@@ -20,6 +20,7 @@ with Ada.Directories;
 with GNAT.Regpat;
 with Util.Strings;
 with EL.Contexts.Default;
+with Porion.Loggers;
 package body Porion.Sources.Git is
 
    use Ada.Directories;
@@ -40,7 +41,7 @@ package body Porion.Sources.Git is
       procedure Process (Line : in String) is
          Matches : GNAT.Regpat.Match_Array (0 .. 2);
       begin
-         Executor.Log (Line);
+         Executor.Log (Porion.Loggers.LOG_EXECUTION, Line);
          if GNAT.Regpat.Match (Pattern1, Line) then
             GNAT.Regpat.Match (Pattern1, Line, Matches);
             declare
@@ -55,7 +56,7 @@ package body Porion.Sources.Git is
       procedure Process_Show (Line : in String) is
          Matches : GNAT.Regpat.Match_Array (0 .. 1);
       begin
-         Executor.Log (Line);
+         Executor.Log (Porion.Loggers.LOG_EXECUTION, Line);
          if GNAT.Regpat.Match (Pattern2, Line) then
             GNAT.Regpat.Match (Pattern2, Line, Matches);
             Status.Head := To_UString (Line (Matches (1).First .. Matches (1).Last));
@@ -66,9 +67,9 @@ package body Porion.Sources.Git is
    begin
       Status.Check_Date := Ada.Calendar.Clock;
       Executor.Execute (Controller.Check_Command, Controller.Config,
-                        Process'Access, Strip_Crlf => False, Status => Result);
+                        Process'Access, Strip_Crlf => True, Status => Result);
       Executor.Execute (Controller.Show_Remote_Command, Controller.Config,
-                        Process_Show'Access, Strip_Crlf => False, Status => Result);
+                        Process_Show'Access, Strip_Crlf => True, Status => Result);
    end Check;
 
    overriding
@@ -131,7 +132,7 @@ package body Porion.Sources.Git is
             Result.URI := To_UString (Line);
             Result.Name := To_UString (Make_Project_Name (Line));
          end if;
-         Executor.Log (Line);
+         Executor.Log (Porion.Loggers.LOG_EXECUTION, Line);
       end Process;
 
       Status : Integer;

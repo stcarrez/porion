@@ -15,7 +15,6 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Porion.Projects.Services;
 with Porion.Projects.Models;
 with Porion.Services;
 with Porion.Queries;
@@ -45,6 +44,13 @@ package body Porion.Commands.Info is
          Porion.Commands.Error (-("missing project name"));
          return;
       end if;
+
+      if Command.List_All then
+         Command.List_Recipes := True;
+         Command.List_Nodes := True;
+         Command.List_Builds := True;
+      end if;
+
       Context.Open;
 
       Printer.Create_Field (Fields (1), Context.Styles.Default, 20.0);
@@ -138,7 +144,7 @@ package body Porion.Commands.Info is
 
             --  Printer.Set_Max_Dimension (Fields (2), (3, 1));
             --  Printer.Set_Max_Dimension (Fields (4), (3, 1));
-            -- Printer.Set_Max_Dimension (Fields (3), Branch_Name);
+            --  Printer.Set_Max_Dimension (Fields (3), Branch_Name);
 
             Printer.Layout_Fields (Fields (3 .. 4));
             for Branch of Branches loop
@@ -193,36 +199,40 @@ package body Porion.Commands.Info is
                end if;
             end;
 
-            declare
-               List   : Porion.Queries.Node_Info_Vector;
-               Query  : ADO.Queries.Context;
-            begin
-               Query.Set_Query (Porion.Queries.Query_Project_Node_List);
-               Query.Bind_Param ("project_id", Context.Project_Service.Project.Get_Id);
-               Porion.Queries.List (List, Context.Project_Service.DB, Query);
+            if Command.List_Nodes then
+               declare
+                  List   : Porion.Queries.Node_Info_Vector;
+                  Query  : ADO.Queries.Context;
+               begin
+                  Query.Set_Query (Porion.Queries.Query_Project_Node_List);
+                  Query.Bind_Param ("project_id", Context.Project_Service.Project.Get_Id);
+                  Porion.Queries.List (List, Context.Project_Service.DB, Query);
 
-               if not List.Is_Empty then
-                  Printer.New_Line;
-                  Porion.Reports.List_Nodes (List, Printer, Context.Styles, -("Nodes"));
-               end if;
-            end;
+                  if not List.Is_Empty then
+                     Printer.New_Line;
+                     Porion.Reports.List_Nodes (List, Printer, Context.Styles, -("Nodes"));
+                  end if;
+               end;
+            end if;
 
-            declare
-               List   : Porion.Queries.Build_Info_Vector;
-               Query  : ADO.Queries.Context;
-            begin
-               Query.Set_Query (Porion.Queries.Query_Project_Last_Build_List);
-               Query.Bind_Param ("project_id", Context.Project_Service.Project.Get_Id);
-               Porion.Queries.List (List, Context.Project_Service.DB, Query);
+            if Command.List_Builds then
+               declare
+                  List   : Porion.Queries.Build_Info_Vector;
+                  Query  : ADO.Queries.Context;
+               begin
+                  Query.Set_Query (Porion.Queries.Query_Project_Last_Build_List);
+                  Query.Bind_Param ("project_id", Context.Project_Service.Project.Get_Id);
+                  Porion.Queries.List (List, Context.Project_Service.DB, Query);
 
-               if not List.Is_Empty then
-                  Printer.New_Line;
-                  Porion.Reports.List_Builds (List    => List,
-                                              Printer => Printer,
-                                              Styles  => Context.Styles,
-                                              Label   => -("Builds"));
-               end if;
-            end;
+                  if not List.Is_Empty then
+                     Printer.New_Line;
+                     Porion.Reports.List_Builds (List    => List,
+                                                 Printer => Printer,
+                                                 Styles  => Context.Styles,
+                                                 Label   => -("Builds"));
+                  end if;
+               end;
+            end if;
 
             declare
                List   : Porion.Queries.Queue_Info_Vector;
@@ -239,24 +249,24 @@ package body Porion.Commands.Info is
                end if;
             end;
 
-            Printer.Layout_Fields (Fields (3 .. 3));
-            Executor.Enable_Dry_Run;
-            Builds.Services.Find_Build_Configs (Context.Project_Service, True, Recipes);
-            for Recipe of Recipes loop
-               Porion.Builds.Services.Build (Context.Project_Service, Recipe, Executor);
-               declare
-                  Commands    : Porion.Executors.Command_Vector;
-                  Ident       : constant String := Projects.To_String (Context.Project_Service.Ident);
-                  Branch_Name : constant String := Context.Project_Service.Branch.Get_Name;
-                  Hostname    : constant String := Context.Project_Service.Build_Node.Get_Name;
-               begin
-                  Printer.New_Line;
-                  Executor.Fetch_Commands (Commands);
-                  Printer.Put (Fields (3), Format (-("Recipe: {0}"), Ident));
-                  Printer.New_Line;
-                  Porion.Reports.List_Commands (Commands, Context.Printer.all, Context.Styles);
-               end;
-            end loop;
+            if Command.List_Recipes then
+               Printer.Layout_Fields (Fields (3 .. 3));
+               Executor.Enable_Dry_Run;
+               Builds.Services.Find_Build_Configs (Context.Project_Service, True, Recipes);
+               for Recipe of Recipes loop
+                  Porion.Builds.Services.Build (Context.Project_Service, Recipe, Executor);
+                  declare
+                     Commands : Porion.Executors.Command_Vector;
+                     Ident    : constant String := Projects.To_String (Context.Project_Service.Ident);
+                  begin
+                     Printer.New_Line;
+                     Executor.Fetch_Commands (Commands);
+                     Printer.Put (Fields (3), Format (-("Recipe: {0}"), Ident));
+                     Printer.New_Line;
+                     Porion.Reports.List_Commands (Commands, Context.Printer.all, Context.Styles);
+                  end;
+               end loop;
+            end if;
 
          exception
             when Porion.Services.Not_Found =>
@@ -276,6 +286,26 @@ package body Porion.Commands.Info is
                     Context : in out Context_Type) is
    begin
       Drivers.Command_Type (Command).Setup (Config, Context);
+      GC.Define_Switch (Config => Config,
+                        Output => Command.List_All'Access,
+                        Switch => "-a",
+                        Long_Switch => "--all",
+                        Help => -("Report all information"));
+      GC.Define_Switch (Config => Config,
+                        Output => Command.List_Recipes'Access,
+                        Switch => "-r",
+                        Long_Switch => "--recipes",
+                        Help => -("List the recipes of the project"));
+      GC.Define_Switch (Config => Config,
+                        Output => Command.List_Nodes'Access,
+                        Switch => "-n",
+                        Long_Switch => "--nodes",
+                        Help => -("List the build nodes used by the project"));
+      GC.Define_Switch (Config => Config,
+                        Output => Command.List_Builds'Access,
+                        Switch => "-b",
+                        Long_Switch => "--builds",
+                        Help => -("List the builds of the project"));
    end Setup;
 
 end Porion.Commands.Info;

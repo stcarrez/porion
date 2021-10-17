@@ -38,7 +38,8 @@ private
 
    type Command_Type is new Porion.Commands.Drivers.Command_Type with record
       Bundle        : Util.Properties.Bundles.Manager;
-      List_Projects : aliased Boolean := False;
+      List_All      : aliased Boolean := False;
+      List_Recipes  : aliased Boolean := False;
       List_Nodes    : aliased Boolean := False;
       List_Builds   : aliased Boolean := False;
    end record;

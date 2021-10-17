@@ -546,9 +546,8 @@ package body Porion.Builds.Services is
       Build_Queues  : Porion.Builds.Models.Build_Queue_Vector;
       Query         : ADO.Queries.Context;
    begin
-      Query.Set_Filter ("o.branch_id = :branch_id AND o.status = :status");
+      Query.Set_Filter ("o.branch_id = :branch_id AND o.status != 0");
       Query.Bind_Param ("branch_id", Branch.Get_Id);
-      Query.Bind_Param ("status", Integer (Builds.Models.Config_Status_Type'Pos (Status)));
       Porion.Builds.Models.List (Recipes, Session, Query);
 
       for Iter in Recipes.Iterate loop

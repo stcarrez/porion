@@ -58,6 +58,8 @@ package body Porion.Commands.Init is
                                              Hostname => "localhost",
                                              Login    => "");
             Nodes.Services.Probe_Node (Context.Project_Service);
+            Context.Notice (-("Default build node 'localhost' is registered"));
+            Context.Notice (-("Use 'porion add' to register a first project"));
          end;
 
       end if;

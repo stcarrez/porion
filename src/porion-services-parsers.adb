@@ -29,7 +29,8 @@ with Porion.Configs;
 with Porion.Sources;
 package body Porion.Services.Parsers is
 
-   Log : aliased constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Services.Parsers");
+   Log : aliased constant Util.Log.Loggers.Logger
+     := Util.Log.Loggers.Create ("Porion.Services.Parsers");
 
    package UBO renames Util.Beans.Objects;
 

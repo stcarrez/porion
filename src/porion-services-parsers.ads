@@ -16,7 +16,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Porion.Builds.Models;
 with Porion.Builds.Services;
 package Porion.Services.Parsers is
 

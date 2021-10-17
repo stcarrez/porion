@@ -56,9 +56,9 @@ package body Porion.Projects.Tests is
 
       Check ("project-name@hostname", "project-name", "", "", "hostname");
 
-      Check ("project^maintenance", "project", "maintenance", "", "");
+      Check ("project#maintenance", "project", "maintenance", "", "");
 
-      Check ("project^maintenance@host", "project", "maintenance", "", "host");
+      Check ("project#maintenance@host", "project", "maintenance", "", "host");
 
       Check ("prj~3", "prj", "", "3", "");
 
@@ -81,9 +81,9 @@ package body Porion.Projects.Tests is
 
    begin
       Check ("project@host");
-      Check ("prj^branch");
+      Check ("prj#branch");
       Check ("prj~config");
-      Check ("prj^branch@hostname");
+      Check ("prj#branch@hostname");
    end Test_To_String;
 
 end Porion.Projects.Tests;

@@ -183,7 +183,7 @@ package body Porion.Commands.Node is
       GC.Define_Switch (Config, Command.Remove'Access,
                         "-r", "--remove", -("remove the build node"));
       GC.Define_Switch (Config, Command.Probe'Access,
-                        "-p", "--probe", -("probe the build node"));
+                        "-P", "--probe", -("probe the build node"));
    end Setup;
 
 end Porion.Commands.Node;

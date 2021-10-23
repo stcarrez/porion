@@ -734,9 +734,9 @@ package body Porion.Builds.Services is
       Service.Recipe.Save (Service.DB);
       Guess (Service, Path, Executor);
 
-      Update_Branch_Config (Service.Branch,
-                            Builds.Models.CONFIG_BUILD_REQUIRED,
-                            Service.DB);
+      Update_Branch_Config (Branch => Service.Branch,
+                            Status => Builds.Models.CONFIG_BUILD_REQUIRED,
+                            Session => Service.DB);
    end Make_Recipes;
 
    --  Load the recipes of a project according to the identification.
@@ -884,9 +884,9 @@ package body Porion.Builds.Services is
             end;
          end loop;
 
-         Update_Branch_Config (Service.Branch,
-                               Models.CONFIG_BUILD_REQUIRED,
-                               Service.DB);
+         Update_Branch_Config (Branch => Service.Branch,
+                               Status => Models.CONFIG_BUILD_REQUIRED,
+                               Session => Service.DB);
          Recipe := New_Recipe;
       end;
       Service.DB.Commit;

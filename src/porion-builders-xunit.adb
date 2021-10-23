@@ -45,9 +45,11 @@ package body Porion.Builders.XUnit is
          end if;
       end loop;
 
-      Porion.XUnit.Analysis.Save (Results => Results,
-                                  Build   => Build,
-                                  Session => Controller.Session);
+      if not Executor.Is_Dry_Run then
+         Porion.XUnit.Analysis.Save (Results => Results,
+                                     Build   => Build,
+                                     Session => Controller.Session);
+      end if;
    end Build;
 
    overriding

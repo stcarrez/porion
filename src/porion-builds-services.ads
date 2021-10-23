@@ -53,6 +53,9 @@ package Porion.Builds.Services is
    subtype Context_Type is Porion.Services.Context_Type;
 
    procedure Build (Service     : in out Context_Type;
+                    Executor    : in out Porion.Executors.Executor_Type'Class);
+
+   procedure Build (Service     : in out Context_Type;
                     Recipe      : in Porion.Builds.Models.Recipe_Ref;
                     Executor    : in out Porion.Executors.Executor_Type'Class) with
      Pre => Service.Has_Project and Recipe.Is_Loaded;

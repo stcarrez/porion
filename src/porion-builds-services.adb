@@ -99,6 +99,31 @@ package body Porion.Builds.Services is
    end Start_Build;
 
    procedure Build (Service  : in out Context_Type;
+                    Executor : in out Porion.Executors.Executor_Type'Class) is
+      Query  : ADO.Queries.Context;
+      Queue  : Porion.Builds.Models.Build_Queue_Ref;
+      Recipe : Porion.Builds.Models.Recipe_Ref;
+      Found  : Boolean;
+   begin
+      if not Service.Build_Node.Is_Null then
+         Query.Set_Filter ("o.building = 0 AND o.node_id = :node_id ORDER BY o.`order` DESC LIMIT 1");
+         Query.Bind_Param ("node_id", Service.Build_Node.Get_Id);
+      else
+         Query.Set_Filter ("o.building = 0 ORDER BY o.`order` DESC LIMIT 1");
+      end if;
+      Queue.Find(Service.DB, Query, Found);
+      if not Found then
+         return;
+      end if;
+
+      Recipe := Builds.Models.Recipe_Ref (Queue.Get_Recipe);
+      Service.Project := Projects.Models.Project_Ref (Recipe.Get_Project);
+      Service.Branch := Projects.Models.Branch_Ref (Recipe.Get_Branch);
+      Service.Build_Node := Nodes.Models.Node_Ref (Recipe.Get_Node);
+      Build (Service, Recipe, Executor);
+   end Build;
+
+   procedure Build (Service  : in out Context_Type;
                     Recipe   : in Porion.Builds.Models.Recipe_Ref;
                     Executor : in out Porion.Executors.Executor_Type'Class) is
       Steps : Build_Step_Vector;

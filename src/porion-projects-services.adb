@@ -16,6 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Calendar;
+with Ada.Directories;
 with Util.Log.Loggers;
 with Util.Properties;
 with Util.Dates.ISO8601;
@@ -156,6 +157,15 @@ package body Porion.Projects.Services is
 
       Service.Project.Delete (Service.DB);
       Service.DB.Commit;
+
+      declare
+         Dir : constant String := Porion.Configs.Get_Project_Directory (Name);
+      begin
+         if Ada.Directories.Exists (Dir) then
+            Ada.Directories.Delete_Tree (Dir);
+         end if;
+      end;
+
    end Remove_Project;
 
    --  ------------------------------

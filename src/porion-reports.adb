@@ -21,6 +21,7 @@ with Util.Strings;
 with PT.Texts;
 with ADO.Queries;
 with Porion.Builds.Models;
+with Porion.Projects;
 with Porion.Projects.Models;
 package body Porion.Reports is
 
@@ -172,28 +173,26 @@ package body Porion.Reports is
       Style2 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
    begin
       Writer.Set_Justify (Style2, PT.J_RIGHT);
-      Writer.Create_Field (Fields (1), Style1, 20.0);
-      Writer.Create_Field (Fields (2), Style1, 20.0);
-      Writer.Create_Field (Fields (3), Style1, 10.0);
-      Writer.Create_Field (Fields (4), Style2, 10.0);
+      Writer.Create_Field (Fields (1), Style1, 40.0);
+      Writer.Create_Field (Fields (2), Style1, 10.0);
+      Writer.Create_Field (Fields (3), Style2, 10.0);
+      Writer.Create_Field (Fields (4), Style2, 0.0);
       Writer.Create_Field (Fields (5), Style2, 0.0);
-      Writer.Create_Field (Fields (6), Style2, 0.0);
-      Writer.Create_Field (Fields (7), Style1, 30.0);
+      Writer.Create_Field (Fields (6), Style1, 30.0);
 
+      Writer.Set_Max_Dimension (Fields (4), (W => 4, H => 0));
       Writer.Set_Max_Dimension (Fields (5), (W => 4, H => 0));
-      Writer.Set_Max_Dimension (Fields (6), (W => 4, H => 0));
       for Field of Fields (2 .. 6) loop
          Writer.Set_Bottom_Right_Padding (Field, (W => 1, H => 0));
       end loop;
 
       Writer.Layout_Fields (Fields);
       Writer.Put (Fields (1), Label);
-      Writer.Put (Fields (2), -("Branch"));
-      Writer.Put (Fields (3), -("Tag"));
-      Writer.Put (Fields (4), -("Status"));
-      Writer.Put (Fields (5), -("Pass"));
-      Writer.Put (Fields (6), -("Fail"));
-      Writer.Put (Fields (7), -("Date"));
+      Writer.Put (Fields (2), -("Tag"));
+      Writer.Put (Fields (3), -("Status"));
+      Writer.Put (Fields (4), -("Pass"));
+      Writer.Put (Fields (5), -("Fail"));
+      Writer.Put (Fields (6), -("Date"));
       Writer.New_Line;
 
       for Build of List loop
@@ -211,17 +210,25 @@ package body Porion.Reports is
             Writer.Copy_Style (To => Style2, From => Styles.Error);
          end if;
          Writer.Set_Justify (Style2, PT.J_RIGHT);
-         Writer.Put_UString (Fields (1), Build.Name);
-         Writer.Put_UString (Fields (2), Build.Branch_Name);
-         Writer.Put (Fields (3), Get_Tag (Build.Build_Tag));
+
+         declare
+            Ident : Porion.Projects.Ident_Type;
+         begin
+            Ident.Name := Build.Name;
+            Ident.Branch := Build.Branch_Name;
+            Ident.Recipe := Build.Recipe_Name;
+            Ident.Node := Build.Node_Name;
+            Writer.Put (Fields (1), Porion.Projects.To_String (Ident));
+         end;
+         Writer.Put (Fields (2), Get_Tag (Build.Build_Tag));
          if Build.Build_Status = Builds.Models.BUILD_PASS then
-            Writer.Put (Fields (4), -("OK"));
+            Writer.Put (Fields (3), -("OK"));
          else
-            Writer.Put (Fields (4), -("KO"));
+            Writer.Put (Fields (3), -("KO"));
          end if;
-         Writer.Put_Int (Fields (5), Build.Pass_Count);
-         Writer.Put_Int (Fields (6), Build.Fail_Count);
-         Writer.Put (Fields (7), Format (Build.Build_Date.Value));
+         Writer.Put_Int (Fields (4), Build.Pass_Count);
+         Writer.Put_Int (Fields (5), Build.Fail_Count);
+         Writer.Put (Fields (6), Format (Build.Build_Date.Value));
          Writer.New_Line;
       end loop;
    end List_Builds;

@@ -65,8 +65,7 @@ package Porion.Configs is
                                      Number : in Positive) return String;
 
    --  Get the directory holding the source checkout log files.
-   function Get_Source_Log_Directory (Name   : in String;
-                                      Branch : in String) return String;
+   function Get_Source_Log_Directory (Name   : in String) return String;
 
    --  Get the path of the local database.
    function Get_Database_Path return String;

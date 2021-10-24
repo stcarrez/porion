@@ -187,12 +187,10 @@ package body Porion.Configs is
    --  ------------------------------
    --  Get the directory holding the source checkout log files.
    --  ------------------------------
-   function Get_Source_Log_Directory (Name   : in String;
-                                      Branch : in String) return String is
+   function Get_Source_Log_Directory (Name   : in String) return String is
       Project_Dir : constant String := Get_Project_Directory (Name);
-      Log_Dir     : constant String := Util.Files.Compose ("scm", Branch);
    begin
-      return Util.Files.Compose (Project_Dir, Log_Dir);
+      return Util.Files.Compose (Project_Dir, "scm");
    end Get_Source_Log_Directory;
 
    --  ------------------------------

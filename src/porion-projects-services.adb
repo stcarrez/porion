@@ -257,22 +257,17 @@ package body Porion.Projects.Services is
                             Executor : in out Porion.Executors.Executor_Type'Class) is
       use Porion.Sources;
 
+      Name       : constant String := Service.Project.Get_Name;
+      Log_Dir    : constant String := Configs.Get_Source_Log_Directory (Name);
       Config     : Porion.Configs.Config_Type;
       Query      : ADO.Queries.Context;
       Branches   : Porion.Projects.Models.Branch_Vector;
       Src_Status : Porion.Sources.Status_Type;
       Source_Controller : Porion.Sources.Controller_Access;
    begin
-      if Service.Project.Is_Null then
-         raise Invalid_Name;
-      end if;
+      Log.Info ("Checking changes in {0}", Name);
 
-      declare
-         Name    : constant String := Service.Project.Get_Name;
-         Log_Dir : constant String := Configs.Get_Source_Log_Directory (Name, "master");
-      begin
-         Executor.Create_Logger (Log_Dir, "source.log");
-      end;
+      Executor.Create_Logger (Log_Dir, "source.log");
       Executor.Set_Step (Builds.STEP_CHECKOUT);
 
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));

@@ -129,6 +129,10 @@ package Porion.Builds.Services is
                                    Status  : in Porion.Builds.Models.Config_Status_Type;
                                    Session : in out ADO.Sessions.Master_Session);
 
+   --  Get the build queue size.
+   function Get_Queue_Size (Service : in Context_Type) return Natural
+      with Pre => Service.Is_Open;
+
 private
 
    function Get_Build_Directory (Service : in Context_Type) return String;

@@ -111,7 +111,7 @@ package body Porion.Builds.Services is
       else
          Query.Set_Filter ("o.building = 0 ORDER BY o.`order` DESC LIMIT 1");
       end if;
-      Queue.Find(Service.DB, Query, Found);
+      Queue.Find (Service.DB, Query, Found);
       if not Found then
          return;
       end if;
@@ -603,6 +603,17 @@ package body Porion.Builds.Services is
          end;
       end loop;
    end Update_Branch_Config;
+
+   --  ------------------------------
+   --  Get the build queue size.
+   --  ------------------------------
+   function Get_Queue_Size (Service : in Context_Type) return Natural is
+      Stmt : ADO.Statements.Query_Statement
+         := Service.DB.Create_Statement ("SELECT COUNT(*) FROM porion_build_queue");
+   begin
+      Stmt.Execute;
+      return Stmt.Get_Result_Integer;
+   end Get_Queue_Size;
 
    procedure Update (Service : in out Context_Type;
                      Config  : in out Build_Config) is

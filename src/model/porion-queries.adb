@@ -80,16 +80,17 @@ package body Porion.Queries is
          Into.Project_Status := Porion.Projects.Models.Project_Status_Type'Val (Stmt.Get_Integer (1));
          Into.Branch_Name := Stmt.Get_Unbounded_String (2);
          Into.Branch_Status := Porion.Projects.Models.Branch_Status_Type'Val (Stmt.Get_Integer (3));
-         Into.Recipe_Name := Stmt.Get_Unbounded_String (4);
-         Into.Build_Id := Stmt.Get_Integer (5);
-         Into.Build_Number := Stmt.Get_Integer (6);
-         Into.Build_Tag := Stmt.Get_Unbounded_String (7);
-         Into.Build_Status := Porion.Builds.Models.Build_Status_Type'Val (Stmt.Get_Integer (8));
-         Into.Build_Date := Stmt.Get_Nullable_Time (9);
-         Into.Finish_Date := Stmt.Get_Nullable_Time (10);
-         Into.Pass_Count := Stmt.Get_Integer (11);
-         Into.Fail_Count := Stmt.Get_Integer (12);
-         Into.Timeout_Count := Stmt.Get_Integer (13);
+         Into.Node_Name := Stmt.Get_Unbounded_String (4);
+         Into.Recipe_Name := Stmt.Get_Unbounded_String (5);
+         Into.Build_Id := Stmt.Get_Integer (6);
+         Into.Build_Number := Stmt.Get_Integer (7);
+         Into.Build_Tag := Stmt.Get_Unbounded_String (8);
+         Into.Build_Status := Porion.Builds.Models.Build_Status_Type'Val (Stmt.Get_Integer (9));
+         Into.Build_Date := Stmt.Get_Nullable_Time (10);
+         Into.Finish_Date := Stmt.Get_Nullable_Time (11);
+         Into.Pass_Count := Stmt.Get_Integer (12);
+         Into.Fail_Count := Stmt.Get_Integer (13);
+         Into.Timeout_Count := Stmt.Get_Integer (14);
       end Read;
    begin
       Stmt.Execute;
@@ -410,6 +411,137 @@ package body Porion.Queries is
    begin
       Stmt.Execute;
       Queue_Info_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         Object.Insert_Space (Before => Pos);
+         Object.Update_Element (Index => Pos, Process => Read'Access);
+         Pos := Pos + 1;
+         Stmt.Next;
+      end loop;
+   end List;
+
+
+
+   --  ------------------------------
+   --  Get the bean attribute identified by the name.
+   --  ------------------------------
+   overriding
+   function Get_Value (From : in Test_Info;
+                       Name : in String) return Util.Beans.Objects.Object is
+   begin
+      if Name = "id" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Id));
+      elsif Name = "order" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Order));
+      elsif Name = "creation_date" then
+         return Util.Beans.Objects.Time.To_Object (From.Creation_Date);
+      elsif Name = "project_name" then
+         return Util.Beans.Objects.To_Object (From.Project_Name);
+      elsif Name = "project_status" then
+         return Porion.Projects.Models.Project_Status_Type_Objects.To_Object (From.Project_Status);
+      elsif Name = "branch_name" then
+         return Util.Beans.Objects.To_Object (From.Branch_Name);
+      elsif Name = "branch_tag" then
+         return Util.Beans.Objects.To_Object (From.Branch_Tag);
+      elsif Name = "branch_status" then
+         return Porion.Projects.Models.Branch_Status_Type_Objects.To_Object (From.Branch_Status);
+      elsif Name = "recipe_id" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Recipe_Id));
+      elsif Name = "recipe_name" then
+         return Util.Beans.Objects.To_Object (From.Recipe_Name);
+      elsif Name = "recipe_status" then
+         return Porion.Builds.Models.Config_Status_Type_Objects.To_Object (From.Recipe_Status);
+      elsif Name = "main_recipe" then
+         return Util.Beans.Objects.To_Object (From.Main_Recipe);
+      elsif Name = "node_name" then
+         return Util.Beans.Objects.To_Object (From.Node_Name);
+      elsif Name = "node_status" then
+         return Porion.Nodes.Node_Status_Type_Objects.To_Object (From.Node_Status);
+      end if;
+      return Util.Beans.Objects.Null_Object;
+   end Get_Value;
+
+
+   --  ------------------------------
+   --  Set the value identified by the name
+   --  ------------------------------
+   overriding
+   procedure Set_Value (Item  : in out Test_Info;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object) is
+   begin
+      if Name = "id" then
+         Item.Id := ADO.Identifier (Util.Beans.Objects.To_Long_Long_Integer (Value));
+      elsif Name = "order" then
+         Item.Order := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "creation_date" then
+         Item.Creation_Date := Util.Beans.Objects.Time.To_Time (Value);
+      elsif Name = "project_name" then
+         Item.Project_Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "project_status" then
+         Item.Project_Status := Porion.Projects.Models.Project_Status_Type_Objects.To_Value (Value);
+      elsif Name = "branch_name" then
+         Item.Branch_Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "branch_tag" then
+         Item.Branch_Tag := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "branch_status" then
+         Item.Branch_Status := Porion.Projects.Models.Branch_Status_Type_Objects.To_Value (Value);
+      elsif Name = "recipe_id" then
+         Item.Recipe_Id := ADO.Identifier (Util.Beans.Objects.To_Long_Long_Integer (Value));
+      elsif Name = "recipe_name" then
+         Item.Recipe_Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "recipe_status" then
+         Item.Recipe_Status := Porion.Builds.Models.Config_Status_Type_Objects.To_Value (Value);
+      elsif Name = "main_recipe" then
+         Item.Main_Recipe := Util.Beans.Objects.To_Boolean (Value);
+      elsif Name = "node_name" then
+         Item.Node_Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "node_status" then
+         Item.Node_Status := Porion.Nodes.Node_Status_Type_Objects.To_Value (Value);
+      end if;
+   end Set_Value;
+
+
+   --  --------------------
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   --  --------------------
+   procedure List (Object  : in out Test_Info_List_Bean'Class;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+   begin
+      List (Object.List, Session, Context);
+   end List;
+
+   --  --------------------
+   --  Information about a build queue.
+   --  --------------------
+   procedure List (Object  : in out Test_Info_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+      procedure Read (Into : in out Test_Info);
+
+      Stmt : ADO.Statements.Query_Statement
+          := Session.Create_Statement (Context);
+      Pos  : Positive := 1;
+      procedure Read (Into : in out Test_Info) is
+      begin
+         Into.Id := Stmt.Get_Identifier (0);
+         Into.Order := Stmt.Get_Integer (1);
+         Into.Creation_Date := Stmt.Get_Time (2);
+         Into.Project_Name := Stmt.Get_Unbounded_String (3);
+         Into.Project_Status := Porion.Projects.Models.Project_Status_Type'Val (Stmt.Get_Integer (4));
+         Into.Branch_Name := Stmt.Get_Unbounded_String (5);
+         Into.Branch_Tag := Stmt.Get_Unbounded_String (6);
+         Into.Branch_Status := Porion.Projects.Models.Branch_Status_Type'Val (Stmt.Get_Integer (7));
+         Into.Recipe_Id := Stmt.Get_Identifier (8);
+         Into.Recipe_Name := Stmt.Get_Unbounded_String (9);
+         Into.Recipe_Status := Porion.Builds.Models.Config_Status_Type'Val (Stmt.Get_Integer (10));
+         Into.Main_Recipe := Stmt.Get_Boolean (11);
+         Into.Node_Name := Stmt.Get_Unbounded_String (12);
+         Into.Node_Status := Porion.Nodes.Node_Status_Type'Val (Stmt.Get_Integer (13));
+      end Read;
+   begin
+      Stmt.Execute;
+      Test_Info_Vectors.Clear (Object);
       while Stmt.Has_Elements loop
          Object.Insert_Space (Before => Pos);
          Object.Update_Element (Index => Pos, Process => Read'Access);

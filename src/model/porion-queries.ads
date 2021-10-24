@@ -91,6 +91,9 @@ package Porion.Queries is
       --  the branch status.
       Branch_Status : Porion.Projects.Models.Branch_Status_Type;
 
+      --  the node name.
+      Node_Name : Ada.Strings.Unbounded.Unbounded_String;
+
       --  the recipe name.
       Recipe_Name : Ada.Strings.Unbounded.Unbounded_String;
 
@@ -379,6 +382,90 @@ package Porion.Queries is
 
    Query_Node_Build_Queue_List : constant ADO.Queries.Query_Definition_Access;
 
+   --  --------------------
+   --    Information about a build queue.
+   --  --------------------
+   type Test_Info is
+     new Util.Beans.Basic.Bean with  record
+
+      --  the build queue id.
+      Id : ADO.Identifier;
+
+      --  the build queue order.
+      Order : Integer;
+
+      --  the date when the recipe was inserted in the queue.
+      Creation_Date : Ada.Calendar.Time;
+
+      --  the project name.
+      Project_Name : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the project status.
+      Project_Status : Porion.Projects.Models.Project_Status_Type;
+
+      --  the branch name.
+      Branch_Name : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the branch tag.
+      Branch_Tag : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the branch status.
+      Branch_Status : Porion.Projects.Models.Branch_Status_Type;
+
+      --  the build recipe id.
+      Recipe_Id : ADO.Identifier;
+
+      --  the recipe name.
+      Recipe_Name : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the recipe status.
+      Recipe_Status : Porion.Builds.Models.Config_Status_Type;
+
+      --  whether this is the main recipe.
+      Main_Recipe : Boolean;
+
+      --  the node name where the build is executed.
+      Node_Name : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the current node status.
+      Node_Status : Porion.Nodes.Node_Status_Type;
+   end record;
+
+   --  Get the bean attribute identified by the name.
+   overriding
+   function Get_Value (From : in Test_Info;
+                       Name : in String) return Util.Beans.Objects.Object;
+
+   --  Set the bean attribute identified by the name.
+   overriding
+   procedure Set_Value (Item  : in out Test_Info;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object);
+
+
+   package Test_Info_Beans is
+      new Util.Beans.Basic.Lists (Element_Type => Test_Info);
+   package Test_Info_Vectors renames Test_Info_Beans.Vectors;
+   subtype Test_Info_List_Bean is Test_Info_Beans.List_Bean;
+
+   type Test_Info_List_Bean_Access is access all Test_Info_List_Bean;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Test_Info_List_Bean'Class;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
+
+   subtype Test_Info_Vector is Test_Info_Vectors.Vector;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Test_Info_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
+
+   Query_Test_List : constant ADO.Queries.Query_Definition_Access;
+
+   Query_Build_Test_List : constant ADO.Queries.Query_Definition_Access;
+
 
 
 private
@@ -395,7 +482,7 @@ private
 
    package File_2 is
       new ADO.Queries.Loaders.File (Path => "command-builds.xml",
-                                    Sha1 => "C03901267E0F4C88A14F4616A352385D8C7C6710");
+                                    Sha1 => "37059445C1AAF4A560289CF88A0C43525ABB76B1");
 
    package Def_Buildinfo_Build_List is
       new ADO.Queries.Loaders.Query (Name => "build-list",
@@ -478,4 +565,20 @@ private
                                      File => File_6.File'Access);
    Query_Node_Build_Queue_List : constant ADO.Queries.Query_Definition_Access
    := Def_Queueinfo_Node_Build_Queue_List.Query'Access;
+
+   package File_7 is
+      new ADO.Queries.Loaders.File (Path => "report-tests.xml",
+                                    Sha1 => "FDD2DAFC9A988749578980FDA47CCDF3F742CE16");
+
+   package Def_Testinfo_Test_List is
+      new ADO.Queries.Loaders.Query (Name => "test-list",
+                                     File => File_7.File'Access);
+   Query_Test_List : constant ADO.Queries.Query_Definition_Access
+   := Def_Testinfo_Test_List.Query'Access;
+
+   package Def_Testinfo_Build_Test_List is
+      new ADO.Queries.Loaders.Query (Name => "build-test-list",
+                                     File => File_7.File'Access);
+   Query_Build_Test_List : constant ADO.Queries.Query_Definition_Access
+   := Def_Testinfo_Build_Test_List.Query'Access;
 end Porion.Queries;

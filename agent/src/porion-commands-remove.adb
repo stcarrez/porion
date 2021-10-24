@@ -51,7 +51,7 @@ package body Porion.Commands.Remove is
          exception
             when Porion.Services.Not_Found =>
                if not Command.Force then
-                  Porion.Commands.Error (-("project '{0}' already exists"),
+                  Porion.Commands.Error (-("project '{0}' not found"),
                                          Project_Name);
                end if;
          end;

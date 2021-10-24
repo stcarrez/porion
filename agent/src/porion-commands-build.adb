@@ -30,12 +30,24 @@ package body Porion.Commands.Build is
                       Context   : in out Context_Type) is
       Count : constant Natural := Args.Get_Count;
    begin
+      Context.Open;
+
       if Count = 0 then
-         Porion.Commands.Error (-("missing project name"));
+         declare
+            Executor       : Porion.Executors.Executor_Type;
+         begin
+            if Command.Dry_Run then
+               Executor.Enable_Dry_Run;
+            end if;
+            if not Command.Quiet and not (Context.Verbose or Context.Dump) then
+               Executor.Enable_Log;
+            end if;
+
+            Porion.Builds.Services.Build (Service => Context.Project_Service,
+                                          Executor => Executor);
+         end;
          return;
       end if;
-
-      Context.Open;
 
       for I in 1 .. Count loop
          declare

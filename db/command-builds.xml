@@ -17,6 +17,9 @@
         <property type='Porion.Projects.Models.Branch_Status_Type' name="branch_status">
             <comment>the branch status.</comment>
         </property>
+        <property type='String' name="node_name">
+            <comment>the node name.</comment>
+        </property>
         <property type='String' name="recipe_name">
             <comment>the recipe name.</comment>
         </property>
@@ -57,6 +60,7 @@
             project.status AS status,
             branch.name AS branch_name,
             branch.status AS branch_status,
+            node.name AS node_name,
             recipe.name AS recipe_name,
             build.id AS build_id,
             build.number AS number,
@@ -71,6 +75,7 @@
             INNER JOIN porion_project AS project ON build.project_id = project.id
             INNER JOIN porion_branch AS branch ON branch.id = build.branch_id
             INNER JOIN porion_recipe AS recipe ON build.recipe_id = recipe.id
+            INNER JOIN porion_node AS node ON build.node_id = node.id
             ORDER BY finish_date DESC
         </sql>
         <sql-count>
@@ -88,6 +93,7 @@
             project.status AS status,
             branch.name AS branch_name,
             branch.status AS branch_status,
+            node.name AS node_name,
             recipe.name AS recipe_name,
             build.id AS build_id,
             build.number AS number,
@@ -103,6 +109,7 @@
             INNER JOIN porion_project AS project ON build.project_id = project.id
             INNER JOIN porion_branch AS branch ON branch.id = build.branch_id
             INNER JOIN porion_recipe AS recipe ON build.recipe_id = recipe.id
+            INNER JOIN porion_node AS node ON build.node_id = node.id
             WHERE project.id = :project_id
             ORDER BY finish_date DESC
         </sql>

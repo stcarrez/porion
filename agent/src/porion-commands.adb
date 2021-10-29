@@ -38,6 +38,7 @@ with Porion.Commands.Info;
 with Porion.Commands.Depend;
 with Porion.Commands.Node;
 with Porion.Commands.Check;
+with Porion.Commands.Logs;
 package body Porion.Commands is
 
    Help_Command            : aliased Porion.Commands.Drivers.Help_Command_Type;
@@ -54,6 +55,7 @@ package body Porion.Commands is
    Depend_Command          : aliased Porion.Commands.Depend.Command_Type;
    Node_Command            : aliased Porion.Commands.Node.Command_Type;
    Check_Command           : aliased Porion.Commands.Check.Command_Type;
+   Logs_Command            : aliased Porion.Commands.Logs.Command_Type;
    Driver                  : Drivers.Driver_Type;
 
    Text_Printer            : aliased PT.Drivers.Texts.Printer_Type;
@@ -183,6 +185,9 @@ package body Porion.Commands is
       Driver.Add_Command ("check",
                           -("check for changes and update the build queue"),
                            Check_Command'Access);
+      Driver.Add_Command ("logs",
+                          -("display the build logs"),
+                           Logs_Command'Access);
    end Initialize;
 
    --  ------------------------------

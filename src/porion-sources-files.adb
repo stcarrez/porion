@@ -20,7 +20,7 @@ with Interfaces.C.Strings;
 with Util.Log.Loggers;
 with Util.Strings;
 with EL.Contexts.Default;
-with Porion.Loggers;
+with Porion.Logs;
 package body Porion.Sources.Files is
 
    use Ada.Directories;
@@ -188,7 +188,7 @@ package body Porion.Sources.Files is
          if Line'Length > 0 then
             Result.URI := To_UString (Line);
          end if;
-         Executor.Log (Porion.Loggers.LOG_EXECUTION, Line);
+         Executor.Log (Porion.Logs.LOG_EXECUTION, Line);
       end Process;
 
       Status : Integer;

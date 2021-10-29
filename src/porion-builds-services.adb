@@ -26,7 +26,7 @@ with Util.Strings.Formats;
 with ADO.Statements;
 with ADO.Queries;
 with ADO.SQL;
-with Porion.Loggers;
+with Porion.Logs;
 with Porion.Sources.Factories;
 with Porion.Nodes.Models;
 with Porion.Nodes.Services;
@@ -175,7 +175,7 @@ package body Porion.Builds.Services is
       Source_Controller := Sources.Factories.Create (Service.Project.Get_Scm, Config);
 
       Executor.Create_Logger (Log_Dir, "build.log");
-      Executor.Log (Porion.Loggers.LOG_INFO, "Build '" & Ident & "' in " & Path);
+      Executor.Log (Porion.Logs.LOG_INFO, "Build '" & Ident & "' in " & Path);
       Source_Controller.Checkout (Path, Executor);
 
       Config.Set ("build_dir", Path);
@@ -940,7 +940,7 @@ package body Porion.Builds.Services is
          File_Path : constant String := Util.Files.Compose (Path, File);
          Exists    : constant Boolean := Ada.Directories.Exists (File_Path);
       begin
-         Executor.Log (Porion.Loggers.LOG_INFO,
+         Executor.Log (Porion.Logs.LOG_INFO,
                        Format (Message, File, (if Exists then -("yes") else -("no")), "", ""));
          return Exists;
       end Check;

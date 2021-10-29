@@ -19,7 +19,7 @@ with Ada.Finalization;
 with Ada.Containers.Indefinite_Vectors;
 with EL.Expressions;
 with Util.Properties;
-with Porion.Loggers;
+with Porion.Logs;
 with Porion.Builds;
 with Porion.Nodes.Models;
 package Porion.Executors is
@@ -90,7 +90,7 @@ package Porion.Executors is
 
    --  Write the line on the logger.
    procedure Log (Executor : in out Executor_Type;
-                  Source   : in Porion.Loggers.Source_Type;
+                  Source   : in Porion.Logs.Source_Type;
                   Line     : in String);
 
    --  Get the commands that were collected during execution and clear the current list.
@@ -120,7 +120,7 @@ private
       Status     : Integer := 0;
       Step       : Porion.Builds.Step_Type := Porion.Builds.STEP_CHECKOUT;
       Commands   : Command_Vector;
-      Logger     : Porion.Loggers.Logger_Type;
+      Logger     : Porion.Logs.Logger_Type;
       Controller : Porion.Nodes.Controller_Access;
       Local      : Porion.Nodes.Controller_Access;
    end record;

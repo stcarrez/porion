@@ -1,5 +1,5 @@
 -----------------------------------------------------------------------
---  porion-loggers -- Log build execution
+--  porion-Logs -- Log build execution
 --  Copyright (C) 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
@@ -18,7 +18,7 @@
 with Ada.Directories;
 
 with Util.Files;
-package body Porion.Loggers is
+package body Porion.Logs is
 
    --  ------------------------------
    --  Create and open the logger to write on the given path.
@@ -84,4 +84,4 @@ package body Porion.Loggers is
       end if;
    end Finalize;
 
-end Porion.Loggers;
+end Porion.Logs;

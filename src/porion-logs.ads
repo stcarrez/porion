@@ -1,5 +1,5 @@
 -----------------------------------------------------------------------
---  porion-loggers -- Log build execution
+--  porion-Logs -- Log build execution
 --  Copyright (C) 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
@@ -17,7 +17,7 @@
 -----------------------------------------------------------------------
 private with Ada.Finalization;
 private with Ada.Text_IO;
-package Porion.Loggers is
+package Porion.Logs is
 
    type Source_Type is (LOG_INFO,
                         LOG_COMMAND,
@@ -48,4 +48,4 @@ private
    overriding
    procedure Finalize (Logger : in out Logger_Type);
 
-end Porion.Loggers;
+end Porion.Logs;

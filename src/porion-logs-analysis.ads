@@ -24,6 +24,7 @@ package Porion.Logs.Analysis is
                        LOG_FATAL,
                        LOG_ERROR,
                        LOG_WARNING,
+                       LOG_CONTEXT,
                        LOG_INFO,
                        LOG_TRACE,
                        LOG_DEBUG);

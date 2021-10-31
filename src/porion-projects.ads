@@ -23,19 +23,21 @@ package Porion.Projects is
 
    subtype Config_Type is Porion.Configs.Config_Type;
 
+   --  Identify a project, branch, build recipe, build node and build number.
    type Ident_Type is record
       Name   : UString;
       Branch : UString;
       Recipe : UString;
       Node   : UString;
+      Build  : Natural := 0;
    end record;
 
    --  Parse an identification string with the format:
-   --   <project>[#<branch>][~<recipe>][@<node]
+   --   <project>[#<branch>][~<recipe>][@<node][:<build-number>]
    --  Raises the Invalid_Ident exception if the format is invalid.
    function Parse (Ident : in String) return Ident_Type;
 
-   --  Get a printable represnetation of the split identification string.
+   --  Get a printable representation of the split identification string.
    function To_String (Ident : in Ident_Type) return String;
 
    type Project_Type is record

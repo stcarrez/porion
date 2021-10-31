@@ -26,7 +26,7 @@ package body Porion.Projects is
 
    --  ------------------------------
    --  Parse an identification string with the format:
-   --   <project>[#<branch>][~<recipe>][@<node]
+   --   <project>[#<branch>][~<recipe>][@<node][:<build>]
    --  Raises the Invalid_Ident exception if the format is invalid.
    --  ------------------------------
    function Parse (Ident : in String) return Ident_Type is
@@ -34,27 +34,42 @@ package body Porion.Projects is
       Caret_Pos : Natural;
       Tilde_Pos : Natural;
       At_Pos    : Natural;
+      Colon_Pos : Natural;
+      Last      : Natural;
    begin
       Caret_Pos := Util.Strings.Index (Ident, '#');
       Tilde_Pos := Util.Strings.Index (Ident, '~');
       At_Pos := Util.Strings.Index (Ident, '@');
+      Colon_Pos := Util.Strings.Index (Ident, ':');
+      if Colon_Pos > 0 then
+         Last := Colon_Pos - 1;
+         begin
+            Result.Build := Positive'Value (Ident (Colon_Pos + 1 .. Ident'Last));
+
+         exception
+            when Constraint_Error =>
+            raise Invalid_Ident;
+         end;
+      else
+         Last := Ident'Last;
+      end if;
       if Caret_Pos > 0 then
          Result.Name := To_UString (Ident (Ident'First .. Caret_Pos - 1));
          if Tilde_Pos = 0 and At_Pos = 0 then
-            Result.Branch := To_UString (Ident (Caret_Pos + 1 .. Ident'Last));
+            Result.Branch := To_UString (Ident (Caret_Pos + 1 .. Last));
 
          elsif Tilde_Pos = 0 and At_Pos > Caret_Pos + 1 then
             Result.Branch := To_UString (Ident (Caret_Pos + 1 .. At_Pos - 1));
-            Result.Node := To_UString (Ident (At_Pos + 1 .. Ident'Last));
+            Result.Node := To_UString (Ident (At_Pos + 1 .. Last));
 
          elsif At_Pos = 0 and Tilde_Pos > Caret_Pos + 1 then
             Result.Branch := To_UString (Ident (Caret_Pos + 1 .. Tilde_Pos - 1));
-            Result.Recipe := To_UString (Ident (Tilde_Pos + 1 .. Ident'Last));
+            Result.Recipe := To_UString (Ident (Tilde_Pos + 1 .. Last));
 
          elsif Tilde_Pos > Caret_Pos + 1 and At_Pos > Tilde_Pos + 1 then
             Result.Branch := To_UString (Ident (Caret_Pos + 1 .. Tilde_Pos - 1));
             Result.Recipe := To_UString (Ident (Tilde_Pos + 1 .. At_Pos - 1));
-            Result.Node := To_UString (Ident (At_Pos + 1 .. Ident'Last));
+            Result.Node := To_UString (Ident (At_Pos + 1 .. Last));
          else
             raise Invalid_Ident;
          end if;
@@ -62,27 +77,28 @@ package body Porion.Projects is
       elsif Tilde_Pos > 0 then
          Result.Name := To_UString (Ident (Ident'First .. Tilde_Pos - 1));
          if At_Pos = 0 then
-            Result.Recipe := To_UString (Ident (Tilde_Pos + 1 .. Ident'Last));
+            Result.Recipe := To_UString (Ident (Tilde_Pos + 1 .. Last));
          elsif At_Pos > Tilde_Pos + 1 then
             Result.Recipe := To_UString (Ident (Tilde_Pos + 1 .. At_Pos - 1));
-            Result.Node := To_UString (Ident (At_Pos + 1 .. Ident'Last));
+            Result.Node := To_UString (Ident (At_Pos + 1 .. Last));
          else
             raise Invalid_Ident;
          end if;
 
       elsif At_Pos > 0 then
          Result.Name := To_UString (Ident (Ident'First .. At_Pos - 1));
-         Result.Node := To_UString (Ident (At_Pos + 1 .. Ident'Last));
+         Result.Node := To_UString (Ident (At_Pos + 1 .. Last));
 
       else
-         Result.Name := To_UString (Ident);
+         Result.Name := To_UString (Ident (Ident'First .. Last));
       end if;
 
       return Result;
+
    end Parse;
 
    --  ------------------------------
-   --  Get a printable represnetation of the split identification string.
+   --  Get a printable representation of the split identification string.
    --  ------------------------------
    function To_String (Ident : in Ident_Type) return String is
       use Ada.Strings.Unbounded;
@@ -103,6 +119,11 @@ package body Porion.Projects is
       if Length (Ident.Node) > 0 then
          Append (Result, "@");
          Append (Result, Ident.Node);
+      end if;
+
+      if Ident.Build > 0 then
+         Append (Result, ":");
+         Append (Result, Util.Strings.Image (Ident.Build));
       end if;
 
       return To_String (Result);

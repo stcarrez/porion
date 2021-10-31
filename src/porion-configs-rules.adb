@@ -37,6 +37,20 @@ package body Porion.Configs.Rules is
             if Line = "[log-ignore]" then
                Current_Level := Logs.Analysis.LOG_INFO;
                return;
+            elsif Line = "[log-error]" then
+               Current_Level := Logs.Analysis.LOG_ERROR;
+               return;
+            elsif Line = "[log-warning]" then
+               Current_Level := Logs.Analysis.LOG_WARNING;
+               return;
+            elsif Line = "[log-context]" then
+               Current_Level := Logs.Analysis.LOG_CONTEXT;
+            elsif Line = "[log-info]" then
+               Current_Level := Logs.Analysis.LOG_INFO;
+               return;
+            elsif Line = "[log-trace]" then
+               Current_Level := Logs.Analysis.LOG_TRACE;
+               return;
             else
                Current_Level := Logs.Analysis.LOG_UNKNOWN;
                return;

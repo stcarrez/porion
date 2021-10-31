@@ -1,0 +1,230 @@
+.\"
+.\"
+.TH PORION 1 "Oct 31, 2021" "Continuous build system"
+.SH NAME
+porion - Continuous build system
+.SH SYNOPSIS
+.B porion
+[ -v ] [-vv] [-vvv] [-V] [ -c
+.I config-file
+]
+.I command
+ [args]
+.br
+.SH DESCRIPTION
+\fIporion\fR is a continuous integration server and agent that helps automate the building,
+testing and deployment of software development projects written in any language.
+\fIporion\fR maintains a list of projects with build recipes to build these projects.
+It periodically checks for changes in projects and schedule a build when a project
+is modified.  \fIporion\fR uses a build node to build a project and the build node can
+be the current host or a specific remote host registered for that purpose.
+.\"
+.PP
+\fIporion\fR uses a workspace directory to maintain the list of projects, their build status
+and build area.  The workspace directory contains a SQLite database which is used
+to maintain the list of projects, build nodes, build recipes, build queue and build
+results.
+.\"
+.PP
+The steps to use \fIporion\fR are the following:
+.\"
+.IP \(bu 4
+the \fIporion\fR workspace directory is created by using the \fIporion init\fR command,
+.\"
+.IP \(bu 4
+projects are registered by using the \fIporion add\fR command with enough information to
+allow \fIporion\fR to checkout the source and detect changes.  When a project is added
+\fIporion\fR will guess a set of build recipes for the new project.
+.\"
+.IP \(bu 4
+project build recipes and build steps are updated and configured on the project
+by using either \fIporion add --recipe\fR or \fIporion step\fR commands.
+.\"
+.IP \(bu 4
+.\"
+.PP
+.SH OPTIONS
+The following options are recognized by \fIporion\fR:
+.TP 5
+-V
+Prints the
+.I porion
+version.
+.TP 5
+-v
+Enable the verbose mode.
+.TP 5
+-vv
+Enable debugging output.
+.TP 5
+-vvv
+Enable full debugging output.
+.TP 5
+-c
+.I config-file
+Defines the path of the global
+.I porion
+configuration file.
+.\"
+.SH COMMANDS
+.\"
+.SS The init command
+.RS 0
+porion \fBinit\fR \fIdirectory\fR
+.RE
+.PP
+Setup the build workpace directory.
+.\"
+.SS The add command
+.RS 0
+porion \fBadd\fP \fIurl\fR
+.RE
+.RS 0
+porion \fBadd\fP \fI--recipe\fR {\fIname\fR...}
+.RE
+.PP
+Create a new project with the source scheme.
+A default project name is created from the source scheme name
+and a set of build recipes are guessed by analysing the sources.
+.\"
+.\"
+.SS The build command
+.RS 0
+porion \fBbuild\fP \fIproject\fR
+.RE
+.PP
+For each active branch of the project, check if some changes are pending
+or if a build is required and build the project on the branch.
+When --force is given, run the build even if no changes are detected.
+When --dry-run is given, don't build but print the commands that are
+executed to build the project.
+This command is available when the
+.\"
+.SS The check command
+.RS 0
+porion \fBcheck\fR \fIproject\fR
+.RE
+.PP
+The
+.I check
+command is used to check for changes on a project.
+.\"
+.\"
+.SS The config command
+.RS 0
+porion \fBconfig\fP \fIkeystore.akt\fR -- \fIname\fR
+.RE
+.PP
+.\"
+.SS The depend command
+.RS 0
+porion \fBdepend\fP \fIproject\fR \fIname\fR ...
+.RE
+.PP
+.\"
+.SS The edit command
+.RS 0
+porion \fBedit \fIproject\fR
+.RE
+.PP
+The
+.I edit
+command can be used to edit the configuration of a project.
+The editor is launched
+with the path and when editing is finished the temporary file is read.
+The temporary directory and files are erased when the editor terminates
+successfully or not.  The editor can be specified by using the
+.I -e
+option, by setting up the
+.I EDITOR
+environment variable or by updating the
+.IR editor (1)
+alternative with
+.IR update-alternative (1).
+.\"
+.\"
+.SS The info command
+.RS 0
+porion \fBinfo\fR \fIproject\fR
+.RE
+.PP
+The
+.I list
+command describes the entries stored in the keystore with
+their name, size, type, creation date and number of keys which
+protect the entry.
+.\"
+.\"
+.SS The list command
+.RS 0
+porion \fBlist\fR
+.RE
+.PP
+.\"
+.\"
+.SS The logs command
+.RS 0
+porion \fBlogs\fR \fIproject\fR
+.RE
+.\"
+.SS The node command
+.RS 0
+porion \fBnode\fR \fIhostname\fR
+.RE
+.PP
+.\"
+.SS The remove command
+.RS 0
+porion \fBremove\fR [--new-passfile \fIfile\fR] \fIproject\fR
+.RE
+.PP
+.\"
+.SS The step command
+.RS 0
+porion \fBstep\fR [--new-passfile \fIfile\fR] \fIproject\fR
+.RE
+.PP
+.\"
+.SH CONFIGURATION
+The
+.I porion
+global configuration file contains several configuration properties
+which are used to customize several commands.  These properties can
+be modified with the
+.B config
+command.
+.\"
+.SS gpg-encrypt
+This property defines the
+.IR gpg2 (1)
+command to be used to encrypt a content.  The content to encrypt is
+passed in the standard input and the encrypted content is read from
+the standard output.  The GPG key parameter can be retrieved
+by using the
+.I $USER
+pattern.
+.\"
+.SS gpg-decrypt
+This property defines the
+.IR gpg2 (1)
+command to be used to decrypt a content.  The content to decrypt is
+passed in the standard input and the decrypted content is read from
+the standard output.
+.\"
+.SS gpg-list-keys
+This property defines the
+.IR gpg2 (1)
+command to be used to retrieve the list of available secret keys.
+This command is executed when the keystore file is protected by a
+GPG key to identify the possible GPG Key ids that
+are capable of decrypting it.
+.\"
+.SH SEE ALSO
+\fIeditor(1)\fR, \fIupdate-alternative(1)\fR, \fImake(1)\fR,
+\fImvn(1)\fR
+.\"
+.\"
+.SH AUTHOR
+Written by Stephane Carrez.
+.\"
+

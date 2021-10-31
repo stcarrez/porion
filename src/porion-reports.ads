@@ -25,6 +25,7 @@ package Porion.Reports is
    type Style_Configuration is record
       Default  : PT.Style_Type;
       Error    : PT.Style_Type;
+      Warning  : PT.Style_Type;
       Info     : PT.Style_Type;
       Success  : PT.Style_Type;
       Disabled : PT.Style_Type;

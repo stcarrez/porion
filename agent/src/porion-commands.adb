@@ -267,12 +267,14 @@ package body Porion.Commands is
          Context.Styles.Info := Text_Printer.Create_Style (PT.Colors.White);
          Context.Styles.Success := Text_Printer.Create_Style (PT.Colors.Green);
          Context.Styles.Disabled := Text_Printer.Create_Style (PT.Colors.Blue);
+         Context.Styles.Warning := Text_Printer.Create_Style (PT.Colors.Blue);
       else
          Context.Styles.Error := Context.Styles.Default;
          Context.Styles.Error := Context.Styles.Default;
          Context.Styles.Info := Context.Styles.Default;
          Context.Styles.Success := Context.Styles.Default;
          Context.Styles.Disabled := Context.Styles.Default;
+         Context.Styles.Warning := Context.Styles.Default;
       end if;
    end Setup_Printer;
 

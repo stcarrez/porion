@@ -32,24 +32,29 @@ package Porion.Projects.Services is
 
    --  Add a project with the source information.
    procedure Add_Project (Service   : in out Context_Type;
-                          Info      : in Porion.Sources.Source_Info_Type);
+                          Info      : in Porion.Sources.Source_Info_Type) with
+      Pre => Service.Is_Open;
 
    procedure Add_Branch (Service : in out Context_Type;
                          Name    : in String;
                          Item    : in Porion.Sources.Branch_Type;
-                         Is_Head : in Boolean);
+                         Is_Head : in Boolean) with
+      Pre => Service.Is_Open;
 
    --  Remove a project with the given name and all its build data.
    procedure Remove_Project (Service : in out Context_Type;
-                             Name    : in String);
+                             Name    : in String) with
+      Pre => Service.Is_Open;
 
    --  Add a dependency on the current project.
    procedure Add_Dependency (Service : in out Context_Type;
-                             Depend  : in String);
+                             Depend  : in String) with
+      Pre => Service.Is_Open and Service.Has_Project;
 
    --  Remove a dependency on the current project.
    procedure Remove_Dependency (Service : in out Context_Type;
-                                Depend  : in String);
+                                Depend  : in String) with
+      Pre => Service.Is_Open and Service.Has_Project;
 
    procedure Check_Sources (Service  : in out Context_Type;
                             Status   : in out Porion.Sources.Status_Type;

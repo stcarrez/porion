@@ -40,6 +40,7 @@ private
       Delete_Pos : aliased Integer := 0;
       Update_Pos : aliased Integer := 0;
       Insert_Pos : aliased Integer := 0;
+      Quiet      : aliased Boolean := False;
    end record;
 
    function Has_Several_Actions (Command : in Command_Type) return Boolean is

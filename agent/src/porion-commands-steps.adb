@@ -120,6 +120,10 @@ package body Porion.Commands.Steps is
       end if;
 
       Command.Add_Step (Recipes.First_Element, Args, Context);
+
+      if not Command.Quiet then
+         Porion.Commands.Print_Recipe_Steps (Context);
+      end if;
    end Execute;
 
    --  ------------------------------
@@ -146,6 +150,8 @@ package body Porion.Commands.Steps is
                         Long_Switch => "--update=",
                         Argument => "POSITION",
                         Help => -("Update the build step"));
+      GC.Define_Switch (Config, Command.Quiet'Access,
+                        "-q", "--quiet", -("Quiet execution don't print the build steps"));
    end Setup;
 
 end Porion.Commands.Steps;

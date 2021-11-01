@@ -31,10 +31,10 @@ package body Porion.Commands.Add is
    procedure Add_Project (Command : in out Command_Type;
                           URI     : in String;
                           Context : in out Context_Type) is
-      Executor : Porion.Executors.Executor_Type;
       Info     : Porion.Sources.Source_Info_Type;
       Config   : Porion.Configs.Config_Type;
       Status   : Porion.Sources.Status_Type;
+      Executor : Porion.Executors.Executor_Type;
    begin
       --  Step 1: guess the source manager to be used with project info.
       Porion.Sources.Factories.Guess (Path     => URI,
@@ -50,6 +50,15 @@ package body Porion.Commands.Add is
 
       --  Step 3: make a default build config for the branch.
       Builds.Services.Make_Recipes (Context.Project_Service, To_String (Status.Head), Executor);
+
+      if not Command.Quiet then
+         Porion.Commands.Print_Recipe_Steps (Context);
+      end if;
+
+      Context.Notice (-("Use 'porion step {0} <command>' to add a new build step"),
+                      To_String (Info.Name));
+      Context.Notice (-("Use 'porion step {0} xunit <pattern>' to add a unit test analysis step"),
+                      To_String (Info.Name));
 
    exception
       when Porion.Projects.Services.Name_Used =>
@@ -171,6 +180,8 @@ package body Porion.Commands.Add is
       Drivers.Command_Type (Command).Setup (Config, Context);
       GC.Define_Switch (Config, Command.Recipe'Access,
                         "-r", "--recipe", -("Add a build configuration to a project"));
+      GC.Define_Switch (Config, Command.Quiet'Access,
+                        "-q", "--quiet", -("Quiet execution don't print the build steps"));
    end Setup;
 
 end Porion.Commands.Add;

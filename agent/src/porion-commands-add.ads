@@ -48,6 +48,7 @@ private
 
    type Command_Type is new Porion.Commands.Drivers.Command_Type with record
       Recipe : aliased Boolean := False;
+      Quiet  : aliased Boolean := False;
    end record;
 
 end Porion.Commands.Add;

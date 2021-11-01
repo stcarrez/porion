@@ -198,6 +198,14 @@ package body Porion.Executors is
    end Create_Logger;
 
    --  ------------------------------
+   --  Clear and reset the executor.
+   --  ------------------------------
+   procedure Clear (Executor : in out Executor_Type) is
+   begin
+      Executor.Commands.Clear;
+   end Clear;
+
+   --  ------------------------------
    --  Get the commands that were collected during execution and clear the current list.
    --  ------------------------------
    procedure Fetch_Commands (Executor : in out Executor_Type;

@@ -93,6 +93,9 @@ package Porion.Executors is
                   Source   : in Porion.Logs.Source_Type;
                   Line     : in String);
 
+   --  Clear and reset the executor.
+   procedure Clear (Executor : in out Executor_Type);
+
    --  Get the commands that were collected during execution and clear the current list.
    procedure Fetch_Commands (Executor : in out Executor_Type;
                              Commands : out Command_Vector);

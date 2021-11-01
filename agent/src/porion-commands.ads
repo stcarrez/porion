@@ -134,4 +134,7 @@ private
 
    function Confirm (Message : in String) return Boolean;
 
+   --  Print the build recipe steps of the current project.
+   procedure Print_Recipe_Steps (Context : in out Context_Type);
+
 end Porion.Commands;

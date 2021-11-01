@@ -22,7 +22,11 @@ with Util.Strings;
 with Util.Commands.Parsers.GNAT_Parser;
 with PT.Drivers.Texts;
 with PT.Colors;
+with PT.Texts;
 with Porion.Configs;
+with Porion.Executors;
+with Porion.Builds.Models;
+with Porion.Builds.Services;
 with Porion.Resources.Queries;
 with Porion.Commands.Drivers;
 with Porion.Commands.Build;
@@ -390,5 +394,28 @@ package body Porion.Commands is
       when Ada.Text_IO.End_Error =>
          return False;
    end Confirm;
+
+   --  ------------------------------
+   --  Print the build recipe steps of the current project.
+   --  ------------------------------
+   procedure Print_Recipe_Steps (Context : in out Context_Type) is
+      Printer  : PT.Texts.Printer_Type := PT.Texts.Create (Context.Printer.all);
+      Executor : Porion.Executors.Executor_Type;
+      Recipes  : Porion.Builds.Models.Recipe_Vector;
+   begin
+      Executor.Enable_Dry_Run;
+      Builds.Services.Find_Build_Configs (Context.Project_Service, True, Recipes);
+      for Recipe of Recipes loop
+         Porion.Builds.Services.Build (Context.Project_Service, Recipe, Executor);
+         declare
+            Commands : Porion.Executors.Command_Vector;
+         begin
+            Printer.New_Line;
+            Executor.Fetch_Commands (Commands);
+            Porion.Reports.List_Commands (Commands, Context.Printer.all, Context.Styles);
+            Printer.New_Line;
+         end;
+      end loop;
+   end Print_Recipe_Steps;
 
 end Porion.Commands;

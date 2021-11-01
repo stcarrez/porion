@@ -1,0 +1,14 @@
+[build]
+make
+
+[check]
+test -f Makefile
+test -f Makefile.in
+test -f Makefile.am
+
+[log-error]
+make: \*\*\*
+
+[log-context]
+^make\[[0-9]+\]: Leaving directory '.*'
+^make\[[0-9]+\]: Entering directory '.*'

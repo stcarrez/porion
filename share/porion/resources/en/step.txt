@@ -1,0 +1,15 @@
+porion step: control the recipe build steps
+
+Usage: porion step <ident> command [args...]
+
+  Add a new build step to a project build recipe.
+  The recipe is identified by the identification string composed of:
+
+  <project-name>[#<branch-name>][~<recipe-name>][@<node-name]
+
+  A default project name is created from the source scheme name
+  and a set of build recipes are guessed by analysing the sources.
+
+Usage: porion step --delete <POS> <ident>
+
+  Remove the build step at the given position in the build recipe.

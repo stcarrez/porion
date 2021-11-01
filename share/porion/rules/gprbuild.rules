@@ -1,0 +1,14 @@
+[command]
+gprbuild
+
+[log-ignore]
+^Setup$
+^Compile$
+   \[mkdir\]   .*
+   \[mkdirs\]   .*
+   \[Ada\]    .*
+   \[C\]      .*
+
+[log-warning]
+.*[0-9]+: warning:
+pt-charts.adb:69:13: warning:.*

@@ -60,7 +60,8 @@ package Porion.Projects.Services is
       Pre => Service.Is_Open and Service.Has_Project;
 
    procedure Check_Sources (Service  : in out Context_Type;
-                            Executor : in out Porion.Executors.Executor_Type'Class) with
+                            Executor : in out Porion.Executors.Executor_Type'Class;
+                            Force    : in Boolean) with
       Pre => Service.Is_Open;
 
    procedure Check_Sources (Service  : in out Context_Type;

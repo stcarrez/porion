@@ -19,6 +19,7 @@ with Ada.Calendar;
 with Ada.Directories;
 with Util.Log.Loggers;
 with Util.Properties;
+with Util.Strings;
 with Util.Dates.ISO8601;
 with Porion.Configs;
 with Porion.Sources.Factories;
@@ -108,9 +109,12 @@ package body Porion.Projects.Services is
       end if;
    end Add_Branch;
 
+   --  ------------------------------
    --  Remove a project with the given name and all its build data.
+   --  ------------------------------
    procedure Remove_Project (Service : in out Context_Type;
                              Name    : in String) is
+      procedure Execute (Definition : in ADO.Queries.Query_Definition_Access);
 
       procedure Execute (Definition : in ADO.Queries.Query_Definition_Access) is
          Query  : ADO.Queries.Context;
@@ -126,7 +130,6 @@ package body Porion.Projects.Services is
 
       Query : ADO.SQL.Query;
       Found : Boolean;
-
    begin
       Service.DB.Begin_Transaction;
       Query.Bind_Param (1, Name);
@@ -255,15 +258,22 @@ package body Porion.Projects.Services is
    end Remove_Dependency;
 
    procedure Check_Sources (Service  : in out Context_Type;
-                            Executor : in out Porion.Executors.Executor_Type'Class) is
+                            Executor : in out Porion.Executors.Executor_Type'Class;
+                            Force    : in Boolean) is
       Now    : constant Ada.Calendar.Time := Ada.Calendar.Clock;
       List   : Porion.Projects.Models.Project_Vector;
       Query  : ADO.SQL.Query;
       Status : Porion.Sources.Status_Type;
    begin
-      Query.Set_Filter ("o.status != 0 AND o.next_check_date < :now");
-      Query.Bind_Param ("now", Now);
+      if Force then
+         Query.Set_Filter ("o.status != 1");
+      else
+         Query.Set_Filter ("o.status != 1 AND o.next_check_date < :now");
+         Query.Bind_Param ("now", Now);
+      end if;
       Porion.Projects.Models.List (List, Service.DB, Query);
+
+      Log.Info ("Checking changes in {0} projects", Util.Strings.Image (Natural (List.Length)));
 
       for Project of List loop
          Service.Project := Project;

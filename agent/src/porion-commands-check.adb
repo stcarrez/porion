@@ -39,19 +39,27 @@ package body Porion.Commands.Check is
       Context.Open;
 
       Old_Queue_Size := Builds.Services.Get_Queue_Size (Context.Project_Service);
-      for I in 1 .. Count loop
+      if Count = 0 then
          declare
-            Identification : constant String := Args.Get_Argument (I);
-            Source_Status  : Porion.Sources.Status_Type;
-            Executor       : Porion.Executors.Executor_Type;
-            Ident          : Porion.Projects.Ident_Type;
+            Executor : Porion.Executors.Executor_Type;
          begin
-            Ident := Porion.Projects.Parse (Identification);
-            Context.Project_Service.Load (Ident);
-
-            Projects.Services.Check_Sources (Context.Project_Service, Source_Status, Executor);
+            Projects.Services.Check_Sources (Context.Project_Service, Executor);
          end;
-      end loop;
+      else
+         for I in 1 .. Count loop
+            declare
+               Identification : constant String := Args.Get_Argument (I);
+               Source_Status  : Porion.Sources.Status_Type;
+               Executor       : Porion.Executors.Executor_Type;
+               Ident          : Porion.Projects.Ident_Type;
+            begin
+               Ident := Porion.Projects.Parse (Identification);
+               Context.Project_Service.Load (Ident);
+
+               Projects.Services.Check_Sources (Context.Project_Service, Source_Status, Executor);
+            end;
+         end loop;
+      end if;
 
       New_Queue_Size := Builds.Services.Get_Queue_Size (Context.Project_Service);
       if New_Queue_Size = 0 then

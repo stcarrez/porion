@@ -187,6 +187,30 @@ package Porion.Projects.Models is
    function Get_Build_Rate (Object : in Project_Ref)
                  return Integer;
 
+   --  Set the date and time when the sources were checked.
+   procedure Set_Check_Date (Object : in out Project_Ref;
+                             Value  : in Ada.Calendar.Time);
+
+   --  Get the date and time when the sources were checked.
+   function Get_Check_Date (Object : in Project_Ref)
+                 return Ada.Calendar.Time;
+
+   --  Set the prefered delay between two source checks.
+   procedure Set_Check_Delay (Object : in out Project_Ref;
+                              Value  : in Integer);
+
+   --  Get the prefered delay between two source checks.
+   function Get_Check_Delay (Object : in Project_Ref)
+                 return Integer;
+
+   --  Set the next expected check date and time.
+   procedure Set_Next_Check_Date (Object : in out Project_Ref;
+                                  Value  : in Ada.Calendar.Time);
+
+   --  Get the next expected check date and time.
+   function Get_Next_Check_Date (Object : in Project_Ref)
+                 return Ada.Calendar.Time;
+
    --  Load the entity identified by 'Id'.
    --  Raises the NOT_FOUND exception if it does not exist.
    procedure Load (Object  : in out Project_Ref;
@@ -234,6 +258,15 @@ package Porion.Projects.Models is
    procedure Copy (Object : in Project_Ref;
                    Into   : in out Project_Ref);
 
+   package Project_Vectors is
+      new Ada.Containers.Vectors (Index_Type   => Positive,
+                                  Element_Type => Project_Ref,
+                                  "="          => "=");
+   subtype Project_Vector is Project_Vectors.Vector;
+
+   procedure List (Object  : in out Project_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class);
    --  Create an object key for Branch.
    function Branch_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key;
    --  Create an object key for Branch from a string.
@@ -557,9 +590,12 @@ private
    COL_10_1_NAME : aliased constant String := "fail_rate";
    COL_11_1_NAME : aliased constant String := "timeout_rate";
    COL_12_1_NAME : aliased constant String := "build_rate";
+   COL_13_1_NAME : aliased constant String := "check_date";
+   COL_14_1_NAME : aliased constant String := "check_delay";
+   COL_15_1_NAME : aliased constant String := "next_check_date";
 
    PROJECT_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 13,
+     (Count   => 16,
       Table   => PROJECT_NAME'Access,
       Members => (
          1 => COL_0_1_NAME'Access,
@@ -574,20 +610,24 @@ private
          10 => COL_9_1_NAME'Access,
          11 => COL_10_1_NAME'Access,
          12 => COL_11_1_NAME'Access,
-         13 => COL_12_1_NAME'Access)
+         13 => COL_12_1_NAME'Access,
+         14 => COL_13_1_NAME'Access,
+         15 => COL_14_1_NAME'Access,
+         16 => COL_15_1_NAME'Access)
      );
    PROJECT_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := PROJECT_DEF'Access;
 
    PROJECT_AUDIT_DEF : aliased constant ADO.Audits.Auditable_Mapping :=
-     (Count    => 5,
+     (Count    => 6,
       Of_Class => PROJECT_DEF'Access,
       Members  => (
          1 => 1,
          2 => 3,
          3 => 6,
          4 => 7,
-         5 => 8)
+         5 => 8,
+         6 => 14)
      );
    PROJECT_AUDIT_TABLE : constant ADO.Audits.Auditable_Mapping_Access
       := PROJECT_AUDIT_DEF'Access;
@@ -612,6 +652,9 @@ private
        Fail_Rate : Integer;
        Timeout_Rate : Integer;
        Build_Rate : Integer;
+       Check_Date : Ada.Calendar.Time;
+       Check_Delay : Integer;
+       Next_Check_Date : Ada.Calendar.Time;
    end record;
 
    type Project_Access is access all Project_Impl;

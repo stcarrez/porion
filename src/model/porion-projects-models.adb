@@ -77,6 +77,9 @@ package body Porion.Projects.Models is
       Impl.Fail_Rate := 0;
       Impl.Timeout_Rate := 0;
       Impl.Build_Rate := 0;
+      Impl.Check_Date := ADO.DEFAULT_TIME;
+      Impl.Check_Delay := 0;
+      Impl.Next_Check_Date := ADO.DEFAULT_TIME;
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Allocate;
 
@@ -343,6 +346,57 @@ package body Porion.Projects.Models is
       return Impl.Build_Rate;
    end Get_Build_Rate;
 
+
+   procedure Set_Check_Date (Object : in out Project_Ref;
+                             Value  : in Ada.Calendar.Time) is
+      Impl : Project_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Time (Impl.all, 14, Impl.Check_Date, Value);
+   end Set_Check_Date;
+
+   function Get_Check_Date (Object : in Project_Ref)
+                  return Ada.Calendar.Time is
+      Impl : constant Project_Access
+         := Project_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Check_Date;
+   end Get_Check_Date;
+
+
+   procedure Set_Check_Delay (Object : in out Project_Ref;
+                              Value  : in Integer) is
+      Impl : Project_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Audits.Set_Field_Integer (Impl.all, 15, Impl.Check_Delay, Value);
+   end Set_Check_Delay;
+
+   function Get_Check_Delay (Object : in Project_Ref)
+                  return Integer is
+      Impl : constant Project_Access
+         := Project_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Check_Delay;
+   end Get_Check_Delay;
+
+
+   procedure Set_Next_Check_Date (Object : in out Project_Ref;
+                                  Value  : in Ada.Calendar.Time) is
+      Impl : Project_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Time (Impl.all, 16, Impl.Next_Check_Date, Value);
+   end Set_Next_Check_Date;
+
+   function Get_Next_Check_Date (Object : in Project_Ref)
+                  return Ada.Calendar.Time is
+      Impl : constant Project_Access
+         := Project_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Next_Check_Date;
+   end Get_Next_Check_Date;
+
    --  Copy of the object.
    procedure Copy (Object : in Project_Ref;
                    Into   : in out Project_Ref) is
@@ -369,6 +423,9 @@ package body Porion.Projects.Models is
             Copy.Fail_Rate := Impl.Fail_Rate;
             Copy.Timeout_Rate := Impl.Timeout_Rate;
             Copy.Build_Rate := Impl.Build_Rate;
+            Copy.Check_Date := Impl.Check_Date;
+            Copy.Check_Delay := Impl.Check_Delay;
+            Copy.Next_Check_Date := Impl.Next_Check_Date;
          end;
       end if;
       Into := Result;
@@ -553,6 +610,21 @@ package body Porion.Projects.Models is
                           Value => Object.Build_Rate);
          Object.Clear_Modified (13);
       end if;
+      if Object.Is_Modified (14) then
+         Stmt.Save_Field (Name  => COL_13_1_NAME, --  check_date
+                          Value => Object.Check_Date);
+         Object.Clear_Modified (14);
+      end if;
+      if Object.Is_Modified (15) then
+         Stmt.Save_Field (Name  => COL_14_1_NAME, --  check_delay
+                          Value => Object.Check_Delay);
+         Object.Clear_Modified (15);
+      end if;
+      if Object.Is_Modified (16) then
+         Stmt.Save_Field (Name  => COL_15_1_NAME, --  next_check_date
+                          Value => Object.Next_Check_Date);
+         Object.Clear_Modified (16);
+      end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
          Stmt.Save_Field (Name  => "version",
@@ -610,6 +682,12 @@ package body Porion.Projects.Models is
                         Value => Object.Timeout_Rate);
       Query.Save_Field (Name  => COL_12_1_NAME, --  build_rate
                         Value => Object.Build_Rate);
+      Query.Save_Field (Name  => COL_13_1_NAME, --  check_date
+                        Value => Object.Check_Date);
+      Query.Save_Field (Name  => COL_14_1_NAME, --  check_delay
+                        Value => Object.Check_Delay);
+      Query.Save_Field (Name  => COL_15_1_NAME, --  next_check_date
+                        Value => Object.Next_Check_Date);
       Query.Execute (Result);
       if Result /= 1 then
          raise ADO.Objects.INSERT_ERROR;
@@ -670,11 +748,37 @@ package body Porion.Projects.Models is
          return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Timeout_Rate));
       elsif Name = "build_rate" then
          return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Build_Rate));
+      elsif Name = "check_date" then
+         return Util.Beans.Objects.Time.To_Object (Impl.Check_Date);
+      elsif Name = "check_delay" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Check_Delay));
+      elsif Name = "next_check_date" then
+         return Util.Beans.Objects.Time.To_Object (Impl.Next_Check_Date);
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
 
 
+   procedure List (Object  : in out Project_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class) is
+      Stmt : ADO.Statements.Query_Statement
+        := Session.Create_Statement (Query, PROJECT_DEF'Access);
+   begin
+      Stmt.Execute;
+      Project_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         declare
+            Item : Project_Ref;
+            Impl : constant Project_Access := new Project_Impl;
+         begin
+            Impl.Load (Stmt, Session);
+            ADO.Objects.Set_Object (Item, Impl.all'Access);
+            Object.Append (Item);
+         end;
+         Stmt.Next;
+      end loop;
+   end List;
 
    --  ------------------------------
    --  Load the object from current iterator position
@@ -696,6 +800,9 @@ package body Porion.Projects.Models is
       Object.Fail_Rate := Stmt.Get_Integer (10);
       Object.Timeout_Rate := Stmt.Get_Integer (11);
       Object.Build_Rate := Stmt.Get_Integer (12);
+      Object.Check_Date := Stmt.Get_Time (13);
+      Object.Check_Delay := Stmt.Get_Integer (14);
+      Object.Next_Check_Date := Stmt.Get_Time (15);
       Object.Version := Stmt.Get_Integer (2);
       ADO.Objects.Set_Created (Object);
    end Load;

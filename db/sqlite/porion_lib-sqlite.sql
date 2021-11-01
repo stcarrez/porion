@@ -285,6 +285,12 @@ CREATE TABLE IF NOT EXISTS porion_project (
   `timeout_rate` INTEGER NOT NULL,
   /* the build success rate for the build configuration of this project (all branches). */
   `build_rate` INTEGER NOT NULL,
+  /* the date and time when the sources were checked. */
+  `check_date` DATETIME NOT NULL,
+  /* the prefered delay between two source checks. */
+  `check_delay` INTEGER NOT NULL,
+  /* the next expected check date and time. */
+  `next_check_date` DATETIME NOT NULL,
   PRIMARY KEY (`id`)
 );
 /*  */
@@ -443,3 +449,5 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "scm");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "scm_url");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "check_delay");

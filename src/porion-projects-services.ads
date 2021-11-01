@@ -22,6 +22,9 @@ with Porion.Executors;
 with Porion.Projects.Models;
 package Porion.Projects.Services is
 
+   PROJECT_CHECK_DELAY_NAME    : constant String := "project_check_delay";
+   PROJECT_DEFAULT_CHECK_DELAY : constant := 3600;
+
    Name_Used    : exception;
 
    Invalid_Name : exception;
@@ -55,6 +58,10 @@ package Porion.Projects.Services is
    procedure Remove_Dependency (Service : in out Context_Type;
                                 Depend  : in String) with
       Pre => Service.Is_Open and Service.Has_Project;
+
+   procedure Check_Sources (Service  : in out Context_Type;
+                            Executor : in out Porion.Executors.Executor_Type'Class) with
+      Pre => Service.Is_Open;
 
    procedure Check_Sources (Service  : in out Context_Type;
                             Status   : in out Porion.Sources.Status_Type;

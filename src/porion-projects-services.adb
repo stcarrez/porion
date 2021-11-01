@@ -60,6 +60,8 @@ package body Porion.Projects.Services is
       Service.Project.Set_Status (Projects.Models.PROJECT_ACTIVE);
       Service.Project.Set_Scm_Url (Info.URI);
       Service.Project.Set_Scm (Info.Kind);
+      Service.Project.Set_Check_Delay (Configs.Get (PROJECT_CHECK_DELAY_NAME,
+                                                    PROJECT_DEFAULT_CHECK_DELAY));
       Service.Project.Save (Service.DB);
 
       --  Service.Build_Config.Set_Project (Service.Project);
@@ -253,9 +255,27 @@ package body Porion.Projects.Services is
    end Remove_Dependency;
 
    procedure Check_Sources (Service  : in out Context_Type;
+                            Executor : in out Porion.Executors.Executor_Type'Class) is
+      Now    : constant Ada.Calendar.Time := Ada.Calendar.Clock;
+      List   : Porion.Projects.Models.Project_Vector;
+      Query  : ADO.SQL.Query;
+      Status : Porion.Sources.Status_Type;
+   begin
+      Query.Set_Filter ("o.status != 0 AND o.next_check_date < :now");
+      Query.Bind_Param ("now", Now);
+      Porion.Projects.Models.List (List, Service.DB, Query);
+
+      for Project of List loop
+         Service.Project := Project;
+         Check_Sources (Service, Status, Executor);
+      end loop;
+   end Check_Sources;
+
+   procedure Check_Sources (Service  : in out Context_Type;
                             Status   : in out Porion.Sources.Status_Type;
                             Executor : in out Porion.Executors.Executor_Type'Class) is
       use Porion.Sources;
+      use type Ada.Calendar.Time;
 
       Name       : constant String := Service.Project.Get_Name;
       Log_Dir    : constant String := Configs.Get_Source_Log_Directory (Name);
@@ -264,6 +284,7 @@ package body Porion.Projects.Services is
       Branches   : Porion.Projects.Models.Branch_Vector;
       Src_Status : Porion.Sources.Status_Type;
       Source_Controller : Porion.Sources.Controller_Access;
+      Now        : constant Ada.Calendar.Time := Ada.Calendar.Clock;
    begin
       Log.Info ("Checking changes in {0}", Name);
 
@@ -279,6 +300,10 @@ package body Porion.Projects.Services is
       Query.Bind_Param ("project_id", Service.Project.Get_Id);
       Query.Set_Filter ("o.project_id = :project_id");
       Projects.Models.List (Branches, Service.DB, Query);
+
+      Service.Project.Set_Check_Date (Now);
+      Service.Project.Set_Next_Check_Date (Now + Duration (Service.Project.Get_Check_Delay));
+      Service.Project.Save (Service.DB);
 
       Status.Head := Src_Status.Head;
       for Item in Src_Status.Changes.Iterate loop
@@ -304,7 +329,7 @@ package body Porion.Projects.Services is
                                                                  Builds.Models.CONFIG_BUILD_REQUIRED,
                                                                  Service.DB);
                         end if;
-                        Service.Branch.Set_Update_Date (Ada.Calendar.Clock);
+                        Service.Branch.Set_Update_Date (Now);
                         Service.Branch.Save (Service.DB);
                      else
                         Log.Info ("No change on branch {0}", Name);

@@ -43,7 +43,7 @@ package body Porion.Commands.Check is
          declare
             Executor : Porion.Executors.Executor_Type;
          begin
-            Projects.Services.Check_Sources (Context.Project_Service, Executor);
+            Projects.Services.Check_Sources (Context.Project_Service, Executor, Command.Check_All);
          end;
       else
          for I in 1 .. Count loop

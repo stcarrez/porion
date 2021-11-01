@@ -60,6 +60,10 @@ package Porion.Builds.Services is
                     Executor    : in out Porion.Executors.Executor_Type'Class) with
      Pre => Service.Has_Project and Recipe.Is_Loaded;
 
+   procedure Build_Queue (Service : in out Context_Type;
+                          Node    : in String) with
+      Pre => Service.Is_Open;
+
    procedure Start_Build (Service     : in out Context_Type;
                           Recipe      : in Porion.Builds.Models.Recipe_Ref;
                           Executor    : in out Porion.Executors.Executor_Type'Class) with

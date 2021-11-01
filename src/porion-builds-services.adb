@@ -221,6 +221,33 @@ package body Porion.Builds.Services is
       end if;
    end Build;
 
+   procedure Build_Queue (Service : in out Context_Type;
+                          Node    : in String) is
+      Build_Executor : Porion.Builds.Models.Build_Executor_Ref;
+      Query          : ADO.Queries.Context;
+      Found          : Boolean;
+      Executor       : Porion.Executors.Executor_Type;
+   begin
+      Nodes.Services.Load_Node (Service, Node);
+      Query.Set_Filter ("o.node_id = :node_id");
+      Query.Bind_Param ("node_id", Service.Build_Node.Get_Id);
+      Build_Executor.Find (Service.DB, Query, Found);
+      if Found then
+         return;
+      end if;
+      Build_Executor.Set_Node (Service.Build_Node);
+      Build_Executor.Set_Start_Date (Ada.Calendar.Clock);
+      Build_Executor.Save (Service.DB);
+
+      loop
+         Service.Project := Projects.Models.Null_Project;
+         Build (Service, Executor);
+         exit when Service.Project.Is_Null;
+      end loop;
+
+      Build_Executor.Delete (Service.DB);
+   end Build_Queue;
+
    procedure Update_Build (Service : in out Context_Type;
                            Status  : in Builds.Models.Build_Status_Type) is
       Last_Builds : Builds.Models.Last_Build_Vector;

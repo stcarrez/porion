@@ -35,6 +35,7 @@ package Porion.Configs is
    --  Get the configuration parameter.
    function Get (Name : in String) return String;
    function Get (Name : in String; Default : in String) return String;
+   function Get (Name : in String; Default : in Integer) return Integer;
 
    --  Get a set of configuration parameters.
    function Get_Config (Name : in String) return Config_Type;

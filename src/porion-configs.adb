@@ -23,6 +23,7 @@ with Util.Files;
 with Util.Strings;
 with Util.Log.Loggers;
 with Util.Systems.Os;
+with Util.Properties.Basic;
 package body Porion.Configs is
 
    --  The logger
@@ -106,6 +107,11 @@ package body Porion.Configs is
    function Get (Name : in String; Default : in String) return String is
    begin
       return Cfg.Get (Name, Default);
+   end Get;
+
+   function Get (Name : in String; Default : in Integer) return Integer is
+   begin
+      return Util.Properties.Basic.Integer_Property.Get (Cfg, Name, Default);
    end Get;
 
    --  ------------------------------

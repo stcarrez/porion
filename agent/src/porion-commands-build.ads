@@ -36,10 +36,16 @@ private package Porion.Commands.Build is
 private
 
    type Command_Type is new Porion.Commands.Drivers.Command_Type with record
-      Force   : aliased Boolean := False;
-      Clean   : aliased Boolean := False;
-      Quiet   : aliased Boolean := False;
-      Dry_Run : aliased Boolean := False;
+      Force      : aliased Boolean := False;
+      Clean      : aliased Boolean := False;
+      Quiet      : aliased Boolean := False;
+      Dry_Run    : aliased Boolean := False;
+      Background : aliased Boolean := False;
+      Node       : aliased GNAT.Strings.String_Access;
    end record;
+
+   function Sys_Daemon (No_Chdir : in Integer; No_Close : in Integer) return Integer
+     with Import => True, Convention => C, Link_Name => "daemon";
+   pragma Weak_External (Sys_Daemon);
 
 end Porion.Commands.Build;

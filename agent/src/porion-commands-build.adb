@@ -15,7 +15,7 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-
+with System;
 with Porion.Executors;
 with Porion.Sources;
 with Porion.Builds.Services;
@@ -28,9 +28,38 @@ package body Porion.Commands.Build is
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Context   : in out Context_Type) is
+      use type System.Address;
+
       Count : constant Natural := Args.Get_Count;
    begin
       Context.Open;
+
+      if Command.Background then
+         if Command.Dry_Run then
+            Porion.Commands.Error (-("--dry-run mode is not compatible with --background mode"));
+            return;
+         end if;
+
+         Command.Quiet := True;
+
+         --  If daemon(3) is available and --background is defined, run it so that the parent
+         --  process terminates and the child process continues.
+         if Command.Background and Sys_Daemon'Address /= System.Null_Address then
+            declare
+               Result : constant Integer := Sys_Daemon (1, 0);
+            begin
+               if Result /= 0 then
+                  Porion.Commands.Error (-("cannot run in background"));
+               end if;
+            end;
+         end if;
+      end if;
+
+      if Count = 0 and Command.Node'Length > 0 then
+         Porion.Builds.Services.Build_Queue (Service => Context.Project_Service,
+                                             Node => Command.Node.all);
+         return;
+      end if;
 
       if Count = 0 then
          declare
@@ -70,7 +99,8 @@ package body Porion.Commands.Build is
             end if;
 
             if not Command.Force or Recipes.Is_Empty then
-               Builds.Services.Find_Build_Configs (Context.Project_Service, Command.Force, Recipes);
+               Builds.Services.Find_Build_Configs (Context.Project_Service,
+                                                   Command.Force, Recipes);
             end if;
 
             if Recipes.Is_Empty then
@@ -109,6 +139,12 @@ package body Porion.Commands.Build is
                         "-q", "--quiet", -("Quiet execution where build logs are not printed"));
       GC.Define_Switch (Config, Command.Dry_Run'Access,
                         "-n", "--dry-run", -("Don't build but print commands for building"));
+      GC.Define_Switch (Config, Command.Background'Access,
+                        "-b", "--background", -("Run the build in background"));
+      GC.Define_Switch (Config => Config,
+                        Output => Command.Node'Access,
+                        Long_Switch => "--node=",
+                        Help   => -("Run builds from the given node build queue"));
    end Setup;
 
 end Porion.Commands.Build;

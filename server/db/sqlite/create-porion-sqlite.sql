@@ -375,6 +375,24 @@ CREATE TABLE IF NOT EXISTS porion_build_queue (
   PRIMARY KEY (`id`)
 );
 /*  */
+CREATE TABLE IF NOT EXISTS porion_build_reason (
+  /* the build reason identifier. */
+  `id` BIGINT NOT NULL,
+  /* the creation date of this build reason. */
+  `create_date` DATETIME NOT NULL,
+  /* the optimistic lock version. */
+  `version` INTEGER NOT NULL,
+  /* the reason for triggering the build. */
+  `reason`  NOT NULL,
+  /*  */
+  `build_id` BIGINT ,
+  /*  */
+  `queue_id` BIGINT ,
+  /*  */
+  `upstream_build_id` BIGINT ,
+  PRIMARY KEY (`id`)
+);
+/*  */
 CREATE TABLE IF NOT EXISTS porion_build_step (
   /* the build step identifier. */
   `id` BIGINT NOT NULL,
@@ -546,6 +564,8 @@ CREATE TABLE IF NOT EXISTS porion_branch (
   `rate_factor` INTEGER NOT NULL,
   /* indicates whether this is considered as the main project branch. */
   `main_branch` TINYINT NOT NULL,
+  /* the last build number that was used. */
+  `last_build_number` INTEGER NOT NULL,
   /*  */
   `project_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`)
@@ -701,6 +721,7 @@ CREATE TABLE IF NOT EXISTS porion_test_run_group (
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_executor");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_queue");
+INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_reason");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_step");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_environment");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_last_build");
@@ -758,46 +779,3 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "check_delay");
 /* Copied from porion-sqlite.sql*/
 /* File generated automatically by dynamo */
-/* Copied from awa_counters-sqlite.sql*/
-/* File generated automatically by dynamo */
-/*  */
-CREATE TABLE IF NOT EXISTS awa_counter (
-  /* the object associated with the counter. */
-  `object_id` BIGINT NOT NULL,
-  /* the day associated with the counter. */
-  `date` DATE NOT NULL,
-  /* the counter value. */
-  `counter` INTEGER NOT NULL,
-  /* the counter definition identifier. */
-  `definition_id` BIGINT NOT NULL,
-  PRIMARY KEY (`object_id`, `date`, `definition_id`)
-);
-/* A counter definition defines what the counter represents. It uniquely identifies
-the counter for the Counter table. A counter may be associated with a database
-table. In that case, the counter definition has a relation to the corresponding Entity_Type. */
-CREATE TABLE IF NOT EXISTS awa_counter_definition (
-  /* the counter name. */
-  `name` VARCHAR(255) NOT NULL,
-  /* the counter unique id. */
-  `id` INTEGER NOT NULL,
-  /* the optional entity type that identifies the database table. */
-  `entity_type` INTEGER ,
-  PRIMARY KEY (`id`)
-);
-/*  */
-CREATE TABLE IF NOT EXISTS awa_visit (
-  /* the entity identifier. */
-  `object_id` BIGINT NOT NULL,
-  /* the number of times the entity was visited by the user. */
-  `counter` INTEGER NOT NULL,
-  /* the date and time when the entity was last visited. */
-  `date` DATETIME NOT NULL,
-  /* the user who visited the entity. */
-  `user` BIGINT NOT NULL,
-  /* the counter definition identifier. */
-  `definition_id` BIGINT NOT NULL,
-  PRIMARY KEY (`object_id`, `user`, `definition_id`)
-);
-INSERT OR IGNORE INTO entity_type (name) VALUES ("awa_counter");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("awa_counter_definition");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("awa_visit");

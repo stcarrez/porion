@@ -102,6 +102,24 @@ CREATE TABLE IF NOT EXISTS porion_build_queue (
   PRIMARY KEY (`id`)
 );
 /*  */
+CREATE TABLE IF NOT EXISTS porion_build_reason (
+  /* the build reason identifier. */
+  `id` BIGINT NOT NULL,
+  /* the creation date of this build reason. */
+  `create_date` DATETIME NOT NULL,
+  /* the optimistic lock version. */
+  `version` INTEGER NOT NULL,
+  /* the reason for triggering the build. */
+  `reason`  NOT NULL,
+  /*  */
+  `build_id` BIGINT ,
+  /*  */
+  `queue_id` BIGINT ,
+  /*  */
+  `upstream_build_id` BIGINT ,
+  PRIMARY KEY (`id`)
+);
+/*  */
 CREATE TABLE IF NOT EXISTS porion_build_step (
   /* the build step identifier. */
   `id` BIGINT NOT NULL,
@@ -273,6 +291,8 @@ CREATE TABLE IF NOT EXISTS porion_branch (
   `rate_factor` INTEGER NOT NULL,
   /* indicates whether this is considered as the main project branch. */
   `main_branch` TINYINT NOT NULL,
+  /* the last build number that was used. */
+  `last_build_number` INTEGER NOT NULL,
   /*  */
   `project_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`)
@@ -428,6 +448,7 @@ CREATE TABLE IF NOT EXISTS porion_test_run_group (
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_executor");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_queue");
+INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_reason");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_step");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_environment");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_last_build");

@@ -10,6 +10,8 @@ include Makefile.defaults
 DIST_DIR=porion-$(VERSION)
 DIST_FILE=porion-$(VERSION).tar.gz
 
+GPRFLAGS += -j$(PROCESSORS)
+
 LIBNAME=lib${NAME}
 
 ARE=are
@@ -37,10 +39,10 @@ ROOTDIR=.
 build-test::
 
 build::
-	$(GNATMAKE) -m -p -P "$(GPRPATH)" $(MAKE_ARGS)
+	$(GNATMAKE) $(GPRFLAGS) -p -P "$(GPRPATH)" $(MAKE_ARGS)
 
 server build-server::
-	cd server && $(GNATMAKE) -m -p -P "porion_server" $(MAKE_ARGS)
+	cd server && $(GNATMAKE) $(GPRFLAGS) -p -P "porion_server" $(MAKE_ARGS)
 
 test:	build
 	bin/porion_harness -v -config test.properties -xml porion-aunit.xml

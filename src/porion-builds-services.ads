@@ -139,6 +139,11 @@ package Porion.Builds.Services is
 
 private
 
+   --  Returns True if the recipe is contained in the build queue.
+   function Contains (List   : in Porion.Builds.Models.Build_Queue_Vector;
+                      Recipe : in Porion.Builds.Models.Recipe_Ref) return Boolean
+      with Pre => not Recipe.Is_Null;
+
    function Get_Build_Directory (Service : in Context_Type) return String;
 
    procedure Build (Service     : in out Context_Type;

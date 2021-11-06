@@ -391,6 +391,14 @@ package Porion.Projects.Models is
    function Get_Main_Branch (Object : in Branch_Ref)
                  return Boolean;
 
+   --  Set the last build number that was used.
+   procedure Set_Last_Build_Number (Object : in out Branch_Ref;
+                                    Value  : in Integer);
+
+   --  Get the last build number that was used.
+   function Get_Last_Build_Number (Object : in Branch_Ref)
+                 return Integer;
+
    --
    procedure Set_Project (Object : in out Branch_Ref;
                           Value  : in Porion.Projects.Models.Project_Ref'Class);
@@ -703,10 +711,11 @@ private
    COL_11_2_NAME : aliased constant String := "build_rate";
    COL_12_2_NAME : aliased constant String := "rate_factor";
    COL_13_2_NAME : aliased constant String := "main_branch";
-   COL_14_2_NAME : aliased constant String := "project_id";
+   COL_14_2_NAME : aliased constant String := "last_build_number";
+   COL_15_2_NAME : aliased constant String := "project_id";
 
    BRANCH_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 15,
+     (Count   => 16,
       Table   => BRANCH_NAME'Access,
       Members => (
          1 => COL_0_2_NAME'Access,
@@ -723,7 +732,8 @@ private
          12 => COL_11_2_NAME'Access,
          13 => COL_12_2_NAME'Access,
          14 => COL_13_2_NAME'Access,
-         15 => COL_14_2_NAME'Access)
+         15 => COL_14_2_NAME'Access,
+         16 => COL_15_2_NAME'Access)
      );
    BRANCH_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := BRANCH_DEF'Access;
@@ -760,6 +770,7 @@ private
        Build_Rate : Integer;
        Rate_Factor : Integer;
        Main_Branch : Boolean;
+       Last_Build_Number : Integer;
        Project : Porion.Projects.Models.Project_Ref;
    end record;
 

@@ -851,6 +851,7 @@ package body Porion.Projects.Models is
       Impl.Build_Rate := 0;
       Impl.Rate_Factor := 0;
       Impl.Main_Branch := False;
+      Impl.Last_Build_Number := 0;
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Allocate;
 
@@ -1117,12 +1118,29 @@ package body Porion.Projects.Models is
    end Get_Main_Branch;
 
 
+   procedure Set_Last_Build_Number (Object : in out Branch_Ref;
+                                    Value  : in Integer) is
+      Impl : Branch_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Integer (Impl.all, 15, Impl.Last_Build_Number, Value);
+   end Set_Last_Build_Number;
+
+   function Get_Last_Build_Number (Object : in Branch_Ref)
+                  return Integer is
+      Impl : constant Branch_Access
+         := Branch_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Last_Build_Number;
+   end Get_Last_Build_Number;
+
+
    procedure Set_Project (Object : in out Branch_Ref;
                           Value  : in Porion.Projects.Models.Project_Ref'Class) is
       Impl : Branch_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 15, Impl.Project, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 16, Impl.Project, Value);
    end Set_Project;
 
    function Get_Project (Object : in Branch_Ref)
@@ -1160,6 +1178,7 @@ package body Porion.Projects.Models is
             Copy.Build_Rate := Impl.Build_Rate;
             Copy.Rate_Factor := Impl.Rate_Factor;
             Copy.Main_Branch := Impl.Main_Branch;
+            Copy.Last_Build_Number := Impl.Last_Build_Number;
             Copy.Project := Impl.Project;
          end;
       end if;
@@ -1351,9 +1370,14 @@ package body Porion.Projects.Models is
          Object.Clear_Modified (14);
       end if;
       if Object.Is_Modified (15) then
-         Stmt.Save_Field (Name  => COL_14_2_NAME, --  project_id
-                          Value => Object.Project);
+         Stmt.Save_Field (Name  => COL_14_2_NAME, --  last_build_number
+                          Value => Object.Last_Build_Number);
          Object.Clear_Modified (15);
+      end if;
+      if Object.Is_Modified (16) then
+         Stmt.Save_Field (Name  => COL_15_2_NAME, --  project_id
+                          Value => Object.Project);
+         Object.Clear_Modified (16);
       end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
@@ -1414,7 +1438,9 @@ package body Porion.Projects.Models is
                         Value => Object.Rate_Factor);
       Query.Save_Field (Name  => COL_13_2_NAME, --  main_branch
                         Value => Object.Main_Branch);
-      Query.Save_Field (Name  => COL_14_2_NAME, --  project_id
+      Query.Save_Field (Name  => COL_14_2_NAME, --  last_build_number
+                        Value => Object.Last_Build_Number);
+      Query.Save_Field (Name  => COL_15_2_NAME, --  project_id
                         Value => Object.Project);
       Query.Execute (Result);
       if Result /= 1 then
@@ -1478,6 +1504,8 @@ package body Porion.Projects.Models is
          return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Rate_Factor));
       elsif Name = "main_branch" then
          return Util.Beans.Objects.To_Object (Impl.Main_Branch);
+      elsif Name = "last_build_number" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Last_Build_Number));
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -1524,8 +1552,9 @@ package body Porion.Projects.Models is
       Object.Build_Rate := Stmt.Get_Integer (11);
       Object.Rate_Factor := Stmt.Get_Integer (12);
       Object.Main_Branch := Stmt.Get_Boolean (13);
-      if not Stmt.Is_Null (14) then
-         Object.Project.Set_Key_Value (Stmt.Get_Identifier (14), Session);
+      Object.Last_Build_Number := Stmt.Get_Integer (14);
+      if not Stmt.Is_Null (15) then
+         Object.Project.Set_Key_Value (Stmt.Get_Identifier (15), Session);
       end if;
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);

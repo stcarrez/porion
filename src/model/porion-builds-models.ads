@@ -83,13 +83,25 @@ package Porion.Builds.Models is
       Value   : Execution_Type;
    end record;
 
-   type Build_Ref is new ADO.Objects.Object_Ref with null record;
+   type Reason_Type is (REASON_MANUAL, REASON_SCM, REASON_UPSTREAM);
+   for Reason_Type use (REASON_MANUAL => 0, REASON_SCM => 1, REASON_UPSTREAM => 2);
+   package Reason_Type_Objects is
+      new Util.Beans.Objects.Enums (Reason_Type);
+
+   type Nullable_Reason_Type is record
+      Is_Null : Boolean := True;
+      Value   : Reason_Type;
+   end record;
 
    type Build_Executor_Ref is new ADO.Objects.Object_Ref with null record;
 
    type Recipe_Ref is new ADO.Objects.Object_Ref with null record;
 
+   type Build_Ref is new ADO.Objects.Object_Ref with null record;
+
    type Build_Queue_Ref is new ADO.Objects.Object_Ref with null record;
+
+   type Build_Reason_Ref is new ADO.Objects.Object_Ref with null record;
 
    type Recipe_Step_Ref is new ADO.Objects.Object_Ref with null record;
 
@@ -98,181 +110,6 @@ package Porion.Builds.Models is
    type Environment_Ref is new ADO.Objects.Object_Ref with null record;
 
    type Last_Build_Ref is new ADO.Objects.Object_Ref with null record;
-
-   --  Create an object key for Build.
-   function Build_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key;
-   --  Create an object key for Build from a string.
-   --  Raises Constraint_Error if the string cannot be converted into the object key.
-   function Build_Key (Id : in String) return ADO.Objects.Object_Key;
-
-   Null_Build : constant Build_Ref;
-   function "=" (Left, Right : Build_Ref'Class) return Boolean;
-
-   --  Set the build global identifier.
-   procedure Set_Id (Object : in out Build_Ref;
-                     Value  : in ADO.Identifier);
-
-   --  Get the build global identifier.
-   function Get_Id (Object : in Build_Ref)
-                 return ADO.Identifier;
-   --  Get the optimistic lock.
-   function Get_Version (Object : in Build_Ref)
-                 return Integer;
-
-   --  Set the project build number.
-   procedure Set_Number (Object : in out Build_Ref;
-                         Value  : in Integer);
-
-   --  Get the project build number.
-   function Get_Number (Object : in Build_Ref)
-                 return Integer;
-
-   --  Set the build creation date.
-   procedure Set_Create_Date (Object : in out Build_Ref;
-                              Value  : in Ada.Calendar.Time);
-
-   --  Get the build creation date.
-   function Get_Create_Date (Object : in Build_Ref)
-                 return Ada.Calendar.Time;
-
-   --  Set the date when the build was finished.
-   procedure Set_Finish_Date (Object : in out Build_Ref;
-                              Value  : in ADO.Nullable_Time);
-
-   --  Get the date when the build was finished.
-   function Get_Finish_Date (Object : in Build_Ref)
-                 return ADO.Nullable_Time;
-
-   --  Set the number of tests that passed.
-   procedure Set_Pass_Count (Object : in out Build_Ref;
-                             Value  : in Integer);
-
-   --  Get the number of tests that passed.
-   function Get_Pass_Count (Object : in Build_Ref)
-                 return Integer;
-
-   --  Set the number of tests that failed.
-   procedure Set_Fail_Count (Object : in out Build_Ref;
-                             Value  : in Integer);
-
-   --  Get the number of tests that failed.
-   function Get_Fail_Count (Object : in Build_Ref)
-                 return Integer;
-
-   --  Set the number of tests that timeout.
-   procedure Set_Timeout_Count (Object : in out Build_Ref;
-                                Value  : in Integer);
-
-   --  Get the number of tests that timeout.
-   function Get_Timeout_Count (Object : in Build_Ref)
-                 return Integer;
-
-   --  Set the test total duration in us.
-   procedure Set_Test_Duration (Object : in out Build_Ref;
-                                Value  : in Integer);
-
-   --  Get the test total duration in us.
-   function Get_Test_Duration (Object : in Build_Ref)
-                 return Integer;
-
-   --
-   procedure Set_Status (Object : in out Build_Ref;
-                         Value  : in Porion.Builds.Models.Build_Status_Type);
-
-   --
-   function Get_Status (Object : in Build_Ref)
-                 return Porion.Builds.Models.Build_Status_Type;
-
-   --  Set the source tag that was used when building the project.
-   procedure Set_Tag (Object : in out Build_Ref;
-                      Value  : in Ada.Strings.Unbounded.Unbounded_String);
-   procedure Set_Tag (Object : in out Build_Ref;
-                      Value : in String);
-
-   --  Get the source tag that was used when building the project.
-   function Get_Tag (Object : in Build_Ref)
-                 return Ada.Strings.Unbounded.Unbounded_String;
-   function Get_Tag (Object : in Build_Ref)
-                 return String;
-
-   --  Set the branch associated with the build.
-   procedure Set_Branch (Object : in out Build_Ref;
-                         Value  : in Porion.Projects.Models.Branch_Ref'Class);
-
-   --  Get the branch associated with the build.
-   function Get_Branch (Object : in Build_Ref)
-                 return Porion.Projects.Models.Branch_Ref'Class;
-
-   --  Set the recipe used for the build.
-   procedure Set_Recipe (Object : in out Build_Ref;
-                         Value  : in Porion.Builds.Models.Recipe_Ref'Class);
-
-   --  Get the recipe used for the build.
-   function Get_Recipe (Object : in Build_Ref)
-                 return Porion.Builds.Models.Recipe_Ref'Class;
-
-   --  Set the node where the build was made.
-   procedure Set_Node (Object : in out Build_Ref;
-                       Value  : in Porion.Nodes.Models.Node_Ref'Class);
-
-   --  Get the node where the build was made.
-   function Get_Node (Object : in Build_Ref)
-                 return Porion.Nodes.Models.Node_Ref'Class;
-
-   --  Set the project.
-   procedure Set_Project (Object : in out Build_Ref;
-                          Value  : in Porion.Projects.Models.Project_Ref'Class);
-
-   --  Get the project.
-   function Get_Project (Object : in Build_Ref)
-                 return Porion.Projects.Models.Project_Ref'Class;
-
-   --  Load the entity identified by 'Id'.
-   --  Raises the NOT_FOUND exception if it does not exist.
-   procedure Load (Object  : in out Build_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Id      : in ADO.Identifier);
-
-   --  Load the entity identified by 'Id'.
-   --  Returns True in <b>Found</b> if the object was found and False if it does not exist.
-   procedure Load (Object  : in out Build_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Id      : in ADO.Identifier;
-                   Found   : out Boolean);
-
-   --  Find and load the entity.
-   overriding
-   procedure Find (Object  : in out Build_Ref;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Query   : in ADO.SQL.Query'Class;
-                   Found   : out Boolean);
-
-   --  Save the entity.  If the entity does not have an identifier, an identifier is allocated
-   --  and it is inserted in the table.  Otherwise, only data fields which have been changed
-   --  are updated.
-   overriding
-   procedure Save (Object  : in out Build_Ref;
-                   Session : in out ADO.Sessions.Master_Session'Class);
-
-   --  Delete the entity.
-   overriding
-   procedure Delete (Object  : in out Build_Ref;
-                     Session : in out ADO.Sessions.Master_Session'Class);
-
-   overriding
-   function Get_Value (From : in Build_Ref;
-                       Name : in String) return Util.Beans.Objects.Object;
-
-   --  Table definition
-   BUILD_TABLE : constant ADO.Schemas.Class_Mapping_Access;
-
-   --  Internal method to allocate the Object_Record instance
-   overriding
-   procedure Allocate (Object : in out Build_Ref);
-
-   --  Copy of the object.
-   procedure Copy (Object : in Build_Ref;
-                   Into   : in out Build_Ref);
 
    --  --------------------
    --  Tracks a porion agent that is building something.
@@ -539,6 +376,181 @@ package Porion.Builds.Models is
    procedure List (Object  : in out Recipe_Vector;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class);
+   --  Create an object key for Build.
+   function Build_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key;
+   --  Create an object key for Build from a string.
+   --  Raises Constraint_Error if the string cannot be converted into the object key.
+   function Build_Key (Id : in String) return ADO.Objects.Object_Key;
+
+   Null_Build : constant Build_Ref;
+   function "=" (Left, Right : Build_Ref'Class) return Boolean;
+
+   --  Set the build global identifier.
+   procedure Set_Id (Object : in out Build_Ref;
+                     Value  : in ADO.Identifier);
+
+   --  Get the build global identifier.
+   function Get_Id (Object : in Build_Ref)
+                 return ADO.Identifier;
+   --  Get the optimistic lock.
+   function Get_Version (Object : in Build_Ref)
+                 return Integer;
+
+   --  Set the project build number.
+   procedure Set_Number (Object : in out Build_Ref;
+                         Value  : in Integer);
+
+   --  Get the project build number.
+   function Get_Number (Object : in Build_Ref)
+                 return Integer;
+
+   --  Set the build creation date.
+   procedure Set_Create_Date (Object : in out Build_Ref;
+                              Value  : in Ada.Calendar.Time);
+
+   --  Get the build creation date.
+   function Get_Create_Date (Object : in Build_Ref)
+                 return Ada.Calendar.Time;
+
+   --  Set the date when the build was finished.
+   procedure Set_Finish_Date (Object : in out Build_Ref;
+                              Value  : in ADO.Nullable_Time);
+
+   --  Get the date when the build was finished.
+   function Get_Finish_Date (Object : in Build_Ref)
+                 return ADO.Nullable_Time;
+
+   --  Set the number of tests that passed.
+   procedure Set_Pass_Count (Object : in out Build_Ref;
+                             Value  : in Integer);
+
+   --  Get the number of tests that passed.
+   function Get_Pass_Count (Object : in Build_Ref)
+                 return Integer;
+
+   --  Set the number of tests that failed.
+   procedure Set_Fail_Count (Object : in out Build_Ref;
+                             Value  : in Integer);
+
+   --  Get the number of tests that failed.
+   function Get_Fail_Count (Object : in Build_Ref)
+                 return Integer;
+
+   --  Set the number of tests that timeout.
+   procedure Set_Timeout_Count (Object : in out Build_Ref;
+                                Value  : in Integer);
+
+   --  Get the number of tests that timeout.
+   function Get_Timeout_Count (Object : in Build_Ref)
+                 return Integer;
+
+   --  Set the test total duration in us.
+   procedure Set_Test_Duration (Object : in out Build_Ref;
+                                Value  : in Integer);
+
+   --  Get the test total duration in us.
+   function Get_Test_Duration (Object : in Build_Ref)
+                 return Integer;
+
+   --
+   procedure Set_Status (Object : in out Build_Ref;
+                         Value  : in Porion.Builds.Models.Build_Status_Type);
+
+   --
+   function Get_Status (Object : in Build_Ref)
+                 return Porion.Builds.Models.Build_Status_Type;
+
+   --  Set the source tag that was used when building the project.
+   procedure Set_Tag (Object : in out Build_Ref;
+                      Value  : in Ada.Strings.Unbounded.Unbounded_String);
+   procedure Set_Tag (Object : in out Build_Ref;
+                      Value : in String);
+
+   --  Get the source tag that was used when building the project.
+   function Get_Tag (Object : in Build_Ref)
+                 return Ada.Strings.Unbounded.Unbounded_String;
+   function Get_Tag (Object : in Build_Ref)
+                 return String;
+
+   --  Set the branch associated with the build.
+   procedure Set_Branch (Object : in out Build_Ref;
+                         Value  : in Porion.Projects.Models.Branch_Ref'Class);
+
+   --  Get the branch associated with the build.
+   function Get_Branch (Object : in Build_Ref)
+                 return Porion.Projects.Models.Branch_Ref'Class;
+
+   --  Set the recipe used for the build.
+   procedure Set_Recipe (Object : in out Build_Ref;
+                         Value  : in Porion.Builds.Models.Recipe_Ref'Class);
+
+   --  Get the recipe used for the build.
+   function Get_Recipe (Object : in Build_Ref)
+                 return Porion.Builds.Models.Recipe_Ref'Class;
+
+   --  Set the node where the build was made.
+   procedure Set_Node (Object : in out Build_Ref;
+                       Value  : in Porion.Nodes.Models.Node_Ref'Class);
+
+   --  Get the node where the build was made.
+   function Get_Node (Object : in Build_Ref)
+                 return Porion.Nodes.Models.Node_Ref'Class;
+
+   --  Set the project.
+   procedure Set_Project (Object : in out Build_Ref;
+                          Value  : in Porion.Projects.Models.Project_Ref'Class);
+
+   --  Get the project.
+   function Get_Project (Object : in Build_Ref)
+                 return Porion.Projects.Models.Project_Ref'Class;
+
+   --  Load the entity identified by 'Id'.
+   --  Raises the NOT_FOUND exception if it does not exist.
+   procedure Load (Object  : in out Build_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Id      : in ADO.Identifier);
+
+   --  Load the entity identified by 'Id'.
+   --  Returns True in <b>Found</b> if the object was found and False if it does not exist.
+   procedure Load (Object  : in out Build_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Id      : in ADO.Identifier;
+                   Found   : out Boolean);
+
+   --  Find and load the entity.
+   overriding
+   procedure Find (Object  : in out Build_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class;
+                   Found   : out Boolean);
+
+   --  Save the entity.  If the entity does not have an identifier, an identifier is allocated
+   --  and it is inserted in the table.  Otherwise, only data fields which have been changed
+   --  are updated.
+   overriding
+   procedure Save (Object  : in out Build_Ref;
+                   Session : in out ADO.Sessions.Master_Session'Class);
+
+   --  Delete the entity.
+   overriding
+   procedure Delete (Object  : in out Build_Ref;
+                     Session : in out ADO.Sessions.Master_Session'Class);
+
+   overriding
+   function Get_Value (From : in Build_Ref;
+                       Name : in String) return Util.Beans.Objects.Object;
+
+   --  Table definition
+   BUILD_TABLE : constant ADO.Schemas.Class_Mapping_Access;
+
+   --  Internal method to allocate the Object_Record instance
+   overriding
+   procedure Allocate (Object : in out Build_Ref);
+
+   --  Copy of the object.
+   procedure Copy (Object : in Build_Ref;
+                   Into   : in out Build_Ref);
+
    --  Create an object key for Build_Queue.
    function Build_Queue_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key;
    --  Create an object key for Build_Queue from a string.
@@ -661,6 +673,122 @@ package Porion.Builds.Models is
    subtype Build_Queue_Vector is Build_Queue_Vectors.Vector;
 
    procedure List (Object  : in out Build_Queue_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class);
+   --  Create an object key for Build_Reason.
+   function Build_Reason_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key;
+   --  Create an object key for Build_Reason from a string.
+   --  Raises Constraint_Error if the string cannot be converted into the object key.
+   function Build_Reason_Key (Id : in String) return ADO.Objects.Object_Key;
+
+   Null_Build_Reason : constant Build_Reason_Ref;
+   function "=" (Left, Right : Build_Reason_Ref'Class) return Boolean;
+
+   --  Set the build reason identifier.
+   procedure Set_Id (Object : in out Build_Reason_Ref;
+                     Value  : in ADO.Identifier);
+
+   --  Get the build reason identifier.
+   function Get_Id (Object : in Build_Reason_Ref)
+                 return ADO.Identifier;
+
+   --  Set the creation date of this build reason.
+   procedure Set_Create_Date (Object : in out Build_Reason_Ref;
+                              Value  : in Ada.Calendar.Time);
+
+   --  Get the creation date of this build reason.
+   function Get_Create_Date (Object : in Build_Reason_Ref)
+                 return Ada.Calendar.Time;
+   --  Get the optimistic lock version.
+   function Get_Version (Object : in Build_Reason_Ref)
+                 return Integer;
+
+   --  Set the reason for triggering the build.
+   procedure Set_Reason (Object : in out Build_Reason_Ref;
+                         Value  : in Porion.Builds.Models.Reason_Type);
+
+   --  Get the reason for triggering the build.
+   function Get_Reason (Object : in Build_Reason_Ref)
+                 return Porion.Builds.Models.Reason_Type;
+
+   --
+   procedure Set_Build (Object : in out Build_Reason_Ref;
+                        Value  : in Porion.Builds.Models.Build_Ref'Class);
+
+   --
+   function Get_Build (Object : in Build_Reason_Ref)
+                 return Porion.Builds.Models.Build_Ref'Class;
+
+   --
+   procedure Set_Queue (Object : in out Build_Reason_Ref;
+                        Value  : in Porion.Builds.Models.Build_Queue_Ref'Class);
+
+   --
+   function Get_Queue (Object : in Build_Reason_Ref)
+                 return Porion.Builds.Models.Build_Queue_Ref'Class;
+
+   --
+   procedure Set_Upstream_Build (Object : in out Build_Reason_Ref;
+                                 Value  : in Porion.Builds.Models.Build_Ref'Class);
+
+   --
+   function Get_Upstream_Build (Object : in Build_Reason_Ref)
+                 return Porion.Builds.Models.Build_Ref'Class;
+
+   --  Load the entity identified by 'Id'.
+   --  Raises the NOT_FOUND exception if it does not exist.
+   procedure Load (Object  : in out Build_Reason_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Id      : in ADO.Identifier);
+
+   --  Load the entity identified by 'Id'.
+   --  Returns True in <b>Found</b> if the object was found and False if it does not exist.
+   procedure Load (Object  : in out Build_Reason_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Id      : in ADO.Identifier;
+                   Found   : out Boolean);
+
+   --  Find and load the entity.
+   overriding
+   procedure Find (Object  : in out Build_Reason_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class;
+                   Found   : out Boolean);
+
+   --  Save the entity.  If the entity does not have an identifier, an identifier is allocated
+   --  and it is inserted in the table.  Otherwise, only data fields which have been changed
+   --  are updated.
+   overriding
+   procedure Save (Object  : in out Build_Reason_Ref;
+                   Session : in out ADO.Sessions.Master_Session'Class);
+
+   --  Delete the entity.
+   overriding
+   procedure Delete (Object  : in out Build_Reason_Ref;
+                     Session : in out ADO.Sessions.Master_Session'Class);
+
+   overriding
+   function Get_Value (From : in Build_Reason_Ref;
+                       Name : in String) return Util.Beans.Objects.Object;
+
+   --  Table definition
+   BUILD_REASON_TABLE : constant ADO.Schemas.Class_Mapping_Access;
+
+   --  Internal method to allocate the Object_Record instance
+   overriding
+   procedure Allocate (Object : in out Build_Reason_Ref);
+
+   --  Copy of the object.
+   procedure Copy (Object : in Build_Reason_Ref;
+                   Into   : in out Build_Reason_Ref);
+
+   package Build_Reason_Vectors is
+      new Ada.Containers.Vectors (Index_Type   => Positive,
+                                  Element_Type => Build_Reason_Ref,
+                                  "="          => "=");
+   subtype Build_Reason_Vector is Build_Reason_Vectors.Vector;
+
+   procedure List (Object  : in out Build_Reason_Vector;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class);
    --  --------------------
@@ -1231,119 +1359,24 @@ package Porion.Builds.Models is
 
 
 private
-   BUILD_NAME : aliased constant String := "porion_build";
+   BUILD_EXECUTOR_NAME : aliased constant String := "porion_build_executor";
    COL_0_1_NAME : aliased constant String := "id";
    COL_1_1_NAME : aliased constant String := "version";
-   COL_2_1_NAME : aliased constant String := "number";
-   COL_3_1_NAME : aliased constant String := "create_date";
-   COL_4_1_NAME : aliased constant String := "finish_date";
-   COL_5_1_NAME : aliased constant String := "pass_count";
-   COL_6_1_NAME : aliased constant String := "fail_count";
-   COL_7_1_NAME : aliased constant String := "timeout_count";
-   COL_8_1_NAME : aliased constant String := "test_duration";
-   COL_9_1_NAME : aliased constant String := "status";
-   COL_10_1_NAME : aliased constant String := "tag";
-   COL_11_1_NAME : aliased constant String := "branch_id";
-   COL_12_1_NAME : aliased constant String := "recipe_id";
-   COL_13_1_NAME : aliased constant String := "node_id";
-   COL_14_1_NAME : aliased constant String := "project_id";
+   COL_2_1_NAME : aliased constant String := "pid";
+   COL_3_1_NAME : aliased constant String := "start_date";
+   COL_4_1_NAME : aliased constant String := "port";
+   COL_5_1_NAME : aliased constant String := "node_id";
 
-   BUILD_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 15,
-      Table   => BUILD_NAME'Access,
+   BUILD_EXECUTOR_DEF : aliased constant ADO.Schemas.Class_Mapping :=
+     (Count   => 6,
+      Table   => BUILD_EXECUTOR_NAME'Access,
       Members => (
          1 => COL_0_1_NAME'Access,
          2 => COL_1_1_NAME'Access,
          3 => COL_2_1_NAME'Access,
          4 => COL_3_1_NAME'Access,
          5 => COL_4_1_NAME'Access,
-         6 => COL_5_1_NAME'Access,
-         7 => COL_6_1_NAME'Access,
-         8 => COL_7_1_NAME'Access,
-         9 => COL_8_1_NAME'Access,
-         10 => COL_9_1_NAME'Access,
-         11 => COL_10_1_NAME'Access,
-         12 => COL_11_1_NAME'Access,
-         13 => COL_12_1_NAME'Access,
-         14 => COL_13_1_NAME'Access,
-         15 => COL_14_1_NAME'Access)
-     );
-   BUILD_TABLE : constant ADO.Schemas.Class_Mapping_Access
-      := BUILD_DEF'Access;
-
-
-   Null_Build : constant Build_Ref
-      := Build_Ref'(ADO.Objects.Object_Ref with null record);
-
-   type Build_Impl is
-      new ADO.Objects.Object_Record (Key_Type => ADO.Objects.KEY_INTEGER,
-                                     Of_Class => BUILD_DEF'Access)
-   with record
-       Version : Integer;
-       Number : Integer;
-       Create_Date : Ada.Calendar.Time;
-       Finish_Date : ADO.Nullable_Time;
-       Pass_Count : Integer;
-       Fail_Count : Integer;
-       Timeout_Count : Integer;
-       Test_Duration : Integer;
-       Status : Porion.Builds.Models.Build_Status_Type;
-       Tag : Ada.Strings.Unbounded.Unbounded_String;
-       Branch : Porion.Projects.Models.Branch_Ref;
-       Recipe : Porion.Builds.Models.Recipe_Ref;
-       Node : Porion.Nodes.Models.Node_Ref;
-       Project : Porion.Projects.Models.Project_Ref;
-   end record;
-
-   type Build_Access is access all Build_Impl;
-
-   overriding
-   procedure Destroy (Object : access Build_Impl);
-
-   overriding
-   procedure Find (Object  : in out Build_Impl;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Query   : in ADO.SQL.Query'Class;
-                   Found   : out Boolean);
-
-   overriding
-   procedure Load (Object  : in out Build_Impl;
-                   Session : in out ADO.Sessions.Session'Class);
-   procedure Load (Object  : in out Build_Impl;
-                   Stmt    : in out ADO.Statements.Query_Statement'Class;
-                   Session : in out ADO.Sessions.Session'Class);
-
-   overriding
-   procedure Save (Object  : in out Build_Impl;
-                   Session : in out ADO.Sessions.Master_Session'Class);
-
-   procedure Create (Object  : in out Build_Impl;
-                     Session : in out ADO.Sessions.Master_Session'Class);
-
-   overriding
-   procedure Delete (Object  : in out Build_Impl;
-                     Session : in out ADO.Sessions.Master_Session'Class);
-
-   procedure Set_Field (Object : in out Build_Ref'Class;
-                        Impl   : out Build_Access);
-   BUILD_EXECUTOR_NAME : aliased constant String := "porion_build_executor";
-   COL_0_2_NAME : aliased constant String := "id";
-   COL_1_2_NAME : aliased constant String := "version";
-   COL_2_2_NAME : aliased constant String := "pid";
-   COL_3_2_NAME : aliased constant String := "start_date";
-   COL_4_2_NAME : aliased constant String := "port";
-   COL_5_2_NAME : aliased constant String := "node_id";
-
-   BUILD_EXECUTOR_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 6,
-      Table   => BUILD_EXECUTOR_NAME'Access,
-      Members => (
-         1 => COL_0_2_NAME'Access,
-         2 => COL_1_2_NAME'Access,
-         3 => COL_2_2_NAME'Access,
-         4 => COL_3_2_NAME'Access,
-         5 => COL_4_2_NAME'Access,
-         6 => COL_5_2_NAME'Access)
+         6 => COL_5_1_NAME'Access)
      );
    BUILD_EXECUTOR_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := BUILD_EXECUTOR_DEF'Access;
@@ -1395,31 +1428,31 @@ private
    procedure Set_Field (Object : in out Build_Executor_Ref'Class;
                         Impl   : out Build_Executor_Access);
    RECIPE_NAME : aliased constant String := "porion_recipe";
-   COL_0_3_NAME : aliased constant String := "id";
-   COL_1_3_NAME : aliased constant String := "version";
-   COL_2_3_NAME : aliased constant String := "name";
-   COL_3_3_NAME : aliased constant String := "description";
-   COL_4_3_NAME : aliased constant String := "status";
-   COL_5_3_NAME : aliased constant String := "rate_factor";
-   COL_6_3_NAME : aliased constant String := "main_recipe";
-   COL_7_3_NAME : aliased constant String := "node_id";
-   COL_8_3_NAME : aliased constant String := "branch_id";
-   COL_9_3_NAME : aliased constant String := "project_id";
+   COL_0_2_NAME : aliased constant String := "id";
+   COL_1_2_NAME : aliased constant String := "version";
+   COL_2_2_NAME : aliased constant String := "name";
+   COL_3_2_NAME : aliased constant String := "description";
+   COL_4_2_NAME : aliased constant String := "status";
+   COL_5_2_NAME : aliased constant String := "rate_factor";
+   COL_6_2_NAME : aliased constant String := "main_recipe";
+   COL_7_2_NAME : aliased constant String := "node_id";
+   COL_8_2_NAME : aliased constant String := "branch_id";
+   COL_9_2_NAME : aliased constant String := "project_id";
 
    RECIPE_DEF : aliased constant ADO.Schemas.Class_Mapping :=
      (Count   => 10,
       Table   => RECIPE_NAME'Access,
       Members => (
-         1 => COL_0_3_NAME'Access,
-         2 => COL_1_3_NAME'Access,
-         3 => COL_2_3_NAME'Access,
-         4 => COL_3_3_NAME'Access,
-         5 => COL_4_3_NAME'Access,
-         6 => COL_5_3_NAME'Access,
-         7 => COL_6_3_NAME'Access,
-         8 => COL_7_3_NAME'Access,
-         9 => COL_8_3_NAME'Access,
-         10 => COL_9_3_NAME'Access)
+         1 => COL_0_2_NAME'Access,
+         2 => COL_1_2_NAME'Access,
+         3 => COL_2_2_NAME'Access,
+         4 => COL_3_2_NAME'Access,
+         5 => COL_4_2_NAME'Access,
+         6 => COL_5_2_NAME'Access,
+         7 => COL_6_2_NAME'Access,
+         8 => COL_7_2_NAME'Access,
+         9 => COL_8_2_NAME'Access,
+         10 => COL_9_2_NAME'Access)
      );
    RECIPE_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := RECIPE_DEF'Access;
@@ -1487,6 +1520,101 @@ private
 
    procedure Set_Field (Object : in out Recipe_Ref'Class;
                         Impl   : out Recipe_Access);
+   BUILD_NAME : aliased constant String := "porion_build";
+   COL_0_3_NAME : aliased constant String := "id";
+   COL_1_3_NAME : aliased constant String := "version";
+   COL_2_3_NAME : aliased constant String := "number";
+   COL_3_3_NAME : aliased constant String := "create_date";
+   COL_4_3_NAME : aliased constant String := "finish_date";
+   COL_5_3_NAME : aliased constant String := "pass_count";
+   COL_6_3_NAME : aliased constant String := "fail_count";
+   COL_7_3_NAME : aliased constant String := "timeout_count";
+   COL_8_3_NAME : aliased constant String := "test_duration";
+   COL_9_3_NAME : aliased constant String := "status";
+   COL_10_3_NAME : aliased constant String := "tag";
+   COL_11_3_NAME : aliased constant String := "branch_id";
+   COL_12_3_NAME : aliased constant String := "recipe_id";
+   COL_13_3_NAME : aliased constant String := "node_id";
+   COL_14_3_NAME : aliased constant String := "project_id";
+
+   BUILD_DEF : aliased constant ADO.Schemas.Class_Mapping :=
+     (Count   => 15,
+      Table   => BUILD_NAME'Access,
+      Members => (
+         1 => COL_0_3_NAME'Access,
+         2 => COL_1_3_NAME'Access,
+         3 => COL_2_3_NAME'Access,
+         4 => COL_3_3_NAME'Access,
+         5 => COL_4_3_NAME'Access,
+         6 => COL_5_3_NAME'Access,
+         7 => COL_6_3_NAME'Access,
+         8 => COL_7_3_NAME'Access,
+         9 => COL_8_3_NAME'Access,
+         10 => COL_9_3_NAME'Access,
+         11 => COL_10_3_NAME'Access,
+         12 => COL_11_3_NAME'Access,
+         13 => COL_12_3_NAME'Access,
+         14 => COL_13_3_NAME'Access,
+         15 => COL_14_3_NAME'Access)
+     );
+   BUILD_TABLE : constant ADO.Schemas.Class_Mapping_Access
+      := BUILD_DEF'Access;
+
+
+   Null_Build : constant Build_Ref
+      := Build_Ref'(ADO.Objects.Object_Ref with null record);
+
+   type Build_Impl is
+      new ADO.Objects.Object_Record (Key_Type => ADO.Objects.KEY_INTEGER,
+                                     Of_Class => BUILD_DEF'Access)
+   with record
+       Version : Integer;
+       Number : Integer;
+       Create_Date : Ada.Calendar.Time;
+       Finish_Date : ADO.Nullable_Time;
+       Pass_Count : Integer;
+       Fail_Count : Integer;
+       Timeout_Count : Integer;
+       Test_Duration : Integer;
+       Status : Porion.Builds.Models.Build_Status_Type;
+       Tag : Ada.Strings.Unbounded.Unbounded_String;
+       Branch : Porion.Projects.Models.Branch_Ref;
+       Recipe : Porion.Builds.Models.Recipe_Ref;
+       Node : Porion.Nodes.Models.Node_Ref;
+       Project : Porion.Projects.Models.Project_Ref;
+   end record;
+
+   type Build_Access is access all Build_Impl;
+
+   overriding
+   procedure Destroy (Object : access Build_Impl);
+
+   overriding
+   procedure Find (Object  : in out Build_Impl;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class;
+                   Found   : out Boolean);
+
+   overriding
+   procedure Load (Object  : in out Build_Impl;
+                   Session : in out ADO.Sessions.Session'Class);
+   procedure Load (Object  : in out Build_Impl;
+                   Stmt    : in out ADO.Statements.Query_Statement'Class;
+                   Session : in out ADO.Sessions.Session'Class);
+
+   overriding
+   procedure Save (Object  : in out Build_Impl;
+                   Session : in out ADO.Sessions.Master_Session'Class);
+
+   procedure Create (Object  : in out Build_Impl;
+                     Session : in out ADO.Sessions.Master_Session'Class);
+
+   overriding
+   procedure Delete (Object  : in out Build_Impl;
+                     Session : in out ADO.Sessions.Master_Session'Class);
+
+   procedure Set_Field (Object : in out Build_Ref'Class;
+                        Impl   : out Build_Access);
    BUILD_QUEUE_NAME : aliased constant String := "porion_build_queue";
    COL_0_4_NAME : aliased constant String := "id";
    COL_1_4_NAME : aliased constant String := "version";
@@ -1561,21 +1689,18 @@ private
 
    procedure Set_Field (Object : in out Build_Queue_Ref'Class;
                         Impl   : out Build_Queue_Access);
-   RECIPE_STEP_NAME : aliased constant String := "porion_recipe_step";
+   BUILD_REASON_NAME : aliased constant String := "porion_build_reason";
    COL_0_5_NAME : aliased constant String := "id";
-   COL_1_5_NAME : aliased constant String := "parameters";
-   COL_2_5_NAME : aliased constant String := "number";
-   COL_3_5_NAME : aliased constant String := "builder";
-   COL_4_5_NAME : aliased constant String := "timeout";
-   COL_5_5_NAME : aliased constant String := "step";
-   COL_6_5_NAME : aliased constant String := "version";
-   COL_7_5_NAME : aliased constant String := "execution";
-   COL_8_5_NAME : aliased constant String := "previous_version_id";
-   COL_9_5_NAME : aliased constant String := "recipe_id";
+   COL_1_5_NAME : aliased constant String := "create_date";
+   COL_2_5_NAME : aliased constant String := "version";
+   COL_3_5_NAME : aliased constant String := "reason";
+   COL_4_5_NAME : aliased constant String := "build_id";
+   COL_5_5_NAME : aliased constant String := "queue_id";
+   COL_6_5_NAME : aliased constant String := "upstream_build_id";
 
-   RECIPE_STEP_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 10,
-      Table   => RECIPE_STEP_NAME'Access,
+   BUILD_REASON_DEF : aliased constant ADO.Schemas.Class_Mapping :=
+     (Count   => 7,
+      Table   => BUILD_REASON_NAME'Access,
       Members => (
          1 => COL_0_5_NAME'Access,
          2 => COL_1_5_NAME'Access,
@@ -1583,10 +1708,84 @@ private
          4 => COL_3_5_NAME'Access,
          5 => COL_4_5_NAME'Access,
          6 => COL_5_5_NAME'Access,
-         7 => COL_6_5_NAME'Access,
-         8 => COL_7_5_NAME'Access,
-         9 => COL_8_5_NAME'Access,
-         10 => COL_9_5_NAME'Access)
+         7 => COL_6_5_NAME'Access)
+     );
+   BUILD_REASON_TABLE : constant ADO.Schemas.Class_Mapping_Access
+      := BUILD_REASON_DEF'Access;
+
+
+   Null_Build_Reason : constant Build_Reason_Ref
+      := Build_Reason_Ref'(ADO.Objects.Object_Ref with null record);
+
+   type Build_Reason_Impl is
+      new ADO.Objects.Object_Record (Key_Type => ADO.Objects.KEY_INTEGER,
+                                     Of_Class => BUILD_REASON_DEF'Access)
+   with record
+       Create_Date : Ada.Calendar.Time;
+       Version : Integer;
+       Reason : Porion.Builds.Models.Reason_Type;
+       Build : Porion.Builds.Models.Build_Ref;
+       Queue : Porion.Builds.Models.Build_Queue_Ref;
+       Upstream_Build : Porion.Builds.Models.Build_Ref;
+   end record;
+
+   type Build_Reason_Access is access all Build_Reason_Impl;
+
+   overriding
+   procedure Destroy (Object : access Build_Reason_Impl);
+
+   overriding
+   procedure Find (Object  : in out Build_Reason_Impl;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class;
+                   Found   : out Boolean);
+
+   overriding
+   procedure Load (Object  : in out Build_Reason_Impl;
+                   Session : in out ADO.Sessions.Session'Class);
+   procedure Load (Object  : in out Build_Reason_Impl;
+                   Stmt    : in out ADO.Statements.Query_Statement'Class;
+                   Session : in out ADO.Sessions.Session'Class);
+
+   overriding
+   procedure Save (Object  : in out Build_Reason_Impl;
+                   Session : in out ADO.Sessions.Master_Session'Class);
+
+   procedure Create (Object  : in out Build_Reason_Impl;
+                     Session : in out ADO.Sessions.Master_Session'Class);
+
+   overriding
+   procedure Delete (Object  : in out Build_Reason_Impl;
+                     Session : in out ADO.Sessions.Master_Session'Class);
+
+   procedure Set_Field (Object : in out Build_Reason_Ref'Class;
+                        Impl   : out Build_Reason_Access);
+   RECIPE_STEP_NAME : aliased constant String := "porion_recipe_step";
+   COL_0_6_NAME : aliased constant String := "id";
+   COL_1_6_NAME : aliased constant String := "parameters";
+   COL_2_6_NAME : aliased constant String := "number";
+   COL_3_6_NAME : aliased constant String := "builder";
+   COL_4_6_NAME : aliased constant String := "timeout";
+   COL_5_6_NAME : aliased constant String := "step";
+   COL_6_6_NAME : aliased constant String := "version";
+   COL_7_6_NAME : aliased constant String := "execution";
+   COL_8_6_NAME : aliased constant String := "previous_version_id";
+   COL_9_6_NAME : aliased constant String := "recipe_id";
+
+   RECIPE_STEP_DEF : aliased constant ADO.Schemas.Class_Mapping :=
+     (Count   => 10,
+      Table   => RECIPE_STEP_NAME'Access,
+      Members => (
+         1 => COL_0_6_NAME'Access,
+         2 => COL_1_6_NAME'Access,
+         3 => COL_2_6_NAME'Access,
+         4 => COL_3_6_NAME'Access,
+         5 => COL_4_6_NAME'Access,
+         6 => COL_5_6_NAME'Access,
+         7 => COL_6_6_NAME'Access,
+         8 => COL_7_6_NAME'Access,
+         9 => COL_8_6_NAME'Access,
+         10 => COL_9_6_NAME'Access)
      );
    RECIPE_STEP_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := RECIPE_STEP_DEF'Access;
@@ -1642,23 +1841,23 @@ private
    procedure Set_Field (Object : in out Recipe_Step_Ref'Class;
                         Impl   : out Recipe_Step_Access);
    BUILD_STEP_NAME : aliased constant String := "porion_build_step";
-   COL_0_6_NAME : aliased constant String := "id";
-   COL_1_6_NAME : aliased constant String := "start_date";
-   COL_2_6_NAME : aliased constant String := "end_date";
-   COL_3_6_NAME : aliased constant String := "exit_status";
-   COL_4_6_NAME : aliased constant String := "build_id";
-   COL_5_6_NAME : aliased constant String := "recipe_step_id";
+   COL_0_7_NAME : aliased constant String := "id";
+   COL_1_7_NAME : aliased constant String := "start_date";
+   COL_2_7_NAME : aliased constant String := "end_date";
+   COL_3_7_NAME : aliased constant String := "exit_status";
+   COL_4_7_NAME : aliased constant String := "build_id";
+   COL_5_7_NAME : aliased constant String := "recipe_step_id";
 
    BUILD_STEP_DEF : aliased constant ADO.Schemas.Class_Mapping :=
      (Count   => 6,
       Table   => BUILD_STEP_NAME'Access,
       Members => (
-         1 => COL_0_6_NAME'Access,
-         2 => COL_1_6_NAME'Access,
-         3 => COL_2_6_NAME'Access,
-         4 => COL_3_6_NAME'Access,
-         5 => COL_4_6_NAME'Access,
-         6 => COL_5_6_NAME'Access)
+         1 => COL_0_7_NAME'Access,
+         2 => COL_1_7_NAME'Access,
+         3 => COL_2_7_NAME'Access,
+         4 => COL_3_7_NAME'Access,
+         5 => COL_4_7_NAME'Access,
+         6 => COL_5_7_NAME'Access)
      );
    BUILD_STEP_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := BUILD_STEP_DEF'Access;
@@ -1710,23 +1909,23 @@ private
    procedure Set_Field (Object : in out Build_Step_Ref'Class;
                         Impl   : out Build_Step_Access);
    ENVIRONMENT_NAME : aliased constant String := "porion_environment";
-   COL_0_7_NAME : aliased constant String := "id";
-   COL_1_7_NAME : aliased constant String := "version";
-   COL_2_7_NAME : aliased constant String := "name";
-   COL_3_7_NAME : aliased constant String := "value";
-   COL_4_7_NAME : aliased constant String := "node_id";
-   COL_5_7_NAME : aliased constant String := "recipe_id";
+   COL_0_8_NAME : aliased constant String := "id";
+   COL_1_8_NAME : aliased constant String := "version";
+   COL_2_8_NAME : aliased constant String := "name";
+   COL_3_8_NAME : aliased constant String := "value";
+   COL_4_8_NAME : aliased constant String := "node_id";
+   COL_5_8_NAME : aliased constant String := "recipe_id";
 
    ENVIRONMENT_DEF : aliased constant ADO.Schemas.Class_Mapping :=
      (Count   => 6,
       Table   => ENVIRONMENT_NAME'Access,
       Members => (
-         1 => COL_0_7_NAME'Access,
-         2 => COL_1_7_NAME'Access,
-         3 => COL_2_7_NAME'Access,
-         4 => COL_3_7_NAME'Access,
-         5 => COL_4_7_NAME'Access,
-         6 => COL_5_7_NAME'Access)
+         1 => COL_0_8_NAME'Access,
+         2 => COL_1_8_NAME'Access,
+         3 => COL_2_8_NAME'Access,
+         4 => COL_3_8_NAME'Access,
+         5 => COL_4_8_NAME'Access,
+         6 => COL_5_8_NAME'Access)
      );
    ENVIRONMENT_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := ENVIRONMENT_DEF'Access;
@@ -1787,23 +1986,23 @@ private
    procedure Set_Field (Object : in out Environment_Ref'Class;
                         Impl   : out Environment_Access);
    LAST_BUILD_NAME : aliased constant String := "porion_last_build";
-   COL_0_8_NAME : aliased constant String := "id";
-   COL_1_8_NAME : aliased constant String := "status";
-   COL_2_8_NAME : aliased constant String := "version";
-   COL_3_8_NAME : aliased constant String := "build_id";
-   COL_4_8_NAME : aliased constant String := "branch_id";
-   COL_5_8_NAME : aliased constant String := "recipe_id";
+   COL_0_9_NAME : aliased constant String := "id";
+   COL_1_9_NAME : aliased constant String := "status";
+   COL_2_9_NAME : aliased constant String := "version";
+   COL_3_9_NAME : aliased constant String := "build_id";
+   COL_4_9_NAME : aliased constant String := "branch_id";
+   COL_5_9_NAME : aliased constant String := "recipe_id";
 
    LAST_BUILD_DEF : aliased constant ADO.Schemas.Class_Mapping :=
      (Count   => 6,
       Table   => LAST_BUILD_NAME'Access,
       Members => (
-         1 => COL_0_8_NAME'Access,
-         2 => COL_1_8_NAME'Access,
-         3 => COL_2_8_NAME'Access,
-         4 => COL_3_8_NAME'Access,
-         5 => COL_4_8_NAME'Access,
-         6 => COL_5_8_NAME'Access)
+         1 => COL_0_9_NAME'Access,
+         2 => COL_1_9_NAME'Access,
+         3 => COL_2_9_NAME'Access,
+         4 => COL_3_9_NAME'Access,
+         5 => COL_4_9_NAME'Access,
+         6 => COL_5_9_NAME'Access)
      );
    LAST_BUILD_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := LAST_BUILD_DEF'Access;

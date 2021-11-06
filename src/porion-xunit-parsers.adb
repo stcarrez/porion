@@ -196,8 +196,6 @@ package body Porion.XUnit.Parsers is
    begin
       Log.Info ("Scanning file {0}", Path);
 
-      Mapper.Add_Mapping ("@name", TESTSUITE_NAME);
-      Mapper.Add_Mapping ("@time", TESTSUITE_TIME);
       Mapper.Add_Mapping ("**/testsuite/@name", TESTSUITE_NAME);
       Mapper.Add_Mapping ("**/testsuite/@time", TESTSUITE_TIME);
       Mapper.Add_Mapping ("**/testsuite", TESTSUITE_END);
@@ -216,6 +214,10 @@ package body Porion.XUnit.Parsers is
       Mapper.Add_Mapping ("**/testcase/@feature", TESTCASE_FEATURE);
       Mapper.Add_Mapping ("**/testcase/error/@type", TESTCASE_ERROR_TYPE);
       Mapper.Add_Mapping ("**/testcase/error", TESTCASE_ERROR);
+
+      Mapper.Add_Mapping ("@name", TESTSUITE_NAME);
+      Mapper.Add_Mapping ("@time", TESTSUITE_TIME);
+      --  Mapper.Dump (Log);
 
       XUnit_Mapper.Set_Context (Parser, Config'Unchecked_Access);
       Parser.Add_Mapping ("testsuite", Mapper'Unchecked_Access);

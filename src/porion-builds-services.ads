@@ -147,7 +147,8 @@ package Porion.Builds.Services is
    --  to the build dependency.
    procedure Update_Build_Queue (Service : in out Context_Type;
                                  Trigger_Builds : in Boolean) with
-      Pre => Service.Is_Open and Service.Has_Project and (not Trigger_Builds or Service.Has_Branch);
+      Pre => Service.Is_Open and Service.Has_Project
+             and (not Trigger_Builds or Service.Has_Branch);
 
    --  Get the build queue size.
    function Get_Queue_Size (Service : in Context_Type) return Natural

@@ -123,10 +123,10 @@ package body Porion.Builds.Services is
    begin
       if not Service.Build_Node.Is_Null then
          Query.Set_Filter ("o.building = 0 AND o.node_id = :node_id "
-                           & " ORDER BY o.`order` DESC LIMIT 1");
+                           & " ORDER BY o.`order` ASC LIMIT 1");
          Query.Bind_Param ("node_id", Service.Build_Node.Get_Id);
       else
-         Query.Set_Filter ("o.building = 0 ORDER BY o.`order` DESC LIMIT 1");
+         Query.Set_Filter ("o.building = 0 ORDER BY o.`order` ASC LIMIT 1");
       end if;
       Service.Queue.Find (Service.DB, Query, Found);
       if not Found then
@@ -599,6 +599,9 @@ package body Porion.Builds.Services is
          Update_Build_Queue (Service, Trigger_Builds => False);
       end if;
       Service.DB.Commit;
+
+      Log.Info ("Build step {0} removed from {1}",
+                Util.Strings.Image (Position), Service.Project.Get_Name);
    end Delete_Step;
 
    --  ------------------------------
@@ -841,7 +844,6 @@ package body Porion.Builds.Services is
       Queue_Reason : Models.Build_Reason_Ref;
       Found        : Boolean;
       Id           : constant ADO.Identifier := Recipe.Get_Id;
-      Recipes : Porion.Builds.Models.Recipe_Vector;
       Query   : ADO.Queries.Context;
       Now     : constant Ada.Calendar.Time := Ada.Calendar.Clock;
    begin

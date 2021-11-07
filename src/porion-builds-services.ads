@@ -51,6 +51,10 @@ package Porion.Builds.Services is
 
    subtype Context_Type is Porion.Services.Context_Type;
 
+   --  Get the directory that contains the logs for the build.
+   function Get_Log_Directory (Service : in Context_Type) return String with
+      Pre => Service.Has_Project and Service.Has_Branch and Service.Has_Build;
+
    procedure Build (Service     : in out Context_Type;
                     Executor    : in out Porion.Executors.Executor_Type'Class);
 

@@ -173,17 +173,25 @@ package body Porion.Builds.Services is
       end if;
    end Get_Build_Directory;
 
+   --  ------------------------------
+   --  Get the directory that contains the logs for the build.
+   --  ------------------------------
+   function Get_Log_Directory (Service : in Context_Type) return String is
+      Name        : constant String := Service.Project.Get_Name;
+      Branch_Name : constant String := Service.Branch.Get_Name;
+   begin
+      return Configs.Get_Build_Log_Directory (Name, Branch_Name, Service.Build.Get_Number);
+   end Get_Log_Directory;
+
    procedure Build (Service     : in out Context_Type;
                     Steps       : in Build_Step_Vector;
                     Executor    : in out Porion.Executors.Executor_Type'Class) is
-      Ident   : constant String := Projects.To_String (Service.Ident);
-      Number  : constant Positive := Service.Build.Get_Number;
-      Name    : constant String := Service.Project.Get_Name;
+      Ident       : constant String := Projects.To_String (Service.Ident);
       Branch_Name : constant String := Service.Branch.Get_Name;
-      Path    : constant String := Get_Build_Directory (Service);
-      Log_Dir : constant String := Configs.Get_Build_Log_Directory (Name, Branch_Name, Number);
-      Config  : Util.Properties.Manager;
-      Status  : Builds.Models.Build_Status_Type := Builds.Models.BUILD_RUNNING;
+      Path        : constant String := Get_Build_Directory (Service);
+      Log_Dir     : constant String := Get_Log_Directory (Service);
+      Config      : Util.Properties.Manager;
+      Status      : Builds.Models.Build_Status_Type := Builds.Models.BUILD_RUNNING;
       Source_Controller : Porion.Sources.Controller_Access;
    begin
       Log.Info ("Build {0} in {1}", Ident, Path);

@@ -24,11 +24,13 @@ abstract project Porion_Config is
          when "debug" =>
             for Default_Switches ("Ada") use defaults & warnings
                & ("-g", "-gnata", "-gnatVaMI", "-gnaty3abcefhiklmnprstxM99");
+            for Default_Switches ("C") use ("-g");
 
          when "coverage" =>
             for Default_Switches ("Ada") use defaults & warnings
                & ("-g", "-O2", "-gnata", "-gnatVaMI", "-gnaty3abcefhiklmnprstxM99",
                   "-fprofile-arcs", "-ftest-coverage");
+            for Default_Switches ("C") use ("-g");
 
          when "optimize" =>
             for Default_Switches ("Ada") use defaults & warnings

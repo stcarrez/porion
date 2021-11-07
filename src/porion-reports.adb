@@ -494,9 +494,7 @@ package body Porion.Reports is
       Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
       Fields : PT.Texts.Field_Array (1 .. 7);
       Style1 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
-      Style2 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
    begin
-      Writer.Set_Justify (Style2, PT.J_RIGHT);
       Writer.Create_Field (Fields (1), Style1, 20.0);
       Writer.Create_Field (Fields (2), Style1, 0.0);
       if Hide_Project then
@@ -530,7 +528,11 @@ package body Porion.Reports is
       Writer.New_Line;
 
       for Queue of List loop
-         Writer.Set_Justify (Style2, PT.J_RIGHT);
+         if Queue.Building then
+            Writer.Copy_Style (To => Style1, From => Styles.Success);
+         else
+            Writer.Copy_Style (To => Style1, From => Styles.Default);
+         end if;
          Writer.Put (Fields (1), Format (Queue.Creation_Date));
          Writer.Put_Int (Fields (2), Queue.Order);
          if not Hide_Project then

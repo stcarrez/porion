@@ -23,6 +23,12 @@ CREATE TABLE IF NOT EXISTS porion_build (
   `status`  NOT NULL,
   /* the source tag that was used when building the project. */
   `tag` VARCHAR(255) NOT NULL,
+  /* the build duration in seconds. */
+  `build_duration` INTEGER NOT NULL,
+  /* the system time of cumulated processes in milliseconds. */
+  `sys_time` INTEGER NOT NULL,
+  /* the user time of cumulated processes in milliseconds. */
+  `user_time` INTEGER NOT NULL,
   /* the branch associated with the build. */
   `branch_id` BIGINT NOT NULL,
   /* the recipe used for the build. */

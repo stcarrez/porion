@@ -25,6 +25,7 @@ private with GNAT.Strings;
 private with Porion.Projects.Services;
 private with Util.Commands.Consoles.Text;
 private with Util.Strings.Formats;
+private with Porion.Logs.Analysis;
 package Porion.Commands is
 
    Command_Error : exception;
@@ -136,5 +137,15 @@ private
 
    --  Print the build recipe steps of the current project.
    procedure Print_Recipe_Steps (Context : in out Context_Type);
+
+   --  package Analysis renames Porion.Logs.Analysis;
+
+   --  Print the build logs.
+   procedure Print_Build_Logs (Levels  : in Logs.Analysis.Level_Map;
+                               Context : in out Context_Type);
+
+   procedure Print_Build_Logs (Levels  : in Logs.Analysis.Level_Map;
+                               Path    : in String;
+                               Context : in out Context_Type);
 
 end Porion.Commands;

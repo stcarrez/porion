@@ -44,4 +44,12 @@ private
       List_Builds   : aliased Boolean := False;
    end record;
 
+   procedure Print_Build (Command : in out Command_Type;
+                          Ident   : in Porion.Projects.Ident_Type;
+                          Context : in out Context_Type);
+
+   procedure Print_Project (Command : in out Command_Type;
+                            Ident   : in Porion.Projects.Ident_Type;
+                            Context : in out Context_Type);
+
 end Porion.Commands.Info;

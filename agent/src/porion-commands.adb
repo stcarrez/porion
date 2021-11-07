@@ -18,6 +18,7 @@
 with System.Multiprocessors;
 with Ada.Command_Line;
 with Ada.Text_IO;
+with Ada.Directories;
 with Util.Strings;
 with Util.Commands.Parsers.GNAT_Parser;
 with PT.Drivers.Texts;
@@ -417,5 +418,52 @@ package body Porion.Commands is
          end;
       end loop;
    end Print_Recipe_Steps;
+
+   procedure Print_Build_Logs (Levels  : in Porion.Logs.Analysis.Level_Map;
+                               Context : in out Context_Type) is
+      Path : constant String := Builds.Services.Get_Log_Directory (Context.Project_Service);
+   begin
+      Print_Build_Logs (Levels, Ada.Directories.Compose (Path, "build.log"), Context);
+   end Print_Build_Logs;
+
+   procedure Print_Build_Logs (Levels  : in Porion.Logs.Analysis.Level_Map;
+                               Path    : in String;
+                               Context : in out Context_Type) is
+      use Porion.Logs;
+      use type Porion.Logs.Analysis.Level_Type;
+
+      Printer : PT.Texts.Printer_Type := PT.Texts.Create (Context.Printer.all);
+      Fields  : PT.Texts.Field_Array (1 .. 2);
+      List    : Analysis.Line_Vector;
+      Ctx     : Analysis.Analyser_Type;
+   begin
+      Printer.Create_Field (Fields (1), Context.Styles.Default, 0.0);
+      Printer.Create_Field (Fields (2), Context.Styles.Success, 90.0);
+      Printer.Set_Bottom_Right_Padding (Fields (1), (1, 0));
+      Printer.Set_Max_Dimension (Fields (1), (4, 0));
+      Printer.Layout_Fields (Fields (1 .. 2));
+
+      Porion.Logs.Analysis.Set_Filter (Ctx, Levels);
+      Porion.Logs.Analysis.Read (Ctx, Path, List);
+
+      for Line of List loop
+         if Line.Level = Analysis.LOG_ERROR then
+            Printer.Set_Style (Fields (1), Context.Styles.Error);
+            Printer.Set_Style (Fields (2), Context.Styles.Error);
+         elsif Line.Level = Analysis.LOG_WARNING then
+            Printer.Set_Style (Fields (1), Context.Styles.Warning);
+            Printer.Set_Style (Fields (2), Context.Styles.Warning);
+         elsif Line.Level = Analysis.LOG_INFO then
+            Printer.Set_Style (Fields (1), Context.Styles.Info);
+            Printer.Set_Style (Fields (2), Context.Styles.Info);
+         else
+            Printer.Set_Style (Fields (1), Context.Styles.Default);
+            Printer.Set_Style (Fields (2), Context.Styles.Default);
+         end if;
+         Printer.Put_Int (Fields (1), Line.Number);
+         Printer.Put (Fields (2), Line.Content);
+         Printer.New_Line;
+      end loop;
+   end Print_Build_Logs;
 
 end Porion.Commands;

@@ -23,6 +23,9 @@ package body Porion.Builders.XUnit is
 
    Log   : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Builders.XUnit");
 
+   procedure Load (From : in Util.Beans.Objects.Object;
+                   Into : in out Util.Strings.Vectors.Vector);
+
    overriding
    procedure Build (Controller : in out Controller_Type;
                     Build      : in out Porion.Builds.Models.Build_Ref;

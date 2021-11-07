@@ -503,7 +503,8 @@ package body Porion.Resources.Queries is
        & " JOIN porion_recipe AS recipe ON queue.recipe_id = recipe.id" & ASCII.LF
        & "            INNER JOIN porion_project AS project ON recipe.project_id = "
        & "project.id" & ASCII.LF & "            INNER JOIN porion_branch AS branch"
-       & " ON recipe.branch_id = branch.id" & ASCII.LF & "        </sql>" & ASCII.LF
+       & " ON recipe.branch_id = branch.id" & ASCII.LF & "            ORDER BY que"
+       & "ue.`order` ASC, queue.create_date ASC" & ASCII.LF & "        </sql>" & ASCII.LF
        & "        <sql-count>" & ASCII.LF & "            SELECT" & ASCII.LF & "   "
        & "         count(queue.id)" & ASCII.LF & "            FROM porion_build_qu"
        & "eue AS queue" & ASCII.LF & "        </sql-count>" & ASCII.LF & "    </qu"
@@ -527,11 +528,12 @@ package body Porion.Resources.Queries is
        & "            INNER JOIN porion_project AS project ON recipe.project_id = "
        & "project.id" & ASCII.LF & "            INNER JOIN porion_branch AS branch"
        & " ON recipe.branch_id = branch.id" & ASCII.LF & "            WHERE projec"
-       & "t.id = :project_id" & ASCII.LF & "        </sql>" & ASCII.LF & "    </qu"
-       & "ery>" & ASCII.LF & ASCII.LF & "    <query name='node-build-queue-list'>"
-       & ASCII.LF & "        <comment>Get a description of the build queue for a "
-       & "given build node</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & " "
-       & "           SELECT" & ASCII.LF & "            queue.id AS id," & ASCII.LF
+       & "t.id = :project_id" & ASCII.LF & "            ORDER BY queue.`order` ASC"
+       & ", queue.create_date ASC" & ASCII.LF & "        </sql>" & ASCII.LF & "   "
+       & " </query>" & ASCII.LF & ASCII.LF & "    <query name='node-build-queue-l"
+       & "ist'>" & ASCII.LF & "        <comment>Get a description of the build que"
+       & "ue for a given build node</comment>" & ASCII.LF & "        <sql>" & ASCII.LF
+       & "            SELECT" & ASCII.LF & "            queue.id AS id," & ASCII.LF
        & "            queue.`order` AS `order`," & ASCII.LF & "            queue.c"
        & "reation_date AS create_date," & ASCII.LF & "            project.name AS "
        & "name," & ASCII.LF & "            project.status AS status," & ASCII.LF & " "
@@ -548,8 +550,9 @@ package body Porion.Resources.Queries is
        & "            INNER JOIN porion_project AS project ON recipe.project_id = "
        & "project.id" & ASCII.LF & "            INNER JOIN porion_branch AS branch"
        & " ON recipe.branch_id = branch.id" & ASCII.LF & "            WHERE node.i"
-       & "d = :node_id" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF
-       & ASCII.LF & "</query-mapping>" & ASCII.LF;
+       & "d = :node_id" & ASCII.LF & "            ORDER BY queue.`order` ASC, queu"
+       & "e.create_date ASC" & ASCII.LF & "        </sql>" & ASCII.LF & "    </que"
+       & "ry>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
    C_10 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List the build queues" & ASCII.LF

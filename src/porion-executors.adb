@@ -87,6 +87,23 @@ package body Porion.Executors is
    end Set_Build_Node;
 
    --  ------------------------------
+   --  Get the usage when running the executor on build nodes.
+   --  ------------------------------
+   function Get_Usage (Executor : in Executor_Type) return Nodes.Usage_Type is
+      use type Nodes.Usage_Type;
+   begin
+      if Executor.Controller /= null and Executor.Local /= null then
+         return Executor.Controller.Get_Usage + Executor.Local.Get_Usage;
+      elsif Executor.Controller /= null then
+         return Executor.Controller.Get_Usage;
+      elsif Executor.Local /= null then
+         return Executor.Local.Get_Usage;
+      else
+         return (0, 0);
+      end if;
+   end Get_Usage;
+
+   --  ------------------------------
    --  Create the directory and optionally make sure it is cleaned.
    --  ------------------------------
    procedure Create_Directory (Executor : in out Executor_Type;

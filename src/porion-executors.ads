@@ -52,6 +52,9 @@ package Porion.Executors is
    --  Get the execution status.
    function Get_Status (Executor : in Executor_Type) return Integer;
 
+   --  Get the usage when running the executor on build nodes.
+   function Get_Usage (Executor : in Executor_Type) return Nodes.Usage_Type;
+
    --  Set the execution status.
    procedure Set_Status (Executor : in out Executor_Type;
                          Status   : in Integer);

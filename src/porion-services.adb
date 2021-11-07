@@ -16,6 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
+with Util.Strings;
 with Util.Log.Loggers;
 with Util.Properties;
 
@@ -95,6 +96,25 @@ package body Porion.Services is
             Log.Error ("Branch {0} not found in database", To_String (Ident.Branch));
             return;
          end if;
+      end if;
+
+      if Ident.Build > 0 then
+         Query.Clear;
+         Query.Set_Filter ("o.project_id = :project_id AND o.number = :number");
+         Query.Bind_Param ("project_id", Service.Project.Get_Id);
+         Query.Bind_Param ("number", Ident.Build);
+         Service.Build.Find (Service.DB, Query, Found);
+         if not Found then
+            Log.Error ("Build {0} not found for project {1}",
+                       Util.Strings.Image (Ident.Build), To_String (Ident.Name));
+            return;
+         end if;
+
+         Log.Info ("Build {0} loaded", Porion.Projects.To_String (Ident));
+         Service.Build_Node := Porion.Nodes.Models.Node_Ref (Service.Build.Get_Node);
+         Service.Branch := Porion.Projects.Models.Branch_Ref (Service.Build.Get_Branch);
+         Service.Recipe := Porion.Builds.Models.Recipe_Ref (Service.Build.Get_Recipe);
+         return;
       end if;
 
       if Length (Ident.Node) > 0 then

@@ -335,9 +335,8 @@ package body Porion.Projects.Services is
                         if Service.Branch.Get_Status /= Models.BUILD_DISABLED then
                            Service.Branch.Set_Status (Projects.Models.BUILD_REQUIRED);
                            Log.Info ("Build required for branch {0}", Name);
-                           Builds.Services.Update_Branch_Config (Service.Branch,
-                                                                 Builds.Models.CONFIG_BUILD_REQUIRED,
-                                                                 Service.DB);
+                           Builds.Services.Add_Build_Queue (Service,
+                                                            Builds.Models.REASON_SCM);
                         end if;
                         Service.Branch.Set_Update_Date (Now);
                         Service.Branch.Save (Service.DB);
@@ -355,9 +354,8 @@ package body Porion.Projects.Services is
                Add_Branch (Service, Name, Branch, Is_Head);
                if Service.Branch.Get_Status = Models.BUILD_REQUIRED then
                   Log.Info ("Build required for new branch {0}", Name);
-                  Builds.Services.Update_Branch_Config (Service.Branch,
-                                                        Builds.Models.CONFIG_BUILD_REQUIRED,
-                                                        Service.DB);
+                  Builds.Services.Add_Build_Queue (Service,
+                                                   Builds.Models.REASON_SCM);
                end if;
             end if;
          end;

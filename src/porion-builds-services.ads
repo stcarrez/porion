@@ -18,10 +18,9 @@
 with Ada.Containers.Vectors;
 with Util.Strings.Vectors;
 with Util.Serialize.IO;
-with ADO.Sessions;
 with Porion.Configs;
 with Porion.Builds.Models;
-with Porion.Projects.Models;
+with Porion.Projects;
 with Porion.Services;
 with Porion.Executors;
 package Porion.Builds.Services is
@@ -129,9 +128,11 @@ package Porion.Builds.Services is
                                  Force   : in Boolean;
                                  List    : in out Porion.Builds.Models.Recipe_Vector);
 
-   procedure Update_Branch_Config (Branch  : in Porion.Projects.Models.Branch_Ref;
-                                   Status  : in Porion.Builds.Models.Config_Status_Type;
-                                   Session : in out ADO.Sessions.Master_Session);
+   --  Add in the build queue the recipes for the current branch and use the given
+   --  reason for adding them in the build queue.
+   procedure Add_Build_Queue (Service : in out Context_Type;
+                              Reason  : in Porion.Builds.Models.Reason_Type) with
+      Pre => Service.Is_Open and Service.Has_Project;
 
    --  Get the build queue size.
    function Get_Queue_Size (Service : in Context_Type) return Natural
@@ -159,6 +160,11 @@ private
    procedure Load_Recipe (Service : in out Context_Type;
                           Recipe  : in Models.Recipe_Ref;
                           Steps   : in out Build_Step_Vector) with
-     Pre => Service.Has_Project;
+      Pre => Service.Has_Project;
+
+   --  Update the build reason when starting the build or once it is finished.
+   procedure Update_Build_Reason (Service     : in out Context_Type;
+                                  Is_Finished : in Boolean) with
+      Pre => not Service.Queue.Is_Null;
 
 end Porion.Builds.Services;

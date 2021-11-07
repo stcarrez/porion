@@ -51,6 +51,16 @@ package body Porion.Services is
       return Service.Project.Get_Id;
    end Get_Project_Id;
 
+   --  ------------------------------
+   --  Get the project branch identification string in the form <project>^<branch>.
+   --  ------------------------------
+   function Get_Branch_Name (Service : in Context_Type) return String is
+      Project_Name  : constant String := Service.Branch.Get_Project.Get_Name;
+      Branch_Name   : constant String := Service.Branch.Get_Name;
+   begin
+      return Project_Name & "^" & Branch_Name;
+   end Get_Branch_Name;
+
    procedure Load_Project (Service : in out Context_Type;
                            Name    : in String) is
       Query : ADO.SQL.Query;

@@ -45,9 +45,15 @@ package Porion.Services is
    function Has_Project (Service : in Context_Type) return Boolean is
       (not Service.Project.Is_Null);
 
+   function Has_Branch (Service : in Context_Type) return Boolean is
+      (not Service.Branch.Is_Null);
 
    --  Get the current project id.
    function Get_Project_Id (Service : in Context_Type) return ADO.Identifier;
+
+   --  Get the project branch identification string in the form <project>^<branch>.
+   function Get_Branch_Name (Service : in Context_Type) return String with
+      Pre => Service.Has_Branch;
 
    procedure Load_Project (Service : in out Context_Type;
                            Name    : in String);

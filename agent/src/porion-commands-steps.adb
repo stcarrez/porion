@@ -55,9 +55,14 @@ package body Porion.Commands.Steps is
                           Recipe  : in out Porion.Builds.Models.Recipe_Ref;
                           Context : in out Context_Type) is
    begin
+      if Command.Delete_Pos = 1 then
+         Porion.Commands.Error (-("cannot delete the first step"));
+         return;
+      end if;
+
       Builds.Services.Delete_Step (Context.Project_Service,
                                    Recipe,
-                                   Command.Delete_Pos);
+                                   Command.Delete_Pos - 1);
 
    exception
       when Porion.Builds.Services.Invalid_Position =>
@@ -114,15 +119,14 @@ package body Porion.Commands.Steps is
       begin
          if Command.Delete_Pos > 0 then
             Command.Delete_Step (Recipe, Context);
-            return;
-         end if;
+         else
+            if Args.Get_Count = 1 then
+               Porion.Commands.Error (-("missing step action"));
+               return;
+            end if;
 
-         if Args.Get_Count = 1 then
-            Porion.Commands.Error (-("missing step action"));
-            return;
+            Command.Add_Step (Recipe, Args, Context);
          end if;
-
-         Command.Add_Step (Recipe, Args, Context);
 
          if not Command.Quiet then
             Porion.Commands.Print_Recipe_Steps (Context);

@@ -47,4 +47,12 @@ package body Porion.Nodes is
       Controller.Listener := Listener;
    end Set_Listener;
 
+   --  ------------------------------
+   --  Return the usage identified when running commands on this build node.
+   --  ------------------------------
+   function Get_Usage (Controller : in Controller_Type'Class) return Usage_Type is
+   begin
+      return Controller.Usage;
+   end Get_Usage;
+
 end Porion.Nodes;

@@ -19,6 +19,21 @@ with Ada.Finalization;
 with Util.Beans.Objects.Enums;
 package Porion.Nodes is
 
+   subtype System_Time is Long_Long_Integer;
+
+   type Usage_Type is record
+      User_Time : System_Time;
+      Sys_Time  : System_Time;
+   end record;
+
+   function "-" (Left, Right : in Usage_Type) return Usage_Type is
+      ((User_Time => Left.User_Time - Right.User_Time,
+        Sys_Time  => Left.Sys_Time - Right.Sys_Time));
+
+   function "+" (Left, Right : in Usage_Type) return Usage_Type is
+      ((User_Time => Left.User_Time + Right.User_Time,
+        Sys_Time  => Left.Sys_Time + Right.Sys_Time));
+
    type Node_Type is (NODE_LOCAL, NODE_SSH, NODE_DOCKER, NODE_VIRSH);
 
    --  Use a fixed enum configuration because the value is stored in database.
@@ -63,6 +78,9 @@ package Porion.Nodes is
    type Controller_Type is abstract limited new Ada.Finalization.Limited_Controlled with private;
    type Controller_Access is access all Controller_Type'Class;
 
+   --  Return the usage identified when running commands on this build node.
+   function Get_Usage (Controller : in Controller_Type'Class) return Usage_Type;
+
    procedure Start (Controller : in out Controller_Type) is null;
 
    procedure Stop (Controller : in out Controller_Type) is null;
@@ -87,6 +105,7 @@ private
 
    type Controller_Type is abstract limited new Ada.Finalization.Limited_Controlled with record
       Listener : Listener_Access;
+      Usage    : Usage_Type := (others => 0);
    end record;
 
    --  Returns true if commands are not executed but collected.

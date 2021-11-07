@@ -319,8 +319,7 @@ package body Porion.Commands.Info is
 
          exception
             when Porion.Services.Not_Found =>
-               Porion.Commands.Error (-("project '{0}' not found"),
-                                      To_String (Ident.Name));
+               Context.Error_Not_Found (Ident);
 
          end;
       end loop;

@@ -66,8 +66,7 @@ package body Porion.Commands.Logs is
 
          exception
             when Porion.Services.Not_Found =>
-               Porion.Commands.Error (-("project '{0}' not found"),
-                                      Arg);
+               Context.Error_Not_Found (Ident);
          end;
       end loop;
    end Execute;

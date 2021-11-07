@@ -25,7 +25,7 @@ package body Porion.Commands.Steps is
    use type Ada.Containers.Count_Type;
 
    procedure Add_Step (Command : in out Command_Type;
-                       Recipe  : in Porion.Builds.Models.Recipe_Ref;
+                       Recipe  : in out Porion.Builds.Models.Recipe_Ref;
                        Args    : in Argument_List'Class;
                        Context : in out Context_Type) is
       First  : constant String := Args.Get_Argument (2);
@@ -52,7 +52,7 @@ package body Porion.Commands.Steps is
    end Add_Step;
 
    procedure Delete_Step (Command : in out Command_Type;
-                          Recipe  : in Porion.Builds.Models.Recipe_Ref;
+                          Recipe  : in out Porion.Builds.Models.Recipe_Ref;
                           Context : in out Context_Type) is
    begin
       Builds.Services.Delete_Step (Context.Project_Service,
@@ -109,21 +109,25 @@ package body Porion.Commands.Steps is
          return;
       end if;
 
-      if Command.Delete_Pos > 0 then
-         Command.Delete_Step (Recipes.First_Element, Context);
-         return;
-      end if;
+      declare
+         Recipe : Builds.Models.Recipe_Ref := Recipes.First_Element;
+      begin
+         if Command.Delete_Pos > 0 then
+            Command.Delete_Step (Recipe, Context);
+            return;
+         end if;
 
-      if Args.Get_Count = 1 then
-         Porion.Commands.Error (-("missing step action"));
-         return;
-      end if;
+         if Args.Get_Count = 1 then
+            Porion.Commands.Error (-("missing step action"));
+            return;
+         end if;
 
-      Command.Add_Step (Recipes.First_Element, Args, Context);
+         Command.Add_Step (Recipe, Args, Context);
 
-      if not Command.Quiet then
-         Porion.Commands.Print_Recipe_Steps (Context);
-      end if;
+         if not Command.Quiet then
+            Porion.Commands.Print_Recipe_Steps (Context);
+         end if;
+      end;
    end Execute;
 
    --  ------------------------------

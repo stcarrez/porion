@@ -49,12 +49,12 @@ private
       or (Command.Update_Pos > 0 and Command.Insert_Pos > 0));
 
    procedure Add_Step (Command : in out Command_Type;
-                       Recipe  : in Porion.Builds.Models.Recipe_Ref;
+                       Recipe  : in out Porion.Builds.Models.Recipe_Ref;
                        Args    : in Argument_List'Class;
                        Context : in out Context_Type);
 
    procedure Delete_Step (Command : in out Command_Type;
-                          Recipe  : in Porion.Builds.Models.Recipe_Ref;
+                          Recipe  : in out Porion.Builds.Models.Recipe_Ref;
                           Context : in out Context_Type);
 
 end Porion.Commands.Steps;

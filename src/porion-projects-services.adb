@@ -214,6 +214,9 @@ package body Porion.Projects.Services is
 
       Log.Info ("Project {0} now depends on {1}",
                 String '(Service.Project.Get_Name), Depend);
+
+      --  Update the build queue order.
+      Porion.Builds.Services.Update_Build_Queue (Service, Trigger_Builds => False);
    end Add_Dependency;
 
    --  ------------------------------
@@ -293,6 +296,7 @@ package body Porion.Projects.Services is
       Query      : ADO.Queries.Context;
       Branches   : Porion.Projects.Models.Branch_Vector;
       Src_Status : Porion.Sources.Status_Type;
+      Queue_Added : Boolean := False;
       Source_Controller : Porion.Sources.Controller_Access;
       Now        : constant Ada.Calendar.Time := Ada.Calendar.Clock;
    begin
@@ -322,6 +326,7 @@ package body Porion.Projects.Services is
             Branch  : constant Maps.Reference_Type := Maps.Reference (Src_Status.Changes, Item);
             Is_Head : constant Boolean := Name = To_String (Src_Status.Head);
             Found   : Boolean := False;
+            Added   : Boolean;
          begin
             for Iter in 1 .. Integer (Branches.Length) loop
                declare
@@ -336,7 +341,11 @@ package body Porion.Projects.Services is
                            Service.Branch.Set_Status (Projects.Models.BUILD_REQUIRED);
                            Log.Info ("Build required for branch {0}", Name);
                            Builds.Services.Add_Build_Queue (Service,
-                                                            Builds.Models.REASON_SCM);
+                                                            Builds.Models.REASON_SCM,
+                                                            Added);
+                           if Added then
+                              Queue_Added := True;
+                           end if;
                         end if;
                         Service.Branch.Set_Update_Date (Now);
                         Service.Branch.Save (Service.DB);
@@ -355,7 +364,11 @@ package body Porion.Projects.Services is
                if Service.Branch.Get_Status = Models.BUILD_REQUIRED then
                   Log.Info ("Build required for new branch {0}", Name);
                   Builds.Services.Add_Build_Queue (Service,
-                                                   Builds.Models.REASON_SCM);
+                                                   Builds.Models.REASON_SCM,
+                                                   Added);
+                  if Added then
+                     Queue_Added := True;
+                  end if;
                end if;
             end if;
          end;
@@ -368,6 +381,10 @@ package body Porion.Projects.Services is
             Branch.Save (Service.DB);
          end if;
       end loop;
+
+      if Queue_Added then
+         Builds.Services.Update_Build_Queue (Service, Trigger_Builds => False);
+      end if;
    end Check_Sources;
 
    procedure Write_Date (Stream : in out Util.Serialize.IO.Output_Stream'Class;

@@ -71,13 +71,13 @@ package Porion.Builds.Services is
    --  Delete the build step at the given execution order.
    --  Raises Invalid_Position if the position is invalid.
    procedure Delete_Step (Service  : in out Context_Type;
-                          Recipe   : in Porion.Builds.Models.Recipe_Ref;
+                          Recipe   : in out Porion.Builds.Models.Recipe_Ref;
                           Position : in Positive) with
      Pre => Service.Has_Project and Recipe.Is_Loaded;
 
    --  Insert the build step in the recipe at the given position.
    procedure Insert_Step (Service   : in out Context_Type;
-                          Recipe    : in Porion.Builds.Models.Recipe_Ref;
+                          Recipe    : in out Porion.Builds.Models.Recipe_Ref;
                           Position  : in Natural;
                           Kind      : in Porion.Builds.Models.Builder_Type;
                           Step      : in Porion.Builds.Step_Type;
@@ -131,8 +131,23 @@ package Porion.Builds.Services is
    --  Add in the build queue the recipes for the current branch and use the given
    --  reason for adding them in the build queue.
    procedure Add_Build_Queue (Service : in out Context_Type;
-                              Reason  : in Porion.Builds.Models.Reason_Type) with
+                              Reason  : in Porion.Builds.Models.Reason_Type;
+                              Added   : out Boolean) with
       Pre => Service.Is_Open and Service.Has_Project;
+
+   --  Add in the build queue the given recipe with the reason for adding it
+   --  in the build queue.
+   procedure Add_Build_Queue (Service : in out Context_Type;
+                              Recipe  : in out Porion.Builds.Models.Recipe_Ref;
+                              Reason  : in Porion.Builds.Models.Reason_Type;
+                              Added   : out Boolean) with
+      Pre => Service.Is_Open and Service.Has_Project and not Recipe.Is_Null;
+
+   --  Update the build queue to trigger builds and/or re-order the build queue according
+   --  to the build dependency.
+   procedure Update_Build_Queue (Service : in out Context_Type;
+                                 Trigger_Builds : in Boolean) with
+      Pre => Service.Is_Open and Service.Has_Project and (not Trigger_Builds or Service.Has_Branch);
 
    --  Get the build queue size.
    function Get_Queue_Size (Service : in Context_Type) return Natural
@@ -160,7 +175,8 @@ private
    procedure Load_Recipe (Service : in out Context_Type;
                           Recipe  : in Models.Recipe_Ref;
                           Steps   : in out Build_Step_Vector) with
-      Pre => Service.Has_Project;
+      Pre  => Service.Has_Project and not Recipe.Is_Null,
+      Post => Service.Has_Branch;
 
    --  Update the build reason when starting the build or once it is finished.
    procedure Update_Build_Reason (Service     : in out Context_Type;

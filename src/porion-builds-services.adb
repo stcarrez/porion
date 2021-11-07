@@ -281,13 +281,6 @@ package body Porion.Builds.Services is
       Build_Executor.Delete (Service.DB);
    end Build_Queue;
 
-   package Map_Depends is
-      new Ada.Containers.Hashed_Maps (Key_Type => ADO.Identifier,
-                                      Element_Type => ADO.Utils.Identifier_Vector,
-                                      Hash => ADO.Utils.Hash,
-                                      Equivalent_Keys => ADO."=",
-                                      "=" => ADO.Utils.Identifier_Vectors."=");
-
    --  ------------------------------
    --  Returns True if the recipe is contained in the build queue.
    --  ------------------------------
@@ -302,50 +295,122 @@ package body Porion.Builds.Services is
       return False;
    end Contains;
 
-   procedure Trigger_Builds (Service : in out Context_Type) is
+   --  ------------------------------
+   --  Update the build queue to trigger builds and/or re-order the build queue according
+   --  to the build dependency.
+   --  ------------------------------
+   procedure Update_Build_Queue (Service : in out Context_Type;
+                                 Trigger_Builds : in Boolean) is
+      use type Ada.Calendar.Time;
+
+      package Map_Depends is
+        new Ada.Containers.Hashed_Maps (Key_Type => ADO.Identifier,
+                                        Element_Type => ADO.Utils.Identifier_Vector,
+                                        Hash => ADO.Utils.Hash,
+                                        Equivalent_Keys => ADO."=",
+                                        "=" => ADO.Utils.Identifier_Vectors."=");
+
+      function Get_Dependencies (Queue : in Models.Build_Queue_Ref) return Map_Depends.Cursor;
+      function "<" (Left, Right : in Models.Build_Queue_Ref) return Boolean;
+
       Recipes : Porion.Builds.Models.Recipe_Vector;
       Queues  : Porion.Builds.Models.Build_Queue_Vector;
       Query   : ADO.Queries.Context;
       Deps    : Map_Depends.Map;
+
+      function Get_Dependencies (Queue : in Models.Build_Queue_Ref) return Map_Depends.Cursor is
+         Recipe : constant Models.Recipe_Ref'Class := Queue.Get_Recipe;
+         Id     : constant ADO.Identifier := Recipe.Get_Project.Get_Id;
+         Pos    : Map_Depends.Cursor := Deps.Find (Id);
+      begin
+         if not Map_Depends.Has_Element (Pos) then
+            declare
+               List : ADO.Utils.Identifier_Vector;
+               Stmt : ADO.Statements.Query_Statement :=
+                  Service.DB.Create_Statement ("SELECT d.project_id FROM porion_dependency AS d "
+                                               & "WHERE d.owner_id = :project_id");
+            begin
+               Stmt.Bind_Param ("project_id", Id);
+               Stmt.Execute;
+               while Stmt.Has_Elements loop
+                  List.Append (Stmt.Get_Identifier (0));
+                  Stmt.Next;
+               end loop;
+               Deps.Include (Id, List);
+               Pos := Deps.Find (Id);
+            end;
+         end if;
+         return Pos;
+      end Get_Dependencies;
+
+      function "<" (Left, Right : in Models.Build_Queue_Ref) return Boolean is
+         Left_Deps  : constant Map_Depends.Cursor := Get_Dependencies (Left);
+         Right_Deps : constant Map_Depends.Cursor := Get_Dependencies (Right);
+      begin
+         if Left.Get_Node.Get_Id = Right.Get_Node.Get_Id then
+            if Map_Depends.Has_Element (Left_Deps) and Map_Depends.Has_Element (Right_Deps) then
+               if Map_Depends.Element (Left_Deps).Contains (Map_Depends.Key (Right_Deps)) then
+                  return False;
+               end if;
+               if Map_Depends.Element (Right_Deps).Contains (Map_Depends.Key (Left_Deps)) then
+                  return True;
+               end if;
+            end if;
+         end if;
+
+         --  Left and Right don't depend on each other: sort on the creation date.
+         return Left.Get_Create_Date < Right.Get_Create_Date;
+      end "<";
+
+      package Sort_Queue is
+         new Models.Build_Queue_Vectors.Generic_Sorting ("<" => "<");
+
    begin
       --  Step 1: find the recipes that depend on the project that was built.
-      Query.Set_Join ("INNER JOIN porion_dependency AS dep ON o.project_id = dep.owner_id");
-      Query.Set_Filter ("dep.project_id = :project_id AND o.node_id = :node_id");
-      Query.Bind_Param ("project_id", Service.Project.Get_Id);
-      Query.Bind_Param ("node_id", Service.Build_Node.Get_Id);
-      Porion.Builds.Models.List (Recipes, Service.DB, Query);
+      if Trigger_Builds then
+         Query.Set_Join ("INNER JOIN porion_dependency AS dep ON o.project_id = dep.owner_id");
+         Query.Set_Filter ("dep.project_id = :project_id AND o.node_id = :node_id");
+         Query.Bind_Param ("project_id", Service.Project.Get_Id);
+         Query.Bind_Param ("node_id", Service.Build_Node.Get_Id);
+         Porion.Builds.Models.List (Recipes, Service.DB, Query);
 
-      Log.Info ("Found {0} recipes triggered by dependencies",
-                Util.Strings.Image (Natural (Recipes.Length)));
-      if Recipes.Is_Empty then
-         return;
+         Log.Info ("Found {0} recipes triggered by dependencies",
+                   Util.Strings.Image (Natural (Recipes.Length)));
+         if Recipes.Is_Empty then
+            return;
+         end if;
+         Query.Clear;
       end if;
 
       --  Step 2: get the current build queue for the current build node.
-      Query.Clear;
-      Query.Set_Filter ("o.node_id = :node_id ORDER BY o.`order`");
-      Query.Bind_Param ("node_id", Service.Build_Node.Get_Id);
+      if Trigger_Builds then
+         Query.Set_Filter ("o.node_id = :node_id ORDER BY o.`order`");
+         Query.Bind_Param ("node_id", Service.Build_Node.Get_Id);
+      end if;
       Porion.Builds.Models.List (Queues, Service.DB, Query);
 
       --  Step 3: check and add the triggered recipes in the build queue.
-      declare
-         Now : constant Ada.Calendar.Time := Ada.Calendar.Clock;
-      begin
-         for Recipe of Recipes loop
-            if not Contains (Queues, Recipe) then
-               declare
-                  Queue : Porion.Builds.Models.Build_Queue_Ref;
-               begin
-                  Queue.Set_Recipe (Recipe);
-                  Queue.Set_Node (Service.Build_Node);
-                  Queue.Set_Create_Date (Now);
-                  Queues.Append (Queue);
-               end;
-            end if;
-         end loop;
-      end;
+      if Trigger_Builds then
+         declare
+            Now : constant Ada.Calendar.Time := Ada.Calendar.Clock;
+         begin
+            for Recipe of Recipes loop
+               if not Contains (Queues, Recipe) then
+                  declare
+                     Queue : Porion.Builds.Models.Build_Queue_Ref;
+                  begin
+                     Queue.Set_Recipe (Recipe);
+                     Queue.Set_Node (Service.Build_Node);
+                     Queue.Set_Create_Date (Now);
+                     Queues.Append (Queue);
+                  end;
+               end if;
+            end loop;
+         end;
+      end if;
 
-      --  Step 4: TODO reorder the build queue according to project dependencies
+      --  Step 4: reorder the build queue according to project dependencies.
+      Sort_Queue.Sort (Queues);
 
       --  Step 5: save the new build queue order.
       declare
@@ -357,7 +422,7 @@ package body Porion.Builds.Services is
             Order := Order + 1;
          end loop;
       end;
-   end Trigger_Builds;
+   end Update_Build_Queue;
 
    --  ------------------------------
    --  Update the build reason when starting the build or once it is finished.
@@ -431,7 +496,7 @@ package body Porion.Builds.Services is
          when Builds.Models.BUILD_PASS =>
             Service.Recipe.Set_Status (Builds.Models.CONFIG_BUILD_PASS);
             Service.Recipe.Save (Service.DB);
-            Trigger_Builds (Service);
+            Update_Build_Queue (Service, Trigger_Builds => True);
 
          when Builds.Models.BUILD_FAIL =>
             Service.Recipe.Set_Status (Builds.Models.CONFIG_BUILD_FAIL);
@@ -471,6 +536,7 @@ package body Porion.Builds.Services is
       List  : Models.Recipe_Step_Vector;
       Query : ADO.Queries.Context;
    begin
+      Service.Branch := Projects.Models.Branch_Ref (Recipe.Get_Branch);
       Steps.Clear;
       Query.Set_Filter ("o.recipe_id = :recipe_id ORDER BY o.number");
       Query.Bind_Param ("recipe_id", Recipe.Get_Id);
@@ -498,10 +564,11 @@ package body Porion.Builds.Services is
    --  Raises Invalid_Position if the position is invalid.
    --  ------------------------------
    procedure Delete_Step (Service  : in out Context_Type;
-                          Recipe   : in Porion.Builds.Models.Recipe_Ref;
+                          Recipe   : in out Porion.Builds.Models.Recipe_Ref;
                           Position : in Positive) is
       Last  : Natural;
       Steps : Build_Step_Vector;
+      Added : Boolean;
    begin
       Load_Recipe (Service, Recipe, Steps);
 
@@ -526,6 +593,11 @@ package body Porion.Builds.Services is
             Step.Step.Save (Service.DB);
          end;
       end loop;
+
+      Add_Build_Queue (Service, Recipe, Models.REASON_CONFIG, Added);
+      if Added then
+         Update_Build_Queue (Service, Trigger_Builds => False);
+      end if;
       Service.DB.Commit;
    end Delete_Step;
 
@@ -533,7 +605,7 @@ package body Porion.Builds.Services is
    --  Insert the build step in the recipe at the given position.
    --  ------------------------------
    procedure Insert_Step (Service   : in out Context_Type;
-                          Recipe    : in Porion.Builds.Models.Recipe_Ref;
+                          Recipe    : in out Porion.Builds.Models.Recipe_Ref;
                           Position  : in Natural;
                           Kind      : in Porion.Builds.Models.Builder_Type;
                           Step      : in Porion.Builds.Step_Type;
@@ -542,6 +614,7 @@ package body Porion.Builds.Services is
       New_Step : Build_Step;
       Pos      : Natural := Position;
       Last     : Natural;
+      Added    : Boolean;
    begin
       Load_Recipe (Service, Recipe, Steps);
 
@@ -578,6 +651,11 @@ package body Porion.Builds.Services is
          end;
          Pos := Pos + 1;
       end loop;
+
+      Add_Build_Queue (Service, Recipe, Models.REASON_CONFIG, Added);
+      if Added then
+         Update_Build_Queue (Service, Trigger_Builds => False);
+      end if;
       Service.DB.Commit;
    end Insert_Step;
 
@@ -727,55 +805,75 @@ package body Porion.Builds.Services is
    --  reason for adding them in the build queue.
    --  ------------------------------
    procedure Add_Build_Queue (Service : in out Context_Type;
-                              Reason  : in Porion.Builds.Models.Reason_Type) is
-      use Porion.Builds.Models;
-
+                              Reason  : in Porion.Builds.Models.Reason_Type;
+                              Added   : out Boolean) is
       Recipes : Porion.Builds.Models.Recipe_Vector;
       Query   : ADO.Queries.Context;
-      Now     : constant Ada.Calendar.Time := Ada.Calendar.Clock;
    begin
       Query.Set_Filter ("o.branch_id = :branch_id AND o.status != 0");
       Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
       Porion.Builds.Models.List (Recipes, Service.DB, Query);
 
+      Added := False;
       for Recipe of Recipes loop
          declare
-            Queue        : Models.Build_Queue_Ref;
-            Queue_Reason : Models.Build_Reason_Ref;
-            Found        : Boolean;
-            Id           : constant ADO.Identifier := Recipe.Get_Id;
+            Recipe_Added : Boolean;
          begin
-            Recipe.Set_Status (Models.CONFIG_BUILD_REQUIRED);
-            Recipe.Save (Service.DB);
-
-            Query.Clear;
-            Query.Set_Filter ("o.recipe_id = :recipe_id");
-            Query.Bind_Param ("recipe_id", Id);
-            Queue.Find (Service.DB, Query, Found);
-            if not Found then
-               Queue.Set_Recipe (Recipe);
-               Queue.Set_Node (Recipe.Get_Node);
-               Queue.Set_Create_Date (Now);
-               Queue.Set_Update_Date (Queue.Get_Create_Date);
-
-               Log.Info ("Add build queue for {0} as{1}", Service.Get_Branch_Name,
-                         ADO.Identifier'Image (Id));
-            end if;
-            Queue.Save (Service.DB);
-
-            Query.Clear;
-            Query.Set_Filter ("o.queue_id = :queue_id AND o.reason = :reason");
-            Query.Bind_Param ("queue_id", Queue.Get_Id);
-            Query.Bind_Param ("reason", Integer (Models.Reason_Type'Pos (Reason)));
-            Queue_Reason.Find (Service.DB, Query, Found);
-            if not Found then
-               Queue_Reason.Set_Queue (Queue);
-               Queue_Reason.Set_Create_Date (Now);
-               Queue_Reason.Set_Reason (Reason);
-               Queue_Reason.Save (Service.DB);
+            Add_Build_Queue (Service, Recipe, Reason, Recipe_Added);
+            if Recipe_Added then
+               Added := True;
             end if;
          end;
       end loop;
+   end Add_Build_Queue;
+
+   --  ------------------------------
+   --  Add in the build queue the given recipe with the reason for adding it
+   --  in the build queue.
+   --  ------------------------------
+   procedure Add_Build_Queue (Service : in out Context_Type;
+                              Recipe  : in out Porion.Builds.Models.Recipe_Ref;
+                              Reason  : in Porion.Builds.Models.Reason_Type;
+                              Added   : out Boolean) is
+      use Porion.Builds.Models;
+
+      Queue        : Models.Build_Queue_Ref;
+      Queue_Reason : Models.Build_Reason_Ref;
+      Found        : Boolean;
+      Id           : constant ADO.Identifier := Recipe.Get_Id;
+      Recipes : Porion.Builds.Models.Recipe_Vector;
+      Query   : ADO.Queries.Context;
+      Now     : constant Ada.Calendar.Time := Ada.Calendar.Clock;
+   begin
+      Recipe.Set_Status (Models.CONFIG_BUILD_REQUIRED);
+      Recipe.Save (Service.DB);
+
+      Query.Set_Filter ("o.recipe_id = :recipe_id");
+      Query.Bind_Param ("recipe_id", Id);
+      Queue.Find (Service.DB, Query, Found);
+      Added := not Found;
+      if not Found then
+         Queue.Set_Recipe (Recipe);
+         Queue.Set_Node (Recipe.Get_Node);
+         Queue.Set_Create_Date (Now);
+         Queue.Set_Update_Date (Queue.Get_Create_Date);
+
+         Log.Info ("Add build queue for {0} as{1}", Service.Get_Branch_Name,
+                   ADO.Identifier'Image (Id));
+      end if;
+      Queue.Save (Service.DB);
+
+      Query.Clear;
+      Query.Set_Filter ("o.queue_id = :queue_id AND o.reason = :reason");
+      Query.Bind_Param ("queue_id", Queue.Get_Id);
+      Query.Bind_Param ("reason", Integer (Models.Reason_Type'Pos (Reason)));
+      Queue_Reason.Find (Service.DB, Query, Found);
+      if not Found then
+         Queue_Reason.Set_Queue (Queue);
+         Queue_Reason.Set_Create_Date (Now);
+         Queue_Reason.Set_Reason (Reason);
+         Queue_Reason.Save (Service.DB);
+      end if;
    end Add_Build_Queue;
 
    --  ------------------------------
@@ -910,6 +1008,7 @@ package body Porion.Builds.Services is
       Query   : ADO.SQL.Query;
       Found   : Boolean;
       Source_Controller : Porion.Sources.Controller_Access;
+      Added   : Boolean;
    begin
       Log.Info ("Make build config {0} for branch {1} in {2}", Name, Branch, Path);
 
@@ -944,7 +1043,10 @@ package body Porion.Builds.Services is
       Service.Recipe.Save (Service.DB);
       Guess (Service, Path, Executor);
 
-      Add_Build_Queue (Service, Models.REASON_CONFIG);
+      Add_Build_Queue (Service, Models.REASON_CONFIG, Added);
+      if Added then
+         Update_Build_Queue (Service, Trigger_Builds => False);
+      end if;
    end Make_Recipes;
 
    --  Load the recipes of a project according to the identification.
@@ -1061,6 +1163,7 @@ package body Porion.Builds.Services is
       Service.DB.Begin_Transaction;
       declare
          New_Recipe : Models.Recipe_Ref;
+         Added      : Boolean;
       begin
          New_Recipe.Set_Name (String '(Recipe.Get_Name));
          New_Recipe.Set_Description (String '(Recipe.Get_Description));
@@ -1092,7 +1195,10 @@ package body Porion.Builds.Services is
             end;
          end loop;
 
-         Add_Build_Queue (Service, Models.REASON_CONFIG);
+         Add_Build_Queue (Service, Models.REASON_CONFIG, Added);
+         if Added then
+            Update_Build_Queue (Service, Trigger_Builds => False);
+         end if;
          Recipe := New_Recipe;
       end;
       Service.DB.Commit;

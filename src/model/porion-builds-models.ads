@@ -83,8 +83,8 @@ package Porion.Builds.Models is
       Value   : Execution_Type;
    end record;
 
-   type Reason_Type is (REASON_MANUAL, REASON_SCM, REASON_UPSTREAM);
-   for Reason_Type use (REASON_MANUAL => 0, REASON_SCM => 1, REASON_UPSTREAM => 2);
+   type Reason_Type is (REASON_MANUAL, REASON_SCM, REASON_UPSTREAM, REASON_CONFIG);
+   for Reason_Type use (REASON_MANUAL => 0, REASON_SCM => 1, REASON_UPSTREAM => 2, REASON_CONFIG => 3);
    package Reason_Type_Objects is
       new Util.Beans.Objects.Enums (Reason_Type);
 

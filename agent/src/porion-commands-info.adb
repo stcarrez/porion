@@ -15,6 +15,7 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Ada.Calendar;
 with Porion.Projects.Models;
 with Porion.Services;
 with Porion.Queries;
@@ -29,12 +30,17 @@ with Porion.Builds.Models;
 with Porion.Builds.Services;
 package body Porion.Commands.Info is
 
+   use type Ada.Calendar.Time;
+
    procedure Print_Build (Command : in out Command_Type;
                           Ident   : in Porion.Projects.Ident_Type;
                           Context : in out Context_Type) is
       Printer : PT.Texts.Printer_Type := PT.Texts.Create (Context.Printer.all);
       Fields  : PT.Texts.Field_Array (1 .. 10);
+      Build   : Builds.Models.Build_Ref := Context.Project_Service.Build;
    begin
+      Printer.Create_Field (Fields (1), Context.Styles.Default, 20.0);
+      Printer.Create_Field (Fields (2), Context.Styles.Success, 80.0);
       Printer.Layout_Fields (Fields (1 .. 2));
       Printer.Put (Fields (1), -("Project"));
       Printer.Put_UString (Fields (2), Ident.Name);
@@ -54,13 +60,25 @@ package body Porion.Commands.Info is
       Printer.Put_Int (Fields (2), Ident.Build);
       Printer.New_Line;
 
-      Printer.Put (Fields (1), -("Started on:"));
-      Printer.Put (Fields (2), Porion.Reports.Format (Context.Project_Service.Build.Get_Create_Date));
+      Printer.Put (Fields (1), -("Tag:"));
+      Printer.Put_UString (Fields (2), Build.Get_Tag);
       Printer.New_Line;
 
-      if not Context.Project_Service.Build.Get_Finish_Date.Is_Null then
+      Printer.Put (Fields (1), -("Built on:"));
+      Printer.Put_UString (Fields (2), Build.Get_Node.Get_Name);
+      Printer.New_Line;
+
+      Printer.Put (Fields (1), -("Started on:"));
+      Printer.Put (Fields (2), Porion.Reports.Format (Build.Get_Create_Date));
+      Printer.New_Line;
+
+      if not Build.Get_Finish_Date.Is_Null then
          Printer.Put (Fields (1), -("Finished on:"));
-         Printer.Put (Fields (2), Porion.Reports.Format (Context.Project_Service.Build.Get_Finish_Date.Value));
+         Printer.Put (Fields (2), Porion.Reports.Format (Build.Get_Finish_Date.Value));
+         Printer.New_Line;
+
+         Printer.Put (Fields (1), -("Duration:"));
+         Printer.Put (Fields (2), Porion.Reports.Format (Build.Get_Finish_Date.Value - Build.Get_Create_Date));
          Printer.New_Line;
       end if;
    end Print_Build;

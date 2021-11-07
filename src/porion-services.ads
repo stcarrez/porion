@@ -62,7 +62,13 @@ package Porion.Services is
                            Name    : in String);
 
    procedure Load (Service : in out Context_Type;
-                   Ident   : in Porion.Projects.Ident_Type);
+                   Ident   : in Porion.Projects.Ident_Type) with
+      Pre  => Service.Is_Open and Porion.Projects.Is_Valid (Ident),
+      Post => Service.Has_Project
+         and (Service.Has_Branch = (Projects.Has_Branch (Ident)
+                                    or Projects.Has_Recipe (Ident)
+                                    or Projects.Has_Build (Ident)))
+         and (Service.Has_Build = Projects.Has_Build (Ident));
 
    procedure Open (Service  : in out Context_Type;
                    Resource : in Resources.Get_Resource_Access;

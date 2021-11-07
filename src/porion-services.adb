@@ -94,7 +94,7 @@ package body Porion.Services is
          Service.Branch.Find (Service.DB, Query, Found);
          if not Found then
             Log.Error ("Branch {0} not found in database", To_String (Ident.Branch));
-            return;
+            raise Not_Found;
          end if;
       end if;
 
@@ -105,9 +105,9 @@ package body Porion.Services is
          Query.Bind_Param ("number", Ident.Build);
          Service.Build.Find (Service.DB, Query, Found);
          if not Found then
-            Log.Error ("Build {0} not found for project {1}",
-                       Util.Strings.Image (Ident.Build), To_String (Ident.Name));
-            return;
+            Log.Warn ("Build {0} not found for project {1}",
+                      Util.Strings.Image (Ident.Build), To_String (Ident.Name));
+            raise Not_Found;
          end if;
 
          Log.Info ("Build {0} loaded", Porion.Projects.To_String (Ident));
@@ -138,6 +138,7 @@ package body Porion.Services is
       Service.Recipe.Find (Service.DB, Query, Found);
       if not Found then
          Log.Error ("Recipe not found");
+         raise Not_Found;
       end if;
    end Load;
 

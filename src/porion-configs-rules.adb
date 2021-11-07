@@ -15,20 +15,27 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Ada.Exceptions;
 with Util.Files;
+with Util.Strings;
+with Util.Log.Loggers;
 with Porion.Logs.Analysis;
 package body Porion.Configs.Rules is
 
    use type Logs.Analysis.Level_Type;
 
+   Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Configs.Rules");
+
    --  Read the rule configuration file.
    procedure Read (Path : in String) is
       procedure Process (Line : in String);
 
+      Line_Number   : Natural := 1;
       Current_Level : Logs.Analysis.Level_Type := Logs.Analysis.LOG_UNKNOWN;
 
       procedure Process (Line : in String) is
       begin
+         Line_Number := Line_Number + 1;
          if Line'Length = 0 then
             return;
          end if;
@@ -45,6 +52,7 @@ package body Porion.Configs.Rules is
                return;
             elsif Line = "[log-context]" then
                Current_Level := Logs.Analysis.LOG_CONTEXT;
+               return;
             elsif Line = "[log-info]" then
                Current_Level := Logs.Analysis.LOG_INFO;
                return;
@@ -60,6 +68,12 @@ package body Porion.Configs.Rules is
          if Current_Level /= Logs.Analysis.LOG_UNKNOWN then
             Logs.Analysis.Add_Rule (Line, Current_Level);
          end if;
+
+      exception
+         when E : others =>
+            Log.Error ("{0}:{1}: invalid pattern: {2}",
+                       Path, Util.Strings.Image (Line_Number),
+                       Ada.Exceptions.Exception_Message (E));
       end Process;
 
    begin

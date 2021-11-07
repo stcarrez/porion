@@ -311,6 +311,9 @@ package Porion.Queries is
       --  the date when the recipe was inserted in the queue.
       Creation_Date : Ada.Calendar.Time;
 
+      --  true if the build is running.
+      Building : Boolean;
+
       --  the project name.
       Project_Name : Ada.Strings.Unbounded.Unbounded_String;
 
@@ -546,7 +549,7 @@ private
 
    package File_6 is
       new ADO.Queries.Loaders.File (Path => "report-build-queue.xml",
-                                    Sha1 => "9B8605FB258746A91644D0297B106A8C80AD8418");
+                                    Sha1 => "6DDF3CCE1B8BCE9D2009013C1705B52EDF3D127E");
 
    package Def_Queueinfo_Build_Queue_List is
       new ADO.Queries.Loaders.Query (Name => "build-queue-list",

@@ -303,6 +303,8 @@ package body Porion.Queries is
          return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Order));
       elsif Name = "creation_date" then
          return Util.Beans.Objects.Time.To_Object (From.Creation_Date);
+      elsif Name = "building" then
+         return Util.Beans.Objects.To_Object (From.Building);
       elsif Name = "project_name" then
          return Util.Beans.Objects.To_Object (From.Project_Name);
       elsif Name = "project_status" then
@@ -344,6 +346,8 @@ package body Porion.Queries is
          Item.Order := Util.Beans.Objects.To_Integer (Value);
       elsif Name = "creation_date" then
          Item.Creation_Date := Util.Beans.Objects.Time.To_Time (Value);
+      elsif Name = "building" then
+         Item.Building := Util.Beans.Objects.To_Boolean (Value);
       elsif Name = "project_name" then
          Item.Project_Name := Util.Beans.Objects.To_Unbounded_String (Value);
       elsif Name = "project_status" then
@@ -396,17 +400,18 @@ package body Porion.Queries is
          Into.Id := Stmt.Get_Identifier (0);
          Into.Order := Stmt.Get_Integer (1);
          Into.Creation_Date := Stmt.Get_Time (2);
-         Into.Project_Name := Stmt.Get_Unbounded_String (3);
-         Into.Project_Status := Porion.Projects.Models.Project_Status_Type'Val (Stmt.Get_Integer (4));
-         Into.Branch_Name := Stmt.Get_Unbounded_String (5);
-         Into.Branch_Tag := Stmt.Get_Unbounded_String (6);
-         Into.Branch_Status := Porion.Projects.Models.Branch_Status_Type'Val (Stmt.Get_Integer (7));
-         Into.Recipe_Id := Stmt.Get_Identifier (8);
-         Into.Recipe_Name := Stmt.Get_Unbounded_String (9);
-         Into.Recipe_Status := Porion.Builds.Models.Config_Status_Type'Val (Stmt.Get_Integer (10));
-         Into.Main_Recipe := Stmt.Get_Boolean (11);
-         Into.Node_Name := Stmt.Get_Unbounded_String (12);
-         Into.Node_Status := Porion.Nodes.Node_Status_Type'Val (Stmt.Get_Integer (13));
+         Into.Building := Stmt.Get_Boolean (3);
+         Into.Project_Name := Stmt.Get_Unbounded_String (4);
+         Into.Project_Status := Porion.Projects.Models.Project_Status_Type'Val (Stmt.Get_Integer (5));
+         Into.Branch_Name := Stmt.Get_Unbounded_String (6);
+         Into.Branch_Tag := Stmt.Get_Unbounded_String (7);
+         Into.Branch_Status := Porion.Projects.Models.Branch_Status_Type'Val (Stmt.Get_Integer (8));
+         Into.Recipe_Id := Stmt.Get_Identifier (9);
+         Into.Recipe_Name := Stmt.Get_Unbounded_String (10);
+         Into.Recipe_Status := Porion.Builds.Models.Config_Status_Type'Val (Stmt.Get_Integer (11));
+         Into.Main_Recipe := Stmt.Get_Boolean (12);
+         Into.Node_Name := Stmt.Get_Unbounded_String (13);
+         Into.Node_Status := Porion.Nodes.Node_Status_Type'Val (Stmt.Get_Integer (14));
       end Read;
    begin
       Stmt.Execute;

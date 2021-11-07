@@ -113,6 +113,10 @@ private
                     Arg2    : in String := "";
                     Arg3    : in String := "");
 
+   --  Report an error related to the identification which is not found.
+   procedure Error_Not_Found (Context : in out Context_Type;
+                              Ident   : in Projects.Ident_Type);
+
    --  Report an information message during or after executing some command.
    procedure Notice (Context : in out Context_Type;
                      Message : in String);

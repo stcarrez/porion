@@ -105,6 +105,7 @@
             INNER JOIN porion_project AS project ON recipe.project_id = project.id
             INNER JOIN porion_branch AS branch ON recipe.branch_id = branch.id
             WHERE project.id = :project_id
+            ORDER BY queue.`order` ASC, queue.create_date ASC
         </sql>
     </query>
 
@@ -132,6 +133,7 @@
             INNER JOIN porion_project AS project ON recipe.project_id = project.id
             INNER JOIN porion_branch AS branch ON recipe.branch_id = branch.id
             WHERE node.id = :node_id
+            ORDER BY queue.`order` ASC, queue.create_date ASC
         </sql>
     </query>
 

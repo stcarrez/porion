@@ -15,6 +15,7 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Ada.Calendar;
 with PT;
 with Porion.Nodes;
 with Porion.Queries;
@@ -30,6 +31,8 @@ package Porion.Reports is
       Success  : PT.Style_Type;
       Disabled : PT.Style_Type;
    end record;
+
+   function Format (Date : in Ada.Calendar.Time) return String;
 
    --  Get a printable name for the node status.
    function Get_Status (Status : in Porion.Nodes.Node_Status_Type) return String;

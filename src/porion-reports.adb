@@ -26,7 +26,6 @@ with Porion.Projects.Models;
 package body Porion.Reports is
 
    function Get_Tag (Tag : in UString) return String;
-   function Format (Date : in Ada.Calendar.Time) return String;
    function Get_Image (Step : in Porion.Builds.Step_Type) return String;
    function Get_Kind (Kind : in Porion.Nodes.Node_Type) return String;
 

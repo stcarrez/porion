@@ -43,6 +43,31 @@ package body Porion.Reports is
       end if;
    end Format;
 
+   --  ------------------------------
+   --  Format a duration using SS or MM:SS format.
+   --  ------------------------------
+   function Format (Value : in Duration) return String is
+      To_Char : constant array (0 .. 9) of Character := "0123456789";
+
+      Secs    : Natural := Natural (Value);
+      Mins    : Natural := Secs / 60;
+      Hours   : constant Natural := Secs / 3600;
+   begin
+      if Secs <= 59 then
+         return Util.Strings.Image (Secs);
+      elsif Secs <= 3600 then
+         Secs := Secs mod 60;
+         return Util.Strings.Image (Mins) & ":"
+            & To_Char (Secs / 10) & To_Char (Secs mod 10);
+      else
+         Secs := Secs mod 60;
+         Mins := Mins mod 60;
+         return Util.Strings.Image (Hours) & ":"
+            & To_Char (Mins / 10) & To_Char (Mins mod 10)
+            & To_Char (Secs / 10) & To_Char (Secs mod 10);
+      end if;
+   end Format;
+
    function Get_Tag (Tag : in UString) return String is
       Value : constant String := To_String (Tag);
    begin

@@ -34,6 +34,9 @@ package Porion.Reports is
 
    function Format (Date : in Ada.Calendar.Time) return String;
 
+   --  Format a duration using SS or MM:SS format.
+   function Format (Value : in Duration) return String;
+
    --  Get a printable name for the node status.
    function Get_Status (Status : in Porion.Nodes.Node_Status_Type) return String;
 

@@ -72,6 +72,7 @@
             INNER JOIN porion_recipe AS recipe ON queue.recipe_id = recipe.id
             INNER JOIN porion_project AS project ON recipe.project_id = project.id
             INNER JOIN porion_branch AS branch ON recipe.branch_id = branch.id
+            ORDER BY queue.`order` ASC, queue.create_date ASC
         </sql>
         <sql-count>
             SELECT

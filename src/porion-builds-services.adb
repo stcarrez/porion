@@ -250,6 +250,14 @@ package body Porion.Builds.Services is
          if Status = Builds.Models.BUILD_RUNNING then
             Status := Builds.Models.BUILD_PASS;
          end if;
+
+         --  Save the resource usage in the build.
+         declare
+            Usage : constant Nodes.Usage_Type := Executor.Get_Usage;
+         begin
+            Service.Build.Set_User_Time (Natural (Usage.User_Time));
+            Service.Build.Set_Sys_Time (Natural (Usage.Sys_Time));
+         end;
          Update_Build (Service, Status);
       end if;
    end Build;
@@ -457,6 +465,7 @@ package body Porion.Builds.Services is
    procedure Update_Build (Service : in out Context_Type;
                            Status  : in Builds.Models.Build_Status_Type) is
       procedure Update_Last;
+      use type Ada.Calendar.Time;
 
       Last_Builds : Builds.Models.Last_Build_Vector;
       Query       : ADO.Queries.Context;
@@ -486,10 +495,13 @@ package body Porion.Builds.Services is
          end;
       end Update_Last;
 
+      Now  : constant Ada.Calendar.Time := Ada.Calendar.Clock;
+      Time : constant Duration := Now - Service.Build.Get_Create_Date;
    begin
       Service.Build.Set_Status (Status);
       Service.Build.Set_Finish_Date ((Is_Null => False,
-                                      Value => Ada.Calendar.Clock));
+                                      Value   => Now));
+      Service.Build.Set_Build_Duration (Natural (Time * 1_000.0));
       Service.Build.Save (Service.DB);
 
       Query.Set_Filter ("o.recipe_id = :config_id"

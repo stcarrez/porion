@@ -14,6 +14,9 @@
         <property type='Date' name="creation_date" not-null="yes">
             <comment>the date when the recipe was inserted in the queue.</comment>
         </property>
+        <property type='Boolean' name="building">
+            <comment>true if the build is running.</comment>
+        </property>
         <property type='String' name="project_name">
             <comment>the project name.</comment>
         </property>
@@ -56,6 +59,7 @@
             queue.id AS id,
             queue.`order` AS `order`,
             queue.create_date AS create_date,
+            queue.building AS building,
             project.name AS name,
             project.status AS status,
             branch.name AS branch_name,
@@ -88,6 +92,7 @@
             queue.id AS id,
             queue.`order` AS `order`,
             queue.create_date AS create_date,
+            queue.building AS building,
             project.name AS name,
             project.status AS status,
             branch.name AS branch_name,
@@ -116,6 +121,7 @@
             queue.id AS id,
             queue.`order` AS `order`,
             queue.creation_date AS create_date,
+            queue.building AS building,
             project.name AS name,
             project.status AS status,
             branch.name AS branch_name,

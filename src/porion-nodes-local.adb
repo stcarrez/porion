@@ -25,6 +25,9 @@ package body Porion.Nodes.Local is
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Nodes.Local");
 
+   procedure Sys_Rusage (Usage : out Usage_Type)
+     with Import => True, Convention => C, Link_Name => "porion_get_rusage";
+
    --  ------------------------------
    --  Create the controller for the management of the given build node.
    --  ------------------------------
@@ -58,6 +61,8 @@ package body Porion.Nodes.Local is
          Output  : Util.Streams.Input_Stream_Access;
          Input   : Util.Streams.Output_Stream_Access;
          Reader  : Util.Streams.Texts.Reader_Stream;
+         Start   : Usage_Type;
+         Usage   : Usage_Type;
       begin
          if Working_Dir'Length > 0 then
             Log.Info ("Running '{0}' in '{1}'", Command, Working_Dir);
@@ -66,6 +71,7 @@ package body Porion.Nodes.Local is
             Log.Info ("Running '{0}'", Command);
          end if;
 
+         Sys_Rusage (Start);
          Util.Processes.Spawn (Proc    => Proc,
                                Command => Command,
                                Mode    => Util.Processes.READ_WRITE_ALL);
@@ -82,6 +88,10 @@ package body Porion.Nodes.Local is
             end;
          end loop;
          Util.Processes.Wait (Proc);
+
+         Sys_Rusage (Usage);
+         Controller.Usage := Controller.Usage + (Usage - Start);
+
          Status := Util.Processes.Get_Exit_Status (Proc);
          if Status /= 0 then
             Log.Warn ("Command '{0}' terminated with exit code{1}", Command,
@@ -110,6 +120,8 @@ package body Porion.Nodes.Local is
          Output  : Util.Streams.Input_Stream_Access;
          Input   : Util.Streams.Output_Stream_Access;
          Reader  : Util.Streams.Texts.Reader_Stream;
+         Start   : Usage_Type;
+         Usage   : Usage_Type;
       begin
          if Working_Dir'Length > 0 then
             Log.Info ("Running '{0}' in '{1}'", Command, Working_Dir);
@@ -118,6 +130,7 @@ package body Porion.Nodes.Local is
             Log.Info ("Running '{0}'", Command);
          end if;
 
+         Sys_Rusage (Start);
          Util.Processes.Spawn (Proc      => Proc,
                                Arguments => Args,
                                Mode      => Util.Processes.READ_WRITE_ALL);
@@ -134,6 +147,10 @@ package body Porion.Nodes.Local is
             end;
          end loop;
          Util.Processes.Wait (Proc);
+
+         Sys_Rusage (Usage);
+         Controller.Usage := Controller.Usage + (Usage - Start);
+
          Status := Util.Processes.Get_Exit_Status (Proc);
          if Status /= 0 then
             Log.Warn ("Command '{0}' terminated with exit code{1}", Command,

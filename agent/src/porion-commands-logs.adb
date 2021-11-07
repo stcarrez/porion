@@ -64,6 +64,7 @@ package body Porion.Commands.Logs is
       Porion.Configs.Rules.Read ("configure.rules");
       Porion.Configs.Rules.Read ("git.rules");
       Porion.Configs.Rules.Read ("gprbuild.rules");
+      Porion.Configs.Rules.Read ("make.rules");
       for I in 1 .. Args.Get_Count loop
          declare
             Path : constant String := Args.Get_Argument (I);

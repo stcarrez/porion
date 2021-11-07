@@ -1091,6 +1091,9 @@ package body Porion.Builds.Models is
       Impl.Timeout_Count := 0;
       Impl.Test_Duration := 0;
       Impl.Status := Porion.Builds.Models.Build_Status_Type'First;
+      Impl.Build_Duration := 0;
+      Impl.Sys_Time := 0;
+      Impl.User_Time := 0;
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Allocate;
 
@@ -1293,12 +1296,63 @@ package body Porion.Builds.Models is
    end Get_Tag;
 
 
+   procedure Set_Build_Duration (Object : in out Build_Ref;
+                                 Value  : in Integer) is
+      Impl : Build_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Integer (Impl.all, 12, Impl.Build_Duration, Value);
+   end Set_Build_Duration;
+
+   function Get_Build_Duration (Object : in Build_Ref)
+                  return Integer is
+      Impl : constant Build_Access
+         := Build_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Build_Duration;
+   end Get_Build_Duration;
+
+
+   procedure Set_Sys_Time (Object : in out Build_Ref;
+                           Value  : in Integer) is
+      Impl : Build_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Integer (Impl.all, 13, Impl.Sys_Time, Value);
+   end Set_Sys_Time;
+
+   function Get_Sys_Time (Object : in Build_Ref)
+                  return Integer is
+      Impl : constant Build_Access
+         := Build_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Sys_Time;
+   end Get_Sys_Time;
+
+
+   procedure Set_User_Time (Object : in out Build_Ref;
+                            Value  : in Integer) is
+      Impl : Build_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Integer (Impl.all, 14, Impl.User_Time, Value);
+   end Set_User_Time;
+
+   function Get_User_Time (Object : in Build_Ref)
+                  return Integer is
+      Impl : constant Build_Access
+         := Build_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.User_Time;
+   end Get_User_Time;
+
+
    procedure Set_Branch (Object : in out Build_Ref;
                          Value  : in Porion.Projects.Models.Branch_Ref'Class) is
       Impl : Build_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 12, Impl.Branch, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 15, Impl.Branch, Value);
    end Set_Branch;
 
    function Get_Branch (Object : in Build_Ref)
@@ -1315,7 +1369,7 @@ package body Porion.Builds.Models is
       Impl : Build_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 13, Impl.Recipe, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 16, Impl.Recipe, Value);
    end Set_Recipe;
 
    function Get_Recipe (Object : in Build_Ref)
@@ -1332,7 +1386,7 @@ package body Porion.Builds.Models is
       Impl : Build_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 14, Impl.Node, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 17, Impl.Node, Value);
    end Set_Node;
 
    function Get_Node (Object : in Build_Ref)
@@ -1349,7 +1403,7 @@ package body Porion.Builds.Models is
       Impl : Build_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 15, Impl.Project, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 18, Impl.Project, Value);
    end Set_Project;
 
    function Get_Project (Object : in Build_Ref)
@@ -1384,6 +1438,9 @@ package body Porion.Builds.Models is
             Copy.Test_Duration := Impl.Test_Duration;
             Copy.Status := Impl.Status;
             Copy.Tag := Impl.Tag;
+            Copy.Build_Duration := Impl.Build_Duration;
+            Copy.Sys_Time := Impl.Sys_Time;
+            Copy.User_Time := Impl.User_Time;
             Copy.Branch := Impl.Branch;
             Copy.Recipe := Impl.Recipe;
             Copy.Node := Impl.Node;
@@ -1558,24 +1615,39 @@ package body Porion.Builds.Models is
          Object.Clear_Modified (11);
       end if;
       if Object.Is_Modified (12) then
-         Stmt.Save_Field (Name  => COL_11_3_NAME, --  branch_id
-                          Value => Object.Branch);
+         Stmt.Save_Field (Name  => COL_11_3_NAME, --  build_duration
+                          Value => Object.Build_Duration);
          Object.Clear_Modified (12);
       end if;
       if Object.Is_Modified (13) then
-         Stmt.Save_Field (Name  => COL_12_3_NAME, --  recipe_id
-                          Value => Object.Recipe);
+         Stmt.Save_Field (Name  => COL_12_3_NAME, --  sys_time
+                          Value => Object.Sys_Time);
          Object.Clear_Modified (13);
       end if;
       if Object.Is_Modified (14) then
-         Stmt.Save_Field (Name  => COL_13_3_NAME, --  node_id
-                          Value => Object.Node);
+         Stmt.Save_Field (Name  => COL_13_3_NAME, --  user_time
+                          Value => Object.User_Time);
          Object.Clear_Modified (14);
       end if;
       if Object.Is_Modified (15) then
-         Stmt.Save_Field (Name  => COL_14_3_NAME, --  project_id
-                          Value => Object.Project);
+         Stmt.Save_Field (Name  => COL_14_3_NAME, --  branch_id
+                          Value => Object.Branch);
          Object.Clear_Modified (15);
+      end if;
+      if Object.Is_Modified (16) then
+         Stmt.Save_Field (Name  => COL_15_3_NAME, --  recipe_id
+                          Value => Object.Recipe);
+         Object.Clear_Modified (16);
+      end if;
+      if Object.Is_Modified (17) then
+         Stmt.Save_Field (Name  => COL_16_3_NAME, --  node_id
+                          Value => Object.Node);
+         Object.Clear_Modified (17);
+      end if;
+      if Object.Is_Modified (18) then
+         Stmt.Save_Field (Name  => COL_17_3_NAME, --  project_id
+                          Value => Object.Project);
+         Object.Clear_Modified (18);
       end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
@@ -1629,13 +1701,19 @@ package body Porion.Builds.Models is
                         Value => Integer (Porion.Builds.Models.Build_Status_Type'Pos (Object.Status)));
       Query.Save_Field (Name  => COL_10_3_NAME, --  tag
                         Value => Object.Tag);
-      Query.Save_Field (Name  => COL_11_3_NAME, --  branch_id
+      Query.Save_Field (Name  => COL_11_3_NAME, --  build_duration
+                        Value => Object.Build_Duration);
+      Query.Save_Field (Name  => COL_12_3_NAME, --  sys_time
+                        Value => Object.Sys_Time);
+      Query.Save_Field (Name  => COL_13_3_NAME, --  user_time
+                        Value => Object.User_Time);
+      Query.Save_Field (Name  => COL_14_3_NAME, --  branch_id
                         Value => Object.Branch);
-      Query.Save_Field (Name  => COL_12_3_NAME, --  recipe_id
+      Query.Save_Field (Name  => COL_15_3_NAME, --  recipe_id
                         Value => Object.Recipe);
-      Query.Save_Field (Name  => COL_13_3_NAME, --  node_id
+      Query.Save_Field (Name  => COL_16_3_NAME, --  node_id
                         Value => Object.Node);
-      Query.Save_Field (Name  => COL_14_3_NAME, --  project_id
+      Query.Save_Field (Name  => COL_17_3_NAME, --  project_id
                         Value => Object.Project);
       Query.Execute (Result);
       if Result /= 1 then
@@ -1692,6 +1770,12 @@ package body Porion.Builds.Models is
          return Porion.Builds.Models.Build_Status_Type_Objects.To_Object (Impl.Status);
       elsif Name = "tag" then
          return Util.Beans.Objects.To_Object (Impl.Tag);
+      elsif Name = "build_duration" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Build_Duration));
+      elsif Name = "sys_time" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Sys_Time));
+      elsif Name = "user_time" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.User_Time));
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -1715,17 +1799,20 @@ package body Porion.Builds.Models is
       Object.Test_Duration := Stmt.Get_Integer (8);
       Object.Status := Porion.Builds.Models.Build_Status_Type'Val (Stmt.Get_Integer (9));
       Object.Tag := Stmt.Get_Unbounded_String (10);
-      if not Stmt.Is_Null (11) then
-         Object.Branch.Set_Key_Value (Stmt.Get_Identifier (11), Session);
-      end if;
-      if not Stmt.Is_Null (12) then
-         Object.Recipe.Set_Key_Value (Stmt.Get_Identifier (12), Session);
-      end if;
-      if not Stmt.Is_Null (13) then
-         Object.Node.Set_Key_Value (Stmt.Get_Identifier (13), Session);
-      end if;
+      Object.Build_Duration := Stmt.Get_Integer (11);
+      Object.Sys_Time := Stmt.Get_Integer (12);
+      Object.User_Time := Stmt.Get_Integer (13);
       if not Stmt.Is_Null (14) then
-         Object.Project.Set_Key_Value (Stmt.Get_Identifier (14), Session);
+         Object.Branch.Set_Key_Value (Stmt.Get_Identifier (14), Session);
+      end if;
+      if not Stmt.Is_Null (15) then
+         Object.Recipe.Set_Key_Value (Stmt.Get_Identifier (15), Session);
+      end if;
+      if not Stmt.Is_Null (16) then
+         Object.Node.Set_Key_Value (Stmt.Get_Identifier (16), Session);
+      end if;
+      if not Stmt.Is_Null (17) then
+         Object.Project.Set_Key_Value (Stmt.Get_Identifier (17), Session);
       end if;
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);

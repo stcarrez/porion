@@ -472,6 +472,30 @@ package Porion.Builds.Models is
    function Get_Tag (Object : in Build_Ref)
                  return String;
 
+   --  Set the build duration in seconds.
+   procedure Set_Build_Duration (Object : in out Build_Ref;
+                                 Value  : in Integer);
+
+   --  Get the build duration in seconds.
+   function Get_Build_Duration (Object : in Build_Ref)
+                 return Integer;
+
+   --  Set the system time of cumulated processes in milliseconds.
+   procedure Set_Sys_Time (Object : in out Build_Ref;
+                           Value  : in Integer);
+
+   --  Get the system time of cumulated processes in milliseconds.
+   function Get_Sys_Time (Object : in Build_Ref)
+                 return Integer;
+
+   --  Set the user time of cumulated processes in milliseconds.
+   procedure Set_User_Time (Object : in out Build_Ref;
+                            Value  : in Integer);
+
+   --  Get the user time of cumulated processes in milliseconds.
+   function Get_User_Time (Object : in Build_Ref)
+                 return Integer;
+
    --  Set the branch associated with the build.
    procedure Set_Branch (Object : in out Build_Ref;
                          Value  : in Porion.Projects.Models.Branch_Ref'Class);
@@ -1532,13 +1556,16 @@ private
    COL_8_3_NAME : aliased constant String := "test_duration";
    COL_9_3_NAME : aliased constant String := "status";
    COL_10_3_NAME : aliased constant String := "tag";
-   COL_11_3_NAME : aliased constant String := "branch_id";
-   COL_12_3_NAME : aliased constant String := "recipe_id";
-   COL_13_3_NAME : aliased constant String := "node_id";
-   COL_14_3_NAME : aliased constant String := "project_id";
+   COL_11_3_NAME : aliased constant String := "build_duration";
+   COL_12_3_NAME : aliased constant String := "sys_time";
+   COL_13_3_NAME : aliased constant String := "user_time";
+   COL_14_3_NAME : aliased constant String := "branch_id";
+   COL_15_3_NAME : aliased constant String := "recipe_id";
+   COL_16_3_NAME : aliased constant String := "node_id";
+   COL_17_3_NAME : aliased constant String := "project_id";
 
    BUILD_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 15,
+     (Count   => 18,
       Table   => BUILD_NAME'Access,
       Members => (
          1 => COL_0_3_NAME'Access,
@@ -1555,7 +1582,10 @@ private
          12 => COL_11_3_NAME'Access,
          13 => COL_12_3_NAME'Access,
          14 => COL_13_3_NAME'Access,
-         15 => COL_14_3_NAME'Access)
+         15 => COL_14_3_NAME'Access,
+         16 => COL_15_3_NAME'Access,
+         17 => COL_16_3_NAME'Access,
+         18 => COL_17_3_NAME'Access)
      );
    BUILD_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := BUILD_DEF'Access;
@@ -1578,6 +1608,9 @@ private
        Test_Duration : Integer;
        Status : Porion.Builds.Models.Build_Status_Type;
        Tag : Ada.Strings.Unbounded.Unbounded_String;
+       Build_Duration : Integer;
+       Sys_Time : Integer;
+       User_Time : Integer;
        Branch : Porion.Projects.Models.Branch_Ref;
        Recipe : Porion.Builds.Models.Recipe_Ref;
        Node : Porion.Nodes.Models.Node_Ref;

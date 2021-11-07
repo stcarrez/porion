@@ -32,13 +32,35 @@ package Porion.Projects is
       Build  : Natural := 0;
    end record;
 
+   --  Check if the identification is valid.
+   function Is_Valid (Ident : in Ident_Type) return Boolean
+      is (Length (Ident.Name) > 0);
+
+   --  Check if the identification indicates a project branch.
+   function Has_Branch (Ident : in Ident_Type) return Boolean
+      is (Length (Ident.Name) > 0 and Length (Ident.Branch) > 0);
+
+   --  Check if the identification indicates a project recipe.
+   function Has_Recipe (Ident : in Ident_Type) return Boolean
+      is (Length (Ident.Name) > 0 and Length (Ident.Recipe) > 0);
+
+   --  Check if the identification indicates a build node.
+   function Has_Node (Ident : in Ident_Type) return Boolean
+      is (Length (Ident.Name) > 0 and Length (Ident.Node) > 0);
+
+   --  Check if the identification indicates a build number.
+   function Has_Build (Ident : in Ident_Type) return Boolean
+      is (Length (Ident.Name) > 0 and Ident.Build > 0);
+
    --  Parse an identification string with the format:
    --   <project>[#<branch>][~<recipe>][@<node][:<build-number>]
    --  Raises the Invalid_Ident exception if the format is invalid.
-   function Parse (Ident : in String) return Ident_Type;
+   function Parse (Ident : in String) return Ident_Type with
+      Post => Is_Valid (Parse'Result);
 
    --  Get a printable representation of the split identification string.
-   function To_String (Ident : in Ident_Type) return String;
+   function To_String (Ident : in Ident_Type) return String with
+      Pre => Is_Valid (Ident);
 
    type Project_Type is record
       Name    : UString;

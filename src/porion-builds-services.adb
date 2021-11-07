@@ -47,7 +47,6 @@ package body Porion.Builds.Services is
                           Recipe      : in Porion.Builds.Models.Recipe_Ref;
                           Executor    : in out Porion.Executors.Executor_Type'Class) is
       Query : ADO.Queries.Context;
-      Stmt  : ADO.Statements.Query_Statement;
       Found : Boolean;
    begin
       Service.Recipe := Recipe;
@@ -61,14 +60,9 @@ package body Porion.Builds.Services is
       Service.Ident.Branch := To_UString (Service.Branch.get_Name);
       Service.Ident.Recipe := To_UString (Service.Recipe.Get_Name);
       Service.Ident.Node := To_UString (Service.Build_Node.get_Name);
-      Query.Set_Query (Projects.Models.Query_Project_Last_Build);
-      Query.Bind_Param ("project_id", Service.Project.Get_Id);
-      Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
-      Stmt := Service.DB.Create_Statement (Query);
-      Stmt.Execute;
 
       Service.Build := Porion.Builds.Models.Null_Build;
-      Service.Build.Set_Number (Stmt.Get_Result_Integer + 1);
+      Service.Build.Set_Number (Service.Branch.Get_Last_Build_Number + 1);
 
       Service.Build.Set_Project (Service.Project);
       Service.Build.Set_Branch (Service.Branch);
@@ -77,7 +71,9 @@ package body Porion.Builds.Services is
       Service.Build.Set_Tag (String '(Service.Branch.Get_Tag));
       Service.Build.Set_Create_Date (Ada.Calendar.Clock);
       if not Executor.Is_Dry_Run then
+         Service.Branch.Set_Last_Build_Number (Service.Build.Get_Number);
          Service.Build.Save (Service.DB);
+         Service.Branch.Save (Service.DB);
 
          --  Get or create a build queue entry for the recipe.
          if Service.Queue.Is_Null then
@@ -277,7 +273,10 @@ package body Porion.Builds.Services is
                                       Equivalent_Keys => ADO."=",
                                       "=" => ADO.Utils.Identifier_Vectors."=");
 
-   function Contains (List : in Porion.Builds.Models.Build_Queue_Vector;
+   --  ------------------------------
+   --  Returns True if the recipe is contained in the build queue.
+   --  ------------------------------
+   function Contains (List   : in Porion.Builds.Models.Build_Queue_Vector;
                       Recipe : in Porion.Builds.Models.Recipe_Ref) return Boolean is
    begin
       for Queue of List loop
@@ -330,7 +329,7 @@ package body Porion.Builds.Services is
             end if;
          end loop;
       end;
-      
+
       --  Step 4: TODO reorder the build queue according to project dependencies
 
       --  Step 5: save the new build queue order.
@@ -347,6 +346,8 @@ package body Porion.Builds.Services is
 
    procedure Update_Build (Service : in out Context_Type;
                            Status  : in Builds.Models.Build_Status_Type) is
+      procedure Update_Last;
+
       Last_Builds : Builds.Models.Last_Build_Vector;
       Query       : ADO.Queries.Context;
 
@@ -598,6 +599,9 @@ package body Porion.Builds.Services is
                Stream.Write_Entity ("execution", Step.Get_Execution'Image);
                Stream.Start_Entity ("parameters");
                declare
+                  procedure Print (Name : in String;
+                                   Value : Util.Properties.Value);
+
                   Params : constant String := Step.Get_Parameters;
                   Config : Porion.Configs.Config_Type;
 
@@ -683,6 +687,8 @@ package body Porion.Builds.Services is
    procedure Update_Branch_Config (Branch  : in Porion.Projects.Models.Branch_Ref;
                                    Status  : in Porion.Builds.Models.Config_Status_Type;
                                    Session : in out ADO.Sessions.Master_Session) is
+      function Get_Name return String;
+
       use Porion.Builds.Models;
 
       function Get_Name return String is
@@ -1055,6 +1061,16 @@ package body Porion.Builds.Services is
    procedure Guess (Service  : in out Context_Type;
                     Path     : in String;
                     Executor : in out Porion.Executors.Executor_Type'Class) is
+      function Check (File    : in String;
+                      Message : in String) return Boolean;
+
+      procedure Add_Step (Step    : in out Builds.Models.Recipe_Step_Ref;
+                          Builder : in Builds.Models.Builder_Type;
+                          Kind    : in Builds.Step_Type);
+
+      procedure Add_Step (Kind    : in Builds.Step_Type;
+                          Command : in String);
+
       use Util.Strings.Formats;
 
       Current_Step : Positive := 1;

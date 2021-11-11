@@ -80,11 +80,11 @@ package body Porion.Commands.Info is
          Printer.New_Line;
 
          Printer.Put (Fields (1), -("User time:"));
-         Printer.Put_Int (Fields (2), Build.Get_User_Time);
+         Printer.Put (Fields (2), Reports.Format (Build.Get_User_Time));
          Printer.New_Line;
 
          Printer.Put (Fields (1), -("System time:"));
-         Printer.Put_Int (Fields (2), Build.Get_Sys_Time);
+         Printer.Put (Fields (2), Reports.Format (Build.Get_Sys_Time));
          Printer.New_Line;
 
          Printer.Create_Field (Fields (3), Context.Styles.Default, 20.0);

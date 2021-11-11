@@ -37,6 +37,9 @@ package Porion.Reports is
    --  Format a duration using SS or MM:SS format.
    function Format (Value : in Duration) return String;
 
+   --  Format a duration expressed in milliseconds.
+   function Format (Value : in Millisecond_Type) return String;
+
    --  Get a printable name for the node status.
    function Get_Status (Status : in Porion.Nodes.Node_Status_Type) return String;
 

@@ -13,8 +13,8 @@ void porion_get_rusage(struct porion_usage *usage)
     struct rusage rusage;
 
     if (getrusage(RUSAGE_CHILDREN, &rusage) != 0) {
-        rusage->utime = 0;
-        rusage->stime = 0;
+        usage->utime = 0;
+        usage->stime = 0;
         return;
     }
 

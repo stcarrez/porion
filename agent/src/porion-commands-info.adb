@@ -25,8 +25,6 @@ with Porion.Executors;
 with Porion.Configs;
 with ADO.Queries;
 with PT.Texts;
-with Porion.Reports;
-with Porion.Builds.Models;
 with Porion.Builds.Services;
 package body Porion.Commands.Info is
 
@@ -37,7 +35,7 @@ package body Porion.Commands.Info is
                           Context : in out Context_Type) is
       Printer : PT.Texts.Printer_Type := PT.Texts.Create (Context.Printer.all);
       Fields  : PT.Texts.Field_Array (1 .. 10);
-      Build   : Builds.Models.Build_Ref := Context.Project_Service.Build;
+      Build   : constant Builds.Models.Build_Ref := Context.Project_Service.Build;
    begin
       Printer.Create_Field (Fields (1), Context.Styles.Default, 20.0);
       Printer.Create_Field (Fields (2), Context.Styles.Success, 80.0);
@@ -64,22 +62,55 @@ package body Porion.Commands.Info is
       Printer.Put_UString (Fields (2), Build.Get_Tag);
       Printer.New_Line;
 
-      Printer.Put (Fields (1), -("Built on:"));
+      Printer.Put (Fields (1), -("Build node:"));
       Printer.Put_UString (Fields (2), Build.Get_Node.Get_Name);
       Printer.New_Line;
 
       Printer.Put (Fields (1), -("Started on:"));
-      Printer.Put (Fields (2), Porion.Reports.Format (Build.Get_Create_Date));
+      Printer.Put (Fields (2), Reports.Format (Build.Get_Create_Date));
       Printer.New_Line;
 
       if not Build.Get_Finish_Date.Is_Null then
          Printer.Put (Fields (1), -("Finished on:"));
-         Printer.Put (Fields (2), Porion.Reports.Format (Build.Get_Finish_Date.Value));
+         Printer.Put (Fields (2), Reports.Format (Build.Get_Finish_Date.Value));
          Printer.New_Line;
 
          Printer.Put (Fields (1), -("Duration:"));
-         Printer.Put (Fields (2), Porion.Reports.Format (Build.Get_Finish_Date.Value - Build.Get_Create_Date));
+         Printer.Put (Fields (2), Reports.Format (Build.Get_Finish_Date.Value - Build.Get_Create_Date));
          Printer.New_Line;
+
+         Printer.Put (Fields (1), -("User time:"));
+         Printer.Put_Int (Fields (2), Build.Get_User_Time);
+         Printer.New_Line;
+
+         Printer.Put (Fields (1), -("System time:"));
+         Printer.Put_Int (Fields (2), Build.Get_Sys_Time);
+         Printer.New_Line;
+
+         Printer.Create_Field (Fields (3), Context.Styles.Default, 20.0);
+         Printer.Create_Field (Fields (4), Context.Styles.Success, 0.0);
+         Printer.Create_Field (Fields (5), Context.Styles.Default, 0.0);
+         Printer.Create_Field (Fields (6), Context.Styles.Error, 0.0);
+         Printer.Create_Field (Fields (7), Context.Styles.Default, 0.0);
+         Printer.Create_Field (Fields (8), Context.Styles.Error, 0.0);
+         for I in 4 .. 8 loop
+            Printer.Set_Bottom_Right_Padding (Fields (I), (1, 0));
+         end loop;
+         Printer.Layout_Fields (Fields (3 .. 8));
+
+         Printer.Put (Fields (3), -("Tests run:"));
+         Printer.Put_Int (Fields (4), Build.Get_Pass_Count);
+         if Build.Get_Fail_Count > 0 then
+            Printer.Put (Fields (5), -("Failure:"));
+            Printer.Put_Int (Fields (6), Build.Get_Fail_Count);
+         end if;
+
+         if Build.Get_Timeout_Count > 0 then
+            Printer.Put (Fields (7), -("Timeout:"));
+            Printer.Put_Int (Fields (8), Build.Get_Timeout_Count);
+         end if;
+         Printer.New_Line;
+
       end if;
    end Print_Build;
 
@@ -325,8 +356,9 @@ package body Porion.Commands.Info is
       for I in 1 .. Args.Get_Count loop
          declare
             Arg   : constant String := Args.Get_Argument (I);
-            Ident : constant Porion.Projects.Ident_Type := Porion.Projects.Parse (Arg);
+            Ident : Porion.Projects.Ident_Type;
          begin
+            Ident := Porion.Projects.Parse (Arg);
             Context.Project_Service.Load (Ident);
 
             if Ident.Build > 0 then
@@ -338,6 +370,9 @@ package body Porion.Commands.Info is
          exception
             when Porion.Services.Not_Found =>
                Context.Error_Not_Found (Ident);
+
+            when Porion.Projects.Invalid_Ident =>
+               Commands.Error (-("invalid project or build identifier: {0}"), Arg);
 
          end;
       end loop;

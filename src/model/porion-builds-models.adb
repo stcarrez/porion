@@ -602,14 +602,14 @@ package body Porion.Builds.Models is
 
    procedure Set_Status (Object : in out Recipe_Ref;
                          Value  : in Porion.Builds.Models.Config_Status_Type) is
-      procedure Set_Field_Enum is
+      procedure Set_Field_Discrete is
         new ADO.Audits.Set_Field_Operation
           (Porion.Builds.Models.Config_Status_Type,
            Porion.Builds.Models.Config_Status_Type_Objects.To_Object);
       Impl : Recipe_Access;
    begin
       Set_Field (Object, Impl);
-      Set_Field_Enum (Impl.all, 5, Impl.Status, Value);
+      Set_Field_Discrete (Impl.all, 5, Impl.Status, Value);
    end Set_Status;
 
    function Get_Status (Object : in Recipe_Ref)
@@ -1248,13 +1248,13 @@ package body Porion.Builds.Models is
 
    procedure Set_Status (Object : in out Build_Ref;
                          Value  : in Porion.Builds.Models.Build_Status_Type) is
-      procedure Set_Field_Enum is
+      procedure Set_Field_Discrete is
         new ADO.Objects.Set_Field_Operation
           (Porion.Builds.Models.Build_Status_Type);
       Impl : Build_Access;
    begin
       Set_Field (Object, Impl);
-      Set_Field_Enum (Impl.all, 10, Impl.Status, Value);
+      Set_Field_Discrete (Impl.all, 10, Impl.Status, Value);
    end Set_Status;
 
    function Get_Status (Object : in Build_Ref)
@@ -1314,15 +1314,18 @@ package body Porion.Builds.Models is
 
 
    procedure Set_Sys_Time (Object : in out Build_Ref;
-                           Value  : in Integer) is
+                           Value  : in Porion.Millisecond_Type) is
+      procedure Set_Field_Discrete is
+        new ADO.Objects.Set_Field_Operation
+          (Porion.Millisecond_Type);
       Impl : Build_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Integer (Impl.all, 13, Impl.Sys_Time, Value);
+      Set_Field_Discrete (Impl.all, 13, Impl.Sys_Time, Value);
    end Set_Sys_Time;
 
    function Get_Sys_Time (Object : in Build_Ref)
-                  return Integer is
+                  return Porion.Millisecond_Type is
       Impl : constant Build_Access
          := Build_Impl (Object.Get_Load_Object.all)'Access;
    begin
@@ -1331,15 +1334,18 @@ package body Porion.Builds.Models is
 
 
    procedure Set_User_Time (Object : in out Build_Ref;
-                            Value  : in Integer) is
+                            Value  : in Porion.Millisecond_Type) is
+      procedure Set_Field_Discrete is
+        new ADO.Objects.Set_Field_Operation
+          (Porion.Millisecond_Type);
       Impl : Build_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Integer (Impl.all, 14, Impl.User_Time, Value);
+      Set_Field_Discrete (Impl.all, 14, Impl.User_Time, Value);
    end Set_User_Time;
 
    function Get_User_Time (Object : in Build_Ref)
-                  return Integer is
+                  return Porion.Millisecond_Type is
       Impl : constant Build_Access
          := Build_Impl (Object.Get_Load_Object.all)'Access;
    begin
@@ -1621,12 +1627,12 @@ package body Porion.Builds.Models is
       end if;
       if Object.Is_Modified (13) then
          Stmt.Save_Field (Name  => COL_12_3_NAME, --  sys_time
-                          Value => Object.Sys_Time);
+                          Value => Integer (Object.Sys_Time));
          Object.Clear_Modified (13);
       end if;
       if Object.Is_Modified (14) then
          Stmt.Save_Field (Name  => COL_13_3_NAME, --  user_time
-                          Value => Object.User_Time);
+                          Value => Integer (Object.User_Time));
          Object.Clear_Modified (14);
       end if;
       if Object.Is_Modified (15) then
@@ -1704,9 +1710,9 @@ package body Porion.Builds.Models is
       Query.Save_Field (Name  => COL_11_3_NAME, --  build_duration
                         Value => Object.Build_Duration);
       Query.Save_Field (Name  => COL_12_3_NAME, --  sys_time
-                        Value => Object.Sys_Time);
+                        Value => Integer (Object.Sys_Time));
       Query.Save_Field (Name  => COL_13_3_NAME, --  user_time
-                        Value => Object.User_Time);
+                        Value => Integer (Object.User_Time));
       Query.Save_Field (Name  => COL_14_3_NAME, --  branch_id
                         Value => Object.Branch);
       Query.Save_Field (Name  => COL_15_3_NAME, --  recipe_id
@@ -1800,8 +1806,8 @@ package body Porion.Builds.Models is
       Object.Status := Porion.Builds.Models.Build_Status_Type'Val (Stmt.Get_Integer (9));
       Object.Tag := Stmt.Get_Unbounded_String (10);
       Object.Build_Duration := Stmt.Get_Integer (11);
-      Object.Sys_Time := Stmt.Get_Integer (12);
-      Object.User_Time := Stmt.Get_Integer (13);
+      Object.Sys_Time := Porion.Millisecond_Type (Stmt.Get_Integer (12));
+      Object.User_Time := Porion.Millisecond_Type (Stmt.Get_Integer (13));
       if not Stmt.Is_Null (14) then
          Object.Branch.Set_Key_Value (Stmt.Get_Identifier (14), Session);
       end if;
@@ -2393,13 +2399,13 @@ package body Porion.Builds.Models is
 
    procedure Set_Reason (Object : in out Build_Reason_Ref;
                          Value  : in Porion.Builds.Models.Reason_Type) is
-      procedure Set_Field_Enum is
+      procedure Set_Field_Discrete is
         new ADO.Objects.Set_Field_Operation
           (Porion.Builds.Models.Reason_Type);
       Impl : Build_Reason_Access;
    begin
       Set_Field (Object, Impl);
-      Set_Field_Enum (Impl.all, 4, Impl.Reason, Value);
+      Set_Field_Discrete (Impl.all, 4, Impl.Reason, Value);
    end Set_Reason;
 
    function Get_Reason (Object : in Build_Reason_Ref)
@@ -2877,13 +2883,13 @@ package body Porion.Builds.Models is
 
    procedure Set_Builder (Object : in out Recipe_Step_Ref;
                           Value  : in Porion.Builds.Models.Builder_Type) is
-      procedure Set_Field_Enum is
+      procedure Set_Field_Discrete is
         new ADO.Objects.Set_Field_Operation
           (Porion.Builds.Models.Builder_Type);
       Impl : Recipe_Step_Access;
    begin
       Set_Field (Object, Impl);
-      Set_Field_Enum (Impl.all, 4, Impl.Builder, Value);
+      Set_Field_Discrete (Impl.all, 4, Impl.Builder, Value);
    end Set_Builder;
 
    function Get_Builder (Object : in Recipe_Step_Ref)
@@ -2914,13 +2920,13 @@ package body Porion.Builds.Models is
 
    procedure Set_Step (Object : in out Recipe_Step_Ref;
                        Value  : in Porion.Builds.Step_Type) is
-      procedure Set_Field_Enum is
+      procedure Set_Field_Discrete is
         new ADO.Objects.Set_Field_Operation
           (Porion.Builds.Step_Type);
       Impl : Recipe_Step_Access;
    begin
       Set_Field (Object, Impl);
-      Set_Field_Enum (Impl.all, 6, Impl.Step, Value);
+      Set_Field_Discrete (Impl.all, 6, Impl.Step, Value);
    end Set_Step;
 
    function Get_Step (Object : in Recipe_Step_Ref)
@@ -2951,13 +2957,13 @@ package body Porion.Builds.Models is
 
    procedure Set_Execution (Object : in out Recipe_Step_Ref;
                             Value  : in Porion.Builds.Models.Execution_Type) is
-      procedure Set_Field_Enum is
+      procedure Set_Field_Discrete is
         new ADO.Objects.Set_Field_Operation
           (Porion.Builds.Models.Execution_Type);
       Impl : Recipe_Step_Access;
    begin
       Set_Field (Object, Impl);
-      Set_Field_Enum (Impl.all, 8, Impl.Execution, Value);
+      Set_Field_Discrete (Impl.all, 8, Impl.Execution, Value);
    end Set_Execution;
 
    function Get_Execution (Object : in Recipe_Step_Ref)
@@ -4266,13 +4272,13 @@ package body Porion.Builds.Models is
 
    procedure Set_Status (Object : in out Last_Build_Ref;
                          Value  : in Porion.Builds.Models.Build_Status_Type) is
-      procedure Set_Field_Enum is
+      procedure Set_Field_Discrete is
         new ADO.Objects.Set_Field_Operation
           (Porion.Builds.Models.Build_Status_Type);
       Impl : Last_Build_Access;
    begin
       Set_Field (Object, Impl);
-      Set_Field_Enum (Impl.all, 2, Impl.Status, Value);
+      Set_Field_Discrete (Impl.all, 2, Impl.Status, Value);
    end Set_Status;
 
    function Get_Status (Object : in Last_Build_Ref)

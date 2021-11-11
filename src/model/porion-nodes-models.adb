@@ -265,14 +265,14 @@ package body Porion.Nodes.Models is
 
    procedure Set_Kind (Object : in out Node_Ref;
                        Value  : in Porion.Nodes.Node_Type) is
-      procedure Set_Field_Enum is
+      procedure Set_Field_Discrete is
         new ADO.Audits.Set_Field_Operation
           (Porion.Nodes.Node_Type,
            Porion.Nodes.Node_Type_Objects.To_Object);
       Impl : Node_Access;
    begin
       Set_Field (Object, Impl);
-      Set_Field_Enum (Impl.all, 9, Impl.Kind, Value);
+      Set_Field_Discrete (Impl.all, 9, Impl.Kind, Value);
    end Set_Kind;
 
    function Get_Kind (Object : in Node_Ref)
@@ -303,13 +303,13 @@ package body Porion.Nodes.Models is
 
    procedure Set_Status (Object : in out Node_Ref;
                          Value  : in Porion.Nodes.Node_Status_Type) is
-      procedure Set_Field_Enum is
+      procedure Set_Field_Discrete is
         new ADO.Objects.Set_Field_Operation
           (Porion.Nodes.Node_Status_Type);
       Impl : Node_Access;
    begin
       Set_Field (Object, Impl);
-      Set_Field_Enum (Impl.all, 11, Impl.Status, Value);
+      Set_Field_Discrete (Impl.all, 11, Impl.Status, Value);
    end Set_Status;
 
    function Get_Status (Object : in Node_Ref)

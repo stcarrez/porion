@@ -482,19 +482,19 @@ package Porion.Builds.Models is
 
    --  Set the system time of cumulated processes in milliseconds.
    procedure Set_Sys_Time (Object : in out Build_Ref;
-                           Value  : in Integer);
+                           Value  : in Porion.Millisecond_Type);
 
    --  Get the system time of cumulated processes in milliseconds.
    function Get_Sys_Time (Object : in Build_Ref)
-                 return Integer;
+                 return Porion.Millisecond_Type;
 
    --  Set the user time of cumulated processes in milliseconds.
    procedure Set_User_Time (Object : in out Build_Ref;
-                            Value  : in Integer);
+                            Value  : in Porion.Millisecond_Type);
 
    --  Get the user time of cumulated processes in milliseconds.
    function Get_User_Time (Object : in Build_Ref)
-                 return Integer;
+                 return Porion.Millisecond_Type;
 
    --  Set the branch associated with the build.
    procedure Set_Branch (Object : in out Build_Ref;
@@ -1609,8 +1609,8 @@ private
        Status : Porion.Builds.Models.Build_Status_Type;
        Tag : Ada.Strings.Unbounded.Unbounded_String;
        Build_Duration : Integer;
-       Sys_Time : Integer;
-       User_Time : Integer;
+       Sys_Time : Porion.Millisecond_Type;
+       User_Time : Porion.Millisecond_Type;
        Branch : Porion.Projects.Models.Branch_Ref;
        Recipe : Porion.Builds.Models.Recipe_Ref;
        Node : Porion.Nodes.Models.Node_Ref;

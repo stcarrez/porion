@@ -1961,13 +1961,13 @@ package body Porion.Xunit.Models is
 
    procedure Set_Status (Object : in out Test_Run_Ref;
                          Value  : in Porion.Xunit.Models.Test_Status_Type) is
-      procedure Set_Field_Enum is
+      procedure Set_Field_Discrete is
         new ADO.Objects.Set_Field_Operation
           (Porion.Xunit.Models.Test_Status_Type);
       Impl : Test_Run_Access;
    begin
       Set_Field (Object, Impl);
-      Set_Field_Enum (Impl.all, 2, Impl.Status, Value);
+      Set_Field_Discrete (Impl.all, 2, Impl.Status, Value);
    end Set_Status;
 
    function Get_Status (Object : in Test_Run_Ref)

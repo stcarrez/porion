@@ -209,14 +209,14 @@ package body Porion.Projects.Models is
 
    procedure Set_Status (Object : in out Project_Ref;
                          Value  : in Porion.Projects.Models.Project_Status_Type) is
-      procedure Set_Field_Enum is
+      procedure Set_Field_Discrete is
         new ADO.Audits.Set_Field_Operation
           (Porion.Projects.Models.Project_Status_Type,
            Porion.Projects.Models.Project_Status_Type_Objects.To_Object);
       Impl : Project_Access;
    begin
       Set_Field (Object, Impl);
-      Set_Field_Enum (Impl.all, 7, Impl.Status, Value);
+      Set_Field_Discrete (Impl.all, 7, Impl.Status, Value);
    end Set_Status;
 
    function Get_Status (Object : in Project_Ref)
@@ -230,14 +230,14 @@ package body Porion.Projects.Models is
 
    procedure Set_Scm (Object : in out Project_Ref;
                       Value  : in Porion.Sources.Source_Control_Type) is
-      procedure Set_Field_Enum is
+      procedure Set_Field_Discrete is
         new ADO.Audits.Set_Field_Operation
           (Porion.Sources.Source_Control_Type,
            Porion.Sources.Source_Control_Type_Objects.To_Object);
       Impl : Project_Access;
    begin
       Set_Field (Object, Impl);
-      Set_Field_Enum (Impl.all, 8, Impl.Scm, Value);
+      Set_Field_Discrete (Impl.all, 8, Impl.Scm, Value);
    end Set_Scm;
 
    function Get_Scm (Object : in Project_Ref)
@@ -998,13 +998,13 @@ package body Porion.Projects.Models is
 
    procedure Set_Status (Object : in out Branch_Ref;
                          Value  : in Porion.Projects.Models.Branch_Status_Type) is
-      procedure Set_Field_Enum is
+      procedure Set_Field_Discrete is
         new ADO.Objects.Set_Field_Operation
           (Porion.Projects.Models.Branch_Status_Type);
       Impl : Branch_Access;
    begin
       Set_Field (Object, Impl);
-      Set_Field_Enum (Impl.all, 8, Impl.Status, Value);
+      Set_Field_Discrete (Impl.all, 8, Impl.Status, Value);
    end Set_Status;
 
    function Get_Status (Object : in Branch_Ref)

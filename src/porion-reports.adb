@@ -29,6 +29,8 @@ package body Porion.Reports is
    function Get_Image (Step : in Porion.Builds.Step_Type) return String;
    function Get_Kind (Kind : in Porion.Nodes.Node_Type) return String;
 
+   To_Digit : constant array (0 .. 9) of Character := "0123456789";
+
    function Format (Date : in Ada.Calendar.Time) return String is
       use Ada.Calendar;
 
@@ -47,8 +49,6 @@ package body Porion.Reports is
    --  Format a duration using SS or MM:SS format.
    --  ------------------------------
    function Format (Value : in Duration) return String is
-      To_Char : constant array (0 .. 9) of Character := "0123456789";
-
       Secs    : Natural := Natural (Value);
       Mins    : Natural := Secs / 60;
       Hours   : constant Natural := Secs / 3600;
@@ -58,13 +58,32 @@ package body Porion.Reports is
       elsif Secs <= 3600 then
          Secs := Secs mod 60;
          return Util.Strings.Image (Mins) & ":"
-            & To_Char (Secs / 10) & To_Char (Secs mod 10);
+            & To_Digit (Secs / 10) & To_Digit (Secs mod 10);
       else
          Secs := Secs mod 60;
          Mins := Mins mod 60;
          return Util.Strings.Image (Hours) & ":"
-            & To_Char (Mins / 10) & To_Char (Mins mod 10)
-            & To_Char (Secs / 10) & To_Char (Secs mod 10);
+            & To_Digit (Mins / 10) & To_Digit (Mins mod 10)
+            & To_Digit (Secs / 10) & To_Digit (Secs mod 10);
+      end if;
+   end Format;
+
+   --  ------------------------------
+   --  Format a duration expressed in milliseconds.
+   --  ------------------------------
+   function Format (Value : in Millisecond_Type) return String is
+      Ms   : constant Natural := Natural (Value mod 1000);
+      Ms2  : constant Natural := Ms mod 100;
+      Ms3  : constant Natural := Ms2 mod 10;
+      Secs : constant Natural := Natural (Value / 1000);
+   begin
+      if Ms2 = 0 then
+         return Util.Strings.Image (Secs) & "." & To_Digit (Ms / 100);
+      elsif Ms3 = 0 then
+         return Util.Strings.Image (Secs) & "." & To_Digit (Ms / 100) & To_Digit (Ms2 / 10);
+      else
+         return Util.Strings.Image (Secs) & "." & To_Digit (Ms / 100) & To_Digit (Ms2 / 10)
+                   & To_Digit (Ms3);
       end if;
    end Format;
 

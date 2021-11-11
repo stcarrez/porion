@@ -158,6 +158,11 @@ package body Porion.Commands.Steps is
                         Long_Switch => "--update=",
                         Argument => "POSITION",
                         Help => -("Update the build step"));
+      GC.Define_Switch (Config => Config,
+                        Output => Command.Timeout'Access,
+                        Long_Switch => "--timeout=",
+                        Argument => "TIMEOUT",
+                        Help => -("Define the build step timeout"));
       GC.Define_Switch (Config, Command.Quiet'Access,
                         "-q", "--quiet", -("Quiet execution don't print the build steps"));
    end Setup;

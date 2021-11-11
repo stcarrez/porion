@@ -40,6 +40,7 @@ private
       Delete_Pos : aliased Integer := 0;
       Update_Pos : aliased Integer := 0;
       Insert_Pos : aliased Integer := 0;
+      Timeout    : aliased Integer := 0;
       Quiet      : aliased Boolean := False;
    end record;
 

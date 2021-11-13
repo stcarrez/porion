@@ -37,11 +37,13 @@ private package Porion.Commands.Steps is
 private
 
    type Command_Type is new Porion.Commands.Drivers.Command_Type with record
-      Delete_Pos : aliased Integer := 0;
-      Update_Pos : aliased Integer := 0;
-      Insert_Pos : aliased Integer := 0;
-      Timeout    : aliased Integer := 0;
-      Quiet      : aliased Boolean := False;
+      Delete_Pos   : aliased Integer := 0;
+      Update_Pos   : aliased Integer := 0;
+      Insert_Pos   : aliased Integer := 0;
+      Timeout      : aliased Integer := 0;
+      Ignore_Error : aliased Boolean := False;
+      Disable      : aliased Boolean := False;
+      Quiet        : aliased Boolean := False;
    end record;
 
    function Has_Several_Actions (Command : in Command_Type) return Boolean is
@@ -53,6 +55,11 @@ private
                        Recipe  : in out Porion.Builds.Models.Recipe_Ref;
                        Args    : in Argument_List'Class;
                        Context : in out Context_Type);
+
+   procedure Update_Step (Command : in out Command_Type;
+                          Recipe  : in out Porion.Builds.Models.Recipe_Ref;
+                          Args    : in Argument_List'Class;
+                          Context : in out Context_Type);
 
    procedure Delete_Step (Command : in out Command_Type;
                           Recipe  : in out Porion.Builds.Models.Recipe_Ref;

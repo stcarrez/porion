@@ -19,6 +19,8 @@ with Intl;
 with Ada.Strings.Unbounded;
 package Porion is
 
+   type Microsecond_Type is new Natural;
+
    type Millisecond_Type is new Natural;
 
    function "-" (Message : in String) return String is (Intl."-" (Message));

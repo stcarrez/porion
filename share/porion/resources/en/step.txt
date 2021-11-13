@@ -1,6 +1,6 @@
 porion step: control the recipe build steps
 
-Usage: porion step <ident> command [args...]
+Usage: porion step [--timeout N] [--execution] <ident> command [args...]
 
   Add a new build step to a project build recipe.
   The recipe is identified by the identification string composed of:
@@ -9,6 +9,11 @@ Usage: porion step <ident> command [args...]
 
   A default project name is created from the source scheme name
   and a set of build recipes are guessed by analysing the sources.
+
+Usage: porion step --update <POS> [--timeout N] [--execution] <ident> [command args...]
+
+  Update the timeout, the execution mode or the command for the given build
+  recipe step.
 
 Usage: porion step --delete <POS> <ident>
 

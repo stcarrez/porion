@@ -26,7 +26,7 @@ package Porion.XUnit.Analysis is
 
    type Test_Type (Length : Positive) is record
       Status   : Porion.XUnit.Models.Test_Status_Type;
-      Duration : Natural;
+      Duration : Microsecond_Type;
       Test     : Porion.XUnit.Models.Test_Ref;
       Group    : Porion.XUnit.Models.Test_Group_Ref;
       Run      : Porion.XUnit.Models.Test_Run_Ref;
@@ -68,7 +68,7 @@ package Porion.XUnit.Analysis is
    procedure Add_Test (Results  : in out Test_Results;
                        Group    : in Group_Path;
                        Name     : in String;
-                       Duration : in Natural;
+                       Duration : in Microsecond_Type;
                        Status   : in Porion.XUnit.Models.Test_Status_Type);
 
    procedure Save (Results : in out Test_Results;

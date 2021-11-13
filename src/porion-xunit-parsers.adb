@@ -50,7 +50,7 @@ package body Porion.XUnit.Parsers is
       Suite_Time       : Util.Beans.Objects.Object;
       Name             : Util.Beans.Objects.Object;
       Classname        : Util.Beans.Objects.Object;
-      Duration         : Integer;
+      Duration         : Microsecond_Type;
       Output           : Util.Beans.Objects.Object;
       Failure          : Util.Beans.Objects.Object;
       File             : Util.Beans.Objects.Object;
@@ -64,11 +64,11 @@ package body Porion.XUnit.Parsers is
    type XUnit_Config_Access is access all XUnit_Config;
 
    function Get_Status (Config : in XUnit_Config) return Test_Status_Type;
-   function To_Duration (Value : in Util.Beans.Objects.Object) return Integer;
+   function To_Duration (Value : in Util.Beans.Objects.Object) return Microsecond_Type;
 
    Log   : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.XUnit.Parsers");
 
-   function To_Duration (Value : in Util.Beans.Objects.Object) return Integer is
+   function To_Duration (Value : in Util.Beans.Objects.Object) return Microsecond_Type is
    begin
       if Is_Null (Value) then
          return 0;
@@ -76,17 +76,17 @@ package body Porion.XUnit.Parsers is
          declare
             S   : constant String := To_String (Value);
             Dot : constant Natural := Util.Strings.Index (S, '.');
-            V1  : Integer;
-            V2  : Integer;
+            V1  : Microsecond_Type;
+            V2  : Microsecond_Type;
             L   : Natural;
          begin
             if Dot > 0 then
-               V1 := Integer'Value (S (S'First .. Dot - 1));
+               V1 := Microsecond_Type'Value (S (S'First .. Dot - 1));
                L := S'Last - Dot;
                if L >= 6 then
-                  V2 := Integer'Value (S (Dot + 1 .. Dot + 6));
+                  V2 := Microsecond_Type'Value (S (Dot + 1 .. Dot + 6));
                elsif L > 0 then
-                  V2 := Integer'Value (S (Dot + 1 .. S'Last));
+                  V2 := Microsecond_Type'Value (S (Dot + 1 .. S'Last));
                   while L < 6 loop
                      V2 := V2 * 10;
                      L := L + 1;
@@ -95,7 +95,7 @@ package body Porion.XUnit.Parsers is
                   V2 := 0;
                end if;
             else
-               V1 := Integer'Value (S);
+               V1 := Microsecond_Type'Value (S);
                V2 := 0;
             end if;
             return V1 * 1000_000 + V2;

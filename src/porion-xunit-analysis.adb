@@ -105,7 +105,7 @@ package body Porion.XUnit.Analysis is
    procedure Add_Test (Results  : in out Test_Results;
                        Group    : in Group_Path;
                        Name     : in String;
-                       Duration : in Natural;
+                       Duration : in Microsecond_Type;
                        Status   : in Porion.XUnit.Models.Test_Status_Type) is
       use Util.Strings.Vectors;
 
@@ -193,7 +193,7 @@ package body Porion.XUnit.Analysis is
             Pass_Count    : Natural := 0;
             Fail_Count    : Natural := 0;
             Timeout_Count : Natural := 0;
-            Duration      : Natural := 0;
+            Duration      : Microsecond_Type := 0;
          begin
             for Test_Iter in Group.Tests.Iterate loop
                declare
@@ -242,7 +242,7 @@ package body Porion.XUnit.Analysis is
          Pass_Count    : Natural := 0;
          Fail_Count    : Natural := 0;
          Timeout_Count : Natural := 0;
-         Duration      : Natural := 0;
+         Duration      : Microsecond_Type := 0;
       begin
          for Iter in Results.Groups.Iterate loop
             declare

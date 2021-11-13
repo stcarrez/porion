@@ -1,0 +1,9 @@
+porion check: check for changes and update the build queue
+
+Usage: porion check [--all] [project ...]
+
+  Check for changes in a set of project or in every active project.
+  When a change is detected in a project branch, the build recipes
+  are added to the build queue.
+
+  The --all option allows to check every active project.

@@ -1475,15 +1475,18 @@ package body Porion.Xunit.Models is
 
 
    procedure Set_Duration (Object : in out Test_Run_Group_Ref;
-                           Value  : in Integer) is
+                           Value  : in Porion.Microsecond_Type) is
+      procedure Set_Field_Discrete is
+        new ADO.Objects.Set_Field_Operation
+          (Porion.Microsecond_Type);
       Impl : Test_Run_Group_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Integer (Impl.all, 11, Impl.Duration, Value);
+      Set_Field_Discrete (Impl.all, 11, Impl.Duration, Value);
    end Set_Duration;
 
    function Get_Duration (Object : in Test_Run_Group_Ref)
-                  return Integer is
+                  return Porion.Microsecond_Type is
       Impl : constant Test_Run_Group_Access
          := Test_Run_Group_Impl (Object.Get_Load_Object.all)'Access;
    begin
@@ -1726,7 +1729,7 @@ package body Porion.Xunit.Models is
       end if;
       if Object.Is_Modified (11) then
          Stmt.Save_Field (Name  => COL_10_3_NAME, --  duration
-                          Value => Object.Duration);
+                          Value => Integer (Object.Duration));
          Object.Clear_Modified (11);
       end if;
       if Object.Is_Modified (12) then
@@ -1790,7 +1793,7 @@ package body Porion.Xunit.Models is
       Query.Save_Field (Name  => COL_9_3_NAME, --  diff_skip
                         Value => Object.Diff_Skip);
       Query.Save_Field (Name  => COL_10_3_NAME, --  duration
-                        Value => Object.Duration);
+                        Value => Integer (Object.Duration));
       Query.Save_Field (Name  => COL_11_3_NAME, --  group_id
                         Value => Object.Group);
       Query.Save_Field (Name  => COL_12_3_NAME, --  build_id
@@ -1888,7 +1891,7 @@ package body Porion.Xunit.Models is
       Object.Diff_Fail := Stmt.Get_Integer (7);
       Object.Diff_Timeout := Stmt.Get_Integer (8);
       Object.Diff_Skip := Stmt.Get_Integer (9);
-      Object.Duration := Stmt.Get_Integer (10);
+      Object.Duration := Porion.Microsecond_Type (Stmt.Get_Integer (10));
       if not Stmt.Is_Null (11) then
          Object.Group.Set_Key_Value (Stmt.Get_Identifier (11), Session);
       end if;
@@ -1943,15 +1946,18 @@ package body Porion.Xunit.Models is
    -- ----------------------------------------
 
    procedure Set_Duration (Object : in out Test_Run_Ref;
-                           Value  : in Integer) is
+                           Value  : in Porion.Microsecond_Type) is
+      procedure Set_Field_Discrete is
+        new ADO.Objects.Set_Field_Operation
+          (Porion.Microsecond_Type);
       Impl : Test_Run_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Integer (Impl.all, 1, Impl.Duration, Value);
+      Set_Field_Discrete (Impl.all, 1, Impl.Duration, Value);
    end Set_Duration;
 
    function Get_Duration (Object : in Test_Run_Ref)
-                  return Integer is
+                  return Porion.Microsecond_Type is
       Impl : constant Test_Run_Access
          := Test_Run_Impl (Object.Get_Load_Object.all)'Access;
    begin
@@ -2227,7 +2233,7 @@ package body Porion.Xunit.Models is
       Result : Integer;
    begin
       Query.Save_Field (Name  => COL_0_4_NAME, --  duration
-                        Value => Object.Duration);
+                        Value => Integer (Object.Duration));
       Query.Save_Field (Name  => COL_1_4_NAME, --  status
                         Value => Integer (Test_Status_Type'Pos (Object.Status)));
       Session.Allocate (Id => Object);
@@ -2291,7 +2297,7 @@ package body Porion.Xunit.Models is
                    Stmt    : in out ADO.Statements.Query_Statement'Class;
                    Session : in out ADO.Sessions.Session'Class) is
    begin
-      Object.Duration := Stmt.Get_Integer (0);
+      Object.Duration := Porion.Microsecond_Type (Stmt.Get_Integer (0));
       Object.Status := Test_Status_Type'Val (Stmt.Get_Integer (1));
       Object.Set_Key_Value (Stmt.Get_Identifier (2));
       Object.Assertions := Stmt.Get_Integer (3);

@@ -454,11 +454,11 @@ package Porion.Xunit.Models is
 
    --  Set total duration for the execution of the test group
    procedure Set_Duration (Object : in out Test_Run_Group_Ref;
-                           Value  : in Integer);
+                           Value  : in Porion.Microsecond_Type);
 
    --  Get total duration for the execution of the test group
    function Get_Duration (Object : in Test_Run_Group_Ref)
-                 return Integer;
+                 return Porion.Microsecond_Type;
 
    --
    procedure Set_Group (Object : in out Test_Run_Group_Ref;
@@ -546,11 +546,11 @@ package Porion.Xunit.Models is
 
    --  Set the test execution time in us.
    procedure Set_Duration (Object : in out Test_Run_Ref;
-                           Value  : in Integer);
+                           Value  : in Porion.Microsecond_Type);
 
    --  Get the test execution time in us.
    function Get_Duration (Object : in Test_Run_Ref)
-                 return Integer;
+                 return Porion.Microsecond_Type;
 
    --  Set the test execution status.
    procedure Set_Status (Object : in out Test_Run_Ref;
@@ -865,7 +865,7 @@ private
        Diff_Fail : Integer;
        Diff_Timeout : Integer;
        Diff_Skip : Integer;
-       Duration : Integer;
+       Duration : Porion.Microsecond_Type;
        Group : Test_Group_Ref;
        Build : Porion.Builds.Models.Build_Ref;
    end record;
@@ -931,7 +931,7 @@ private
       new ADO.Objects.Object_Record (Key_Type => ADO.Objects.KEY_INTEGER,
                                      Of_Class => TEST_RUN_DEF'Access)
    with record
-       Duration : Integer;
+       Duration : Porion.Microsecond_Type;
        Status : Test_Status_Type;
        Assertions : Integer;
        Test : Test_Ref;

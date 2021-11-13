@@ -446,11 +446,11 @@ package Porion.Builds.Models is
 
    --  Set the test total duration in us.
    procedure Set_Test_Duration (Object : in out Build_Ref;
-                                Value  : in Integer);
+                                Value  : in Porion.Microsecond_Type);
 
    --  Get the test total duration in us.
    function Get_Test_Duration (Object : in Build_Ref)
-                 return Integer;
+                 return Porion.Microsecond_Type;
 
    --
    procedure Set_Status (Object : in out Build_Ref;
@@ -1605,7 +1605,7 @@ private
        Pass_Count : Integer;
        Fail_Count : Integer;
        Timeout_Count : Integer;
-       Test_Duration : Integer;
+       Test_Duration : Porion.Microsecond_Type;
        Status : Build_Status_Type;
        Tag : Ada.Strings.Unbounded.Unbounded_String;
        Build_Duration : Porion.Millisecond_Type;

@@ -1230,15 +1230,18 @@ package body Porion.Builds.Models is
 
 
    procedure Set_Test_Duration (Object : in out Build_Ref;
-                                Value  : in Integer) is
+                                Value  : in Porion.Microsecond_Type) is
+      procedure Set_Field_Discrete is
+        new ADO.Objects.Set_Field_Operation
+          (Porion.Microsecond_Type);
       Impl : Build_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Integer (Impl.all, 9, Impl.Test_Duration, Value);
+      Set_Field_Discrete (Impl.all, 9, Impl.Test_Duration, Value);
    end Set_Test_Duration;
 
    function Get_Test_Duration (Object : in Build_Ref)
-                  return Integer is
+                  return Porion.Microsecond_Type is
       Impl : constant Build_Access
          := Build_Impl (Object.Get_Load_Object.all)'Access;
    begin
@@ -1610,7 +1613,7 @@ package body Porion.Builds.Models is
       end if;
       if Object.Is_Modified (9) then
          Stmt.Save_Field (Name  => COL_8_3_NAME, --  test_duration
-                          Value => Object.Test_Duration);
+                          Value => Integer (Object.Test_Duration));
          Object.Clear_Modified (9);
       end if;
       if Object.Is_Modified (10) then
@@ -1705,7 +1708,7 @@ package body Porion.Builds.Models is
       Query.Save_Field (Name  => COL_7_3_NAME, --  timeout_count
                         Value => Object.Timeout_Count);
       Query.Save_Field (Name  => COL_8_3_NAME, --  test_duration
-                        Value => Object.Test_Duration);
+                        Value => Integer (Object.Test_Duration));
       Query.Save_Field (Name  => COL_9_3_NAME, --  status
                         Value => Integer (Build_Status_Type'Pos (Object.Status)));
       Query.Save_Field (Name  => COL_10_3_NAME, --  tag
@@ -1805,7 +1808,7 @@ package body Porion.Builds.Models is
       Object.Pass_Count := Stmt.Get_Integer (5);
       Object.Fail_Count := Stmt.Get_Integer (6);
       Object.Timeout_Count := Stmt.Get_Integer (7);
-      Object.Test_Duration := Stmt.Get_Integer (8);
+      Object.Test_Duration := Porion.Microsecond_Type (Stmt.Get_Integer (8));
       Object.Status := Build_Status_Type'Val (Stmt.Get_Integer (9));
       Object.Tag := Stmt.Get_Unbounded_String (10);
       Object.Build_Duration := Porion.Millisecond_Type (Stmt.Get_Integer (11));

@@ -88,6 +88,25 @@ package Porion.Builds.Services is
                           Arguments : in Util.Strings.Vectors.Vector) with
      Pre => Service.Has_Project and Recipe.Is_Loaded;
 
+   --  Update the build step at the given position in the recipe.  To update the
+   --  recipe, the Update procedure is called.  The build step parameters should
+   --  not be modified.
+   procedure Update_Step (Service   : in out Context_Type;
+                          Recipe    : in out Porion.Builds.Models.Recipe_Ref;
+                          Position  : in Positive;
+                          Update    : not null access
+                           procedure (Step : in out Porion.Builds.Models.Recipe_Step_Ref)) with
+      Pre => Service.Has_Project and Recipe.Is_Loaded;
+
+   --  Update the build step command at the given position in the recipe.
+   procedure Update_Step (Service   : in out Context_Type;
+                          Recipe    : in out Porion.Builds.Models.Recipe_Ref;
+                          Position  : in Positive;
+                          Kind      : in Porion.Builds.Models.Builder_Type;
+                          Step      : in Porion.Builds.Step_Type;
+                          Arguments : in Util.Strings.Vectors.Vector) with
+      Pre => Service.Has_Project and Recipe.Is_Loaded;
+
    --  Export some information about the project in the output stream.
    procedure Export (Service : in out Context_Type;
                      Stream  : in out Util.Serialize.IO.Output_Stream'Class);

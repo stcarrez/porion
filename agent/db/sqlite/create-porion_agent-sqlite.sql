@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS porion_build (
   /* the test total duration in us. */
   `test_duration` INTEGER NOT NULL,
   /*  */
-  `status`  NOT NULL,
+  `status` TINYINT NOT NULL,
   /* the source tag that was used when building the project. */
   `tag` VARCHAR(255) NOT NULL,
   /* the build duration in seconds. */
@@ -116,7 +116,7 @@ CREATE TABLE IF NOT EXISTS porion_build_reason (
   /* the optimistic lock version. */
   `version` INTEGER NOT NULL,
   /* the reason for triggering the build. */
-  `reason`  NOT NULL,
+  `reason` TINYINT NOT NULL,
   /*  */
   `build_id` BIGINT ,
   /*  */
@@ -165,7 +165,7 @@ CREATE TABLE IF NOT EXISTS porion_last_build (
   /* the record identifier. */
   `id` BIGINT NOT NULL,
   /* the build status. */
-  `status`  NOT NULL,
+  `status` TINYINT NOT NULL,
   /* the optimistic lock version. */
   `version` INTEGER NOT NULL,
   /*  */
@@ -223,7 +223,7 @@ CREATE TABLE IF NOT EXISTS porion_recipe_step (
   /*  */
   `version` INTEGER NOT NULL,
   /*  */
-  `execution`  NOT NULL,
+  `execution` TINYINT NOT NULL,
   /*  */
   `previous_version_id` BIGINT ,
   /* the build configuration that contains this build step.
@@ -250,11 +250,11 @@ CREATE TABLE IF NOT EXISTS porion_node (
   /* date when the node was updated. */
   `update_date` DATETIME ,
   /* the type of node */
-  `kind`  NOT NULL,
+  `kind` TINYINT NOT NULL,
   /* whether the build node was deleted. */
   `deleted` TINYINT NOT NULL,
   /* the node status. */
-  `status`  NOT NULL,
+  `status` TINYINT NOT NULL,
   /* the OS name. */
   `os_name` VARCHAR(255) NOT NULL,
   /* the OS version or additional information. */

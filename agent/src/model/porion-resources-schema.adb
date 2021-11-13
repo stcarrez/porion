@@ -17,11 +17,11 @@ package body Porion.Resources.Schema is
        & " `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `number` INTEGER NOT "
        & "NULL, `create_date` DATETIME NOT NULL, `finish_date` DATETIME , `pass_co"
        & "unt` INTEGER NOT NULL, `fail_count` INTEGER NOT NULL, `timeout_count` IN"
-       & "TEGER NOT NULL, `test_duration` INTEGER NOT NULL, `status` NOT NULL, `ta"
-       & "g` VARCHAR(255) NOT NULL, `build_duration` INTEGER NOT NULL, `sys_time` "
-       & "INTEGER NOT NULL, `user_time` INTEGER NOT NULL, `branch_id` BIGINT NOT N"
-       & "ULL, `recipe_id` BIGINT NOT NULL, `node_id` BIGINT NOT NULL, `project_id"
-       & "` BIGINT NOT NULL, PRIMARY KEY (`id`))";
+       & "TEGER NOT NULL, `test_duration` INTEGER NOT NULL, `status` TINYINT NOT N"
+       & "ULL, `tag` VARCHAR(255) NOT NULL, `build_duration` INTEGER NOT NULL, `sy"
+       & "s_time` INTEGER NOT NULL, `user_time` INTEGER NOT NULL, `branch_id` BIGI"
+       & "NT NOT NULL, `recipe_id` BIGINT NOT NULL, `node_id` BIGINT NOT NULL, `pr"
+       & "oject_id` BIGINT NOT NULL, PRIMARY KEY (`id`))";
    L_8   : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_build_e"
        & "xecutor ( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `pid` INTEGE"
        & "R NOT NULL, `start_date` DATETIME NOT NULL, `port` INTEGER NOT NULL, `no"
@@ -33,8 +33,8 @@ package body Porion.Resources.Schema is
        & " BIGINT NOT NULL, PRIMARY KEY (`id`))";
    L_10  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_build_r"
        & "eason ( `id` BIGINT NOT NULL, `create_date` DATETIME NOT NULL, `version`"
-       & " INTEGER NOT NULL, `reason` NOT NULL, `build_id` BIGINT , `queue_id` BIG"
-       & "INT , `upstream_build_id` BIGINT , PRIMARY KEY (`id`))";
+       & " INTEGER NOT NULL, `reason` TINYINT NOT NULL, `build_id` BIGINT , `queue"
+       & "_id` BIGINT , `upstream_build_id` BIGINT , PRIMARY KEY (`id`))";
    L_11  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_build_s"
        & "tep ( `id` BIGINT NOT NULL, `start_date` DATETIME NOT NULL, `end_date` D"
        & "ATETIME , `exit_status` INTEGER NOT NULL, `build_id` BIGINT NOT NULL, `r"
@@ -44,9 +44,9 @@ package body Porion.Resources.Schema is
        & "255) NOT NULL, `value` VARCHAR(4096) NOT NULL, `node_id` BIGINT , `recip"
        & "e_id` BIGINT , PRIMARY KEY (`id`))";
    L_13  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_last_bu"
-       & "ild ( `id` BIGINT NOT NULL, `status` NOT NULL, `version` INTEGER NOT NUL"
-       & "L, `build_id` BIGINT NOT NULL, `branch_id` BIGINT NOT NULL, `recipe_id` "
-       & "BIGINT NOT NULL, PRIMARY KEY (`id`))";
+       & "ild ( `id` BIGINT NOT NULL, `status` TINYINT NOT NULL, `version` INTEGER"
+       & " NOT NULL, `build_id` BIGINT NOT NULL, `branch_id` BIGINT NOT NULL, `rec"
+       & "ipe_id` BIGINT NOT NULL, PRIMARY KEY (`id`))";
    L_14  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_recipe "
        & "( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `name` VARCHAR(255) "
        & "NOT NULL, `description` VARCHAR(4096) NOT NULL, `status` INTEGER NOT NUL"
@@ -56,17 +56,17 @@ package body Porion.Resources.Schema is
    L_15  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_recipe_"
        & "step ( `id` BIGINT NOT NULL, `parameters` VARCHAR(65536) NOT NULL, `numb"
        & "er` INTEGER NOT NULL, `builder` INTEGER NOT NULL, `timeout` INTEGER NOT "
-       & "NULL, `step` INTEGER NOT NULL, `version` INTEGER NOT NULL, `execution` N"
-       & "OT NULL, `previous_version_id` BIGINT , `recipe_id` BIGINT NOT NULL, PRI"
-       & "MARY KEY (`id`))";
+       & "NULL, `step` INTEGER NOT NULL, `version` INTEGER NOT NULL, `execution` T"
+       & "INYINT NOT NULL, `previous_version_id` BIGINT , `recipe_id` BIGINT NOT N"
+       & "ULL, PRIMARY KEY (`id`))";
    L_16  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_node ( "
        & "`id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `name` VARCHAR(255) NO"
        & "T NULL, `login` VARCHAR(255) NOT NULL, `repository_dir` VARCHAR(255) NOT"
        & " NULL, `parameters` VARCHAR(255) NOT NULL, `create_date` DATETIME NOT NU"
-       & "LL, `update_date` DATETIME , `kind` NOT NULL, `deleted` TINYINT NOT NULL"
-       & ", `status` NOT NULL, `os_name` VARCHAR(255) NOT NULL, `os_version` VARCH"
-       & "AR(255) NOT NULL, `info_date` DATETIME , `cpu_type` VARCHAR(255) NOT NUL"
-       & "L, `main_node` TINYINT NOT NULL, PRIMARY KEY (`id`))";
+       & "LL, `update_date` DATETIME , `kind` TINYINT NOT NULL, `deleted` TINYINT "
+       & "NOT NULL, `status` TINYINT NOT NULL, `os_name` VARCHAR(255) NOT NULL, `o"
+       & "s_version` VARCHAR(255) NOT NULL, `info_date` DATETIME , `cpu_type` VARC"
+       & "HAR(255) NOT NULL, `main_node` TINYINT NOT NULL, PRIMARY KEY (`id`))";
    L_17  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_branch "
        & "( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `name` VARCHAR(255) "
        & "NOT NULL, `tag` VARCHAR(255) NOT NULL, `last_date` DATETIME , `create_da"

@@ -255,8 +255,8 @@ package body Porion.Builds.Services is
          declare
             Usage : constant Nodes.Usage_Type := Executor.Get_Usage;
          begin
-            Service.Build.Set_User_Time (Natural (Usage.User_Time));
-            Service.Build.Set_Sys_Time (Natural (Usage.Sys_Time));
+            Service.Build.Set_User_Time (Millisecond_Type (Usage.User_Time));
+            Service.Build.Set_Sys_Time (Millisecond_Type (Usage.Sys_Time));
          end;
          Update_Build (Service, Status);
       end if;
@@ -681,6 +681,70 @@ package body Porion.Builds.Services is
       end if;
       Service.DB.Commit;
    end Insert_Step;
+
+   --  ------------------------------
+   --  Update the build step at the given position in the recipe.  To update the
+   --  recipe, the Update procedure is called.  The build step parameters should
+   --  not be modified.
+   --  ------------------------------
+   procedure Update_Step (Service   : in out Context_Type;
+                          Recipe    : in out Porion.Builds.Models.Recipe_Ref;
+                          Position  : in Positive;
+                          Update    : not null access
+                           procedure (Step : in out Porion.Builds.Models.Recipe_Step_Ref)) is
+      Last  : Natural;
+      Steps : Build_Step_Vector;
+      Added : Boolean;
+   begin
+      Load_Recipe (Service, Recipe, Steps);
+
+      Last := Natural (Steps.Length);
+      if Position > Last then
+         Log.Warn ("Step position{0} is out of range", Positive'Image (Position));
+         raise Invalid_Position;
+      end if;
+
+      Service.DB.Begin_Transaction;
+      declare
+         Step : Build_Step := Steps.Element (Position);
+      begin
+         Update (Step.Step);
+         if not Step.Step.Is_Modified then
+            Service.DB.Rollback;
+            return;
+         end if;
+         Step.Step.Save (Service.DB);
+      end;
+
+      Add_Build_Queue (Service, Recipe, Models.REASON_CONFIG, Added);
+      if Added then
+         Update_Build_Queue (Service, Trigger_Builds => False);
+      end if;
+      Service.DB.Commit;
+
+      Log.Info ("Build step {0} updated in {1}",
+                Util.Strings.Image (Position), Service.Project.Get_Name);
+   end Update_Step;
+
+   --  ------------------------------
+   --  Update the build step command at the given position in the recipe.
+   --  ------------------------------
+   procedure Update_Step (Service   : in out Context_Type;
+                          Recipe    : in out Porion.Builds.Models.Recipe_Ref;
+                          Position  : in Positive;
+                          Kind      : in Porion.Builds.Models.Builder_Type;
+                          Step      : in Porion.Builds.Step_Type;
+                          Arguments : in Util.Strings.Vectors.Vector) is
+      procedure Update (Recipe_Step : in out Porion.Builds.Models.Recipe_Step_Ref);
+
+      procedure Update (Recipe_Step : in out Porion.Builds.Models.Recipe_Step_Ref) is
+      begin
+         Recipe_Step.Set_Step (Step);
+         Recipe_Step.Set_Parameters (Builders.Save_Configuration (Kind, Service.DB, Arguments));
+      end Update;
+   begin
+      Update_Step (Service, Recipe, Position, Update'Access);
+   end Update_Step;
 
    --  Export some information about the project in the output stream.
    procedure Export (Service : in out Context_Type;

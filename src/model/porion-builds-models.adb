@@ -1297,15 +1297,18 @@ package body Porion.Builds.Models is
 
 
    procedure Set_Build_Duration (Object : in out Build_Ref;
-                                 Value  : in Integer) is
+                                 Value  : in Porion.Millisecond_Type) is
+      procedure Set_Field_Discrete is
+        new ADO.Objects.Set_Field_Operation
+          (Porion.Millisecond_Type);
       Impl : Build_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Integer (Impl.all, 12, Impl.Build_Duration, Value);
+      Set_Field_Discrete (Impl.all, 12, Impl.Build_Duration, Value);
    end Set_Build_Duration;
 
    function Get_Build_Duration (Object : in Build_Ref)
-                  return Integer is
+                  return Porion.Millisecond_Type is
       Impl : constant Build_Access
          := Build_Impl (Object.Get_Load_Object.all)'Access;
    begin
@@ -1622,7 +1625,7 @@ package body Porion.Builds.Models is
       end if;
       if Object.Is_Modified (12) then
          Stmt.Save_Field (Name  => COL_11_3_NAME, --  build_duration
-                          Value => Object.Build_Duration);
+                          Value => Integer (Object.Build_Duration));
          Object.Clear_Modified (12);
       end if;
       if Object.Is_Modified (13) then
@@ -1708,7 +1711,7 @@ package body Porion.Builds.Models is
       Query.Save_Field (Name  => COL_10_3_NAME, --  tag
                         Value => Object.Tag);
       Query.Save_Field (Name  => COL_11_3_NAME, --  build_duration
-                        Value => Object.Build_Duration);
+                        Value => Integer (Object.Build_Duration));
       Query.Save_Field (Name  => COL_12_3_NAME, --  sys_time
                         Value => Integer (Object.Sys_Time));
       Query.Save_Field (Name  => COL_13_3_NAME, --  user_time
@@ -1805,7 +1808,7 @@ package body Porion.Builds.Models is
       Object.Test_Duration := Stmt.Get_Integer (8);
       Object.Status := Build_Status_Type'Val (Stmt.Get_Integer (9));
       Object.Tag := Stmt.Get_Unbounded_String (10);
-      Object.Build_Duration := Stmt.Get_Integer (11);
+      Object.Build_Duration := Porion.Millisecond_Type (Stmt.Get_Integer (11));
       Object.Sys_Time := Porion.Millisecond_Type (Stmt.Get_Integer (12));
       Object.User_Time := Porion.Millisecond_Type (Stmt.Get_Integer (13));
       if not Stmt.Is_Null (14) then

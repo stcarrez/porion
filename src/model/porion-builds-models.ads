@@ -474,11 +474,11 @@ package Porion.Builds.Models is
 
    --  Set the build duration in seconds.
    procedure Set_Build_Duration (Object : in out Build_Ref;
-                                 Value  : in Integer);
+                                 Value  : in Porion.Millisecond_Type);
 
    --  Get the build duration in seconds.
    function Get_Build_Duration (Object : in Build_Ref)
-                 return Integer;
+                 return Porion.Millisecond_Type;
 
    --  Set the system time of cumulated processes in milliseconds.
    procedure Set_Sys_Time (Object : in out Build_Ref;
@@ -1608,7 +1608,7 @@ private
        Test_Duration : Integer;
        Status : Build_Status_Type;
        Tag : Ada.Strings.Unbounded.Unbounded_String;
-       Build_Duration : Integer;
+       Build_Duration : Porion.Millisecond_Type;
        Sys_Time : Porion.Millisecond_Type;
        User_Time : Porion.Millisecond_Type;
        Branch : Porion.Projects.Models.Branch_Ref;

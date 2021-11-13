@@ -159,6 +159,7 @@ package body Porion.Commands.Info is
                             Context : in out Context_Type) is
       function Count_Active_Branches return Natural;
       use type Porion.Projects.Models.Branch_Status_Type;
+      use type Porion.Builds.Models.Build_Status_Type;
 
       Printer : PT.Texts.Printer_Type := PT.Texts.Create (Context.Printer.all);
       Fields  : PT.Texts.Field_Array (1 .. 10);
@@ -278,7 +279,15 @@ package body Porion.Commands.Info is
                                                       Branch_Name,
                                                       Build_Number);
             begin
-               Printer.Put (Fields (3), Branch_Name);
+               if Build.Get_Status = Builds.Models.BUILD_FAIL then
+                  Printer.Set_Style (Fields (4), Context.Styles.Error);
+                  Printer.Set_Style (Fields (5), Context.Styles.Error);
+                  Printer.Put (Fields (3), Branch_Name & (-(" (KO)")));
+               else
+                  Printer.Set_Style (Fields (4), Context.Styles.Success);
+                  Printer.Set_Style (Fields (5), Context.Styles.Success);
+                  Printer.Put (Fields (3), Branch_Name);
+               end if;
                Printer.Put_Int (Fields (4), Build_Number);
                Printer.Put (Fields (5), Log_Dir);
                Printer.New_Line;

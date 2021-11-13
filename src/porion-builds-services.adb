@@ -501,7 +501,7 @@ package body Porion.Builds.Services is
       Service.Build.Set_Status (Status);
       Service.Build.Set_Finish_Date ((Is_Null => False,
                                       Value   => Now));
-      Service.Build.Set_Build_Duration (Natural (Time * 1_000.0));
+      Service.Build.Set_Build_Duration (Millisecond_Type (Time * 1_000.0));
       Service.Build.Save (Service.DB);
 
       Query.Set_Filter ("o.recipe_id = :config_id"

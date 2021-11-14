@@ -21,6 +21,7 @@ with Porion.Nodes;
 with Porion.Queries;
 with Porion.Services;
 with Porion.Executors;
+with Porion.Builds.Models;
 package Porion.Reports is
 
    type Style_Configuration is record
@@ -39,6 +40,9 @@ package Porion.Reports is
 
    --  Format a duration expressed in milliseconds.
    function Format (Value : in Millisecond_Type) return String;
+
+   --  Format a duration expressed in microseconds.
+   function Format (Value : in Microsecond_Type) return String;
 
    --  Get a printable name for the node status.
    function Get_Status (Status : in Porion.Nodes.Node_Status_Type) return String;
@@ -87,5 +91,16 @@ package Porion.Reports is
                           Styles  : in Style_Configuration;
                           Label   : in String;
                           Hide_Project : in Boolean := False);
+
+   --  Create a report with the unit tests for the given build.
+   procedure List_Tests (Service : in out Porion.Services.Context_Type'Class;
+                         Build   : in Porion.Builds.Models.Build_Ref;
+                         Printer : in out PT.Printer_Type'Class;
+                         Styles  : in Style_Configuration);
+
+   --  Create a report with the unit tests.
+   procedure List_Tests (List     : in Porion.Queries.Test_Info_Vector;
+                         Printer  : in out PT.Printer_Type'Class;
+                         Styles   : in Style_Configuration);
 
 end Porion.Reports;

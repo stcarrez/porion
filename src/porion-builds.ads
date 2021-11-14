@@ -19,7 +19,7 @@ with Util.Beans.Objects.Enums;
 package Porion.Builds is
 
    type Step_Type is (STEP_CHECKOUT, STEP_SETUP, STEP_GENERATE, STEP_CONFIGURE, STEP_MAKE,
-                      STEP_TEST, STEP_PACKAGE, STEP_INSTALL, STEP_PUBLISH);
+                      STEP_TEST, STEP_PACKAGE, STEP_INSTALL, STEP_PUBLISH, STEP_METRIC);
 
    for Step_Type use (STEP_CHECKOUT => -1,
                       STEP_SETUP => 0,
@@ -29,7 +29,8 @@ package Porion.Builds is
                       STEP_TEST => 4,
                       STEP_PACKAGE => 5,
                       STEP_INSTALL => 6,
-                      STEP_PUBLISH => 7);
+                      STEP_PUBLISH => 7,
+                      STEP_METRIC => 8);
 
    package Step_Type_Objects is
       new Util.Beans.Objects.Enums (Step_Type);

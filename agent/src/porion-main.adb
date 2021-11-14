@@ -52,7 +52,7 @@ exception
       Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
 
    when E : others =>
-      Log.Error (-("some internal error occurred"), E);
+      Log.Error (-("some internal error occurred"), E, True);
       Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
 
 end Porion.Main;

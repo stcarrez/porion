@@ -21,7 +21,6 @@ with Util.Strings;
 with PT.Texts;
 with ADO.Queries;
 with Porion.Projects;
-with Porion.Builds.Models;
 with Porion.XUnit.Models;
 with Porion.Projects.Models;
 package body Porion.Reports is
@@ -218,7 +217,7 @@ package body Porion.Reports is
       end if;
       Porion.Queries.List (List, Service.DB, Query);
 
-      List_Builds (List, Printer, Styles, -("Name"));
+      List_Builds (List, Printer, Styles, -("Identifier"));
    end List_Builds;
 
    --  ------------------------------
@@ -239,28 +238,31 @@ package body Porion.Reports is
    begin
       Writer.Set_Justify (Style2, PT.J_RIGHT);
       Writer.Create_Field (Fields (1), Style1, 40.0);
-      Writer.Create_Field (Fields (2), Style2, 0.0);
-      Writer.Create_Field (Fields (3), Style1, 10.0);
-      Writer.Create_Field (Fields (4), Style2, 10.0);
+      Writer.Create_Field (Fields (2), Style1, 0.0);
+      Writer.Create_Field (Fields (3), Style2, 0.0);
+      Writer.Create_Field (Fields (4), Style2, 0.0);
       Writer.Create_Field (Fields (5), Style2, 0.0);
-      Writer.Create_Field (Fields (6), Style2, 0.0);
-      Writer.Create_Field (Fields (7), Style1, 30.0);
+      Writer.Create_Field (Fields (6), Style1, 0.0);
+      Writer.Create_Field (Fields (7), Style2, 0.0);
 
-      Writer.Set_Max_Dimension (Fields (2), (W => 4, H => 0));
+      Writer.Set_Max_Dimension (Fields (2), (W => 8, H => 0));
+      Writer.Set_Max_Dimension (Fields (3), (W => 8, H => 0));
       Writer.Set_Max_Dimension (Fields (4), (W => 4, H => 0));
       Writer.Set_Max_Dimension (Fields (5), (W => 4, H => 0));
+      Writer.Set_Max_Dimension (Fields (6), (W => 16, H => 0));
+      Writer.Set_Max_Dimension (Fields (7), (W => 10, H => 0));
       for Field of Fields (2 .. 6) loop
          Writer.Set_Bottom_Right_Padding (Field, (W => 1, H => 0));
       end loop;
 
       Writer.Layout_Fields (Fields);
       Writer.Put (Fields (1), Label);
-      Writer.Put (Fields (2), -("Num"));
-      Writer.Put (Fields (3), -("Tag"));
-      Writer.Put (Fields (4), -("Status"));
-      Writer.Put (Fields (5), -("Pass"));
-      Writer.Put (Fields (6), -("Fail"));
-      Writer.Put (Fields (7), -("Date"));
+      Writer.Put (Fields (2), -("Tag"));
+      Writer.Put (Fields (3), -("Status"));
+      Writer.Put (Fields (4), -("Pass"));
+      Writer.Put (Fields (5), -("Fail"));
+      Writer.Put (Fields (6), -("Date"));
+      Writer.Put (Fields (7), -("Duration"));
       Writer.New_Line;
 
       for Build of List loop
@@ -286,18 +288,21 @@ package body Porion.Reports is
             Ident.Branch := Build.Branch_Name;
             Ident.Recipe := Build.Recipe_Name;
             Ident.Node := Build.Node_Name;
+            Ident.Build := Build.Build_Number;
             Writer.Put (Fields (1), Porion.Projects.To_String (Ident));
          end;
-         Writer.Put_Int (Fields (2), Build.Build_Number);
-         Writer.Put (Fields (3), Get_Tag (Build.Build_Tag));
+         Writer.Put (Fields (2), Get_Tag (Build.Build_Tag));
          if Build.Build_Status = Builds.Models.BUILD_PASS then
-            Writer.Put (Fields (4), -("OK"));
+            Writer.Put (Fields (3), -("OK"));
          else
-            Writer.Put (Fields (4), -("KO"));
+            Writer.Put (Fields (3), -("KO"));
          end if;
-         Writer.Put_Int (Fields (5), Build.Pass_Count);
-         Writer.Put_Int (Fields (6), Build.Fail_Count);
-         Writer.Put (Fields (7), Format (Build.Build_Date.Value));
+         Writer.Put_Int (Fields (4), Build.Pass_Count);
+         Writer.Put_Int (Fields (5), Build.Fail_Count);
+         Writer.Put (Fields (6), Format (Build.Build_Date.Value));
+         if Build.Build_Duration > 0 then
+            Writer.Put (Fields (7), Format (Build.Build_Duration));
+         end if;
          Writer.New_Line;
       end loop;
    end List_Builds;
@@ -372,8 +377,13 @@ package body Porion.Reports is
          end if;
 
          Writer.Set_Justify (Style2, PT.J_RIGHT);
-         Writer.Put_UString (Fields (1), Project.Name);
-         Writer.Put_UString (Fields (2), Project.Branch_Name);
+         declare
+            Ident : Porion.Projects.Ident_Type;
+         begin
+            Ident.Name := Project.Name;
+            Ident.Branch := Project.Branch_Name;
+            Writer.Put (Fields (1), Porion.Projects.To_String (Ident));
+         end;
          Writer.Put (Fields (3), Get_Tag (Project.Branch_Tag));
          if not Project.Build_Date.Is_Null then
             if Project.Build_Status = Builds.Models.BUILD_PASS then
@@ -628,7 +638,9 @@ package body Porion.Reports is
       List_Tests (List, Printer, Styles);
    end List_Tests;
 
+   --  ------------------------------
    --  Create a report with the unit tests.
+   --  ------------------------------
    procedure List_Tests (List     : in Porion.Queries.Test_Info_Vector;
                          Printer  : in out PT.Printer_Type'Class;
                          Styles   : in Style_Configuration) is

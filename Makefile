@@ -22,6 +22,7 @@ DYNAMO_ARGS=\
   --package Porion.Queries \
   --package Porion.Nodes.Models \
   --package Porion.Builds.Models \
+  --package Porion.Metrics.Models \
   --package Porion.XUnit.Models \
   --package Porion.Projects.Models \
   db uml/porion.zargo

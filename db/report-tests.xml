@@ -1,0 +1,58 @@
+<query-mapping package='Porion.Queries'>
+    <description>
+        List the tests
+    </description>
+
+    <class name="Porion.Queries.Test_Info" bean="yes">
+        <comment>Information about a test.</comment>
+        <property type='ADO.Identifier' name="id">
+            <comment>the test group id.</comment>
+        </property>
+        <property type='String' name="group_name">
+            <comment>the test group name.</comment>
+        </property>
+        <property type='ADO.Identifier' name="test_id">
+            <comment>the test id.</comment>
+        </property>
+        <property type='String' name="test_name">
+            <comment>the test name.</comment>
+        </property>
+        <property type='Integer' name="test_pass_count">
+            <comment>the number of times the test passed.</comment>
+        </property>
+        <property type='Integer' name="test_fail_count">
+            <comment>the number of times the test failed.</comment>
+        </property>
+        <property type='Integer' name="test_timeout_count">
+            <comment>the number of times the test timed out.</comment>
+        </property>
+        <property type='Porion.Microsecond_Type' name="test_duration">
+            <comment>the test duration.</comment>
+        </property>
+        <property type='Porion.XUnit.Models.Test_Status_Type' name="test_status">
+            <comment>the test status.</comment>
+        </property>
+    </class>
+
+    <query name='build-test-list'>
+        <comment>Get the list of tests for a build</comment>
+        <sql>
+            SELECT
+            grp.id AS id,
+            grp.name AS grp_name,
+            test.id AS tid,
+            test.name AS test_name,
+            test.total_pass_count AS pass_count,
+            test.total_fail_count AS fail_count,
+            test.total_timeout_count AS timeout_count,
+            run.duration AS duration,
+            run.status AS status
+            FROM porion_test_run_group AS rgrp
+            INNER JOIN porion_test_group AS grp ON rgrp.group_id = grp.id
+            INNER JOIN porion_test_run AS run ON run.group_id = rgrp.id
+            INNER JOIN porion_test AS test ON run.test_id = test.id
+            WHERE rgrp.build_id = :build_id
+        </sql>
+    </query>
+
+</query-mapping>

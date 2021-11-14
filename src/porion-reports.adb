@@ -631,12 +631,16 @@ package body Porion.Reports is
    procedure List_Tests (Service : in out Porion.Services.Context_Type'Class;
                          Build   : in Porion.Builds.Models.Build_Ref;
                          Printer : in out PT.Printer_Type'Class;
-                         Styles  : in Style_Configuration) is
+                         Styles  : in Style_Configuration;
+                         Failed_Only : in Boolean) is
       List   : Porion.Queries.Test_Info_Vector;
       Query  : ADO.Queries.Context;
    begin
       Query.Bind_Param ("build_id", Build.Get_Id);
       Query.Set_Query (Porion.Queries.Query_Build_Test_List);
+      if Failed_Only then
+         Query.Set_Join ("AND run.status != 0");
+      end if;
       Porion.Queries.List (List, Service.DB, Query);
 
       List_Tests (List, Printer, Styles);

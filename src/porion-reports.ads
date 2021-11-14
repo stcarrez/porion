@@ -96,7 +96,8 @@ package Porion.Reports is
    procedure List_Tests (Service : in out Porion.Services.Context_Type'Class;
                          Build   : in Porion.Builds.Models.Build_Ref;
                          Printer : in out PT.Printer_Type'Class;
-                         Styles  : in Style_Configuration);
+                         Styles  : in Style_Configuration;
+                         Failed_Only : in Boolean);
 
    --  Create a report with the unit tests.
    procedure List_Tests (List     : in Porion.Queries.Test_Info_Vector;

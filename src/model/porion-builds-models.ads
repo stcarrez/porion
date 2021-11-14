@@ -296,6 +296,18 @@ package Porion.Builds.Models is
    function Get_Main_Recipe (Object : in Recipe_Ref)
                  return Boolean;
 
+   --  Set a list of comma separated filtering rules to activate when displaying logs.
+   procedure Set_Filter_Rules (Object : in out Recipe_Ref;
+                               Value  : in Ada.Strings.Unbounded.Unbounded_String);
+   procedure Set_Filter_Rules (Object : in out Recipe_Ref;
+                               Value : in String);
+
+   --  Get a list of comma separated filtering rules to activate when displaying logs.
+   function Get_Filter_Rules (Object : in Recipe_Ref)
+                 return Ada.Strings.Unbounded.Unbounded_String;
+   function Get_Filter_Rules (Object : in Recipe_Ref)
+                 return String;
+
    --
    procedure Set_Node (Object : in out Recipe_Ref;
                        Value  : in Porion.Nodes.Models.Node_Ref'Class);
@@ -1483,12 +1495,13 @@ private
    COL_4_2_NAME : aliased constant String := "status";
    COL_5_2_NAME : aliased constant String := "rate_factor";
    COL_6_2_NAME : aliased constant String := "main_recipe";
-   COL_7_2_NAME : aliased constant String := "node_id";
-   COL_8_2_NAME : aliased constant String := "branch_id";
-   COL_9_2_NAME : aliased constant String := "project_id";
+   COL_7_2_NAME : aliased constant String := "filter_rules";
+   COL_8_2_NAME : aliased constant String := "node_id";
+   COL_9_2_NAME : aliased constant String := "branch_id";
+   COL_10_2_NAME : aliased constant String := "project_id";
 
    RECIPE_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 10,
+     (Count   => 11,
       Table   => RECIPE_NAME'Access,
       Members => (
          1 => COL_0_2_NAME'Access,
@@ -1500,20 +1513,22 @@ private
          7 => COL_6_2_NAME'Access,
          8 => COL_7_2_NAME'Access,
          9 => COL_8_2_NAME'Access,
-         10 => COL_9_2_NAME'Access)
+         10 => COL_9_2_NAME'Access,
+         11 => COL_10_2_NAME'Access)
      );
    RECIPE_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := RECIPE_DEF'Access;
 
    RECIPE_AUDIT_DEF : aliased constant ADO.Audits.Auditable_Mapping :=
-     (Count    => 5,
+     (Count    => 6,
       Of_Class => RECIPE_DEF'Access,
       Members  => (
          1 => 2,
          2 => 3,
          3 => 4,
          4 => 5,
-         5 => 6)
+         5 => 6,
+         6 => 7)
      );
    RECIPE_AUDIT_TABLE : constant ADO.Audits.Auditable_Mapping_Access
       := RECIPE_AUDIT_DEF'Access;
@@ -1532,6 +1547,7 @@ private
        Status : Config_Status_Type;
        Rate_Factor : Integer;
        Main_Recipe : Boolean;
+       Filter_Rules : Ada.Strings.Unbounded.Unbounded_String;
        Node : Porion.Nodes.Models.Node_Ref;
        Branch : Porion.Projects.Models.Branch_Ref;
        Project : Porion.Projects.Models.Project_Ref;

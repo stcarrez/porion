@@ -655,12 +655,42 @@ package body Porion.Builds.Models is
    end Get_Main_Recipe;
 
 
+   procedure Set_Filter_Rules (Object : in out Recipe_Ref;
+                                Value : in String) is
+      Impl : Recipe_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Audits.Set_Field_String (Impl.all, 8, Impl.Filter_Rules, Value);
+   end Set_Filter_Rules;
+
+   procedure Set_Filter_Rules (Object : in out Recipe_Ref;
+                               Value  : in Ada.Strings.Unbounded.Unbounded_String) is
+      Impl : Recipe_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Audits.Set_Field_Unbounded_String (Impl.all, 8, Impl.Filter_Rules, Value);
+   end Set_Filter_Rules;
+
+   function Get_Filter_Rules (Object : in Recipe_Ref)
+                 return String is
+   begin
+      return Ada.Strings.Unbounded.To_String (Object.Get_Filter_Rules);
+   end Get_Filter_Rules;
+   function Get_Filter_Rules (Object : in Recipe_Ref)
+                  return Ada.Strings.Unbounded.Unbounded_String is
+      Impl : constant Recipe_Access
+         := Recipe_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Filter_Rules;
+   end Get_Filter_Rules;
+
+
    procedure Set_Node (Object : in out Recipe_Ref;
                        Value  : in Porion.Nodes.Models.Node_Ref'Class) is
       Impl : Recipe_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 8, Impl.Node, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 9, Impl.Node, Value);
    end Set_Node;
 
    function Get_Node (Object : in Recipe_Ref)
@@ -677,7 +707,7 @@ package body Porion.Builds.Models is
       Impl : Recipe_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 9, Impl.Branch, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 10, Impl.Branch, Value);
    end Set_Branch;
 
    function Get_Branch (Object : in Recipe_Ref)
@@ -694,7 +724,7 @@ package body Porion.Builds.Models is
       Impl : Recipe_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 10, Impl.Project, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 11, Impl.Project, Value);
    end Set_Project;
 
    function Get_Project (Object : in Recipe_Ref)
@@ -725,6 +755,7 @@ package body Porion.Builds.Models is
             Copy.Status := Impl.Status;
             Copy.Rate_Factor := Impl.Rate_Factor;
             Copy.Main_Recipe := Impl.Main_Recipe;
+            Copy.Filter_Rules := Impl.Filter_Rules;
             Copy.Node := Impl.Node;
             Copy.Branch := Impl.Branch;
             Copy.Project := Impl.Project;
@@ -888,19 +919,24 @@ package body Porion.Builds.Models is
          Object.Clear_Modified (7);
       end if;
       if Object.Is_Modified (8) then
-         Stmt.Save_Field (Name  => COL_7_2_NAME, --  node_id
-                          Value => Object.Node);
+         Stmt.Save_Field (Name  => COL_7_2_NAME, --  filter_rules
+                          Value => Object.Filter_Rules);
          Object.Clear_Modified (8);
       end if;
       if Object.Is_Modified (9) then
-         Stmt.Save_Field (Name  => COL_8_2_NAME, --  branch_id
-                          Value => Object.Branch);
+         Stmt.Save_Field (Name  => COL_8_2_NAME, --  node_id
+                          Value => Object.Node);
          Object.Clear_Modified (9);
       end if;
       if Object.Is_Modified (10) then
-         Stmt.Save_Field (Name  => COL_9_2_NAME, --  project_id
-                          Value => Object.Project);
+         Stmt.Save_Field (Name  => COL_9_2_NAME, --  branch_id
+                          Value => Object.Branch);
          Object.Clear_Modified (10);
+      end if;
+      if Object.Is_Modified (11) then
+         Stmt.Save_Field (Name  => COL_10_2_NAME, --  project_id
+                          Value => Object.Project);
+         Object.Clear_Modified (11);
       end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
@@ -947,11 +983,13 @@ package body Porion.Builds.Models is
                         Value => Object.Rate_Factor);
       Query.Save_Field (Name  => COL_6_2_NAME, --  main_recipe
                         Value => Object.Main_Recipe);
-      Query.Save_Field (Name  => COL_7_2_NAME, --  node_id
+      Query.Save_Field (Name  => COL_7_2_NAME, --  filter_rules
+                        Value => Object.Filter_Rules);
+      Query.Save_Field (Name  => COL_8_2_NAME, --  node_id
                         Value => Object.Node);
-      Query.Save_Field (Name  => COL_8_2_NAME, --  branch_id
+      Query.Save_Field (Name  => COL_9_2_NAME, --  branch_id
                         Value => Object.Branch);
-      Query.Save_Field (Name  => COL_9_2_NAME, --  project_id
+      Query.Save_Field (Name  => COL_10_2_NAME, --  project_id
                         Value => Object.Project);
       Query.Execute (Result);
       if Result /= 1 then
@@ -997,6 +1035,8 @@ package body Porion.Builds.Models is
          return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Rate_Factor));
       elsif Name = "main_recipe" then
          return Util.Beans.Objects.To_Object (Impl.Main_Recipe);
+      elsif Name = "filter_rules" then
+         return Util.Beans.Objects.To_Object (Impl.Filter_Rules);
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -1036,14 +1076,15 @@ package body Porion.Builds.Models is
       Object.Status := Config_Status_Type'Val (Stmt.Get_Integer (4));
       Object.Rate_Factor := Stmt.Get_Integer (5);
       Object.Main_Recipe := Stmt.Get_Boolean (6);
-      if not Stmt.Is_Null (7) then
-         Object.Node.Set_Key_Value (Stmt.Get_Identifier (7), Session);
-      end if;
+      Object.Filter_Rules := Stmt.Get_Unbounded_String (7);
       if not Stmt.Is_Null (8) then
-         Object.Branch.Set_Key_Value (Stmt.Get_Identifier (8), Session);
+         Object.Node.Set_Key_Value (Stmt.Get_Identifier (8), Session);
       end if;
       if not Stmt.Is_Null (9) then
-         Object.Project.Set_Key_Value (Stmt.Get_Identifier (9), Session);
+         Object.Branch.Set_Key_Value (Stmt.Get_Identifier (9), Session);
+      end if;
+      if not Stmt.Is_Null (10) then
+         Object.Project.Set_Key_Value (Stmt.Get_Identifier (10), Session);
       end if;
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);

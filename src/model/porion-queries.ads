@@ -116,6 +116,9 @@ package Porion.Queries is
       --  the build ending date.
       Finish_Date : ADO.Nullable_Time;
 
+      --  the build duration.
+      Build_Duration : Porion.Millisecond_Type;
+
       --  the number of tests that succeeded.
       Pass_Count : Integer;
 
@@ -451,8 +454,6 @@ package Porion.Queries is
                    Session : in out ADO.Sessions.Session'Class;
                    Context : in out ADO.Queries.Context'Class);
 
-   Query_Test_List : constant ADO.Queries.Query_Definition_Access;
-
    Query_Build_Test_List : constant ADO.Queries.Query_Definition_Access;
 
 
@@ -470,8 +471,8 @@ private
    := Def_Branchinfo_Branch_List.Query'Access;
 
    package File_2 is
-      new ADO.Queries.Loaders.File (Path => "command-builds.xml",
-                                    Sha1 => "37059445C1AAF4A560289CF88A0C43525ABB76B1");
+      new ADO.Queries.Loaders.File (Path => "report-builds.xml",
+                                    Sha1 => "76DB1B40E8B963EFE16859709B5405A21AF05B81");
 
    package Def_Buildinfo_Build_List is
       new ADO.Queries.Loaders.Query (Name => "build-list",
@@ -558,12 +559,6 @@ private
    package File_7 is
       new ADO.Queries.Loaders.File (Path => "report-tests.xml",
                                     Sha1 => "156DC07FA310576EE59560D133C5C3BF4C945A83");
-
-   package Def_Testinfo_Test_List is
-      new ADO.Queries.Loaders.Query (Name => "test-list",
-                                     File => File_7.File'Access);
-   Query_Test_List : constant ADO.Queries.Query_Definition_Access
-   := Def_Testinfo_Test_List.Query'Access;
 
    package Def_Testinfo_Build_Test_List is
       new ADO.Queries.Loaders.Query (Name => "build-test-list",

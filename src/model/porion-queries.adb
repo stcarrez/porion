@@ -88,9 +88,10 @@ package body Porion.Queries is
          Into.Build_Status := Porion.Builds.Models.Build_Status_Type'Val (Stmt.Get_Integer (9));
          Into.Build_Date := Stmt.Get_Nullable_Time (10);
          Into.Finish_Date := Stmt.Get_Nullable_Time (11);
-         Into.Pass_Count := Stmt.Get_Integer (12);
-         Into.Fail_Count := Stmt.Get_Integer (13);
-         Into.Timeout_Count := Stmt.Get_Integer (14);
+         Into.Build_Duration := Porion.Millisecond_Type (Stmt.Get_Integer (12));
+         Into.Pass_Count := Stmt.Get_Integer (13);
+         Into.Fail_Count := Stmt.Get_Integer (14);
+         Into.Timeout_Count := Stmt.Get_Integer (15);
       end Read;
    begin
       Stmt.Execute;

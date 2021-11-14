@@ -96,4 +96,43 @@ package body Porion.Tools is
       end;
    end Execute;
 
+   --  ------------------------------
+   --  Find statistics about the directory tree.
+   --  ------------------------------
+   procedure Find_Stats (Path  : in String;
+                         Stats : in out Tree_Stat_Type) is
+      use Ada.Directories;
+
+      function Is_Ignored (Name : in String) return Boolean
+         is (Name = "." or Name = "..");
+
+      Filter  : constant Filter_Type := (Ordinary_File => True,
+                                         Directory     => True,
+                                         others        => False);
+      Search  : Search_Type;
+      Ent     : Ada.Directories.Directory_Entry_Type;
+   begin
+      Start_Search (Search, Directory => Path,
+                    Pattern => "*", Filter => Filter);
+      while More_Entries (Search) loop
+         Get_Next_Entry (Search, Ent);
+         declare
+            Full_Path : constant String := Ada.Directories.Full_Name (Ent);
+            Kind      : constant File_Kind := Ada.Directories.Kind (Ent);
+         begin
+            if Kind = Ada.Directories.Directory then
+               if not Is_Ignored (Ada.Directories.Simple_Name (Ent)) then
+                  Stats.Dir_Count := Stats.Dir_Count + 1;
+                  Find_Stats (Full_Path, Stats);
+               end if;
+            elsif Kind = Ada.Directories.Ordinary_File then
+               Stats.File_Count := Stats.File_Count + 1;
+               Stats.Total_Size := Stats.Total_Size + Ada.Directories.Size (Ent);
+            else
+               Stats.File_Count := Stats.File_Count + 1;
+            end if;
+         end;
+      end loop;
+   end Find_Stats;
+
 end Porion.Tools;

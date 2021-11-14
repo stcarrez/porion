@@ -41,6 +41,9 @@
         <property type='Nullable_Date' name="finish_date" not-null="no">
             <comment>the build ending date.</comment>
         </property>
+        <property type='Porion.Millisecond_Type' name="build_duration" not-null="yes">
+            <comment>the build duration.</comment>
+        </property>
         <property type='Integer' name="pass_count">
             <comment>the number of tests that succeeded.</comment>
         </property>
@@ -68,6 +71,7 @@
             build.status AS build_status,
             build.create_date AS build_date,
             build.finish_date AS finish_date,
+            build.build_duration AS build_duration,
             build.pass_count AS pass_count,
             build.fail_count AS fail_count,
             build.timeout_count AS timeout_count
@@ -100,6 +104,7 @@
             build.tag AS tag,
             build.status AS build_status,
             build.create_date AS build_date,
+            build.build_duration AS build_duration,
             build.finish_date AS finish_date,
             build.pass_count AS pass_count,
             build.fail_count AS fail_count,

@@ -135,6 +135,12 @@ CREATE TABLE IF NOT EXISTS porion_build_step (
   `end_date` DATETIME ,
   /* the command exit status. */
   `exit_status` INTEGER NOT NULL,
+  /* the user CPU time to execute this step. */
+  `user_time` INTEGER NOT NULL,
+  /* the system CPU time to execute this step. */
+  `sys_time` INTEGER NOT NULL,
+  /* this step duration. */
+  `step_duration` INTEGER NOT NULL,
   /* the build that used this build step */
   `build_id` BIGINT NOT NULL,
   /* the build step configuration that was used. */

@@ -20,8 +20,9 @@ with Ada.Calendar.Time_Zones;
 with Util.Strings;
 with PT.Texts;
 with ADO.Queries;
-with Porion.Builds.Models;
 with Porion.Projects;
+with Porion.Builds.Models;
+with Porion.XUnit.Models;
 with Porion.Projects.Models;
 package body Porion.Reports is
 
@@ -84,6 +85,27 @@ package body Porion.Reports is
       else
          return Util.Strings.Image (Secs) & "." & To_Digit (Ms / 100) & To_Digit (Ms2 / 10)
                    & To_Digit (Ms3);
+      end if;
+   end Format;
+
+   --  ------------------------------
+   --  Format a duration expressed in microseconds.
+   --  ------------------------------
+   function Format (Value : in Microsecond_Type) return String is
+   begin
+      if Value < 1000 then
+         return Util.Strings.Image (Natural (Value)) & " us";
+      elsif Value < 1_000_000 then
+         declare
+            Us  : constant Natural := Natural (Value mod 1_000);
+            Us2 : constant Natural := Us mod 100;
+            Us3 : constant Natural := Us2 mod 10;
+         begin
+            return Util.Strings.Image (Natural (Value / 1_000)) & "."
+               & To_Digit (Us / 100) & To_Digit (Us2 / 10) & To_Digit (Us3) & " ms";
+         end;
+      else
+         return Format (Millisecond_Type (Value / 1_000)) & " s";
       end if;
    end Format;
 
@@ -588,5 +610,63 @@ package body Porion.Reports is
          Writer.New_Line;
       end loop;
    end List_Queues;
+
+   --  ------------------------------
+   --  Create a report with the unit tests for the given build.
+   --  ------------------------------
+   procedure List_Tests (Service : in out Porion.Services.Context_Type'Class;
+                         Build   : in Porion.Builds.Models.Build_Ref;
+                         Printer : in out PT.Printer_Type'Class;
+                         Styles  : in Style_Configuration) is
+      List   : Porion.Queries.Test_Info_Vector;
+      Query  : ADO.Queries.Context;
+   begin
+      Query.Bind_Param ("build_id", Build.Get_Id);
+      Query.Set_Query (Porion.Queries.Query_Build_Test_List);
+      Porion.Queries.List (List, Service.DB, Query);
+
+      List_Tests (List, Printer, Styles);
+   end List_Tests;
+
+   --  Create a report with the unit tests.
+   procedure List_Tests (List     : in Porion.Queries.Test_Info_Vector;
+                         Printer  : in out PT.Printer_Type'Class;
+                         Styles   : in Style_Configuration) is
+      use type Porion.XUnit.Models.Test_Status_Type;
+
+      Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
+      Fields : PT.Texts.Field_Array (1 .. 4);
+      Style1 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
+   begin
+      Writer.Create_Field (Fields (1), Style1, 30.0);
+      Writer.Create_Field (Fields (2), Style1, 50.0);
+      Writer.Create_Field (Fields (3), Style1, 10.0);
+      Writer.Create_Field (Fields (4), Style1, 10.0);
+
+      Writer.Set_Bottom_Right_Padding (Fields (1), (1, 0));
+      Writer.Set_Bottom_Right_Padding (Fields (2), (1, 0));
+      Writer.Set_Bottom_Right_Padding (Fields (3), (1, 0));
+      Writer.Set_Bottom_Right_Padding (Fields (4), (1, 0));
+
+      Writer.Layout_Fields (Fields);
+      Writer.Put (Fields (1), -("Group"));
+      Writer.Put (Fields (2), -("Test"));
+      Writer.Put (Fields (3), -("Duration"));
+      Writer.Put (Fields (4), -("Rate"));
+      Writer.New_Line;
+
+      for Test of List loop
+         if Test.Test_Status = Porion.XUnit.Models.TEST_FAIL then
+            Writer.Copy_Style (To => Style1, From => Styles.Error);
+         else
+            Writer.Copy_Style (To => Style1, From => Styles.Default);
+         end if;
+         Writer.Put_UString (Fields (1), Test.Group_Name);
+         Writer.Put_UString (Fields (2), Test.Test_Name);
+         Writer.Set_Justify (Style1, PT.J_RIGHT);
+         Writer.Put (Fields (3), Format (Test.Test_Duration));
+         Writer.New_Line;
+      end loop;
+   end List_Tests;
 
 end Porion.Reports;

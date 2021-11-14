@@ -151,6 +151,7 @@ package body Porion.Commands.Info is
                         Style2 => Context.Styles.Error);
          Printer.New_Line;
 
+         Porion.Reports.List_Tests (Context.Project_Service, Build, Printer, Context.Styles);
       end if;
    end Print_Build;
 

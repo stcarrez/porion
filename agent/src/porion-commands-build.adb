@@ -63,7 +63,8 @@ package body Porion.Commands.Build is
 
       if Count = 0 then
          declare
-            Executor       : Porion.Executors.Executor_Type;
+            Executor : Porion.Executors.Executor_Type;
+            Found    : Boolean;
          begin
             if Command.Dry_Run then
                Executor.Enable_Dry_Run;
@@ -72,8 +73,9 @@ package body Porion.Commands.Build is
                Executor.Enable_Log;
             end if;
 
-            Porion.Builds.Services.Build (Service => Context.Project_Service,
-                                          Executor => Executor);
+            Porion.Builds.Services.Build (Service  => Context.Project_Service,
+                                          Executor => Executor,
+                                          Found    => Found);
          end;
          return;
       end if;

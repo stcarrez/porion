@@ -238,6 +238,32 @@ the recipe that this step belongs to */
   PRIMARY KEY (`id`)
 );
 /*  */
+CREATE TABLE IF NOT EXISTS porion_build_metric (
+  /* the build metric identifier. */
+  `id` BIGINT NOT NULL,
+  /* the optimistic lock version. */
+  `version` INTEGER NOT NULL,
+  /* the metric value. */
+  `value` INTEGER NOT NULL,
+  /* the build associated with the metric. */
+  `build_id` BIGINT NOT NULL,
+  /* the metric definition. */
+  `metric_id` BIGINT NOT NULL,
+  PRIMARY KEY (`id`)
+);
+/*  */
+CREATE TABLE IF NOT EXISTS porion_metric (
+  /* the metric identifier. */
+  `id` BIGINT NOT NULL,
+  /* the metric name. */
+  `name` VARCHAR(255) NOT NULL,
+  /* the metric label. */
+  `label` VARCHAR(255) NOT NULL,
+  /* the optimistic lock version. */
+  `version` INTEGER NOT NULL,
+  PRIMARY KEY (`id`)
+);
+/*  */
 CREATE TABLE IF NOT EXISTS porion_node (
   /* the node identifier */
   `id` BIGINT NOT NULL,
@@ -466,6 +492,8 @@ INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_environment");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_last_build");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_recipe");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_recipe_step");
+INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_metric");
+INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_metric");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_node");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_branch");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_dependency");

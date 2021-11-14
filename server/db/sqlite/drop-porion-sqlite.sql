@@ -11,6 +11,8 @@ DROP TABLE IF EXISTS `porion_project`;
 DROP TABLE IF EXISTS `porion_dependency`;
 DROP TABLE IF EXISTS `porion_branch`;
 DROP TABLE IF EXISTS `porion_node`;
+DROP TABLE IF EXISTS `porion_metric`;
+DROP TABLE IF EXISTS `porion_build_metric`;
 DROP TABLE IF EXISTS `porion_recipe_step`;
 DROP TABLE IF EXISTS `porion_recipe`;
 DROP TABLE IF EXISTS `porion_last_build`;

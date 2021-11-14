@@ -319,7 +319,7 @@ package body Porion.Reports is
       Query.Set_Query (Porion.Queries.Query_Project_List);
       Porion.Queries.List (List, Service.DB, Query);
 
-      List_Projects (List, Printer, Styles, -("Name"));
+      List_Projects (List, Printer, Styles, -("Identifier"));
    end List_Projects;
 
    --  ------------------------------
@@ -339,22 +339,25 @@ package body Porion.Reports is
    begin
       Writer.Set_Justify (Style2, PT.J_RIGHT);
       Writer.Create_Field (Fields (1), Style1, 20.0);
-      Writer.Create_Field (Fields (2), Style1, 20.0);
-      Writer.Create_Field (Fields (3), Style1, 10.0);
+      Writer.Create_Field (Fields (2), Style1, 0.0);
+      Writer.Create_Field (Fields (3), Style1, 0.0);
       Writer.Create_Field (Fields (4), Style2, 10.0);
       Writer.Create_Field (Fields (5), Style2, 0.0);
       Writer.Create_Field (Fields (6), Style2, 0.0);
       Writer.Create_Field (Fields (7), Style1, 30.0);
 
+      Writer.Set_Max_Dimension (Fields (2), (8, 1));
+      Writer.Set_Max_Dimension (Fields (3), (6, 1));
       Writer.Set_Max_Dimension (Fields (5), (6, 1));
       Writer.Set_Max_Dimension (Fields (6), (6, 1));
-      Writer.Set_Bottom_Right_Padding (Fields (5), (1, 0));
-      Writer.Set_Bottom_Right_Padding (Fields (6), (1, 0));
+      for I in 2 .. 6 loop
+         Writer.Set_Bottom_Right_Padding (Fields (I), (1, 0));
+      end loop;
 
       Writer.Layout_Fields (Fields);
       Writer.Put (Fields (1), Label);
-      Writer.Put (Fields (2), -("Branch"));
-      Writer.Put (Fields (3), -("Tag"));
+      Writer.Put (Fields (2), -("Tag"));
+      Writer.Put (Fields (3), -("Build"));
       Writer.Put (Fields (4), -("Status"));
       Writer.Put (Fields (5), -("Pass"));
       Writer.Put (Fields (6), -("Fail"));
@@ -384,8 +387,9 @@ package body Porion.Reports is
             Ident.Branch := Project.Branch_Name;
             Writer.Put (Fields (1), Porion.Projects.To_String (Ident));
          end;
-         Writer.Put (Fields (3), Get_Tag (Project.Branch_Tag));
+         Writer.Put (Fields (2), Get_Tag (Project.Branch_Tag));
          if not Project.Build_Date.Is_Null then
+            Writer.Put_Int (Fields (3), Project.Build_Number);
             if Project.Build_Status = Builds.Models.BUILD_PASS then
                Writer.Put (Fields (4), -("OK"));
             else

@@ -29,6 +29,9 @@
         <property type='String' name="build_tag">
             <comment>the build tag.</comment>
         </property>
+        <property type='Integer' name="build_number">
+            <comment>the build number.</comment>
+        </property>
         <property type='Integer' name="pass_count">
             <comment>the number of tests that succeeded.</comment>
         </property>
@@ -52,6 +55,7 @@
             build.finish_date AS build_date,
             COALESCE(build.status, 0) AS build_status,
             COALESCE(build.tag, '') AS build_tag,
+            COALESCE(build.number, 0) AS build_number,
             COALESCE(build.pass_count, 0) AS pass_count,
             COALESCE(build.fail_count, 0) AS fail_count,
             COALESCE(build.timeout_count, 0) AS timeout_count
@@ -79,6 +83,7 @@
             build.finish_date AS build_date,
             COALESCE(build.status, 0) AS build_status,
             COALESCE(build.tag, '') AS build_tag,
+            COALESCE(build.number, 0) AS build_number,
             COALESCE(build.pass_count, 0) AS pass_count,
             COALESCE(build.fail_count, 0) AS fail_count,
             COALESCE(build.timeout_count, 0) AS timeout_count

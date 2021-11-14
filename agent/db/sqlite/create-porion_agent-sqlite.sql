@@ -263,6 +263,8 @@ CREATE TABLE IF NOT EXISTS porion_metric (
   `label` VARCHAR(255) NOT NULL,
   /* the optimistic lock version. */
   `version` INTEGER NOT NULL,
+  /* the metric that produced this entry. */
+  `metric` TINYINT NOT NULL,
   PRIMARY KEY (`id`)
 );
 /*  */

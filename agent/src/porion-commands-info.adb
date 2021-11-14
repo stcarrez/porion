@@ -29,8 +29,6 @@ with PT.Charts;
 with Porion.Builds.Services;
 package body Porion.Commands.Info is
 
-   use type Ada.Calendar.Time;
-
    function Get_Max_Time (Build : in Builds.Models.Build_Ref) return Millisecond_Type;
 
    function "-" (Left, Right : Porion.Millisecond_Type) return PT.W_Type is
@@ -98,7 +96,7 @@ package body Porion.Commands.Info is
          Printer.New_Line;
 
          Printer.Put (Fields (1), -("Duration:"));
-         Printer.Put (Fields (2), Reports.Format (Build.Get_Finish_Date.Value - Build.Get_Create_Date));
+         Printer.Put (Fields (2), Reports.Format (Build.Get_Build_Duration));
          Bar_Box := Printer.Get_Box (Fields (3));
          Draw_Progress (Chart, Bar_Box, Build.Get_Build_Duration,
                         Max => Get_Max_Time (Build),
@@ -121,6 +119,16 @@ package body Porion.Commands.Info is
                         Style1 => Context.Styles.Success,
                         Style2 => Context.Styles.Disabled);
          Printer.New_Line;
+
+         if Build.Get_Test_Duration > 0 then
+            Printer.Put (Fields (1), -("Test duration:"));
+            Printer.Put (Fields (2), Reports.Format (Build.Get_Test_Duration));
+            Draw_Progress (Chart, Bar_Box, Millisecond_Type (Build.Get_Test_Duration / 1_000),
+                           Max => Get_Max_Time (Build),
+                           Style1 => Context.Styles.Success,
+                           Style2 => Context.Styles.Disabled);
+            Printer.New_Line;
+         end if;
 
          Printer.Create_Field (Fields (3), Context.Styles.Default, 20.0);
          Printer.Create_Field (Fields (4), Context.Styles.Success, 0.0);

@@ -435,32 +435,22 @@ package body Porion.Queries is
    begin
       if Name = "id" then
          return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Id));
-      elsif Name = "order" then
-         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Order));
-      elsif Name = "creation_date" then
-         return Util.Beans.Objects.Time.To_Object (From.Creation_Date);
-      elsif Name = "project_name" then
-         return Util.Beans.Objects.To_Object (From.Project_Name);
-      elsif Name = "project_status" then
-         return Porion.Projects.Models.Project_Status_Type_Objects.To_Object (From.Project_Status);
-      elsif Name = "branch_name" then
-         return Util.Beans.Objects.To_Object (From.Branch_Name);
-      elsif Name = "branch_tag" then
-         return Util.Beans.Objects.To_Object (From.Branch_Tag);
-      elsif Name = "branch_status" then
-         return Porion.Projects.Models.Branch_Status_Type_Objects.To_Object (From.Branch_Status);
-      elsif Name = "recipe_id" then
-         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Recipe_Id));
-      elsif Name = "recipe_name" then
-         return Util.Beans.Objects.To_Object (From.Recipe_Name);
-      elsif Name = "recipe_status" then
-         return Porion.Builds.Models.Config_Status_Type_Objects.To_Object (From.Recipe_Status);
-      elsif Name = "main_recipe" then
-         return Util.Beans.Objects.To_Object (From.Main_Recipe);
-      elsif Name = "node_name" then
-         return Util.Beans.Objects.To_Object (From.Node_Name);
-      elsif Name = "node_status" then
-         return Porion.Nodes.Node_Status_Type_Objects.To_Object (From.Node_Status);
+      elsif Name = "group_name" then
+         return Util.Beans.Objects.To_Object (From.Group_Name);
+      elsif Name = "test_id" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Test_Id));
+      elsif Name = "test_name" then
+         return Util.Beans.Objects.To_Object (From.Test_Name);
+      elsif Name = "test_pass_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Test_Pass_Count));
+      elsif Name = "test_fail_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Test_Fail_Count));
+      elsif Name = "test_timeout_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Test_Timeout_Count));
+      elsif Name = "test_duration" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Test_Duration));
+      elsif Name = "test_status" then
+         return Porion.XUnit.Models.Test_Status_Type_Objects.To_Object (From.Test_Status);
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -476,32 +466,22 @@ package body Porion.Queries is
    begin
       if Name = "id" then
          Item.Id := ADO.Identifier (Util.Beans.Objects.To_Long_Long_Integer (Value));
-      elsif Name = "order" then
-         Item.Order := Util.Beans.Objects.To_Integer (Value);
-      elsif Name = "creation_date" then
-         Item.Creation_Date := Util.Beans.Objects.Time.To_Time (Value);
-      elsif Name = "project_name" then
-         Item.Project_Name := Util.Beans.Objects.To_Unbounded_String (Value);
-      elsif Name = "project_status" then
-         Item.Project_Status := Porion.Projects.Models.Project_Status_Type_Objects.To_Value (Value);
-      elsif Name = "branch_name" then
-         Item.Branch_Name := Util.Beans.Objects.To_Unbounded_String (Value);
-      elsif Name = "branch_tag" then
-         Item.Branch_Tag := Util.Beans.Objects.To_Unbounded_String (Value);
-      elsif Name = "branch_status" then
-         Item.Branch_Status := Porion.Projects.Models.Branch_Status_Type_Objects.To_Value (Value);
-      elsif Name = "recipe_id" then
-         Item.Recipe_Id := ADO.Identifier (Util.Beans.Objects.To_Long_Long_Integer (Value));
-      elsif Name = "recipe_name" then
-         Item.Recipe_Name := Util.Beans.Objects.To_Unbounded_String (Value);
-      elsif Name = "recipe_status" then
-         Item.Recipe_Status := Porion.Builds.Models.Config_Status_Type_Objects.To_Value (Value);
-      elsif Name = "main_recipe" then
-         Item.Main_Recipe := Util.Beans.Objects.To_Boolean (Value);
-      elsif Name = "node_name" then
-         Item.Node_Name := Util.Beans.Objects.To_Unbounded_String (Value);
-      elsif Name = "node_status" then
-         Item.Node_Status := Porion.Nodes.Node_Status_Type_Objects.To_Value (Value);
+      elsif Name = "group_name" then
+         Item.Group_Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "test_id" then
+         Item.Test_Id := ADO.Identifier (Util.Beans.Objects.To_Long_Long_Integer (Value));
+      elsif Name = "test_name" then
+         Item.Test_Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "test_pass_count" then
+         Item.Test_Pass_Count := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "test_fail_count" then
+         Item.Test_Fail_Count := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "test_timeout_count" then
+         Item.Test_Timeout_Count := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "test_duration" then
+         Item.Test_Duration := Porion.Microsecond_Type (Util.Beans.Objects.To_Integer (Value));
+      elsif Name = "test_status" then
+         Item.Test_Status := Porion.XUnit.Models.Test_Status_Type_Objects.To_Value (Value);
       end if;
    end Set_Value;
 
@@ -517,7 +497,7 @@ package body Porion.Queries is
    end List;
 
    --  --------------------
-   --  Information about a build queue.
+   --  Information about a test.
    --  --------------------
    procedure List (Object  : in out Test_Info_Vector;
                    Session : in out ADO.Sessions.Session'Class;
@@ -530,19 +510,14 @@ package body Porion.Queries is
       procedure Read (Into : in out Test_Info) is
       begin
          Into.Id := Stmt.Get_Identifier (0);
-         Into.Order := Stmt.Get_Integer (1);
-         Into.Creation_Date := Stmt.Get_Time (2);
-         Into.Project_Name := Stmt.Get_Unbounded_String (3);
-         Into.Project_Status := Porion.Projects.Models.Project_Status_Type'Val (Stmt.Get_Integer (4));
-         Into.Branch_Name := Stmt.Get_Unbounded_String (5);
-         Into.Branch_Tag := Stmt.Get_Unbounded_String (6);
-         Into.Branch_Status := Porion.Projects.Models.Branch_Status_Type'Val (Stmt.Get_Integer (7));
-         Into.Recipe_Id := Stmt.Get_Identifier (8);
-         Into.Recipe_Name := Stmt.Get_Unbounded_String (9);
-         Into.Recipe_Status := Porion.Builds.Models.Config_Status_Type'Val (Stmt.Get_Integer (10));
-         Into.Main_Recipe := Stmt.Get_Boolean (11);
-         Into.Node_Name := Stmt.Get_Unbounded_String (12);
-         Into.Node_Status := Porion.Nodes.Node_Status_Type'Val (Stmt.Get_Integer (13));
+         Into.Group_Name := Stmt.Get_Unbounded_String (1);
+         Into.Test_Id := Stmt.Get_Identifier (2);
+         Into.Test_Name := Stmt.Get_Unbounded_String (3);
+         Into.Test_Pass_Count := Stmt.Get_Integer (4);
+         Into.Test_Fail_Count := Stmt.Get_Integer (5);
+         Into.Test_Timeout_Count := Stmt.Get_Integer (6);
+         Into.Test_Duration := Porion.Microsecond_Type (Stmt.Get_Integer (7));
+         Into.Test_Status := Porion.XUnit.Models.Test_Status_Type'Val (Stmt.Get_Integer (8));
       end Read;
    begin
       Stmt.Execute;

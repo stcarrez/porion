@@ -36,6 +36,7 @@ with Util.Beans.Basic.Lists;
 with Porion.Builds.Models;
 with Porion.Nodes;
 with Porion.Projects.Models;
+with Porion.XUnit.Models;
 pragma Warnings (On);
 package Porion.Queries is
 
@@ -386,52 +387,37 @@ package Porion.Queries is
    Query_Node_Build_Queue_List : constant ADO.Queries.Query_Definition_Access;
 
    --  --------------------
-   --    Information about a build queue.
+   --    Information about a test.
    --  --------------------
    type Test_Info is
      new Util.Beans.Basic.Bean with  record
 
-      --  the build queue id.
+      --  the test group id.
       Id : ADO.Identifier;
 
-      --  the build queue order.
-      Order : Integer;
+      --  the test group name.
+      Group_Name : Ada.Strings.Unbounded.Unbounded_String;
 
-      --  the date when the recipe was inserted in the queue.
-      Creation_Date : Ada.Calendar.Time;
+      --  the test id.
+      Test_Id : ADO.Identifier;
 
-      --  the project name.
-      Project_Name : Ada.Strings.Unbounded.Unbounded_String;
+      --  the test name.
+      Test_Name : Ada.Strings.Unbounded.Unbounded_String;
 
-      --  the project status.
-      Project_Status : Porion.Projects.Models.Project_Status_Type;
+      --  the number of times the test passed.
+      Test_Pass_Count : Integer;
 
-      --  the branch name.
-      Branch_Name : Ada.Strings.Unbounded.Unbounded_String;
+      --  the number of times the test failed.
+      Test_Fail_Count : Integer;
 
-      --  the branch tag.
-      Branch_Tag : Ada.Strings.Unbounded.Unbounded_String;
+      --  the number of times the test timed out.
+      Test_Timeout_Count : Integer;
 
-      --  the branch status.
-      Branch_Status : Porion.Projects.Models.Branch_Status_Type;
+      --  the test duration.
+      Test_Duration : Porion.Microsecond_Type;
 
-      --  the build recipe id.
-      Recipe_Id : ADO.Identifier;
-
-      --  the recipe name.
-      Recipe_Name : Ada.Strings.Unbounded.Unbounded_String;
-
-      --  the recipe status.
-      Recipe_Status : Porion.Builds.Models.Config_Status_Type;
-
-      --  whether this is the main recipe.
-      Main_Recipe : Boolean;
-
-      --  the node name where the build is executed.
-      Node_Name : Ada.Strings.Unbounded.Unbounded_String;
-
-      --  the current node status.
-      Node_Status : Porion.Nodes.Node_Status_Type;
+      --  the test status.
+      Test_Status : Porion.XUnit.Models.Test_Status_Type;
    end record;
 
    --  Get the bean attribute identified by the name.
@@ -571,7 +557,7 @@ private
 
    package File_7 is
       new ADO.Queries.Loaders.File (Path => "report-tests.xml",
-                                    Sha1 => "FDD2DAFC9A988749578980FDA47CCDF3F742CE16");
+                                    Sha1 => "156DC07FA310576EE59560D133C5C3BF4C945A83");
 
    package Def_Testinfo_Test_List is
       new ADO.Queries.Loaders.Query (Name => "test-list",

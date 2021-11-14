@@ -1013,6 +1013,30 @@ package Porion.Builds.Models is
    function Get_Exit_Status (Object : in Build_Step_Ref)
                  return Integer;
 
+   --  Set the user CPU time to execute this step.
+   procedure Set_User_Time (Object : in out Build_Step_Ref;
+                            Value  : in Porion.Millisecond_Type);
+
+   --  Get the user CPU time to execute this step.
+   function Get_User_Time (Object : in Build_Step_Ref)
+                 return Porion.Millisecond_Type;
+
+   --  Set the system CPU time to execute this step.
+   procedure Set_Sys_Time (Object : in out Build_Step_Ref;
+                           Value  : in Porion.Millisecond_Type);
+
+   --  Get the system CPU time to execute this step.
+   function Get_Sys_Time (Object : in Build_Step_Ref)
+                 return Porion.Millisecond_Type;
+
+   --  Set this step duration.
+   procedure Set_Step_Duration (Object : in out Build_Step_Ref;
+                                Value  : in Porion.Millisecond_Type);
+
+   --  Get this step duration.
+   function Get_Step_Duration (Object : in Build_Step_Ref)
+                 return Porion.Millisecond_Type;
+
    --  Set the build that used this build step
    procedure Set_Build (Object : in out Build_Step_Ref;
                         Value  : in Build_Ref'Class);
@@ -1878,11 +1902,14 @@ private
    COL_1_7_NAME : aliased constant String := "start_date";
    COL_2_7_NAME : aliased constant String := "end_date";
    COL_3_7_NAME : aliased constant String := "exit_status";
-   COL_4_7_NAME : aliased constant String := "build_id";
-   COL_5_7_NAME : aliased constant String := "recipe_step_id";
+   COL_4_7_NAME : aliased constant String := "user_time";
+   COL_5_7_NAME : aliased constant String := "sys_time";
+   COL_6_7_NAME : aliased constant String := "step_duration";
+   COL_7_7_NAME : aliased constant String := "build_id";
+   COL_8_7_NAME : aliased constant String := "recipe_step_id";
 
    BUILD_STEP_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 6,
+     (Count   => 9,
       Table   => BUILD_STEP_NAME'Access,
       Members => (
          1 => COL_0_7_NAME'Access,
@@ -1890,7 +1917,10 @@ private
          3 => COL_2_7_NAME'Access,
          4 => COL_3_7_NAME'Access,
          5 => COL_4_7_NAME'Access,
-         6 => COL_5_7_NAME'Access)
+         6 => COL_5_7_NAME'Access,
+         7 => COL_6_7_NAME'Access,
+         8 => COL_7_7_NAME'Access,
+         9 => COL_8_7_NAME'Access)
      );
    BUILD_STEP_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := BUILD_STEP_DEF'Access;
@@ -1906,6 +1936,9 @@ private
        Start_Date : Ada.Calendar.Time;
        End_Date : ADO.Nullable_Time;
        Exit_Status : Integer;
+       User_Time : Porion.Millisecond_Type;
+       Sys_Time : Porion.Millisecond_Type;
+       Step_Duration : Porion.Millisecond_Type;
        Build : Build_Ref;
        Recipe_Step : Recipe_Step_Ref;
    end record;

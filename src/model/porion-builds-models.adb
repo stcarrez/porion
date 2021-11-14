@@ -3362,6 +3362,9 @@ package body Porion.Builds.Models is
       Impl.Start_Date := ADO.DEFAULT_TIME;
       Impl.End_Date.Is_Null := True;
       Impl.Exit_Status := 0;
+      Impl.User_Time := 0;
+      Impl.Sys_Time := 0;
+      Impl.Step_Duration := 0;
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Allocate;
 
@@ -3437,12 +3440,72 @@ package body Porion.Builds.Models is
    end Get_Exit_Status;
 
 
+   procedure Set_User_Time (Object : in out Build_Step_Ref;
+                            Value  : in Porion.Millisecond_Type) is
+      procedure Set_Field_Discrete is
+        new ADO.Objects.Set_Field_Operation
+          (Porion.Millisecond_Type);
+      Impl : Build_Step_Access;
+   begin
+      Set_Field (Object, Impl);
+      Set_Field_Discrete (Impl.all, 5, Impl.User_Time, Value);
+   end Set_User_Time;
+
+   function Get_User_Time (Object : in Build_Step_Ref)
+                  return Porion.Millisecond_Type is
+      Impl : constant Build_Step_Access
+         := Build_Step_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.User_Time;
+   end Get_User_Time;
+
+
+   procedure Set_Sys_Time (Object : in out Build_Step_Ref;
+                           Value  : in Porion.Millisecond_Type) is
+      procedure Set_Field_Discrete is
+        new ADO.Objects.Set_Field_Operation
+          (Porion.Millisecond_Type);
+      Impl : Build_Step_Access;
+   begin
+      Set_Field (Object, Impl);
+      Set_Field_Discrete (Impl.all, 6, Impl.Sys_Time, Value);
+   end Set_Sys_Time;
+
+   function Get_Sys_Time (Object : in Build_Step_Ref)
+                  return Porion.Millisecond_Type is
+      Impl : constant Build_Step_Access
+         := Build_Step_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Sys_Time;
+   end Get_Sys_Time;
+
+
+   procedure Set_Step_Duration (Object : in out Build_Step_Ref;
+                                Value  : in Porion.Millisecond_Type) is
+      procedure Set_Field_Discrete is
+        new ADO.Objects.Set_Field_Operation
+          (Porion.Millisecond_Type);
+      Impl : Build_Step_Access;
+   begin
+      Set_Field (Object, Impl);
+      Set_Field_Discrete (Impl.all, 7, Impl.Step_Duration, Value);
+   end Set_Step_Duration;
+
+   function Get_Step_Duration (Object : in Build_Step_Ref)
+                  return Porion.Millisecond_Type is
+      Impl : constant Build_Step_Access
+         := Build_Step_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Step_Duration;
+   end Get_Step_Duration;
+
+
    procedure Set_Build (Object : in out Build_Step_Ref;
                         Value  : in Build_Ref'Class) is
       Impl : Build_Step_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 5, Impl.Build, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 8, Impl.Build, Value);
    end Set_Build;
 
    function Get_Build (Object : in Build_Step_Ref)
@@ -3459,7 +3522,7 @@ package body Porion.Builds.Models is
       Impl : Build_Step_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 6, Impl.Recipe_Step, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 9, Impl.Recipe_Step, Value);
    end Set_Recipe_Step;
 
    function Get_Recipe_Step (Object : in Build_Step_Ref)
@@ -3487,6 +3550,9 @@ package body Porion.Builds.Models is
             Copy.Start_Date := Impl.Start_Date;
             Copy.End_Date := Impl.End_Date;
             Copy.Exit_Status := Impl.Exit_Status;
+            Copy.User_Time := Impl.User_Time;
+            Copy.Sys_Time := Impl.Sys_Time;
+            Copy.Step_Duration := Impl.Step_Duration;
             Copy.Build := Impl.Build;
             Copy.Recipe_Step := Impl.Recipe_Step;
          end;
@@ -3629,14 +3695,29 @@ package body Porion.Builds.Models is
          Object.Clear_Modified (4);
       end if;
       if Object.Is_Modified (5) then
-         Stmt.Save_Field (Name  => COL_4_7_NAME, --  build_id
-                          Value => Object.Build);
+         Stmt.Save_Field (Name  => COL_4_7_NAME, --  user_time
+                          Value => Integer (Object.User_Time));
          Object.Clear_Modified (5);
       end if;
       if Object.Is_Modified (6) then
-         Stmt.Save_Field (Name  => COL_5_7_NAME, --  recipe_step_id
-                          Value => Object.Recipe_Step);
+         Stmt.Save_Field (Name  => COL_5_7_NAME, --  sys_time
+                          Value => Integer (Object.Sys_Time));
          Object.Clear_Modified (6);
+      end if;
+      if Object.Is_Modified (7) then
+         Stmt.Save_Field (Name  => COL_6_7_NAME, --  step_duration
+                          Value => Integer (Object.Step_Duration));
+         Object.Clear_Modified (7);
+      end if;
+      if Object.Is_Modified (8) then
+         Stmt.Save_Field (Name  => COL_7_7_NAME, --  build_id
+                          Value => Object.Build);
+         Object.Clear_Modified (8);
+      end if;
+      if Object.Is_Modified (9) then
+         Stmt.Save_Field (Name  => COL_8_7_NAME, --  recipe_step_id
+                          Value => Object.Recipe_Step);
+         Object.Clear_Modified (9);
       end if;
       if Stmt.Has_Save_Fields then
          Stmt.Set_Filter (Filter => "id = ?");
@@ -3669,9 +3750,15 @@ package body Porion.Builds.Models is
                         Value => Object.End_Date);
       Query.Save_Field (Name  => COL_3_7_NAME, --  exit_status
                         Value => Object.Exit_Status);
-      Query.Save_Field (Name  => COL_4_7_NAME, --  build_id
+      Query.Save_Field (Name  => COL_4_7_NAME, --  user_time
+                        Value => Integer (Object.User_Time));
+      Query.Save_Field (Name  => COL_5_7_NAME, --  sys_time
+                        Value => Integer (Object.Sys_Time));
+      Query.Save_Field (Name  => COL_6_7_NAME, --  step_duration
+                        Value => Integer (Object.Step_Duration));
+      Query.Save_Field (Name  => COL_7_7_NAME, --  build_id
                         Value => Object.Build);
-      Query.Save_Field (Name  => COL_5_7_NAME, --  recipe_step_id
+      Query.Save_Field (Name  => COL_8_7_NAME, --  recipe_step_id
                         Value => Object.Recipe_Step);
       Query.Execute (Result);
       if Result /= 1 then
@@ -3716,6 +3803,12 @@ package body Porion.Builds.Models is
          end if;
       elsif Name = "exit_status" then
          return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Exit_Status));
+      elsif Name = "user_time" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.User_Time));
+      elsif Name = "sys_time" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Sys_Time));
+      elsif Name = "step_duration" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Step_Duration));
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -3753,11 +3846,14 @@ package body Porion.Builds.Models is
       Object.Start_Date := Stmt.Get_Time (1);
       Object.End_Date := Stmt.Get_Nullable_Time (2);
       Object.Exit_Status := Stmt.Get_Integer (3);
-      if not Stmt.Is_Null (4) then
-         Object.Build.Set_Key_Value (Stmt.Get_Identifier (4), Session);
+      Object.User_Time := Porion.Millisecond_Type (Stmt.Get_Integer (4));
+      Object.Sys_Time := Porion.Millisecond_Type (Stmt.Get_Integer (5));
+      Object.Step_Duration := Porion.Millisecond_Type (Stmt.Get_Integer (6));
+      if not Stmt.Is_Null (7) then
+         Object.Build.Set_Key_Value (Stmt.Get_Identifier (7), Session);
       end if;
-      if not Stmt.Is_Null (5) then
-         Object.Recipe_Step.Set_Key_Value (Stmt.Get_Identifier (5), Session);
+      if not Stmt.Is_Null (8) then
+         Object.Recipe_Step.Set_Key_Value (Stmt.Get_Identifier (8), Session);
       end if;
       ADO.Objects.Set_Created (Object);
    end Load;

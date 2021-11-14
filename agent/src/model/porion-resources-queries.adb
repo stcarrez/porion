@@ -562,64 +562,52 @@ package body Porion.Resources.Queries is
        & "    <description>" & ASCII.LF & "        List the build queues" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
        & "ueries.Test_Info"" bean=""yes"">" & ASCII.LF & "        <comment>Informa"
-       & "tion about a build queue.</comment>" & ASCII.LF & "        <property typ"
-       & "e='ADO.Identifier' name=""id"">" & ASCII.LF & "            <comment>the "
-       & "build queue id.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
-       & "        <property type='Integer' name=""order"">" & ASCII.LF & "        "
-       & "    <comment>the build queue order.</comment>" & ASCII.LF & "        </p"
-       & "roperty>" & ASCII.LF & "        <property type='Date' name=""creation_da"
-       & "te"" not-null=""yes"">" & ASCII.LF & "            <comment>the date when"
-       & " the recipe was inserted in the queue.</comment>" & ASCII.LF & "        "
-       & "</property>" & ASCII.LF & "        <property type='String' name=""projec"
-       & "t_name"">" & ASCII.LF & "            <comment>the project name.</comment"
-       & ">" & ASCII.LF & "        </property>" & ASCII.LF & "        <property ty"
-       & "pe='Porion.Projects.Models.Project_Status_Type' name=""project_status"">"
-       & ASCII.LF & "            <comment>the project status.</comment>" & ASCII.LF
+       & "tion about a test.</comment>" & ASCII.LF & "        <property type='ADO."
+       & "Identifier' name=""id"">" & ASCII.LF & "            <comment>the test gr"
+       & "oup id.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "    "
+       & "    <property type='String' name=""group_name"">" & ASCII.LF & "        "
+       & "    <comment>the test group name.</comment>" & ASCII.LF & "        </pro"
+       & "perty>" & ASCII.LF & "        <property type='ADO.Identifier' name=""tes"
+       & "t_id"">" & ASCII.LF & "            <comment>the test id.</comment>" & ASCII.LF
        & "        </property>" & ASCII.LF & "        <property type='String' name="
-       & """branch_name"">" & ASCII.LF & "            <comment>the branch name.</c"
-       & "omment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <prope"
-       & "rty type='String' name=""branch_tag"">" & ASCII.LF & "            <comme"
-       & "nt>the branch tag.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
-       & "        <property type='Porion.Projects.Models.Branch_Status_Type' name="
-       & """branch_status"">" & ASCII.LF & "            <comment>the branch status"
-       & ".</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <p"
-       & "roperty type='ADO.Identifier' name=""recipe_id"">" & ASCII.LF & "       "
-       & "     <comment>the build recipe id.</comment>" & ASCII.LF & "        </pr"
-       & "operty>" & ASCII.LF & "        <property type='String' name=""recipe_nam"
-       & "e"">" & ASCII.LF & "            <comment>the recipe name.</comment>" & ASCII.LF
-       & "        </property>" & ASCII.LF & "        <property type='Porion.Builds"
-       & ".Models.Config_Status_Type' name=""recipe_status"">" & ASCII.LF & "     "
-       & "       <comment>the recipe status.</comment>" & ASCII.LF & "        </pr"
-       & "operty>" & ASCII.LF & "        <property type='Boolean' name=""main_reci"
-       & "pe"">" & ASCII.LF & "            <comment>whether this is the main recip"
-       & "e.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <"
-       & "property type='String' name=""node_name"">" & ASCII.LF & "            <c"
-       & "omment>the node name where the build is executed.</comment>" & ASCII.LF
-       & "        </property>" & ASCII.LF & "        <property type='Porion.Nodes."
-       & "Node_Status_Type' name=""node_status"">" & ASCII.LF & "            <comm"
-       & "ent>the current node status.</comment>" & ASCII.LF & "        </property"
-       & ">" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF & "    <query name"
-       & "='test-list'>" & ASCII.LF & "        <comment>Get a description of the b"
-       & "uild queue</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & "       "
-       & "     SELECT" & ASCII.LF & "            grp.id AS id," & ASCII.LF & "    "
-       & "        grp.name AS grp_name," & ASCII.LF & "            test.id AS tid,"
-       & ASCII.LF & "            test.name AS test_name," & ASCII.LF & "         "
-       & "   test.total_pass_count AS pass_count," & ASCII.LF & "            test."
-       & "total_fail_count AS fail_count," & ASCII.LF & "            test.total_ti"
-       & "meout_count AS timeout_count" & ASCII.LF & "            FROM porion_test"
-       & "_group AS grp" & ASCII.LF & "            INNER JOIN porion_test AS test "
-       & "ON test.group_id = grp.id" & ASCII.LF & "        </sql>" & ASCII.LF & " "
-       & "   </query>" & ASCII.LF & ASCII.LF & "    <query name='build-test-list'"
-       & ">" & ASCII.LF & "        <comment>Get a description of the build queue</"
-       & "comment>" & ASCII.LF & "        <sql>" & ASCII.LF & "            SELECT" & ASCII.LF
-       & "            grp.id AS id," & ASCII.LF & "            grp.name AS grp_nam"
-       & "e," & ASCII.LF & "            test.id AS tid," & ASCII.LF & "           "
-       & " test.name AS test_name," & ASCII.LF & "            run.duration AS dura"
-       & "tion," & ASCII.LF & "            run.status AS status," & ASCII.LF & "  "
-       & "          test.total_timeout_count AS timeout_count" & ASCII.LF & "     "
-       & "       FROM porion_test_run_group AS rgrp" & ASCII.LF & "            INN"
-       & "ER JOIN porion_test_group AS grp ON rgrp.group_id = grp.id" & ASCII.LF & " "
-       & "           INNER JOIN porion_test_run AS run ON run.group_id = rgrp.id" & ASCII.LF
+       & """test_name"">" & ASCII.LF & "            <comment>the test name.</comme"
+       & "nt>" & ASCII.LF & "        </property>" & ASCII.LF & "        <property "
+       & "type='Integer' name=""test_pass_count"">" & ASCII.LF & "            <com"
+       & "ment>the number of times the test passed.</comment>" & ASCII.LF & "     "
+       & "   </property>" & ASCII.LF & "        <property type='Integer' name=""te"
+       & "st_fail_count"">" & ASCII.LF & "            <comment>the number of times"
+       & " the test failed.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Integer' name=""test_timeout_count"">" & ASCII.LF
+       & "            <comment>the number of times the test timed out.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Porion.Micros"
+       & "econd_Type' name=""test_duration"">" & ASCII.LF & "            <comment>"
+       & "the test duration.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Porion.XUnit.Models.Test_Status_Type' name=""tes"
+       & "t_status"">" & ASCII.LF & "            <comment>the test status.</commen"
+       & "t>" & ASCII.LF & "        </property>" & ASCII.LF & "    </class>" & ASCII.LF
+       & ASCII.LF & "    <query name='test-list'>" & ASCII.LF & "        <comment"
+       & ">Get a description of the build queue</comment>" & ASCII.LF & "        <"
+       & "sql>" & ASCII.LF & "            SELECT" & ASCII.LF & "            grp.id"
+       & " AS id," & ASCII.LF & "            grp.name AS grp_name," & ASCII.LF & " "
+       & "           test.id AS tid," & ASCII.LF & "            test.name AS test_"
+       & "name," & ASCII.LF & "            test.total_pass_count AS pass_count," & ASCII.LF
+       & "            test.total_fail_count AS fail_count," & ASCII.LF & "        "
+       & "    test.total_timeout_count AS timeout_count" & ASCII.LF & "           "
+       & " FROM porion_test_group AS grp" & ASCII.LF & "            INNER JOIN por"
+       & "ion_test AS test ON test.group_id = grp.id" & ASCII.LF & "        </sql>"
+       & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "    <query name='bui"
+       & "ld-test-list'>" & ASCII.LF & "        <comment>Get a description of the "
+       & "build queue</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & "      "
+       & "      SELECT" & ASCII.LF & "            grp.id AS id," & ASCII.LF & "   "
+       & "         grp.name AS grp_name," & ASCII.LF & "            test.id AS tid"
+       & "," & ASCII.LF & "            test.name AS test_name," & ASCII.LF & "    "
+       & "        test.total_pass_count AS pass_count," & ASCII.LF & "            "
+       & "test.total_fail_count AS fail_count," & ASCII.LF & "            test.tot"
+       & "al_timeout_count AS timeout_count," & ASCII.LF & "            run.durati"
+       & "on AS duration," & ASCII.LF & "            run.status AS status" & ASCII.LF
+       & "            FROM porion_test_run_group AS rgrp" & ASCII.LF & "          "
+       & "  INNER JOIN porion_test_group AS grp ON rgrp.group_id = grp.id" & ASCII.LF
+       & "            INNER JOIN porion_test_run AS run ON run.group_id = rgrp.id" & ASCII.LF
        & "            INNER JOIN porion_test AS test ON run.test_id = test.id" & ASCII.LF
        & "            WHERE rgrp.build_id = 801" & ASCII.LF & "        </sql>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;

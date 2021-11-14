@@ -37,8 +37,9 @@ package body Porion.Resources.Schema is
        & "_id` BIGINT , `upstream_build_id` BIGINT , PRIMARY KEY (`id`))";
    L_11  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_build_s"
        & "tep ( `id` BIGINT NOT NULL, `start_date` DATETIME NOT NULL, `end_date` D"
-       & "ATETIME , `exit_status` INTEGER NOT NULL, `build_id` BIGINT NOT NULL, `r"
-       & "ecipe_step_id` BIGINT NOT NULL, PRIMARY KEY (`id`))";
+       & "ATETIME , `exit_status` INTEGER NOT NULL, `user_time` INTEGER NOT NULL, "
+       & "`sys_time` INTEGER NOT NULL, `step_duration` INTEGER NOT NULL, `build_id"
+       & "` BIGINT NOT NULL, `recipe_step_id` BIGINT NOT NULL, PRIMARY KEY (`id`))";
    L_12  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_environ"
        & "ment ( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `name` VARCHAR("
        & "255) NOT NULL, `value` VARCHAR(4096) NOT NULL, `node_id` BIGINT , `recip"

@@ -56,7 +56,7 @@ private
                     Path       : in String;
                     Executor   : in out Executors.Executor_Type'Class) is abstract;
 
-   procedure Clean (Controller : in out Controller_Type) is abstract;
+   procedure Clean (Controller : in out Controller_Type) is null;
 
    procedure Configure (Controller : in out Controller_Type;
                         Parameters : in String_Vector) is null;

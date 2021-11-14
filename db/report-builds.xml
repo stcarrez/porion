@@ -104,8 +104,8 @@
             build.tag AS tag,
             build.status AS build_status,
             build.create_date AS build_date,
-            build.build_duration AS build_duration,
             build.finish_date AS finish_date,
+            build.build_duration AS build_duration,
             build.pass_count AS pass_count,
             build.fail_count AS fail_count,
             build.timeout_count AS timeout_count

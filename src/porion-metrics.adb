@@ -1,0 +1,81 @@
+-----------------------------------------------------------------------
+--  porion-metrics -- Build metrics
+--  Copyright (C) 2021 Stephane Carrez
+--  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
+--
+--  Licensed under the Apache License, Version 2.0 (the "License");
+--  you may not use this file except in compliance with the License.
+--  You may obtain a copy of the License at
+--
+--      http://www.apache.org/licenses/LICENSE-2.0
+--
+--  Unless required by applicable law or agreed to in writing, software
+--  distributed under the License is distributed on an "AS IS" BASIS,
+--  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+--  See the License for the specific language governing permissions and
+--  limitations under the License.
+-----------------------------------------------------------------------
+
+with ADO.Queries;
+with Porion.Metrics.Models;
+package body Porion.Metrics is
+
+   --  ------------------------------
+   --  Get the identification type of this metric controller.
+   --  ------------------------------
+   function Get_Kind (Controller : in Controller_Type) return String is
+   begin
+      case Controller.Kind is
+         when METRIC_SPACE =>
+            return "space";
+
+         when METRIC_FILESIZE =>
+            return "filesize";
+
+      end case;
+   end Get_Kind;
+
+   --  ------------------------------
+   --  Returns True if the controller knows the current build.
+   --  ------------------------------
+   function Has_Build (Controller : in Controller_Type) return Boolean is
+   begin
+      return not Controller.Build.Is_Null;
+   end Has_Build;
+
+   procedure Build (Controller : in out Controller_Type;
+                    Build      : in out Porion.Builds.Models.Build_Ref;
+                    Path       : in String;
+                    Executor   : in out Porion.Executors.Executor_Type'Class) is
+   begin
+      Controller.Build := Build;
+      Controller_Type'Class (Controller).Collect (Path, Executor);
+   end Build;
+
+   --  ------------------------------
+   --  Save the build metric.
+   --  ------------------------------
+   procedure Save_Metric (Controller : in out Controller_Type;
+                          Name       : in String;
+                          Value      : in Integer) is
+      Query        : ADO.Queries.Context;
+      Metric       : Porion.Metrics.Models.Metric_Ref;
+      Found        : Boolean;
+      Build_Metric : Porion.Metrics.Models.Build_Metric_Ref;
+   begin
+      Query.Set_Filter ("o.name = :name");
+      Query.Bind_Param ("name", Name);
+      Metric.Find (Controller.Session, Query, Found);
+      if not Found then
+         Metric.Set_Name (Name);
+         Metric.Set_Metric (Controller.Kind);
+         Metric.Save (Controller.Session);
+      end if;
+
+      Build_Metric.Set_Metric (Metric);
+      Build_Metric.Set_Build (Controller.Build);
+      Build_Metric.Set_Value (Value);
+      Build_Metric.Save (Controller.Session);
+   end Save_Metric;
+
+end Porion.Metrics;

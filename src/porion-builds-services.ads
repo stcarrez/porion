@@ -56,7 +56,9 @@ package Porion.Builds.Services is
       Pre => Service.Has_Project and Service.Has_Branch and Service.Has_Build;
 
    procedure Build (Service     : in out Context_Type;
-                    Executor    : in out Porion.Executors.Executor_Type'Class);
+                    Executor    : in out Porion.Executors.Executor_Type'Class;
+                    Found       : out Boolean) with
+      Pre => Service.Is_Open;
 
    procedure Build (Service     : in out Context_Type;
                     Recipe      : in Porion.Builds.Models.Recipe_Ref;

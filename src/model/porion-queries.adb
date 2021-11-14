@@ -195,6 +195,8 @@ package body Porion.Queries is
          return Porion.Builds.Models.Build_Status_Type_Objects.To_Object (From.Build_Status);
       elsif Name = "build_tag" then
          return Util.Beans.Objects.To_Object (From.Build_Tag);
+      elsif Name = "build_number" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Build_Number));
       elsif Name = "pass_count" then
          return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Pass_Count));
       elsif Name = "fail_count" then
@@ -233,6 +235,8 @@ package body Porion.Queries is
          Item.Build_Status := Porion.Builds.Models.Build_Status_Type_Objects.To_Value (Value);
       elsif Name = "build_tag" then
          Item.Build_Tag := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "build_number" then
+         Item.Build_Number := Util.Beans.Objects.To_Integer (Value);
       elsif Name = "pass_count" then
          Item.Pass_Count := Util.Beans.Objects.To_Integer (Value);
       elsif Name = "fail_count" then
@@ -274,9 +278,10 @@ package body Porion.Queries is
          Into.Build_Date := Stmt.Get_Nullable_Time (5);
          Into.Build_Status := Porion.Builds.Models.Build_Status_Type'Val (Stmt.Get_Integer (6));
          Into.Build_Tag := Stmt.Get_Unbounded_String (7);
-         Into.Pass_Count := Stmt.Get_Integer (8);
-         Into.Fail_Count := Stmt.Get_Integer (9);
-         Into.Timeout_Count := Stmt.Get_Integer (10);
+         Into.Build_Number := Stmt.Get_Integer (8);
+         Into.Pass_Count := Stmt.Get_Integer (9);
+         Into.Fail_Count := Stmt.Get_Integer (10);
+         Into.Timeout_Count := Stmt.Get_Integer (11);
       end Read;
    begin
       Stmt.Execute;

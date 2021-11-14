@@ -255,6 +255,9 @@ package Porion.Queries is
       --  the build tag.
       Build_Tag : Ada.Strings.Unbounded.Unbounded_String;
 
+      --  the build number.
+      Build_Number : Integer;
+
       --  the number of tests that succeeded.
       Pass_Count : Integer;
 
@@ -519,8 +522,8 @@ private
    := Def_Nodeinfo_Project_Node_List.Query'Access;
 
    package File_5 is
-      new ADO.Queries.Loaders.File (Path => "command-projects.xml",
-                                    Sha1 => "2B4AA202D163FA68DAD7ABA6910669E55F4DFDB6");
+      new ADO.Queries.Loaders.File (Path => "report-projects.xml",
+                                    Sha1 => "96375E20177918A20C634ACAAE0D686D04E00104");
 
    package Def_Projectinfo_Project_List is
       new ADO.Queries.Loaders.Query (Name => "project-list",

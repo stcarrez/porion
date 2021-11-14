@@ -467,9 +467,9 @@ package body Porion.Resources.Queries is
        & "            build.id AS build_id," & ASCII.LF & "            build.numbe"
        & "r AS number," & ASCII.LF & "            build.tag AS tag," & ASCII.LF & " "
        & "           build.status AS build_status," & ASCII.LF & "            buil"
-       & "d.create_date AS build_date," & ASCII.LF & "            build.build_dura"
-       & "tion AS build_duration," & ASCII.LF & "            build.finish_date AS "
-       & "finish_date," & ASCII.LF & "            build.pass_count AS pass_count," & ASCII.LF
+       & "d.create_date AS build_date," & ASCII.LF & "            build.finish_dat"
+       & "e AS finish_date," & ASCII.LF & "            build.build_duration AS bui"
+       & "ld_duration," & ASCII.LF & "            build.pass_count AS pass_count," & ASCII.LF
        & "            build.fail_count AS fail_count," & ASCII.LF & "            b"
        & "uild.timeout_count AS timeout_count" & ASCII.LF & "            FROM pori"
        & "on_last_build AS last_build" & ASCII.LF & "            INNER JOIN porion"

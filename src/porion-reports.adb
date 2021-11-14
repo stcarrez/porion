@@ -149,6 +149,9 @@ package body Porion.Reports is
          when STEP_PUBLISH =>
             return -("publish");
 
+         when STEP_METRIC =>
+            return -("metric");
+
       end case;
    end Get_Image;
 

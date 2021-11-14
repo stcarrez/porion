@@ -15,10 +15,23 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Ada.Directories;
 with Util.Properties;
 with EL.Expressions;
 with Util.Strings.Vectors;
 package Porion.Tools is
+
+   subtype File_Size is Ada.Directories.File_Size;
+
+   type Tree_Stat_Type is record
+      File_Count : Natural := 0;
+      Dir_Count  : Natural := 0;
+      Total_Size : File_Size := 0;
+   end record;
+
+   --  Find statistics about the directory tree.
+   procedure Find_Stats (Path  : in String;
+                         Stats : in out Tree_Stat_Type);
 
    --  Return a string formed by a concatenation of strings in the vector.
    function To_String (Args : in Util.Strings.Vectors.Vector) return String;

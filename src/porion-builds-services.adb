@@ -39,7 +39,9 @@ with Porion.Projects.Models;
 with Porion.Builders;
 package body Porion.Builds.Services is
 
+   use type Ada.Calendar.Time;
    use type ADO.Identifier;
+   use type Porion.Nodes.Usage_Type;
    use type Porion.Builds.Models.Execution_Type;
    use type Porion.Builds.Models.Build_Status_Type;
 
@@ -193,6 +195,7 @@ package body Porion.Builds.Services is
       Config      : Util.Properties.Manager;
       Status      : Builds.Models.Build_Status_Type := Builds.Models.BUILD_RUNNING;
       Source_Controller : Porion.Sources.Controller_Access;
+      Usage       : Nodes.Usage_Type := (others => 0);
    begin
       Log.Info ("Build {0} in {1}", Ident, Path);
 
@@ -230,11 +233,21 @@ package body Porion.Builds.Services is
                              Service.Build, Path, Executor);
 
                if not Executor.Is_Dry_Run then
-                  Step_Status := Executor.Get_Status;
-                  Exec_Step.Set_Exit_Status (Step_Status);
-                  Exec_Step.Set_End_Date ((Is_Null => False,
-                                           Value => Ada.Calendar.Clock));
-                  Exec_Step.Save (Service.DB);
+                  declare
+                     Finish     : constant Ada.Calendar.Time := Ada.Calendar.Clock;
+                     Time       : constant Duration := Finish - Exec_Step.Get_Start_Date;
+                     New_Usage  : constant Nodes.Usage_Type := Executor.Get_Usage;
+                     Step_Usage : constant Nodes.Usage_Type := New_Usage - Usage;
+                  begin
+                     Usage := New_Usage;
+                     Step_Status := Executor.Get_Status;
+                     Exec_Step.Set_Exit_Status (Step_Status);
+                     Exec_Step.Set_End_Date ((Is_Null => False, Value => Finish));
+                     Exec_Step.Set_Step_Duration (Millisecond_Type (Time * 1_000.0));
+                     Exec_Step.Set_User_Time (Millisecond_Type (Step_Usage.User_Time));
+                     Exec_Step.Set_Sys_Time (Millisecond_Type (Step_Usage.Sys_Time));
+                     Exec_Step.Save (Service.DB);
+                  end;
                   if Step_Status /= 0
                     and Step.Step.Get_Execution = Builds.Models.EXEC_NO_ERROR
                   then
@@ -317,7 +330,6 @@ package body Porion.Builds.Services is
    --  ------------------------------
    procedure Update_Build_Queue (Service : in out Context_Type;
                                  Trigger_Builds : in Boolean) is
-      use type Ada.Calendar.Time;
 
       package Map_Depends is
         new Ada.Containers.Hashed_Maps (Key_Type => ADO.Identifier,
@@ -465,7 +477,6 @@ package body Porion.Builds.Services is
    procedure Update_Build (Service : in out Context_Type;
                            Status  : in Builds.Models.Build_Status_Type) is
       procedure Update_Last;
-      use type Ada.Calendar.Time;
 
       Last_Builds : Builds.Models.Last_Build_Vector;
       Query       : ADO.Queries.Context;

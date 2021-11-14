@@ -169,6 +169,8 @@ CREATE TABLE IF NOT EXISTS porion_recipe (
   `rate_factor` INTEGER NOT NULL,
   /* the main recipe. */
   `main_recipe` TINYINT NOT NULL,
+  /* a list of comma separated filtering rules to activate when displaying logs. */
+  `filter_rules` VARCHAR(255) NOT NULL,
   /*  */
   `node_id` BIGINT ,
   /*  */
@@ -482,6 +484,8 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_recipe"), "rate_factor");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_recipe"), "main_recipe");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_recipe"), "filter_rules");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "name");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)

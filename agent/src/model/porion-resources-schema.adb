@@ -66,7 +66,8 @@ package body Porion.Resources.Schema is
        & "MARY KEY (`id`))";
    L_17  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_metric "
        & "( `id` BIGINT NOT NULL, `name` VARCHAR(255) NOT NULL, `label` VARCHAR(25"
-       & "5) NOT NULL, `version` INTEGER NOT NULL, PRIMARY KEY (`id`))";
+       & "5) NOT NULL, `version` INTEGER NOT NULL, `metric` TINYINT NOT NULL, PRIM"
+       & "ARY KEY (`id`))";
    L_18  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_node ( "
        & "`id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `name` VARCHAR(255) NO"
        & "T NULL, `login` VARCHAR(255) NOT NULL, `repository_dir` VARCHAR(255) NOT"

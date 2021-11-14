@@ -31,6 +31,7 @@ with Ada.Strings.Unbounded;
 with Util.Beans.Objects;
 with Util.Beans.Basic.Lists;
 with Porion.Builds.Models;
+with Porion.Metrics;
 pragma Warnings (On);
 package Porion.Metrics.Models is
 
@@ -83,6 +84,14 @@ package Porion.Metrics.Models is
    --  Get the optimistic lock version.
    function Get_Version (Object : in Metric_Ref)
                  return Integer;
+
+   --  Set the metric that produced this entry.
+   procedure Set_Metric (Object : in out Metric_Ref;
+                         Value  : in Porion.Metrics.Metric_Type);
+
+   --  Get the metric that produced this entry.
+   function Get_Metric (Object : in Metric_Ref)
+                 return Porion.Metrics.Metric_Type;
 
    --  Load the entity identified by 'Id'.
    --  Raises the NOT_FOUND exception if it does not exist.
@@ -249,15 +258,17 @@ private
    COL_1_1_NAME : aliased constant String := "name";
    COL_2_1_NAME : aliased constant String := "label";
    COL_3_1_NAME : aliased constant String := "version";
+   COL_4_1_NAME : aliased constant String := "metric";
 
    METRIC_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 4,
+     (Count   => 5,
       Table   => METRIC_NAME'Access,
       Members => (
          1 => COL_0_1_NAME'Access,
          2 => COL_1_1_NAME'Access,
          3 => COL_2_1_NAME'Access,
-         4 => COL_3_1_NAME'Access)
+         4 => COL_3_1_NAME'Access,
+         5 => COL_4_1_NAME'Access)
      );
    METRIC_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := METRIC_DEF'Access;
@@ -273,6 +284,7 @@ private
        Name : Ada.Strings.Unbounded.Unbounded_String;
        Label : Ada.Strings.Unbounded.Unbounded_String;
        Version : Integer;
+       Metric : Porion.Metrics.Metric_Type;
    end record;
 
    type Metric_Access is access all Metric_Impl;

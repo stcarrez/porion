@@ -68,6 +68,7 @@ package body Porion.Metrics.Models is
    begin
       Impl := new Metric_Impl;
       Impl.Version := 0;
+      Impl.Metric := Porion.Metrics.Metric_Type'First;
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Allocate;
 
@@ -160,6 +161,26 @@ package body Porion.Metrics.Models is
       return Impl.Version;
    end Get_Version;
 
+
+   procedure Set_Metric (Object : in out Metric_Ref;
+                         Value  : in Porion.Metrics.Metric_Type) is
+      procedure Set_Field_Discrete is
+        new ADO.Objects.Set_Field_Operation
+          (Porion.Metrics.Metric_Type);
+      Impl : Metric_Access;
+   begin
+      Set_Field (Object, Impl);
+      Set_Field_Discrete (Impl.all, 5, Impl.Metric, Value);
+   end Set_Metric;
+
+   function Get_Metric (Object : in Metric_Ref)
+                  return Porion.Metrics.Metric_Type is
+      Impl : constant Metric_Access
+         := Metric_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Metric;
+   end Get_Metric;
+
    --  Copy of the object.
    procedure Copy (Object : in Metric_Ref;
                    Into   : in out Metric_Ref) is
@@ -177,6 +198,7 @@ package body Porion.Metrics.Models is
             Copy.Name := Impl.Name;
             Copy.Label := Impl.Label;
             Copy.Version := Impl.Version;
+            Copy.Metric := Impl.Metric;
          end;
       end if;
       Into := Result;
@@ -321,6 +343,11 @@ package body Porion.Metrics.Models is
                           Value => Object.Label);
          Object.Clear_Modified (3);
       end if;
+      if Object.Is_Modified (5) then
+         Stmt.Save_Field (Name  => COL_4_1_NAME, --  metric
+                          Value => Integer (Porion.Metrics.Metric_Type'Pos (Object.Metric)));
+         Object.Clear_Modified (5);
+      end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
          Stmt.Save_Field (Name  => "version",
@@ -359,6 +386,8 @@ package body Porion.Metrics.Models is
                         Value => Object.Label);
       Query.Save_Field (Name  => COL_3_1_NAME, --  version
                         Value => Object.Version);
+      Query.Save_Field (Name  => COL_4_1_NAME, --  metric
+                        Value => Integer (Porion.Metrics.Metric_Type'Pos (Object.Metric)));
       Query.Execute (Result);
       if Result /= 1 then
          raise ADO.Objects.INSERT_ERROR;
@@ -396,6 +425,8 @@ package body Porion.Metrics.Models is
          return Util.Beans.Objects.To_Object (Impl.Name);
       elsif Name = "label" then
          return Util.Beans.Objects.To_Object (Impl.Label);
+      elsif Name = "metric" then
+         return Porion.Metrics.Metric_Type_Objects.To_Object (Impl.Metric);
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -433,6 +464,7 @@ package body Porion.Metrics.Models is
       Object.Set_Key_Value (Stmt.Get_Identifier (0));
       Object.Name := Stmt.Get_Unbounded_String (1);
       Object.Label := Stmt.Get_Unbounded_String (2);
+      Object.Metric := Porion.Metrics.Metric_Type'Val (Stmt.Get_Integer (4));
       Object.Version := Stmt.Get_Integer (3);
       ADO.Objects.Set_Created (Object);
    end Load;

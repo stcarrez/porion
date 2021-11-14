@@ -118,10 +118,10 @@ package body Porion.Builds.Services is
    end Start_Build;
 
    procedure Build (Service  : in out Context_Type;
-                    Executor : in out Porion.Executors.Executor_Type'Class) is
+                    Executor : in out Porion.Executors.Executor_Type'Class;
+                    Found    : out Boolean) is
       Query  : ADO.Queries.Context;
       Recipe : Porion.Builds.Models.Recipe_Ref;
-      Found  : Boolean;
    begin
       if not Service.Build_Node.Is_Null then
          Query.Set_Filter ("o.building = 0 AND o.node_id = :node_id "
@@ -142,12 +142,13 @@ package body Porion.Builds.Services is
          Service.Branch := Projects.Models.Branch_Ref (Recipe.Get_Branch);
          Service.Build_Node := Nodes.Models.Node_Ref (Recipe.Get_Node);
 
-         Build (Service, Recipe, Executor);
-
       exception
          when ADO.Objects.Not_Found =>
-            null;
+            Service.Queue.Delete (Service.DB);
+            return;
       end;
+
+      Build (Service, Recipe, Executor);
    end Build;
 
    procedure Build (Service  : in out Context_Type;
@@ -303,8 +304,8 @@ package body Porion.Builds.Services is
 
       loop
          Service.Project := Projects.Models.Null_Project;
-         Build (Service, Executor);
-         exit when Service.Project.Is_Null;
+         Build (Service, Executor, Found);
+         exit when not Found;
       end loop;
 
       Build_Executor.Delete (Service.DB);
@@ -372,9 +373,11 @@ package body Porion.Builds.Services is
       end Get_Dependencies;
 
       function "<" (Left, Right : in Models.Build_Queue_Ref) return Boolean is
-         Left_Deps  : constant Map_Depends.Cursor := Get_Dependencies (Left);
-         Right_Deps : constant Map_Depends.Cursor := Get_Dependencies (Right);
+         Left_Deps  : Map_Depends.Cursor;
+         Right_Deps : Map_Depends.Cursor;
       begin
+         Left_Deps  := Get_Dependencies (Left);
+         Right_Deps := Get_Dependencies (Right);
          if Left.Get_Node.Get_Id = Right.Get_Node.Get_Id then
             if Map_Depends.Has_Element (Left_Deps) and Map_Depends.Has_Element (Right_Deps) then
                if Map_Depends.Element (Left_Deps).Contains (Map_Depends.Key (Right_Deps)) then
@@ -388,6 +391,10 @@ package body Porion.Builds.Services is
 
          --  Left and Right don't depend on each other: sort on the creation date.
          return Left.Get_Create_Date < Right.Get_Create_Date;
+
+      exception
+         when ADO.Objects.Not_Found =>
+            return Left.Get_Create_Date < Right.Get_Create_Date;
       end "<";
 
       package Sort_Queue is
@@ -1354,6 +1361,16 @@ package body Porion.Builds.Services is
          Add_Step (Step, Builds.Models.BUILDER_SCRIPT, Kind);
       end Add_Step;
 
+      procedure Add_Metric_Step (Command : in String) is
+         Step   : Builds.Models.Recipe_Step_Ref;
+         Config : Porion.Configs.Config_Type;
+      begin
+         Config.Set ("metric", Command);
+         Step.Set_Builder (Builds.Models.BUILDER_METRIC);
+         Update_Parameters (Service, Step, Config);
+         Add_Step (Step, Builds.Models.BUILDER_METRIC, Builds.STEP_METRIC);
+      end Add_Metric_Step;
+
       Has_Autogen     : Boolean;
       Has_Autoconf    : Boolean;
       Has_Automake    : Boolean;
@@ -1374,6 +1391,8 @@ package body Porion.Builds.Services is
       Has_Makefile := Check ("Makefile", -("checking for {0}"))
         or else Check ("makefile", -("checking for {0}"));
       Has_Pom_Xml := Check ("pom.xml", -("checking for {0}"));
+
+      Add_Metric_Step ("space");
 
       if Has_Autogen then
          Add_Step (Builds.STEP_GENERATE, "./autogen.sh");

@@ -16,23 +16,9 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Util.Files;
-with Util.Strings;
-with GNAT.Regpat;
+with Util.Strings.Tokenizers;
+with Porion.Configs.Rules;
 package body Porion.Logs.Analysis is
-
-   type Rule_Matcher (Size : GNAT.Regpat.Program_Size) is record
-      Pattern : GNAT.Regpat.Pattern_Matcher (Size);
-      Kind    : Line_Info_Type;
-   end record;
-
-   package Match_Vectors is
-      new Ada.Containers.Indefinite_Vectors (Index_Type   => Positive,
-                                             Element_Type => Rule_Matcher,
-                                             "="          => "=");
-
-   subtype Match_Vector is Match_Vectors.Vector;
-
-   Rules : Match_Vector;
 
    --  ------------------------------
    --  Analyze the log line according to the current context and the log rules.
@@ -42,7 +28,7 @@ package body Porion.Logs.Analysis is
                       Result  : out Line_Info_Type) is
    begin
       Context.Count := Context.Count + 1;
-      for Rule of Rules loop
+      for Rule of Context.Rules loop
          if GNAT.Regpat.Match (Rule.Pattern, Line) then
             Result := Rule.Kind;
             if not Result.Drop and not Context.Levels (Result.Level) then
@@ -104,13 +90,38 @@ package body Porion.Logs.Analysis is
    end Set_Filter;
 
    --  ------------------------------
-   --  Add a log analysis rule.
+   --  Set the filtering rules that must be applied when analysing the logs.
    --  ------------------------------
-   procedure Add_Rule (Line  : in String;
-                       Level : in Level_Type) is
-      Match : constant GNAT.Regpat.Pattern_Matcher := GNAT.Regpat.Compile (Line);
+   procedure Set_Rules (Context : in out Analyser_Type;
+                        Rules   : in String) is
+
+      procedure Process (Line  : in String;
+                         Level : in Level_Type);
+      procedure Read_Rules (Token : in String;
+                            Done  : out Boolean);
+
+      procedure Process (Line  : in String;
+                         Level : in Level_Type) is
+         Match : constant GNAT.Regpat.Pattern_Matcher := GNAT.Regpat.Compile (Line);
+      begin
+         Context.Rules.Append ((Size    => Match.Size,
+                                Pattern => Match,
+                                Kind    => (Level, False)));
+      end Process;
+
+      procedure Read_Rules (Token : in String;
+                            Done  : out Boolean) is
+      begin
+         Done := False;
+         if Token'Length > 0 then
+            Porion.Configs.Rules.Read_Rule (Token, Process'Access);
+         end if;
+      end Read_Rules;
+
    begin
-      Rules.Append ((Size => Match.Size, Pattern => Match, Kind => (Level, False)));
-   end Add_Rule;
+      Util.Strings.Tokenizers.Iterate_Tokens (Content => Rules,
+                                              Pattern => " ",
+                                              Process => Read_Rules'Access);
+   end Set_Rules;
 
 end Porion.Logs.Analysis;

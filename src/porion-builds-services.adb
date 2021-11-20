@@ -1321,6 +1321,9 @@ package body Porion.Builds.Services is
       procedure Add_Step (Kind    : in Builds.Step_Type;
                           Command : in String);
 
+      procedure Add_Metric_Step (Command : in String;
+                                 Arg     : in String);
+
       use Util.Strings.Formats;
 
       Current_Step : Positive := 1;
@@ -1361,14 +1364,17 @@ package body Porion.Builds.Services is
          Add_Step (Step, Builds.Models.BUILDER_SCRIPT, Kind);
       end Add_Step;
 
-      procedure Add_Metric_Step (Command : in String) is
+      procedure Add_Metric_Step (Command : in String;
+                                 Arg     : in String) is
          Step   : Builds.Models.Recipe_Step_Ref;
-         Config : Porion.Configs.Config_Type;
+         Params : Util.Strings.Vectors.Vector;
+         Kind   : Builds.Models.Builder_Type renames Builds.Models.BUILDER_METRIC;
       begin
-         Config.Set ("metric", Command);
-         Step.Set_Builder (Builds.Models.BUILDER_METRIC);
-         Update_Parameters (Service, Step, Config);
-         Add_Step (Step, Builds.Models.BUILDER_METRIC, Builds.STEP_METRIC);
+         Params.Append (Command);
+         Params.Append (Arg);
+         Step.Set_Builder (Kind);
+         Step.Set_Parameters (Builders.Save_Configuration (Kind, Service.DB, Params));
+         Add_Step (Step, Kind, Builds.STEP_METRIC);
       end Add_Metric_Step;
 
       Has_Autogen     : Boolean;
@@ -1394,7 +1400,7 @@ package body Porion.Builds.Services is
       Has_Pom_Xml := Check ("pom.xml", -("checking for {0}"));
       Has_Package_Json := Check ("package.json", -("checking for {0}"));
 
-      Add_Metric_Step ("space");
+      Add_Metric_Step ("disk", "before");
 
       if Has_Autogen then
          Add_Step (Builds.STEP_GENERATE, "./autogen.sh");
@@ -1427,6 +1433,8 @@ package body Porion.Builds.Services is
       if Has_Package_Json then
          Add_Step (Builds.STEP_MAKE, "npm install");
       end if;
+
+      Add_Metric_Step ("disk", "after");
    end Guess;
 
 end Porion.Builds.Services;

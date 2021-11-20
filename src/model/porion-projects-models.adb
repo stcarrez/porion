@@ -577,12 +577,12 @@ package body Porion.Projects.Models is
       end if;
       if Object.Is_Modified (7) then
          Stmt.Save_Field (Name  => COL_6_1_NAME, --  status
-                          Value => Integer (Project_Status_Type'Pos (Object.Status)));
+                          Value => Integer (Project_Status_Type'Enum_Rep (Object.Status)));
          Object.Clear_Modified (7);
       end if;
       if Object.Is_Modified (8) then
          Stmt.Save_Field (Name  => COL_7_1_NAME, --  scm
-                          Value => Integer (Porion.Sources.Source_Control_Type'Pos (Object.Scm)));
+                          Value => Integer (Porion.Sources.Source_Control_Type'Enum_Rep (Object.Scm)));
          Object.Clear_Modified (8);
       end if;
       if Object.Is_Modified (9) then
@@ -669,9 +669,9 @@ package body Porion.Projects.Models is
       Query.Save_Field (Name  => COL_5_1_NAME, --  update_date
                         Value => Object.Update_Date);
       Query.Save_Field (Name  => COL_6_1_NAME, --  status
-                        Value => Integer (Project_Status_Type'Pos (Object.Status)));
+                        Value => Integer (Project_Status_Type'Enum_Rep (Object.Status)));
       Query.Save_Field (Name  => COL_7_1_NAME, --  scm
-                        Value => Integer (Porion.Sources.Source_Control_Type'Pos (Object.Scm)));
+                        Value => Integer (Porion.Sources.Source_Control_Type'Enum_Rep (Object.Scm)));
       Query.Save_Field (Name  => COL_8_1_NAME, --  scm_url
                         Value => Object.Scm_Url);
       Query.Save_Field (Name  => COL_9_1_NAME, --  pass_rate
@@ -793,8 +793,8 @@ package body Porion.Projects.Models is
       Object.Description := Stmt.Get_Unbounded_String (3);
       Object.Create_Date := Stmt.Get_Time (4);
       Object.Update_Date := Stmt.Get_Nullable_Time (5);
-      Object.Status := Project_Status_Type'Val (Stmt.Get_Integer (6));
-      Object.Scm := Porion.Sources.Source_Control_Type'Val (Stmt.Get_Integer (7));
+      Object.Status := Project_Status_Type'Enum_Val (Stmt.Get_Integer (6));
+      Object.Scm := Porion.Sources.Source_Control_Type'Enum_Val (Stmt.Get_Integer (7));
       Object.Scm_Url := Stmt.Get_Unbounded_String (8);
       Object.Pass_Rate := Stmt.Get_Integer (9);
       Object.Fail_Rate := Stmt.Get_Integer (10);
@@ -1336,7 +1336,7 @@ package body Porion.Projects.Models is
       end if;
       if Object.Is_Modified (8) then
          Stmt.Save_Field (Name  => COL_7_2_NAME, --  status
-                          Value => Integer (Branch_Status_Type'Pos (Object.Status)));
+                          Value => Integer (Branch_Status_Type'Enum_Rep (Object.Status)));
          Object.Clear_Modified (8);
       end if;
       if Object.Is_Modified (9) then
@@ -1425,7 +1425,7 @@ package body Porion.Projects.Models is
       Query.Save_Field (Name  => COL_6_2_NAME, --  update_date
                         Value => Object.Update_Date);
       Query.Save_Field (Name  => COL_7_2_NAME, --  status
-                        Value => Integer (Branch_Status_Type'Pos (Object.Status)));
+                        Value => Integer (Branch_Status_Type'Enum_Rep (Object.Status)));
       Query.Save_Field (Name  => COL_8_2_NAME, --  pass_rate
                         Value => Object.Pass_Rate);
       Query.Save_Field (Name  => COL_9_2_NAME, --  fail_rate
@@ -1545,7 +1545,7 @@ package body Porion.Projects.Models is
       Object.Last_Date := Stmt.Get_Nullable_Time (4);
       Object.Create_Date := Stmt.Get_Time (5);
       Object.Update_Date := Stmt.Get_Time (6);
-      Object.Status := Branch_Status_Type'Val (Stmt.Get_Integer (7));
+      Object.Status := Branch_Status_Type'Enum_Val (Stmt.Get_Integer (7));
       Object.Pass_Rate := Stmt.Get_Integer (8);
       Object.Fail_Rate := Stmt.Get_Integer (9);
       Object.Timeout_Rate := Stmt.Get_Integer (10);

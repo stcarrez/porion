@@ -905,7 +905,7 @@ package body Porion.Builds.Models is
       end if;
       if Object.Is_Modified (5) then
          Stmt.Save_Field (Name  => COL_4_2_NAME, --  status
-                          Value => Integer (Config_Status_Type'Pos (Object.Status)));
+                          Value => Integer (Config_Status_Type'Enum_Rep (Object.Status)));
          Object.Clear_Modified (5);
       end if;
       if Object.Is_Modified (6) then
@@ -978,7 +978,7 @@ package body Porion.Builds.Models is
       Query.Save_Field (Name  => COL_3_2_NAME, --  description
                         Value => Object.Description);
       Query.Save_Field (Name  => COL_4_2_NAME, --  status
-                        Value => Integer (Config_Status_Type'Pos (Object.Status)));
+                        Value => Integer (Config_Status_Type'Enum_Rep (Object.Status)));
       Query.Save_Field (Name  => COL_5_2_NAME, --  rate_factor
                         Value => Object.Rate_Factor);
       Query.Save_Field (Name  => COL_6_2_NAME, --  main_recipe
@@ -1073,7 +1073,7 @@ package body Porion.Builds.Models is
       Object.Set_Key_Value (Stmt.Get_Identifier (0));
       Object.Name := Stmt.Get_Unbounded_String (2);
       Object.Description := Stmt.Get_Unbounded_String (3);
-      Object.Status := Config_Status_Type'Val (Stmt.Get_Integer (4));
+      Object.Status := Config_Status_Type'Enum_Val (Stmt.Get_Integer (4));
       Object.Rate_Factor := Stmt.Get_Integer (5);
       Object.Main_Recipe := Stmt.Get_Boolean (6);
       Object.Filter_Rules := Stmt.Get_Unbounded_String (7);
@@ -1659,7 +1659,7 @@ package body Porion.Builds.Models is
       end if;
       if Object.Is_Modified (10) then
          Stmt.Save_Field (Name  => COL_9_3_NAME, --  status
-                          Value => Integer (Build_Status_Type'Pos (Object.Status)));
+                          Value => Integer (Build_Status_Type'Enum_Rep (Object.Status)));
          Object.Clear_Modified (10);
       end if;
       if Object.Is_Modified (11) then
@@ -1751,7 +1751,7 @@ package body Porion.Builds.Models is
       Query.Save_Field (Name  => COL_8_3_NAME, --  test_duration
                         Value => Integer (Object.Test_Duration));
       Query.Save_Field (Name  => COL_9_3_NAME, --  status
-                        Value => Integer (Build_Status_Type'Pos (Object.Status)));
+                        Value => Integer (Build_Status_Type'Enum_Rep (Object.Status)));
       Query.Save_Field (Name  => COL_10_3_NAME, --  tag
                         Value => Object.Tag);
       Query.Save_Field (Name  => COL_11_3_NAME, --  build_duration
@@ -1850,7 +1850,7 @@ package body Porion.Builds.Models is
       Object.Fail_Count := Stmt.Get_Integer (6);
       Object.Timeout_Count := Stmt.Get_Integer (7);
       Object.Test_Duration := Porion.Microsecond_Type (Stmt.Get_Integer (8));
-      Object.Status := Build_Status_Type'Val (Stmt.Get_Integer (9));
+      Object.Status := Build_Status_Type'Enum_Val (Stmt.Get_Integer (9));
       Object.Tag := Stmt.Get_Unbounded_String (10);
       Object.Build_Duration := Porion.Millisecond_Type (Stmt.Get_Integer (11));
       Object.Sys_Time := Porion.Millisecond_Type (Stmt.Get_Integer (12));
@@ -2670,7 +2670,7 @@ package body Porion.Builds.Models is
       end if;
       if Object.Is_Modified (4) then
          Stmt.Save_Field (Name  => COL_3_5_NAME, --  reason
-                          Value => Integer (Reason_Type'Pos (Object.Reason)));
+                          Value => Integer (Reason_Type'Enum_Rep (Object.Reason)));
          Object.Clear_Modified (4);
       end if;
       if Object.Is_Modified (5) then
@@ -2725,7 +2725,7 @@ package body Porion.Builds.Models is
       Query.Save_Field (Name  => COL_2_5_NAME, --  version
                         Value => Object.Version);
       Query.Save_Field (Name  => COL_3_5_NAME, --  reason
-                        Value => Integer (Reason_Type'Pos (Object.Reason)));
+                        Value => Integer (Reason_Type'Enum_Rep (Object.Reason)));
       Query.Save_Field (Name  => COL_4_5_NAME, --  build_id
                         Value => Object.Build);
       Query.Save_Field (Name  => COL_5_5_NAME, --  queue_id
@@ -2804,7 +2804,7 @@ package body Porion.Builds.Models is
    begin
       Object.Set_Key_Value (Stmt.Get_Identifier (0));
       Object.Create_Date := Stmt.Get_Time (1);
-      Object.Reason := Reason_Type'Val (Stmt.Get_Integer (3));
+      Object.Reason := Reason_Type'Enum_Val (Stmt.Get_Integer (3));
       if not Stmt.Is_Null (4) then
          Object.Build.Set_Key_Value (Stmt.Get_Identifier (4), Session);
       end if;
@@ -3214,7 +3214,7 @@ package body Porion.Builds.Models is
       end if;
       if Object.Is_Modified (8) then
          Stmt.Save_Field (Name  => COL_7_6_NAME, --  execution
-                          Value => Integer (Execution_Type'Pos (Object.Execution)));
+                          Value => Integer (Execution_Type'Enum_Rep (Object.Execution)));
          Object.Clear_Modified (8);
       end if;
       if Object.Is_Modified (9) then
@@ -3257,15 +3257,15 @@ package body Porion.Builds.Models is
       Query.Save_Field (Name  => COL_2_6_NAME, --  number
                         Value => Object.Number);
       Query.Save_Field (Name  => COL_3_6_NAME, --  builder
-                        Value => Integer (Builder_Type'Pos (Object.Builder)));
+                        Value => Integer (Builder_Type'Enum_Rep (Object.Builder)));
       Query.Save_Field (Name  => COL_4_6_NAME, --  timeout
                         Value => Object.Timeout);
       Query.Save_Field (Name  => COL_5_6_NAME, --  step
-                        Value => Integer (Porion.Builds.Step_Type'Pos (Object.Step)));
+                        Value => Integer (Porion.Builds.Step_Type'Enum_Rep (Object.Step)));
       Query.Save_Field (Name  => COL_6_6_NAME, --  version
                         Value => Object.Version);
       Query.Save_Field (Name  => COL_7_6_NAME, --  execution
-                        Value => Integer (Execution_Type'Pos (Object.Execution)));
+                        Value => Integer (Execution_Type'Enum_Rep (Object.Execution)));
       Query.Save_Field (Name  => COL_8_6_NAME, --  previous_version_id
                         Value => Object.Previous_Version);
       Query.Save_Field (Name  => COL_9_6_NAME, --  recipe_id
@@ -3353,11 +3353,11 @@ package body Porion.Builds.Models is
       Object.Set_Key_Value (Stmt.Get_Identifier (0));
       Object.Parameters := Stmt.Get_Unbounded_String (1);
       Object.Number := Stmt.Get_Integer (2);
-      Object.Builder := Builder_Type'Val (Stmt.Get_Integer (3));
+      Object.Builder := Builder_Type'Enum_Val (Stmt.Get_Integer (3));
       Object.Timeout := Stmt.Get_Integer (4);
-      Object.Step := Porion.Builds.Step_Type'Val (Stmt.Get_Integer (5));
+      Object.Step := Porion.Builds.Step_Type'Enum_Val (Stmt.Get_Integer (5));
       Object.Version := Stmt.Get_Integer (6);
-      Object.Execution := Execution_Type'Val (Stmt.Get_Integer (7));
+      Object.Execution := Execution_Type'Enum_Val (Stmt.Get_Integer (7));
       if not Stmt.Is_Null (8) then
          Object.Previous_Version.Set_Key_Value (Stmt.Get_Identifier (8), Session);
       end if;
@@ -4693,7 +4693,7 @@ package body Porion.Builds.Models is
       Query.Save_Field (Name  => COL_0_9_NAME, --  id
                         Value => Object.Get_Key);
       Query.Save_Field (Name  => COL_1_9_NAME, --  status
-                        Value => Integer (Build_Status_Type'Pos (Object.Status)));
+                        Value => Integer (Build_Status_Type'Enum_Rep (Object.Status)));
       Query.Save_Field (Name  => COL_2_9_NAME, --  version
                         Value => Object.Version);
       Query.Save_Field (Name  => COL_3_9_NAME, --  build_id
@@ -4771,7 +4771,7 @@ package body Porion.Builds.Models is
                    Session : in out ADO.Sessions.Session'Class) is
    begin
       Object.Set_Key_Value (Stmt.Get_Identifier (0));
-      Object.Status := Build_Status_Type'Val (Stmt.Get_Integer (1));
+      Object.Status := Build_Status_Type'Enum_Val (Stmt.Get_Integer (1));
       if not Stmt.Is_Null (3) then
          Object.Build.Set_Key_Value (Stmt.Get_Identifier (3), Session);
       end if;

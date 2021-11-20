@@ -639,7 +639,7 @@ package body Porion.Nodes.Models is
       end if;
       if Object.Is_Modified (9) then
          Stmt.Save_Field (Name  => COL_8_1_NAME, --  kind
-                          Value => Integer (Porion.Nodes.Node_Type'Pos (Object.Kind)));
+                          Value => Integer (Porion.Nodes.Node_Type'Enum_Rep (Object.Kind)));
          Object.Clear_Modified (9);
       end if;
       if Object.Is_Modified (10) then
@@ -649,7 +649,7 @@ package body Porion.Nodes.Models is
       end if;
       if Object.Is_Modified (11) then
          Stmt.Save_Field (Name  => COL_10_1_NAME, --  status
-                          Value => Integer (Porion.Nodes.Node_Status_Type'Pos (Object.Status)));
+                          Value => Integer (Porion.Nodes.Node_Status_Type'Enum_Rep (Object.Status)));
          Object.Clear_Modified (11);
       end if;
       if Object.Is_Modified (12) then
@@ -725,11 +725,11 @@ package body Porion.Nodes.Models is
       Query.Save_Field (Name  => COL_7_1_NAME, --  update_date
                         Value => Object.Update_Date);
       Query.Save_Field (Name  => COL_8_1_NAME, --  kind
-                        Value => Integer (Porion.Nodes.Node_Type'Pos (Object.Kind)));
+                        Value => Integer (Porion.Nodes.Node_Type'Enum_Rep (Object.Kind)));
       Query.Save_Field (Name  => COL_9_1_NAME, --  deleted
                         Value => Object.Deleted);
       Query.Save_Field (Name  => COL_10_1_NAME, --  status
-                        Value => Integer (Porion.Nodes.Node_Status_Type'Pos (Object.Status)));
+                        Value => Integer (Porion.Nodes.Node_Status_Type'Enum_Rep (Object.Status)));
       Query.Save_Field (Name  => COL_11_1_NAME, --  os_name
                         Value => Object.Os_Name);
       Query.Save_Field (Name  => COL_12_1_NAME, --  os_version
@@ -831,9 +831,9 @@ package body Porion.Nodes.Models is
       Object.Parameters := Stmt.Get_Unbounded_String (5);
       Object.Create_Date := Stmt.Get_Time (6);
       Object.Update_Date := Stmt.Get_Nullable_Time (7);
-      Object.Kind := Porion.Nodes.Node_Type'Val (Stmt.Get_Integer (8));
+      Object.Kind := Porion.Nodes.Node_Type'Enum_Val (Stmt.Get_Integer (8));
       Object.Deleted := Stmt.Get_Boolean (9);
-      Object.Status := Porion.Nodes.Node_Status_Type'Val (Stmt.Get_Integer (10));
+      Object.Status := Porion.Nodes.Node_Status_Type'Enum_Val (Stmt.Get_Integer (10));
       Object.Os_Name := Stmt.Get_Unbounded_String (11);
       Object.Os_Version := Stmt.Get_Unbounded_String (12);
       Object.Info_Date := Stmt.Get_Nullable_Time (13);

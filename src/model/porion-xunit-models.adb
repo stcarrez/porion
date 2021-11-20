@@ -2235,7 +2235,7 @@ package body Porion.Xunit.Models is
       Query.Save_Field (Name  => COL_0_4_NAME, --  duration
                         Value => Integer (Object.Duration));
       Query.Save_Field (Name  => COL_1_4_NAME, --  status
-                        Value => Integer (Test_Status_Type'Pos (Object.Status)));
+                        Value => Integer (Test_Status_Type'Enum_Rep (Object.Status)));
       Session.Allocate (Id => Object);
       Query.Save_Field (Name  => COL_2_4_NAME, --  id
                         Value => Object.Get_Key);
@@ -2298,7 +2298,7 @@ package body Porion.Xunit.Models is
                    Session : in out ADO.Sessions.Session'Class) is
    begin
       Object.Duration := Porion.Microsecond_Type (Stmt.Get_Integer (0));
-      Object.Status := Test_Status_Type'Val (Stmt.Get_Integer (1));
+      Object.Status := Test_Status_Type'Enum_Val (Stmt.Get_Integer (1));
       Object.Set_Key_Value (Stmt.Get_Identifier (2));
       Object.Assertions := Stmt.Get_Integer (3);
       if not Stmt.Is_Null (4) then

@@ -345,7 +345,7 @@ package body Porion.Metrics.Models is
       end if;
       if Object.Is_Modified (5) then
          Stmt.Save_Field (Name  => COL_4_1_NAME, --  metric
-                          Value => Integer (Porion.Metrics.Metric_Type'Pos (Object.Metric)));
+                          Value => Integer (Porion.Metrics.Metric_Type'Enum_Rep (Object.Metric)));
          Object.Clear_Modified (5);
       end if;
       if Stmt.Has_Save_Fields then
@@ -387,7 +387,7 @@ package body Porion.Metrics.Models is
       Query.Save_Field (Name  => COL_3_1_NAME, --  version
                         Value => Object.Version);
       Query.Save_Field (Name  => COL_4_1_NAME, --  metric
-                        Value => Integer (Porion.Metrics.Metric_Type'Pos (Object.Metric)));
+                        Value => Integer (Porion.Metrics.Metric_Type'Enum_Rep (Object.Metric)));
       Query.Execute (Result);
       if Result /= 1 then
          raise ADO.Objects.INSERT_ERROR;
@@ -464,7 +464,7 @@ package body Porion.Metrics.Models is
       Object.Set_Key_Value (Stmt.Get_Identifier (0));
       Object.Name := Stmt.Get_Unbounded_String (1);
       Object.Label := Stmt.Get_Unbounded_String (2);
-      Object.Metric := Porion.Metrics.Metric_Type'Val (Stmt.Get_Integer (4));
+      Object.Metric := Porion.Metrics.Metric_Type'Enum_Val (Stmt.Get_Integer (4));
       Object.Version := Stmt.Get_Integer (3);
       ADO.Objects.Set_Created (Object);
    end Load;

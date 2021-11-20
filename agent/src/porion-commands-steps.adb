@@ -38,6 +38,10 @@ package body Porion.Commands.Steps is
          Kind := Porion.Builds.Models.BUILDER_XUNIT;
          Step := Porion.Builds.STEP_TEST;
          Pos := 3;
+      elsif First = "metric" then
+         Kind := Porion.Builds.Models.BUILDER_METRIC;
+         Step := Porion.Builds.STEP_METRIC;
+         Pos := 3;
       else
          Kind := Porion.Builds.Models.BUILDER_SCRIPT;
          Step := Porion.Builds.STEP_MAKE;
@@ -89,6 +93,10 @@ package body Porion.Commands.Steps is
             if First = "xunit" then
                Kind := Porion.Builds.Models.BUILDER_XUNIT;
                Step := Porion.Builds.STEP_TEST;
+               Pos := 3;
+            elsif First = "metric" then
+               Kind := Porion.Builds.Models.BUILDER_METRIC;
+               Step := Porion.Builds.STEP_METRIC;
                Pos := 3;
             else
                Kind := Porion.Builds.Models.BUILDER_SCRIPT;

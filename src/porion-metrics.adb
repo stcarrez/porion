@@ -27,7 +27,7 @@ package body Porion.Metrics is
    begin
       case Controller.Kind is
          when METRIC_SPACE =>
-            return "space";
+            return "disk";
 
          when METRIC_FILESIZE =>
             return "filesize";

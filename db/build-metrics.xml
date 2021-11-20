@@ -1,0 +1,40 @@
+<query-mapping package='Porion.Queries'>
+    <description>
+        Build metrics
+    </description>
+
+    <class name="Porion.Queries.Metric_Info" bean="no">
+        <comment>A metric collected during the build.</comment>
+        <property type='ADO.Identifier' name="id">
+            <comment>the metric id.</comment>
+        </property>
+        <property type='Integer' name="value">
+            <comment>the metric value.</comment>
+        </property>
+        <property type='String' name="name">
+            <comment>the metric logical name.</comment>
+        </property>
+        <property type='String' name="label">
+            <comment>the metric label.</comment>
+        </property>
+        <property type='Porion.Metrics.Metric_Type' name="kind">
+            <comment>the metric type.</comment>
+        </property>
+    </class>
+
+    <query name='build-metrics'>
+        <comment>Metrics collected during a build</comment>
+        <sql>
+          SELECT
+          bm.id AS id,
+          bm.value AS value,
+          m.name AS name,
+          m.label AS label,
+          m.metric AS metric
+          FROM porion_build_metric AS bm
+          INNER JOIN porion_metric AS m ON bm.metric_id = m.id
+          WHERE bm.build_id = :build_id
+        </sql>
+    </query> 
+
+</query-mapping>

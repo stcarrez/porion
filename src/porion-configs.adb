@@ -176,6 +176,18 @@ package body Porion.Configs is
    end Get_Rules_Directory;
 
    --  ------------------------------
+   --  Get the search path to find filtering rules.
+   --  ------------------------------
+   function Get_Rules_Search_Path return String is
+   begin
+      if Exists (RULES_SEARCH_PATH_NAME) then
+         return Get (RULES_SEARCH_PATH_NAME);
+      else
+         return Get_Rules_Directory & ";" & "share/porion/rules";
+      end if;
+   end Get_Rules_Search_Path;
+
+   --  ------------------------------
    --  Get the directory holding all the projects.
    --  ------------------------------
    function Get_Project_Directory return String is

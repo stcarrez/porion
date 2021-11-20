@@ -51,6 +51,9 @@ package body Porion.Commands.Init is
 
             Ada.Directories.Create_Path (Path);
             Porion.Configs.Set (Porion.Configs.WORKSPACE_DIR_NAME, Path);
+            Ada.Directories.Create_Path (Porion.Configs.Get_Config_Directory);
+            Ada.Directories.Create_Path (Porion.Configs.Get_Project_Directory);
+            Ada.Directories.Create_Path (Porion.Configs.Get_Rules_Directory);
             Porion.Configs.Save;
             Context.Project_Service.Open (Resources.Queries.Get_Content'Access, Schema);
             Context.Notice (-("Porion workspace created in {0}"), Path);

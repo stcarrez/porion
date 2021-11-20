@@ -16,12 +16,12 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with ADO.Sessions;
-private package Porion.Metrics.Spaces is
+private package Porion.Metrics.DiskUsage is
 
    type Controller_Type is limited new Porion.Metrics.Controller_Type with private;
 
    function Create (Session : in ADO.Sessions.Master_Session;
-                    Config  : in Porion.Configs.Config_Type) return Controller_Access;
+                    Params  : in UString) return Controller_Access;
 
 private
 
@@ -36,4 +36,4 @@ private
                       Path       : in String;
                       Executor   : in out Porion.Executors.Executor_Type'Class);
 
-end Porion.Metrics.Spaces;
+end Porion.Metrics.DiskUsage;

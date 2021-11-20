@@ -17,19 +17,19 @@
 -----------------------------------------------------------------------
 with Ada.Directories;
 with Porion.Tools;
-package body Porion.Metrics.Spaces is
+package body Porion.Metrics.DiskUsage is
 
+   use Ada.Strings.Unbounded;
    use type Ada.Directories.File_Size;
 
    function Create (Session : in ADO.Sessions.Master_Session;
-                    Config  : in Porion.Configs.Config_Type) return Controller_Access is
+                    Params  : in UString) return Controller_Access is
       Result  : constant Spaces_Controller_Access := new Controller_Type;
-      Prefix  : constant String := Config.Get ("prefix", "");
    begin
       Result.Kind := METRIC_SPACE;
       Result.Session := Session;
-      if Prefix'Length > 0 then
-         Result.Prefix := To_UString (Prefix & ".");
+      if Length (Params) > 0 then
+         Result.Prefix := Params & ".";
       end if;
       return Result.all'Access;
    end Create;
@@ -47,4 +47,4 @@ package body Porion.Metrics.Spaces is
       Controller.Save_Metric (Prefix & "directory_count", Stats.Dir_Count);
    end Collect;
 
-end Porion.Metrics.Spaces;
+end Porion.Metrics.DiskUsage;

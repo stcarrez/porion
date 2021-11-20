@@ -276,7 +276,7 @@ package body Porion.Nodes.Services is
       Service.Build_Node.Set_Create_Date (Ada.Calendar.Clock);
       Service.Build_Node.Set_Kind (Porion.Nodes.NODE_LOCAL);
       Service.Build_Node.Set_Status (NODE_ENABLED);
-      Service.Build_Node.Set_Repository_Dir (Porion.Configs.Get_Porion_Directory);
+      Service.Build_Node.Set_Repository_Dir (Porion.Configs.Get_Project_Directory);
       Service.Build_Node.Set_Main_Node (True);
       Service.Build_Node.Save (Service.DB);
       Service.DB.Commit;

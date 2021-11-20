@@ -23,10 +23,11 @@ package Porion.Configs is
    PREFIX    : constant String := "/build/local-gnat-2021";
    RESOURCES : constant String := "/share/porion/resources/";
 
-   WORKSPACE_DIR_NAME : constant String := "workspace_dir";
-   PROJECT_DIR_NAME   : constant String := "project_dir";
-   RULES_DIR_NAME     : constant String := "rules_dir";
-   DATABASE_NAME      : constant String := "database";
+   WORKSPACE_DIR_NAME     : constant String := "workspace_dir";
+   PROJECT_DIR_NAME       : constant String := "project_dir";
+   RULES_DIR_NAME         : constant String := "rules_dir";
+   RULES_SEARCH_PATH_NAME : constant String := "rules_search_path";
+   DATABASE_NAME          : constant String := "database";
 
    subtype Config_Type is Util.Properties.Manager;
 
@@ -62,6 +63,9 @@ package Porion.Configs is
 
    --  Get the directory holding filtering rules.
    function Get_Rules_Directory return String;
+
+   --  Get the search path to find filtering rules.
+   function Get_Rules_Search_Path return String;
 
    --  Get the directory holding the projects.
    function Get_Project_Directory (Name : in String) return String;

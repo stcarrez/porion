@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 
 with Ada.Containers.Indefinite_Vectors;
+private with GNAT.Regpat;
 package Porion.Logs.Analysis is
 
    type Level_Type is (LOG_UNKNOWN,
@@ -70,14 +71,23 @@ package Porion.Logs.Analysis is
    procedure Set_Rules (Context : in out Analyser_Type;
                         Rules   : in String);
 
-   --  Add a log analysis rule.
-   procedure Add_Rule (Line  : in String;
-                       Level : in Level_Type);
-
 private
+
+   type Rule_Matcher (Size : GNAT.Regpat.Program_Size) is record
+      Pattern : GNAT.Regpat.Pattern_Matcher (Size);
+      Kind    : Line_Info_Type;
+   end record;
+
+   package Match_Vectors is
+      new Ada.Containers.Indefinite_Vectors (Index_Type   => Positive,
+                                             Element_Type => Rule_Matcher,
+                                             "="          => "=");
+
+   subtype Match_Vector is Match_Vectors.Vector;
 
    type Analyser_Type is limited record
       Count  : Natural := 0;
+      Rules  : Match_Vector;
       Levels : Level_Map := (others => True);
    end record;
 

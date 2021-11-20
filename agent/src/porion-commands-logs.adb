@@ -49,11 +49,6 @@ package body Porion.Commands.Logs is
          Levels := (others => True);
       end if;
 
-      Porion.Configs.Rules.Read ("configure.rules");
-      Porion.Configs.Rules.Read ("git.rules");
-      Porion.Configs.Rules.Read ("gprbuild.rules");
-      Porion.Configs.Rules.Read ("make.rules");
-      Porion.Configs.Rules.Read ("mvn.rules");
       for I in 1 .. Args.Get_Count loop
          declare
             Arg   : constant String := Args.Get_Argument (I);

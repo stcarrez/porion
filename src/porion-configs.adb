@@ -156,15 +156,23 @@ package body Porion.Configs is
    end Get_Porion_Directory;
 
    --  ------------------------------
+   --  Get the directory holding all the projects.
+   --  ------------------------------
+   function Get_Project_Directory return String is
+   begin
+      if Exists (PROJECT_DIR_NAME) then
+         return Get (PROJECT_DIR_NAME);
+      else
+         return Util.Files.Compose (Get_Porion_Directory, "projects");
+      end if;
+   end Get_Project_Directory;
+
+   --  ------------------------------
    --  Get the directory holding the projects.
    --  ------------------------------
    function Get_Project_Directory (Name : in String) return String is
    begin
-      if Exists (PROJECT_DIR_NAME) then
-         return Util.Files.Compose (Get (PROJECT_DIR_NAME), Name);
-      else
-         return Util.Files.Compose (Get_Porion_Directory, Name);
-      end if;
+      return Util.Files.Compose (Get_Project_Directory, Name);
    end Get_Project_Directory;
 
    --  ------------------------------

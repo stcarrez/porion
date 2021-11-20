@@ -32,6 +32,9 @@ package body Porion.Metrics is
          when METRIC_FILESIZE =>
             return "filesize";
 
+         when METRIC_COVERAGE =>
+            return "coverage";
+
       end case;
    end Get_Kind;
 

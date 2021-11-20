@@ -19,21 +19,25 @@ with Ada.Exceptions;
 with Util.Files;
 with Util.Strings;
 with Util.Log.Loggers;
-with Porion.Logs.Analysis;
 package body Porion.Configs.Rules is
 
    use type Logs.Analysis.Level_Type;
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Configs.Rules");
 
+   --  ------------------------------
    --  Read the rule configuration file.
-   procedure Read (Path : in String) is
-      procedure Process (Line : in String);
+   --  ------------------------------
+   procedure Read (Path    : in String;
+                   Process : not null
+                      access procedure (Line : in String;
+                                        Level : in Logs.Analysis.Level_Type)) is
+      procedure Process_Line (Line : in String);
 
       Line_Number   : Natural := 1;
       Current_Level : Logs.Analysis.Level_Type := Logs.Analysis.LOG_UNKNOWN;
 
-      procedure Process (Line : in String) is
+      procedure Process_Line (Line : in String) is
       begin
          Line_Number := Line_Number + 1;
          if Line'Length = 0 then
@@ -66,7 +70,7 @@ package body Porion.Configs.Rules is
          end if;
 
          if Current_Level /= Logs.Analysis.LOG_UNKNOWN then
-            Logs.Analysis.Add_Rule (Line, Current_Level);
+            Process (Line, Current_Level);
          end if;
 
       exception
@@ -74,10 +78,28 @@ package body Porion.Configs.Rules is
             Log.Error ("{0}:{1}: invalid pattern: {2}",
                        Path, Util.Strings.Image (Line_Number),
                        Ada.Exceptions.Exception_Message (E));
-      end Process;
+      end Process_Line;
 
    begin
-      Util.Files.Read_File (Path, Process'Access);
+      Log.Info ("Loading rules {0}", Path);
+      Util.Files.Read_File (Path, Process_Line'Access);
    end Read;
+
+   --  ------------------------------
+   --  Find the rule configuration file and read it.
+   --  ------------------------------
+   procedure Read_Rule (Name    : in String;
+                        Process : not null
+                           access procedure (Line : in String;
+                                             Level : in Logs.Analysis.Level_Type)) is
+      Dirs : constant String := Porion.Configs.Get_Rules_Search_Path;
+      Path : constant String := Util.Files.Find_File_Path (Name & ".rules", Dirs);
+   begin
+      if Ada.Directories.Exists (Path) then
+         Read (Path, Process);
+      else
+         Log.Warn ("Skipping rule '{0}'' not found", Name);
+      end if;
+   end Read_Rule;
 
 end Porion.Configs.Rules;

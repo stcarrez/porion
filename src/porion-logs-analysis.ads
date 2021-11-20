@@ -66,6 +66,10 @@ package Porion.Logs.Analysis is
    procedure Set_Filter (Context : in out Analyser_Type;
                          Levels  : in Level_Map);
 
+   --  Set the filtering rules that must be applied when analysing the logs.
+   procedure Set_Rules (Context : in out Analyser_Type;
+                        Rules   : in String);
+
    --  Add a log analysis rule.
    procedure Add_Rule (Line  : in String;
                        Level : in Level_Type);

@@ -457,6 +457,7 @@ package body Porion.Commands is
       Printer.Set_Max_Dimension (Fields (1), (4, 0));
       Printer.Layout_Fields (Fields (1 .. 2));
 
+      Porion.Logs.Analysis.Set_Rules (Ctx, To_String (Context.Project_Service.Recipe.Get_Filter_Rules));
       Porion.Logs.Analysis.Set_Filter (Ctx, Levels);
       Porion.Logs.Analysis.Read (Ctx, Path, List);
 

@@ -18,6 +18,7 @@
 
 with Porion.Metrics.DiskUsage;
 with Porion.Metrics.Filesize;
+with Porion.Metrics.Coverage;
 package body Porion.Metrics.Factories is
 
    function Create (Metric  : in String;
@@ -29,6 +30,9 @@ package body Porion.Metrics.Factories is
 
       elsif Metric = "filesize" then
          return Filesize.Create (Session, Params);
+
+      elsif Metric = "coverage" then
+         return Coverage.Create (Session, Params);
 
       else
          return null;

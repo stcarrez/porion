@@ -53,6 +53,9 @@ package Porion.Configs is
    --  Get the porion installation directory.
    function Get_Porion_Directory return String;
 
+   --  Get the directory holding all the projects.
+   function Get_Project_Directory return String;
+
    --  Get the directory holding the projects.
    function Get_Project_Directory (Name : in String) return String;
 

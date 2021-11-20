@@ -1379,6 +1379,7 @@ package body Porion.Builds.Services is
       Has_CMake       : Boolean;
       Has_Makefile    : Boolean;
       Has_Pom_Xml     : Boolean;
+      Has_Package_Json : Boolean;
    begin
       Has_Autogen := Check ("autogen.sh", -("checking for {0}"));
       Has_Autoconf := Check ("configure.ac", -("checking for {0}"))
@@ -1391,6 +1392,7 @@ package body Porion.Builds.Services is
       Has_Makefile := Check ("Makefile", -("checking for {0}"))
         or else Check ("makefile", -("checking for {0}"));
       Has_Pom_Xml := Check ("pom.xml", -("checking for {0}"));
+      Has_Package_Json := Check ("package.json", -("checking for {0}"));
 
       Add_Metric_Step ("space");
 
@@ -1422,6 +1424,9 @@ package body Porion.Builds.Services is
          Add_Step (Builds.STEP_MAKE, "make");
       end if;
 
+      if Has_Package_Json then
+         Add_Step (Builds.STEP_MAKE, "npm install");
+      end if;
    end Guess;
 
 end Porion.Builds.Services;

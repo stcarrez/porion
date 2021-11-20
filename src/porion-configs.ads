@@ -50,6 +50,9 @@ package Porion.Configs is
    --  Save the configuration.
    procedure Save;
 
+   --  Get the porion configuration directory.
+   function Get_Config_Directory return String;
+
    --  Get the porion installation directory.
    function Get_Porion_Directory return String;
 

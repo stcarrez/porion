@@ -1311,6 +1311,8 @@ package body Porion.Builds.Services is
    procedure Guess (Service  : in out Context_Type;
                     Path     : in String;
                     Executor : in out Porion.Executors.Executor_Type'Class) is
+      use Ada.Strings.Unbounded;
+
       function Check (File    : in String;
                       Message : in String) return Boolean;
 
@@ -1386,6 +1388,7 @@ package body Porion.Builds.Services is
       Has_Makefile    : Boolean;
       Has_Pom_Xml     : Boolean;
       Has_Package_Json : Boolean;
+      Rules           : UString;
    begin
       Has_Autogen := Check ("autogen.sh", -("checking for {0}"));
       Has_Autoconf := Check ("configure.ac", -("checking for {0}"))
@@ -1408,33 +1411,43 @@ package body Porion.Builds.Services is
 
       if not Has_Autogen and Has_Autoconf and not Has_Configure then
          Add_Step (Builds.STEP_GENERATE, "autoconf");
+         Append (Rules, " autoconf");
       end if;
 
       if not Has_Autogen and Has_Automake and not Has_Makefile_In then
          Add_Step (Builds.STEP_GENERATE, "automake");
+         Append (Rules, " automake");
       end if;
 
       if Has_Autogen or Has_Autoconf or Has_Configure then
          Add_Step (Builds.STEP_CONFIGURE, "./configure --prefix=#{install}");
+         Append (Rules, " configure");
       end if;
 
       if Has_CMake then
          Add_Step (Builds.STEP_CONFIGURE, "cmake");
+         Append (Rules, " cmake");
       end if;
 
       if Has_Pom_Xml then
          Add_Step (Builds.STEP_MAKE, "mvn package");
+         Append (Rules, " mvn");
       end if;
 
       if Has_CMake or Has_Makefile_In or Has_Automake or Has_Makefile then
          Add_Step (Builds.STEP_MAKE, "make");
+         Append (Rules, " make");
       end if;
 
       if Has_Package_Json then
          Add_Step (Builds.STEP_MAKE, "npm install");
+         Append (Rules, " npm");
       end if;
 
       Add_Metric_Step ("disk", "after");
+
+      Service.Recipe.Set_Filter_Rules (Rules);
+      Service.Recipe.Save (Service.DB);
    end Guess;
 
 end Porion.Builds.Services;

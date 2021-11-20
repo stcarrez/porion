@@ -156,6 +156,14 @@ package body Porion.Configs is
    end Get_Porion_Directory;
 
    --  ------------------------------
+   --  Get the porion configuration directory.
+   --  ------------------------------
+   function Get_Config_Directory return String is
+   begin
+      return Util.Files.Compose (Get_Porion_Directory, "config");
+   end Get_Config_Directory;
+
+   --  ------------------------------
    --  Get the directory holding all the projects.
    --  ------------------------------
    function Get_Project_Directory return String is
@@ -215,7 +223,7 @@ package body Porion.Configs is
       if Exists (DATABASE_NAME) then
          return Get (DATABASE_NAME);
       else
-         return "sqlite:///" & Util.Files.Compose (Get_Porion_Directory, "porion.db");
+         return "sqlite:///" & Util.Files.Compose (Get_Config_Directory, "porion.db");
       end if;
    end Get_Database_Path;
 

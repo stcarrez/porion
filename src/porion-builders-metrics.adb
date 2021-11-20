@@ -76,12 +76,17 @@ package body Porion.Builders.Metrics is
    function Create (Session : in ADO.Sessions.Master_Session;
                     Config  : in Porion.Configs.Config_Type) return Controller_Access is
       Controller : constant Metric_Controller_Access := new Controller_Type;
-      Kind       : constant String := Config.Get ("metric");
-      Params     : constant UString := Config.Get ("params");
    begin
-      Controller.Metric := Porion.Metrics.Factories.Create (Kind, Session, Params);
+      if Config.Exists ("metric") then
+         declare
+            Kind       : constant String := Config.Get ("metric");
+            Params     : constant UString := Config.Get ("params");            
+         begin
+            Controller.Metric := Porion.Metrics.Factories.Create (Kind, Session, Params);            
+            Controller.Params := Params;
+         end;
+      end if;
       Controller.Session := Session;
-      Controller.Params := Params;
       return Controller.all'Access;
    end Create;
 

@@ -164,6 +164,18 @@ package body Porion.Configs is
    end Get_Config_Directory;
 
    --  ------------------------------
+   --  Get the directory holding filtering rules.
+   --  ------------------------------
+   function Get_Rules_Directory return String is
+   begin
+      if Exists (RULES_DIR_NAME) then
+         return Get (RULES_DIR_NAME);
+      else
+         return Util.Files.Compose (Get_Porion_Directory, "rules");
+      end if;
+   end Get_Rules_Directory;
+
+   --  ------------------------------
    --  Get the directory holding all the projects.
    --  ------------------------------
    function Get_Project_Directory return String is

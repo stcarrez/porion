@@ -25,6 +25,7 @@ package Porion.Configs is
 
    WORKSPACE_DIR_NAME : constant String := "workspace_dir";
    PROJECT_DIR_NAME   : constant String := "project_dir";
+   RULES_DIR_NAME     : constant String := "rules_dir";
    DATABASE_NAME      : constant String := "database";
 
    subtype Config_Type is Util.Properties.Manager;
@@ -58,6 +59,9 @@ package Porion.Configs is
 
    --  Get the directory holding all the projects.
    function Get_Project_Directory return String;
+
+   --  Get the directory holding filtering rules.
+   function Get_Rules_Directory return String;
 
    --  Get the directory holding the projects.
    function Get_Project_Directory (Name : in String) return String;

@@ -254,7 +254,7 @@ package body Porion.Reports is
       Writer.Set_Max_Dimension (Fields (5), (W => 4, H => 0));
       Writer.Set_Max_Dimension (Fields (6), (W => 16, H => 0));
       Writer.Set_Max_Dimension (Fields (7), (W => 10, H => 0));
-      for Field of Fields (2 .. 6) loop
+      for Field of Fields (1 .. 6) loop
          Writer.Set_Bottom_Right_Padding (Field, (W => 1, H => 0));
       end loop;
 
@@ -341,19 +341,21 @@ package body Porion.Reports is
       Style2 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
    begin
       Writer.Set_Justify (Style2, PT.J_RIGHT);
-      Writer.Create_Field (Fields (1), Style1, 20.0);
+      Writer.Create_Field (Fields (1), Style1, 30.0);
       Writer.Create_Field (Fields (2), Style1, 0.0);
       Writer.Create_Field (Fields (3), Style1, 0.0);
-      Writer.Create_Field (Fields (4), Style2, 10.0);
+      Writer.Create_Field (Fields (4), Style2, 0.0);
       Writer.Create_Field (Fields (5), Style2, 0.0);
       Writer.Create_Field (Fields (6), Style2, 0.0);
-      Writer.Create_Field (Fields (7), Style1, 30.0);
+      Writer.Create_Field (Fields (7), Style1, 0.0);
 
       Writer.Set_Max_Dimension (Fields (2), (8, 1));
       Writer.Set_Max_Dimension (Fields (3), (6, 1));
+      Writer.Set_Max_Dimension (Fields (4), (8, 1));
       Writer.Set_Max_Dimension (Fields (5), (6, 1));
       Writer.Set_Max_Dimension (Fields (6), (6, 1));
-      for I in 2 .. 6 loop
+      Writer.Set_Max_Dimension (Fields (7), (16, 1));
+      for I in 1 .. 6 loop
          Writer.Set_Bottom_Right_Padding (Fields (I), (1, 0));
       end loop;
 

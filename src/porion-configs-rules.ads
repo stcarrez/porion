@@ -15,9 +15,22 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Ada.Directories;
+with Porion.Logs.Analysis;
 package Porion.Configs.Rules is
 
    --  Read the rule configuration file.
-   procedure Read (Path : in String);
+   procedure Read (Path    : in String;
+                   Process : not null
+                      access procedure (Line : in String;
+                                        Level : in Logs.Analysis.Level_Type)) with
+      Pre => Ada.Directories.Exists (Path);
+
+   --  Find the rule configuration file and read it.
+   procedure Read_Rule (Name    : in String;
+                        Process : not null
+                           access procedure (Line : in String;
+                                             Level : in Logs.Analysis.Level_Type)) with
+      Pre => Name'Length > 0;
 
 end Porion.Configs.Rules;

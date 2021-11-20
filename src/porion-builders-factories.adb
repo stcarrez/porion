@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 
 with Porion.Builders.XUnit;
+with Porion.Builders.Metrics;
 with Porion.Builders.Scripts;
 package body Porion.Builders.Factories is
 
@@ -31,6 +32,9 @@ package body Porion.Builders.Factories is
 
          when BUILDER_XUNIT =>
             return XUnit.Create (Session, Config);
+
+         when BUILDER_METRIC =>
+            return Metrics.Create (Session, Config);
 
          when others =>
             return null;

@@ -35,6 +35,9 @@ package body Porion.Metrics is
          when METRIC_COVERAGE =>
             return "coverage";
 
+         when METRIC_CLOC =>
+            return "cloc";
+
       end case;
    end Get_Kind;
 
@@ -60,7 +63,9 @@ package body Porion.Metrics is
    --  ------------------------------
    procedure Save_Metric (Controller : in out Controller_Type;
                           Name       : in String;
-                          Value      : in Integer) is
+                          Label      : in String;
+                          Value      : in Integer;
+                          Content    : in String := "") is
       Query        : ADO.Queries.Context;
       Metric       : Porion.Metrics.Models.Metric_Ref;
       Found        : Boolean;
@@ -71,6 +76,7 @@ package body Porion.Metrics is
       Metric.Find (Controller.Session, Query, Found);
       if not Found then
          Metric.Set_Name (Name);
+         Metric.Set_Label (Label);
          Metric.Set_Metric (Controller.Kind);
          Metric.Save (Controller.Session);
       end if;
@@ -78,6 +84,7 @@ package body Porion.Metrics is
       Build_Metric.Set_Metric (Metric);
       Build_Metric.Set_Build (Controller.Build);
       Build_Metric.Set_Value (Value);
+      Build_Metric.Set_Content (Content);
       Build_Metric.Save (Controller.Session);
    end Save_Metric;
 

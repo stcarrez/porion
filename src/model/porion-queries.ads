@@ -185,6 +185,9 @@ package Porion.Queries is
       --  the metric value.
       Value : Integer;
 
+      --  the metric detailed content.
+      Content : Ada.Strings.Unbounded.Unbounded_String;
+
       --  the metric logical name.
       Name : Ada.Strings.Unbounded.Unbounded_String;
 
@@ -543,7 +546,7 @@ private
 
    package File_4 is
       new ADO.Queries.Loaders.File (Path => "build-metrics.xml",
-                                    Sha1 => "03E0A0BEBBB8774E93BD56839481F983592DE5E7");
+                                    Sha1 => "45DFCF3F1EF5660F169B9D876F21020207E4E009");
 
    package Def_Metricinfo_Build_Metrics is
       new ADO.Queries.Loaders.Query (Name => "build-metrics",

@@ -177,6 +177,18 @@ package Porion.Metrics.Models is
    function Get_Value (Object : in Build_Metric_Ref)
                  return Integer;
 
+   --  Set the optional metric detailed content.
+   procedure Set_Content (Object : in out Build_Metric_Ref;
+                          Value  : in Ada.Strings.Unbounded.Unbounded_String);
+   procedure Set_Content (Object : in out Build_Metric_Ref;
+                          Value : in String);
+
+   --  Get the optional metric detailed content.
+   function Get_Content (Object : in Build_Metric_Ref)
+                 return Ada.Strings.Unbounded.Unbounded_String;
+   function Get_Content (Object : in Build_Metric_Ref)
+                 return String;
+
    --  Set the build associated with the metric.
    procedure Set_Build (Object : in out Build_Metric_Ref;
                         Value  : in Porion.Builds.Models.Build_Ref'Class);
@@ -322,18 +334,20 @@ private
    COL_0_2_NAME : aliased constant String := "id";
    COL_1_2_NAME : aliased constant String := "version";
    COL_2_2_NAME : aliased constant String := "value";
-   COL_3_2_NAME : aliased constant String := "build_id";
-   COL_4_2_NAME : aliased constant String := "metric_id";
+   COL_3_2_NAME : aliased constant String := "content";
+   COL_4_2_NAME : aliased constant String := "build_id";
+   COL_5_2_NAME : aliased constant String := "metric_id";
 
    BUILD_METRIC_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 5,
+     (Count   => 6,
       Table   => BUILD_METRIC_NAME'Access,
       Members => (
          1 => COL_0_2_NAME'Access,
          2 => COL_1_2_NAME'Access,
          3 => COL_2_2_NAME'Access,
          4 => COL_3_2_NAME'Access,
-         5 => COL_4_2_NAME'Access)
+         5 => COL_4_2_NAME'Access,
+         6 => COL_5_2_NAME'Access)
      );
    BUILD_METRIC_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := BUILD_METRIC_DEF'Access;
@@ -348,6 +362,7 @@ private
    with record
        Version : Integer;
        Value : Integer;
+       Content : Ada.Strings.Unbounded.Unbounded_String;
        Build : Porion.Builds.Models.Build_Ref;
        Metric : Metric_Ref;
    end record;

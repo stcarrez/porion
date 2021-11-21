@@ -554,12 +554,42 @@ package body Porion.Metrics.Models is
    end Get_Value;
 
 
+   procedure Set_Content (Object : in out Build_Metric_Ref;
+                           Value : in String) is
+      Impl : Build_Metric_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_String (Impl.all, 4, Impl.Content, Value);
+   end Set_Content;
+
+   procedure Set_Content (Object : in out Build_Metric_Ref;
+                          Value  : in Ada.Strings.Unbounded.Unbounded_String) is
+      Impl : Build_Metric_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Unbounded_String (Impl.all, 4, Impl.Content, Value);
+   end Set_Content;
+
+   function Get_Content (Object : in Build_Metric_Ref)
+                 return String is
+   begin
+      return Ada.Strings.Unbounded.To_String (Object.Get_Content);
+   end Get_Content;
+   function Get_Content (Object : in Build_Metric_Ref)
+                  return Ada.Strings.Unbounded.Unbounded_String is
+      Impl : constant Build_Metric_Access
+         := Build_Metric_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Content;
+   end Get_Content;
+
+
    procedure Set_Build (Object : in out Build_Metric_Ref;
                         Value  : in Porion.Builds.Models.Build_Ref'Class) is
       Impl : Build_Metric_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 4, Impl.Build, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 5, Impl.Build, Value);
    end Set_Build;
 
    function Get_Build (Object : in Build_Metric_Ref)
@@ -576,7 +606,7 @@ package body Porion.Metrics.Models is
       Impl : Build_Metric_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 5, Impl.Metric, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 6, Impl.Metric, Value);
    end Set_Metric;
 
    function Get_Metric (Object : in Build_Metric_Ref)
@@ -603,6 +633,7 @@ package body Porion.Metrics.Models is
             Copy.Copy (Impl.all);
             Copy.Version := Impl.Version;
             Copy.Value := Impl.Value;
+            Copy.Content := Impl.Content;
             Copy.Build := Impl.Build;
             Copy.Metric := Impl.Metric;
          end;
@@ -740,14 +771,19 @@ package body Porion.Metrics.Models is
          Object.Clear_Modified (1);
       end if;
       if Object.Is_Modified (4) then
-         Stmt.Save_Field (Name  => COL_3_2_NAME, --  build_id
-                          Value => Object.Build);
+         Stmt.Save_Field (Name  => COL_3_2_NAME, --  content
+                          Value => Object.Content);
          Object.Clear_Modified (4);
       end if;
       if Object.Is_Modified (5) then
-         Stmt.Save_Field (Name  => COL_4_2_NAME, --  metric_id
-                          Value => Object.Metric);
+         Stmt.Save_Field (Name  => COL_4_2_NAME, --  build_id
+                          Value => Object.Build);
          Object.Clear_Modified (5);
+      end if;
+      if Object.Is_Modified (6) then
+         Stmt.Save_Field (Name  => COL_5_2_NAME, --  metric_id
+                          Value => Object.Metric);
+         Object.Clear_Modified (6);
       end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
@@ -785,9 +821,11 @@ package body Porion.Metrics.Models is
                         Value => Object.Version);
       Query.Save_Field (Name  => COL_2_2_NAME, --  value
                         Value => Object.Value);
-      Query.Save_Field (Name  => COL_3_2_NAME, --  build_id
+      Query.Save_Field (Name  => COL_3_2_NAME, --  content
+                        Value => Object.Content);
+      Query.Save_Field (Name  => COL_4_2_NAME, --  build_id
                         Value => Object.Build);
-      Query.Save_Field (Name  => COL_4_2_NAME, --  metric_id
+      Query.Save_Field (Name  => COL_5_2_NAME, --  metric_id
                         Value => Object.Metric);
       Query.Execute (Result);
       if Result /= 1 then
@@ -824,6 +862,8 @@ package body Porion.Metrics.Models is
          return ADO.Objects.To_Object (Impl.Get_Key);
       elsif Name = "value" then
          return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Value));
+      elsif Name = "content" then
+         return Util.Beans.Objects.To_Object (Impl.Content);
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -859,11 +899,12 @@ package body Porion.Metrics.Models is
    begin
       Object.Set_Key_Value (Stmt.Get_Identifier (0));
       Object.Value := Stmt.Get_Integer (2);
-      if not Stmt.Is_Null (3) then
-         Object.Build.Set_Key_Value (Stmt.Get_Identifier (3), Session);
-      end if;
+      Object.Content := Stmt.Get_Unbounded_String (3);
       if not Stmt.Is_Null (4) then
-         Object.Metric.Set_Key_Value (Stmt.Get_Identifier (4), Session);
+         Object.Build.Set_Key_Value (Stmt.Get_Identifier (4), Session);
+      end if;
+      if not Stmt.Is_Null (5) then
+         Object.Metric.Set_Key_Value (Stmt.Get_Identifier (5), Session);
       end if;
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);

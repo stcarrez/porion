@@ -48,7 +48,7 @@ package body Porion.Queries is
       procedure Read (Into : in out Branch_Info) is
       begin
          Into.Name := Stmt.Get_Unbounded_String (0);
-         Into.Branch_Status := Porion.Projects.Models.Branch_Status_Type'Val (Stmt.Get_Integer (1));
+         Into.Branch_Status := Porion.Projects.Models.Branch_Status_Type'Enum_Val (Stmt.Get_Integer (1));
          Into.Branch_Tag := Stmt.Get_Unbounded_String (2);
          Into.Recipe_Count := Stmt.Get_Integer (3);
       end Read;
@@ -77,15 +77,15 @@ package body Porion.Queries is
       procedure Read (Into : in out Build_Info) is
       begin
          Into.Name := Stmt.Get_Unbounded_String (0);
-         Into.Project_Status := Porion.Projects.Models.Project_Status_Type'Val (Stmt.Get_Integer (1));
+         Into.Project_Status := Porion.Projects.Models.Project_Status_Type'Enum_Val (Stmt.Get_Integer (1));
          Into.Branch_Name := Stmt.Get_Unbounded_String (2);
-         Into.Branch_Status := Porion.Projects.Models.Branch_Status_Type'Val (Stmt.Get_Integer (3));
+         Into.Branch_Status := Porion.Projects.Models.Branch_Status_Type'Enum_Val (Stmt.Get_Integer (3));
          Into.Node_Name := Stmt.Get_Unbounded_String (4);
          Into.Recipe_Name := Stmt.Get_Unbounded_String (5);
          Into.Build_Id := Stmt.Get_Integer (6);
          Into.Build_Number := Stmt.Get_Integer (7);
          Into.Build_Tag := Stmt.Get_Unbounded_String (8);
-         Into.Build_Status := Porion.Builds.Models.Build_Status_Type'Val (Stmt.Get_Integer (9));
+         Into.Build_Status := Porion.Builds.Models.Build_Status_Type'Enum_Val (Stmt.Get_Integer (9));
          Into.Build_Date := Stmt.Get_Nullable_Time (10);
          Into.Finish_Date := Stmt.Get_Nullable_Time (11);
          Into.Build_Duration := Porion.Millisecond_Type (Stmt.Get_Integer (12));
@@ -117,7 +117,7 @@ package body Porion.Queries is
       Pos  : Positive := 1;
       procedure Read (Into : in out Build_Stat) is
       begin
-         Into.Build_Status := Porion.Builds.Models.Build_Status_Type'Val (Stmt.Get_Integer (0));
+         Into.Build_Status := Porion.Builds.Models.Build_Status_Type'Enum_Val (Stmt.Get_Integer (0));
          Into.Count := Stmt.Get_Natural (1);
       end Read;
    begin
@@ -146,9 +146,10 @@ package body Porion.Queries is
       begin
          Into.Id := Stmt.Get_Identifier (0);
          Into.Value := Stmt.Get_Integer (1);
-         Into.Name := Stmt.Get_Unbounded_String (2);
-         Into.Label := Stmt.Get_Unbounded_String (3);
-         Into.Kind := Porion.Metrics.Metric_Type'Val (Stmt.Get_Integer (4));
+         Into.Content := Stmt.Get_Unbounded_String (2);
+         Into.Name := Stmt.Get_Unbounded_String (3);
+         Into.Label := Stmt.Get_Unbounded_String (4);
+         Into.Kind := Porion.Metrics.Metric_Type'Enum_Val (Stmt.Get_Integer (5));
       end Read;
    begin
       Stmt.Execute;
@@ -180,8 +181,8 @@ package body Porion.Queries is
          Into.Os_Version := Stmt.Get_Unbounded_String (3);
          Into.Cpu_Type := Stmt.Get_Unbounded_String (4);
          Into.Repository_Dir := Stmt.Get_Unbounded_String (5);
-         Into.Kind := Porion.Nodes.Node_Type'Val (Stmt.Get_Integer (6));
-         Into.Status := Porion.Nodes.Node_Status_Type'Val (Stmt.Get_Integer (7));
+         Into.Kind := Porion.Nodes.Node_Type'Enum_Val (Stmt.Get_Integer (6));
+         Into.Status := Porion.Nodes.Node_Status_Type'Enum_Val (Stmt.Get_Integer (7));
          Into.Recipe_Count := Stmt.Get_Integer (8);
          Into.Build_Count := Stmt.Get_Integer (9);
       end Read;
@@ -301,12 +302,12 @@ package body Porion.Queries is
       procedure Read (Into : in out Project_Info) is
       begin
          Into.Name := Stmt.Get_Unbounded_String (0);
-         Into.Project_Status := Porion.Projects.Models.Project_Status_Type'Val (Stmt.Get_Integer (1));
+         Into.Project_Status := Porion.Projects.Models.Project_Status_Type'Enum_Val (Stmt.Get_Integer (1));
          Into.Branch_Name := Stmt.Get_Unbounded_String (2);
          Into.Branch_Tag := Stmt.Get_Unbounded_String (3);
-         Into.Branch_Status := Porion.Projects.Models.Branch_Status_Type'Val (Stmt.Get_Integer (4));
+         Into.Branch_Status := Porion.Projects.Models.Branch_Status_Type'Enum_Val (Stmt.Get_Integer (4));
          Into.Build_Date := Stmt.Get_Nullable_Time (5);
-         Into.Build_Status := Porion.Builds.Models.Build_Status_Type'Val (Stmt.Get_Integer (6));
+         Into.Build_Status := Porion.Builds.Models.Build_Status_Type'Enum_Val (Stmt.Get_Integer (6));
          Into.Build_Tag := Stmt.Get_Unbounded_String (7);
          Into.Build_Number := Stmt.Get_Integer (8);
          Into.Pass_Count := Stmt.Get_Integer (9);
@@ -438,16 +439,16 @@ package body Porion.Queries is
          Into.Creation_Date := Stmt.Get_Time (2);
          Into.Building := Stmt.Get_Boolean (3);
          Into.Project_Name := Stmt.Get_Unbounded_String (4);
-         Into.Project_Status := Porion.Projects.Models.Project_Status_Type'Val (Stmt.Get_Integer (5));
+         Into.Project_Status := Porion.Projects.Models.Project_Status_Type'Enum_Val (Stmt.Get_Integer (5));
          Into.Branch_Name := Stmt.Get_Unbounded_String (6);
          Into.Branch_Tag := Stmt.Get_Unbounded_String (7);
-         Into.Branch_Status := Porion.Projects.Models.Branch_Status_Type'Val (Stmt.Get_Integer (8));
+         Into.Branch_Status := Porion.Projects.Models.Branch_Status_Type'Enum_Val (Stmt.Get_Integer (8));
          Into.Recipe_Id := Stmt.Get_Identifier (9);
          Into.Recipe_Name := Stmt.Get_Unbounded_String (10);
-         Into.Recipe_Status := Porion.Builds.Models.Config_Status_Type'Val (Stmt.Get_Integer (11));
+         Into.Recipe_Status := Porion.Builds.Models.Config_Status_Type'Enum_Val (Stmt.Get_Integer (11));
          Into.Main_Recipe := Stmt.Get_Boolean (12);
          Into.Node_Name := Stmt.Get_Unbounded_String (13);
-         Into.Node_Status := Porion.Nodes.Node_Status_Type'Val (Stmt.Get_Integer (14));
+         Into.Node_Status := Porion.Nodes.Node_Status_Type'Enum_Val (Stmt.Get_Integer (14));
       end Read;
    begin
       Stmt.Execute;
@@ -553,7 +554,7 @@ package body Porion.Queries is
          Into.Test_Fail_Count := Stmt.Get_Integer (5);
          Into.Test_Timeout_Count := Stmt.Get_Integer (6);
          Into.Test_Duration := Porion.Microsecond_Type (Stmt.Get_Integer (7));
-         Into.Test_Status := Porion.XUnit.Models.Test_Status_Type'Val (Stmt.Get_Integer (8));
+         Into.Test_Status := Porion.XUnit.Models.Test_Status_Type'Enum_Val (Stmt.Get_Integer (8));
       end Read;
    begin
       Stmt.Execute;

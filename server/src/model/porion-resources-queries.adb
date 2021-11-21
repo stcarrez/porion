@@ -41,23 +41,26 @@ package body Porion.Resources.Queries is
        & "he metric id.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & " "
        & "       <property type='Integer' name=""value"">" & ASCII.LF & "         "
        & "   <comment>the metric value.</comment>" & ASCII.LF & "        </propert"
-       & "y>" & ASCII.LF & "        <property type='String' name=""name"">" & ASCII.LF
-       & "            <comment>the metric logical name.</comment>" & ASCII.LF & " "
-       & "       </property>" & ASCII.LF & "        <property type='String' name="""
-       & "label"">" & ASCII.LF & "            <comment>the metric label.</comment>"
-       & ASCII.LF & "        </property>" & ASCII.LF & "        <property type='P"
-       & "orion.Metrics.Metric_Type' name=""kind"">" & ASCII.LF & "            <co"
-       & "mment>the metric type.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
-       & "    </class>" & ASCII.LF & ASCII.LF & "    <query name='build-metrics'>"
-       & ASCII.LF & "        <comment>Metrics collected during a build</comment>" & ASCII.LF
-       & "        <sql>" & ASCII.LF & "          SELECT" & ASCII.LF & "          b"
-       & "m.id AS id," & ASCII.LF & "          bm.value AS value," & ASCII.LF & " "
-       & "         m.name AS name," & ASCII.LF & "          m.label AS label," & ASCII.LF
-       & "          m.metric AS metric" & ASCII.LF & "          FROM porion_build_"
-       & "metric AS bm" & ASCII.LF & "          INNER JOIN porion_metric AS m ON b"
-       & "m.metric_id = m.id" & ASCII.LF & "          WHERE bm.build_id = :build_i"
-       & "d" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query> " & ASCII.LF
-       & ASCII.LF & "</query-mapping>" & ASCII.LF;
+       & "y>" & ASCII.LF & "        <property type='String' name=""content"">" & ASCII.LF
+       & "            <comment>the metric detailed content.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='String' name="
+       & """name"">" & ASCII.LF & "            <comment>the metric logical name.</"
+       & "comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <prop"
+       & "erty type='String' name=""label"">" & ASCII.LF & "            <comment>t"
+       & "he metric label.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Porion.Metrics.Metric_Type' name=""kind"">" & ASCII.LF
+       & "            <comment>the metric type.</comment>" & ASCII.LF & "        <"
+       & "/property>" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF & "    <q"
+       & "uery name='build-metrics'>" & ASCII.LF & "        <comment>Metrics colle"
+       & "cted during a build</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & " "
+       & "         SELECT" & ASCII.LF & "          bm.id AS id," & ASCII.LF & "   "
+       & "       bm.value AS value," & ASCII.LF & "          bm.content AS content"
+       & "," & ASCII.LF & "          m.name AS name," & ASCII.LF & "          m.la"
+       & "bel AS label," & ASCII.LF & "          m.metric AS metric" & ASCII.LF & " "
+       & "         FROM porion_build_metric AS bm" & ASCII.LF & "          INNER J"
+       & "OIN porion_metric AS m ON bm.metric_id = m.id" & ASCII.LF & "          W"
+       & "HERE bm.build_id = :build_id" & ASCII.LF & "        </sql>" & ASCII.LF & " "
+       & "   </query> " & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
    C_1 : aliased constant String := "<query-mapping package='Porion.Projects.M"
        & "odels'>" & ASCII.LF & "    <description>" & ASCII.LF & "      Queries to"

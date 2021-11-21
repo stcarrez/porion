@@ -4873,7 +4873,7 @@ package body Porion.Builds.Models is
       procedure Read (Into : in out Build_Status) is
       begin
          Into.Recipe_Id := Stmt.Get_Identifier (0);
-         Into.Build_Status := Build_Status_Type'Val (Stmt.Get_Integer (1));
+         Into.Build_Status := Build_Status_Type'Enum_Val (Stmt.Get_Integer (1));
          Into.Build_Tag := Stmt.Get_Unbounded_String (2);
          Into.Build_Number := Stmt.Get_Integer (3);
          Into.Pass_Count := Stmt.Get_Integer (4);

@@ -39,4 +39,16 @@ package body Porion.Metrics.Factories is
       end if;
    end Create;
 
+   function Create (Metric  : in Metric_Type) return Reporter_Access is
+   begin
+      case Metric is
+         when METRIC_SPACE =>
+            return Diskusage.Create;
+
+         when others =>
+            return null;
+
+      end case;
+   end Create;
+
 end Porion.Metrics.Factories;

@@ -520,6 +520,8 @@ CREATE TABLE IF NOT EXISTS porion_build_metric (
   `version` INTEGER NOT NULL,
   /* the metric value. */
   `value` INTEGER NOT NULL,
+  /* the optional metric detailed content. */
+  `content` VARCHAR(255) NOT NULL,
   /* the build associated with the metric. */
   `build_id` BIGINT NOT NULL,
   /* the metric definition. */

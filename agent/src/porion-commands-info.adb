@@ -51,6 +51,7 @@ package body Porion.Commands.Info is
       Fields  : PT.Texts.Field_Array (1 .. 10);
       Build   : constant Builds.Models.Build_Ref := Context.Project_Service.Build;
       Bar_Box : PT.Rect_Type;
+      Values  : Porion.Queries.Metric_Info_Vector;
    begin
       Printer.Create_Field (Fields (1), Context.Styles.Default, 20.0);
       Printer.Create_Field (Fields (2), Context.Styles.Success, 80.0);
@@ -119,6 +120,8 @@ package body Porion.Commands.Info is
                         Style1 => Context.Styles.Success,
                         Style2 => Context.Styles.Disabled);
          Printer.New_Line;
+
+         Porion.Reports.List_Metrics (Context.Project_Service, Build, Printer, Context.Styles);
 
          if Build.Get_Test_Duration > 0 then
             Printer.Put (Fields (1), -("Test duration:"));

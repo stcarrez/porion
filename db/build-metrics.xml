@@ -11,6 +11,9 @@
         <property type='Integer' name="value">
             <comment>the metric value.</comment>
         </property>
+        <property type='String' name="content">
+            <comment>the metric detailed content.</comment>
+        </property>
         <property type='String' name="name">
             <comment>the metric logical name.</comment>
         </property>
@@ -28,6 +31,7 @@
           SELECT
           bm.id AS id,
           bm.value AS value,
+          bm.content AS content,
           m.name AS name,
           m.label AS label,
           m.metric AS metric

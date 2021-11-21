@@ -18,9 +18,9 @@
 with Ada.Calendar.Formatting;
 with Ada.Calendar.Time_Zones;
 with Util.Strings;
-with PT.Texts;
 with ADO.Queries;
 with Porion.Projects;
+with Porion.Metrics.Factories;
 with Porion.XUnit.Models;
 with Porion.Projects.Models;
 package body Porion.Reports is
@@ -107,6 +107,25 @@ package body Porion.Reports is
          return Format (Millisecond_Type (Value / 1_000)) & " s";
       end if;
    end Format;
+
+   --  ------------------------------
+   --  Format a percent of DV on the value.
+   --  ------------------------------
+   function Format_Percent (Dv    : in Integer;
+                            Value : in Integer) return String is
+      Val   : Integer := (Dv * 1000) / Value;
+      Div   : Natural;
+      Sign  : Character;
+   begin
+      if Val < 0 then
+         Val := -Val;
+         Sign := '-';
+      else
+         Sign := '+';
+      end if;
+      Div := Val mod 10;
+      return Sign & Util.Strings.Image (Val / 10) & '.' & To_Digit (Div);
+   end Format_Percent;
 
    function Get_Tag (Tag : in UString) return String is
       Value : constant String := To_String (Tag);
@@ -693,5 +712,73 @@ package body Porion.Reports is
          Writer.New_Line;
       end loop;
    end List_Tests;
+
+   --  ------------------------------
+   --  Create a report with the build metrics for the given build.
+   --  ------------------------------
+   procedure List_Metrics (Service : in out Porion.Services.Context_Type'Class;
+                           Build   : in Porion.Builds.Models.Build_Ref;
+                           Printer : in out PT.Printer_Type'Class;
+                           Styles  : in Style_Configuration) is
+      List   : Porion.Queries.Metric_Info_Vector;
+      Query  : ADO.Queries.Context;
+   begin
+      Query.Bind_Param ("build_id", Build.Get_Id);
+      Query.Set_Query (Porion.Queries.Query_Build_Metrics);
+      Porion.Queries.List (List, Service.DB, Query);
+
+      List_Metrics (List, Printer, Styles);
+   end List_Metrics;
+
+   --  ------------------------------
+   --  Create a report with the build metrics.
+   --  ------------------------------
+   procedure List_Metrics (List     : in Porion.Queries.Metric_Info_Vector;
+                           Printer  : in out PT.Printer_Type'Class;
+                           Styles   : in Style_Configuration) is
+      Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
+      Fields : PT.Texts.Field_Array (1 .. 4);
+      Style1 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
+   begin
+      Writer.Create_Field (Fields (1), Style1, 30.0);
+      Writer.Create_Field (Fields (2), Style1, 20.0);
+      Writer.Create_Field (Fields (3), Style1, 25.0);
+      Writer.Create_Field (Fields (4), Style1, 25.0);
+
+      for Metric in Porion.Metrics.Metric_Type'Range loop
+         List_Metrics (List, Metric, Printer, Fields, Styles);
+      end loop;
+   end List_Metrics;
+
+   procedure List_Metrics (List     : in Porion.Queries.Metric_Info_Vector;
+                           Metric   : in Porion.Metrics.Metric_Type;
+                           Printer  : in out PT.Printer_Type'Class;
+                           Fields   : in PT.Texts.Field_Array;
+                           Styles   : in Style_Configuration) is
+      use type Porion.Metrics.Metric_Type;
+      use type Porion.Metrics.Reporter_Access;
+
+      Values     : Porion.Metrics.Value_Map;
+      Controller : Porion.Metrics.Reporter_Access := Porion.Metrics.Factories.Create (Metric);
+   begin
+      if Controller = null then
+         return;
+      end if;
+
+      for Value of List loop
+         if Value.Kind = Metric then
+            Values.Include (Key => To_String (Value.Name),
+                            New_Item => (Length => Length (Value.Label),
+                                         Value  => Value.Value,
+                                         Label  => To_String (Value.Label)));
+         end if;
+      end loop;
+
+      if Values.Is_Empty then
+         return;
+      end if;
+
+      Controller.Report (Printer, Fields, Values);
+   end List_Metrics;
 
 end Porion.Reports;

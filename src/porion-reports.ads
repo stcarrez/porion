@@ -16,11 +16,12 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Calendar;
-with PT;
+with PT.Texts;
 with Porion.Nodes;
 with Porion.Queries;
 with Porion.Services;
 with Porion.Executors;
+with Porion.Metrics;
 with Porion.Builds.Models;
 package Porion.Reports is
 
@@ -43,6 +44,11 @@ package Porion.Reports is
 
    --  Format a duration expressed in microseconds.
    function Format (Value : in Microsecond_Type) return String;
+
+   --  Format a percent of DV on the value.
+   function Format_Percent (Dv    : in Integer;
+                            Value : in Integer) return String with
+      Pre => Value /= 0;
 
    --  Get a printable name for the node status.
    function Get_Status (Status : in Porion.Nodes.Node_Status_Type) return String;
@@ -103,5 +109,22 @@ package Porion.Reports is
    procedure List_Tests (List     : in Porion.Queries.Test_Info_Vector;
                          Printer  : in out PT.Printer_Type'Class;
                          Styles   : in Style_Configuration);
+
+   --  Create a report with the build metrics for the given build.
+   procedure List_Metrics (Service : in out Porion.Services.Context_Type'Class;
+                           Build   : in Porion.Builds.Models.Build_Ref;
+                           Printer : in out PT.Printer_Type'Class;
+                           Styles  : in Style_Configuration);
+
+   --  Create a report with the build metrics.
+   procedure List_Metrics (List     : in Porion.Queries.Metric_Info_Vector;
+                           Printer  : in out PT.Printer_Type'Class;
+                           Styles   : in Style_Configuration);
+
+   procedure List_Metrics (List     : in Porion.Queries.Metric_Info_Vector;
+                           Metric   : in Porion.Metrics.Metric_Type;
+                           Printer  : in out PT.Printer_Type'Class;
+                           Fields   : in PT.Texts.Field_Array;
+                           Styles   : in Style_Configuration);
 
 end Porion.Reports;

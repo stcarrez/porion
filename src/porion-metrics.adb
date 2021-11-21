@@ -15,7 +15,7 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-
+with Util.Strings;
 with ADO.Queries;
 with Porion.Metrics.Models;
 package body Porion.Metrics is
@@ -80,5 +80,36 @@ package body Porion.Metrics is
       Build_Metric.Set_Value (Value);
       Build_Metric.Save (Controller.Session);
    end Save_Metric;
+
+   function Get_Stat_Info (Values : in Value_Map;
+                           Name   : in String) return Stat_Info_Type is
+      Result : Stat_Info_Type;
+   begin
+      Result.Min := Integer'Last;
+      Result.Max := Integer'First;
+      for Iter in Values.Iterate loop
+         declare
+            Item_Name  : constant String := Value_Maps.Key (Iter);
+            Pos        : constant Natural := Util.Strings.Rindex (Item_Name, '.');
+            Value      : Integer;
+         begin
+            if Pos > 0 and Item_Name (Pos + 1 .. Item_Name'Last) = Name then
+               Result.Count := Result.Count + 1;
+               Value := Value_Maps.Element (Iter).Value;
+               if Value < Result.Min then
+                  Result.Min := Value;
+               end if;
+               if Value > Result.Max then
+                  Result.Max := Value;
+               end if;
+            end if;
+         end;
+      end loop;
+      if Result.Count = 0 then
+         Result.Min := 0;
+         Result.Max := 0;
+      end if;
+      return Result;
+   end Get_Stat_Info;
 
 end Porion.Metrics;

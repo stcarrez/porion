@@ -19,6 +19,7 @@
 with Porion.Metrics.DiskUsage;
 with Porion.Metrics.Filesize;
 with Porion.Metrics.Coverage;
+with Porion.Metrics.Cloc;
 package body Porion.Metrics.Factories is
 
    function Create (Metric  : in String;
@@ -34,6 +35,9 @@ package body Porion.Metrics.Factories is
       elsif Metric = "coverage" then
          return Coverage.Create (Session, Params);
 
+      elsif Metric = "cloc" then
+         return Cloc.Create (Session, Params);
+
       else
          return null;
       end if;
@@ -44,6 +48,9 @@ package body Porion.Metrics.Factories is
       case Metric is
          when METRIC_SPACE =>
             return Diskusage.Create;
+
+         when METRIC_CLOC =>
+            return Cloc.Create;
 
          when others =>
             return null;

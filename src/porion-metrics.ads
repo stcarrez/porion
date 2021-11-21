@@ -16,11 +16,15 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Finalization;
+with Ada.Containers.Indefinite_Hashed_Maps;
+with Ada.Strings.Hash;
 with Porion.Builds.Models;
 with Porion.Executors;
 with Porion.Configs;
+with PT.Texts;
 with Util.Beans.Objects.Enums;
 private with ADO.Sessions;
+private with PT.Charts;
 package Porion.Metrics is
 
    type Metric_Type is (METRIC_SPACE,
@@ -33,6 +37,20 @@ package Porion.Metrics is
 
    package Metric_Type_Objects is
       new Util.Beans.Objects.Enums (Metric_Type);
+
+   type Label_Value_Type (Length : Natural) is record
+      Value : Integer;
+      Label : String (1 .. Length);
+   end record;
+
+   package Value_Maps is
+      new Ada.Containers.Indefinite_Hashed_Maps (Key_Type => String,
+                                                 Element_Type => Label_Value_Type,
+                                                 Hash  => Ada.Strings.Hash,
+                                                 Equivalent_Keys => "=");
+
+   subtype Value_Map is Value_Maps.Map;
+   subtype Value_Cursor is Value_Maps.Cursor;
 
    type Controller_Type is limited new Ada.Finalization.Limited_Controlled with private;
    type Controller_Access is access all Controller_Type'Class;
@@ -48,6 +66,24 @@ package Porion.Metrics is
 
    --  Returns True if the controller knows the current build.
    function Has_Build (Controller : in Controller_Type) return Boolean;
+
+   type Reporter_Type is limited new Ada.Finalization.Limited_Controlled with private;
+   type Reporter_Access is access all Reporter_Type'Class;
+
+   --  Produce a report with the metric values collected during a build.
+   procedure Report (Controller : in out Reporter_Type;
+                     Printer    : in out PT.Printer_Type'Class;
+                     Fields     : in PT.Texts.Field_Array;
+                     Values     : in Value_Map) is null;
+
+   type Stat_Info_Type is record
+      Min   : Integer := 0;
+      Max   : Integer := 0;
+      Count : Natural := 0;
+   end record;
+
+   function Get_Stat_Info (Values : in Value_Map;
+                           Name   : in String) return Stat_Info_Type;
 
 private
 
@@ -67,5 +103,15 @@ private
       Build   : Porion.Builds.Models.Build_Ref;
       Kind    : Metric_Type;
    end record;
+
+   type Reporter_Type is limited new Ada.Finalization.Limited_Controlled with record
+      Kind    : Metric_Type;
+   end record;
+
+   function "-" (Left, Right : Integer) return PT.W_Type is
+      (PT.W_Type (Integer '(Left - Right)));
+
+   procedure Draw_Value_Bar is
+      new PT.Charts.Draw_Bar (Integer);
 
 end Porion.Metrics;

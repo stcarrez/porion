@@ -91,13 +91,13 @@ package body Porion.Metrics.Coverage is
       end if;
 
       if Line_Covered_Count > 0 and Line_Total_Count > 0 then
-         Controller.Save_Metric ("lines_total", Line_Total_Count);
-         Controller.Save_Metric ("lines_covered", Line_Covered_Count);
+         Controller.Save_Metric ("lines_total", "Lines total", Line_Total_Count);
+         Controller.Save_Metric ("lines_covered", "Lines covered", Line_Covered_Count);
       end if;
 
       if Func_Covered_Count > 0 and Func_Total_Count > 0 then
-         Controller.Save_Metric ("func_total", Func_Total_Count);
-         Controller.Save_Metric ("func_covered", Func_Covered_Count);
+         Controller.Save_Metric ("func_total", "Functions total", Func_Total_Count);
+         Controller.Save_Metric ("func_covered", "Functions covered", Func_Covered_Count);
       end if;
    end Collect;
 

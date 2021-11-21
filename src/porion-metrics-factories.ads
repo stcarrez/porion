@@ -25,4 +25,6 @@ package Porion.Metrics.Factories is
                     Params  : in UString) return Controller_Access with
       Pre => Session.Get_Status = ADO.Sessions.OPEN;
 
+   function Create (Metric  : in Metric_Type) return Reporter_Access;
+
 end Porion.Metrics.Factories;

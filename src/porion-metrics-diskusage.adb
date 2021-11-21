@@ -45,9 +45,9 @@ package body Porion.Metrics.DiskUsage is
       Prefix : constant String := To_String (Controller.Prefix);
    begin
       Porion.Tools.Find_Stats (Path, Stats);
-      Controller.Save_Metric (Prefix & "total_size", Natural (Stats.Total_Size / 1024));
-      Controller.Save_Metric (Prefix & "file_count", Stats.File_Count);
-      Controller.Save_Metric (Prefix & "directory_count", Stats.Dir_Count);
+      Controller.Save_Metric (Prefix & "total_size", "Total size (Kb)", Natural (Stats.Total_Size / 1024));
+      Controller.Save_Metric (Prefix & "file_count", "File count", Stats.File_Count);
+      Controller.Save_Metric (Prefix & "directory_count", "Directory count", Stats.Dir_Count);
    end Collect;
 
    function Create return Reporter_Access is

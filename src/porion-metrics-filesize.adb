@@ -44,12 +44,14 @@ package body Porion.Metrics.Filesize is
    procedure Collect (Controller : in out Controller_Type;
                       Path       : in String;
                       Executor   : in out Porion.Executors.Executor_Type'Class) is
-      File_Path : constant String := Util.Files.Compose (Path, To_String (Controller.Path));
-      Size      : Ada.Directories.File_Size;
+      Local_Path : constant String := To_String (Controller.Path);
+      File_Path  : constant String := Util.Files.Compose (Path, Local_Path);
+      Size       : Ada.Directories.File_Size;
    begin
       if Ada.Directories.Exists (File_Path) then
          Size := Ada.Directories.Size (File_Path);
-         Controller.Save_Metric (To_String (Controller.Label), Natural (Size / 1024));
+         Controller.Save_Metric (To_String (Controller.Label), "Size '" & Local_Path,
+                                 Natural (Size / 1024));
       end if;
    end Collect;
 

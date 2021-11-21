@@ -29,18 +29,21 @@ package Porion.Metrics is
 
    type Metric_Type is (METRIC_SPACE,
                         METRIC_FILESIZE,
-                        METRIC_COVERAGE);
+                        METRIC_COVERAGE,
+                        METRIC_CLOC);
 
    for Metric_Type use (METRIC_SPACE    => 1,
                         METRIC_FILESIZE => 2,
-                        METRIC_COVERAGE => 3);
+                        METRIC_COVERAGE => 3,
+                        METRIC_CLOC     => 4);
 
    package Metric_Type_Objects is
       new Util.Beans.Objects.Enums (Metric_Type);
 
    type Label_Value_Type (Length : Natural) is record
-      Value : Integer;
-      Label : String (1 .. Length);
+      Value   : Integer;
+      Content : UString;
+      Label   : String (1 .. Length);
    end record;
 
    package Value_Maps is
@@ -90,7 +93,9 @@ private
    --  Save the build metric.
    procedure Save_Metric (Controller : in out Controller_Type;
                           Name       : in String;
-                          Value      : in Integer) with
+                          Label      : in String;
+                          Value      : in Integer;
+                          Content    : in String := "") with
       Pre => Controller.Has_Build and Name'Length > 0;
 
    procedure Collect (Controller : in out Controller_Type;

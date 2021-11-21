@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 with Ada.Finalization;
 with Ada.Containers.Indefinite_Hashed_Maps;
+with Ada.Containers.Indefinite_Vectors;
 with Ada.Strings.Hash;
 with Porion.Builds.Models;
 with Porion.Executors;
@@ -54,6 +55,12 @@ package Porion.Metrics is
 
    subtype Value_Map is Value_Maps.Map;
    subtype Value_Cursor is Value_Maps.Cursor;
+
+   package Value_Vectors is
+      new Ada.Containers.Indefinite_Vectors (Index_Type => Positive,
+                                             Element_Type => Label_Value_Type);
+
+   subtype Value_Vector is Value_Vectors.Vector;
 
    type Controller_Type is limited new Ada.Finalization.Limited_Controlled with private;
    type Controller_Access is access all Controller_Type'Class;

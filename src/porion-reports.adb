@@ -768,9 +768,10 @@ package body Porion.Reports is
       for Value of List loop
          if Value.Kind = Metric then
             Values.Include (Key => To_String (Value.Name),
-                            New_Item => (Length => Length (Value.Label),
-                                         Value  => Value.Value,
-                                         Label  => To_String (Value.Label)));
+                            New_Item => (Length  => Length (Value.Label),
+                                         Value   => Value.Value,
+                                         Content => Value.Content,
+                                         Label   => To_String (Value.Label)));
          end if;
       end loop;
 

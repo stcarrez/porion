@@ -23,6 +23,10 @@ package Porion is
 
    type Millisecond_Type is new Natural;
 
+   type Permille_Type is new Natural;
+
+   subtype Rate_Type is Permille_Type range 0 .. 100;
+
    function "-" (Message : in String) return String is (Intl."-" (Message));
 
    subtype UString is Ada.Strings.Unbounded.Unbounded_String;

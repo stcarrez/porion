@@ -29,6 +29,8 @@ with PT.Charts;
 with Porion.Builds.Services;
 package body Porion.Commands.Info is
 
+   use type Porion.Builds.Models.Build_Status_Type;
+
    function Get_Max_Time (Build : in Builds.Models.Build_Ref) return Millisecond_Type;
 
    function "-" (Left, Right : Porion.Millisecond_Type) return PT.W_Type is
@@ -70,6 +72,10 @@ package body Porion.Commands.Info is
          end if;
       end;
 
+      if Build.Get_Status /= Builds.Models.BUILD_PASS then
+         Printer.Set_Style (Fields (2), Context.Styles.Error);
+      end if;
+
       Printer.Put (Fields (1), -("Build number:"));
       Printer.Put_Int (Fields (2), Ident.Build);
       Printer.New_Line;
@@ -91,6 +97,11 @@ package body Porion.Commands.Info is
          Printer.Create_Field (Fields (2), Context.Styles.Success, 20.0);
          Printer.Create_Field (Fields (3), Context.Styles.Success, 60.0);
          Printer.Layout_Fields (Fields (1 .. 3));
+
+         if Build.Get_Status /= Builds.Models.BUILD_PASS then
+            Printer.Set_Style (Fields (2), Context.Styles.Error);
+            Printer.Set_Style (Fields (3), Context.Styles.Error);
+         end if;
 
          Printer.Put (Fields (1), -("Finished on:"));
          Printer.Put (Fields (2), Reports.Format (Build.Get_Finish_Date.Value));
@@ -131,38 +142,38 @@ package body Porion.Commands.Info is
                            Style1 => Context.Styles.Success,
                            Style2 => Context.Styles.Disabled);
             Printer.New_Line;
+
+            Printer.Create_Field (Fields (3), Context.Styles.Default, 20.0);
+            Printer.Create_Field (Fields (4), Context.Styles.Success, 0.0);
+            Printer.Create_Field (Fields (5), Context.Styles.Default, 0.0);
+            Printer.Create_Field (Fields (6), Context.Styles.Error, 0.0);
+            Printer.Create_Field (Fields (7), Context.Styles.Default, 0.0);
+            Printer.Create_Field (Fields (8), Context.Styles.Error, 0.0);
+            Printer.Create_Field (Fields (9), Context.Styles.Default, 60.0);
+            for I in 4 .. 8 loop
+               Printer.Set_Bottom_Right_Padding (Fields (I), (1, 0));
+            end loop;
+            Printer.Layout_Fields (Fields (3 .. 9));
+
+            Printer.Put (Fields (3), -("Tests run:"));
+            Printer.Put_Int (Fields (4), Build.Get_Pass_Count);
+            if Build.Get_Fail_Count > 0 then
+               Printer.Put (Fields (5), -("Failure:"));
+               Printer.Put_Int (Fields (6), Build.Get_Fail_Count);
+            end if;
+
+            if Build.Get_Timeout_Count > 0 then
+               Printer.Put (Fields (7), -("Timeout:"));
+               Printer.Put_Int (Fields (8), Build.Get_Timeout_Count);
+            end if;
+            Draw_Progress (Chart, Bar_Box, Build.Get_Sys_Time,
+                           Max => Get_Max_Time (Build),
+                           Style1 => Context.Styles.Success,
+                           Style2 => Context.Styles.Error);
+            Printer.New_Line;
+
+            Porion.Reports.List_Tests (Context.Project_Service, Build, Printer, Context.Styles, True);
          end if;
-
-         Printer.Create_Field (Fields (3), Context.Styles.Default, 20.0);
-         Printer.Create_Field (Fields (4), Context.Styles.Success, 0.0);
-         Printer.Create_Field (Fields (5), Context.Styles.Default, 0.0);
-         Printer.Create_Field (Fields (6), Context.Styles.Error, 0.0);
-         Printer.Create_Field (Fields (7), Context.Styles.Default, 0.0);
-         Printer.Create_Field (Fields (8), Context.Styles.Error, 0.0);
-         Printer.Create_Field (Fields (9), Context.Styles.Default, 60.0);
-         for I in 4 .. 8 loop
-            Printer.Set_Bottom_Right_Padding (Fields (I), (1, 0));
-         end loop;
-         Printer.Layout_Fields (Fields (3 .. 9));
-
-         Printer.Put (Fields (3), -("Tests run:"));
-         Printer.Put_Int (Fields (4), Build.Get_Pass_Count);
-         if Build.Get_Fail_Count > 0 then
-            Printer.Put (Fields (5), -("Failure:"));
-            Printer.Put_Int (Fields (6), Build.Get_Fail_Count);
-         end if;
-
-         if Build.Get_Timeout_Count > 0 then
-            Printer.Put (Fields (7), -("Timeout:"));
-            Printer.Put_Int (Fields (8), Build.Get_Timeout_Count);
-         end if;
-         Draw_Progress (Chart, Bar_Box, Build.Get_Sys_Time,
-                        Max => Get_Max_Time (Build),
-                        Style1 => Context.Styles.Success,
-                        Style2 => Context.Styles.Error);
-         Printer.New_Line;
-
-         Porion.Reports.List_Tests (Context.Project_Service, Build, Printer, Context.Styles, True);
       end if;
    end Print_Build;
 

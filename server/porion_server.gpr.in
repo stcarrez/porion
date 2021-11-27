@@ -5,7 +5,7 @@ with "@SERVLET_DIR@servletada";
 with "@SERVLET_DIR@servletada_aws";
 with "@ASF_DIR@asf";
 with "@ADO_DIR@ado";
-with "@ADO_DIR@ado_all";
+with "@ADO_DIR@ado_sqlite";
 with "@AWA_DIR@awa";
 with "@AWA_DIR@awa_mail";
 with "@AWA_DIR@awa_setup";

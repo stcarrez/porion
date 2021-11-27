@@ -282,11 +282,11 @@ package Porion.Builds.Models is
 
    --  Set a rate factor to apply on the build for this build configuration.
    procedure Set_Rate_Factor (Object : in out Recipe_Ref;
-                              Value  : in Integer);
+                              Value  : in Porion.Permille_Type);
 
    --  Get a rate factor to apply on the build for this build configuration.
    function Get_Rate_Factor (Object : in Recipe_Ref)
-                 return Integer;
+                 return Porion.Permille_Type;
 
    --  Set the main recipe.
    procedure Set_Main_Recipe (Object : in out Recipe_Ref;
@@ -1361,8 +1361,11 @@ package Porion.Builds.Models is
       --  the build recipe id.
       Recipe_Id : ADO.Identifier;
 
+      --  the recipe rate factor.
+      Rate_Factor : Porion.Rate_Type;
+
       --  the last build status.
-      Build_Status : Build_Status_Type;
+      Build_Status : Nullable_Build_Status_Type;
 
       --  the branch tag.
       Build_Tag : Ada.Strings.Unbounded.Unbounded_String;
@@ -1545,7 +1548,7 @@ private
        Name : Ada.Strings.Unbounded.Unbounded_String;
        Description : Ada.Strings.Unbounded.Unbounded_String;
        Status : Config_Status_Type;
-       Rate_Factor : Integer;
+       Rate_Factor : Porion.Permille_Type;
        Main_Recipe : Boolean;
        Filter_Rules : Ada.Strings.Unbounded.Unbounded_String;
        Node : Porion.Nodes.Models.Node_Ref;
@@ -2138,7 +2141,7 @@ private
 
    package File_1 is
       new ADO.Queries.Loaders.File (Path => "project-update-status.xml",
-                                    Sha1 => "03F01F9286F11CEED70B7A03E1A2947B8D8FBF4C");
+                                    Sha1 => "83201DC31EA590919F1B67D31D81322604D3613E");
 
    package Def_Buildstatus_Project_Build_Status is
       new ADO.Queries.Loaders.Query (Name => "project-build-status",

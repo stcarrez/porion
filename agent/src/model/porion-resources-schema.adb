@@ -83,7 +83,8 @@ package body Porion.Resources.Schema is
        & " NOT NULL, `pass_rate` INTEGER NOT NULL, `fail_rate` INTEGER NOT NULL, `"
        & "timeout_rate` INTEGER NOT NULL, `build_rate` INTEGER NOT NULL, `rate_fac"
        & "tor` INTEGER NOT NULL, `main_branch` TINYINT NOT NULL, `last_build_numbe"
-       & "r` INTEGER NOT NULL, `project_id` BIGINT NOT NULL, PRIMARY KEY (`id`))";
+       & "r` INTEGER NOT NULL, `build_progress` INTEGER NOT NULL, `project_id` BIG"
+       & "INT NOT NULL, PRIMARY KEY (`id`))";
    L_20  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_depende"
        & "ncy ( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `project_id` BIG"
        & "INT NOT NULL, `owner_id` BIGINT NOT NULL, PRIMARY KEY (`id`))";
@@ -94,8 +95,8 @@ package body Porion.Resources.Schema is
        & "ER NOT NULL, `scm_url` VARCHAR(255) NOT NULL, `pass_rate` INTEGER NOT NU"
        & "LL, `fail_rate` INTEGER NOT NULL, `timeout_rate` INTEGER NOT NULL, `buil"
        & "d_rate` INTEGER NOT NULL, `check_date` DATETIME NOT NULL, `check_delay` "
-       & "INTEGER NOT NULL, `next_check_date` DATETIME NOT NULL, PRIMARY KEY (`id`"
-       & "))";
+       & "INTEGER NOT NULL, `next_check_date` DATETIME NOT NULL, `build_progress` "
+       & "INTEGER NOT NULL, PRIMARY KEY (`id`))";
    L_22  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_test ( "
        & "`id` BIGINT NOT NULL, `name` VARCHAR(255) NOT NULL, `create_date` DATETI"
        & "ME NOT NULL, `version` INTEGER NOT NULL, `total_pass_count` INTEGER NOT "

@@ -271,15 +271,18 @@ package body Porion.Resources.Queries is
        & "/comment>" & ASCII.LF & "        <property type='ADO.Identifier' name="""
        & "recipe_id"">" & ASCII.LF & "            <comment>the build recipe id.</c"
        & "omment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <prope"
-       & "rty type='Porion.Builds.Models.Build_Status_Type' name=""build_status"">"
-       & ASCII.LF & "            <comment>the last build status.</comment>" & ASCII.LF
-       & "        </property>" & ASCII.LF & "        <property type='String' name="
-       & """build_tag"">" & ASCII.LF & "            <comment>the branch tag.</comm"
-       & "ent>" & ASCII.LF & "        </property>" & ASCII.LF & "        <property"
-       & " type='Integer' name=""build_number"">" & ASCII.LF & "            <comme"
-       & "nt>the build number.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
-       & "        <property type='Integer' name=""pass_count"">" & ASCII.LF & "   "
-       & "         <comment>the number of tests that succeeded.</comment>" & ASCII.LF
+       & "rty type='Porion.Rate_Type' name=""rate_factor"">" & ASCII.LF & "       "
+       & "     <comment>the recipe rate factor.</comment>" & ASCII.LF & "        <"
+       & "/property>" & ASCII.LF & "        <property type='Porion.Builds.Models.B"
+       & "uild_Status_Type' name=""build_status"" not-null=""no"">" & ASCII.LF & " "
+       & "           <comment>the last build status.</comment>" & ASCII.LF & "    "
+       & "    </property>" & ASCII.LF & "        <property type='String' name=""bu"
+       & "ild_tag"">" & ASCII.LF & "            <comment>the branch tag.</comment>"
+       & ASCII.LF & "        </property>" & ASCII.LF & "        <property type='I"
+       & "nteger' name=""build_number"">" & ASCII.LF & "            <comment>the b"
+       & "uild number.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & " "
+       & "       <property type='Integer' name=""pass_count"">" & ASCII.LF & "    "
+       & "        <comment>the number of tests that succeeded.</comment>" & ASCII.LF
        & "        </property>" & ASCII.LF & "        <property type='Integer' name"
        & "=""fail_count"">" & ASCII.LF & "            <comment>the number of tests"
        & " that failed.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & " "
@@ -292,16 +295,18 @@ package body Porion.Resources.Queries is
        & "tatus'>" & ASCII.LF & "        <comment>Get the build status of every re"
        & "cipes of a project</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & " "
        & "         SELECT" & ASCII.LF & "          recipe.id," & ASCII.LF & "     "
-       & "     build.status," & ASCII.LF & "          build.tag," & ASCII.LF & "  "
-       & "        build.number," & ASCII.LF & "          build.pass_count," & ASCII.LF
-       & "          build.fail_count," & ASCII.LF & "          build.timeout_count"
-       & "," & ASCII.LF & "          build.finish_date" & ASCII.LF & "          FR"
-       & "OM porion_recipe AS recipe" & ASCII.LF & "          INNER JOIN porion_la"
-       & "st_build AS last_build ON last_build.recipe_id = recipe.id" & ASCII.LF & " "
-       & "         INNER JOIN porion_build AS build ON last_build.build_id = build"
-       & ".id" & ASCII.LF & "          WHERE recipe.project_id = 1 AND" & ASCII.LF
-       & "             build.id IN (SELECT MAX(sb.build_id) FROM porion_last_build"
-       & " AS sb WHERE sb.recipe_id = recipe.id)" & ASCII.LF & "        </sql>" & ASCII.LF
+       & "     recipe.rate_factor," & ASCII.LF & "          build.status," & ASCII.LF
+       & "          COALESCE(build.tag, '')," & ASCII.LF & "          COALESCE(bui"
+       & "ld.number, 0)," & ASCII.LF & "          COALESCE(build.pass_count, 0)," & ASCII.LF
+       & "          COALESCE(build.fail_count, 0)," & ASCII.LF & "          COALES"
+       & "CE(build.timeout_count, 0)," & ASCII.LF & "          build.finish_date" & ASCII.LF
+       & "          FROM porion_recipe AS recipe" & ASCII.LF & "          LEFT JOI"
+       & "N porion_last_build AS last_build ON last_build.recipe_id = recipe.id" & ASCII.LF
+       & "          LEFT JOIN porion_build AS build ON last_build.build_id = build"
+       & ".id" & ASCII.LF & "          WHERE recipe.project_id = :project_id AND r"
+       & "ecipe.branch_id = :branch_id AND" & ASCII.LF & "             (build.id I"
+       & "S NULL OR build.id IN (SELECT MAX(sb.build_id) FROM porion_last_build AS"
+       & " sb WHERE sb.recipe_id = recipe.id))" & ASCII.LF & "        </sql>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
    C_8 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF

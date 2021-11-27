@@ -622,15 +622,21 @@ package body Porion.Builds.Models is
 
 
    procedure Set_Rate_Factor (Object : in out Recipe_Ref;
-                              Value  : in Integer) is
+                              Value  : in Porion.Permille_Type) is
+      function To_Object (Value : in Porion.Permille_Type) return Util.Beans.Objects.Object
+        is (Util.Beans.Objects.To_Object (Long_Long_Integer (Value)));
+      procedure Set_Field_Discrete is
+        new ADO.Audits.Set_Field_Operation
+          (Porion.Permille_Type,
+           To_Object);
       Impl : Recipe_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Audits.Set_Field_Integer (Impl.all, 6, Impl.Rate_Factor, Value);
+      Set_Field_Discrete (Impl.all, 6, Impl.Rate_Factor, Value);
    end Set_Rate_Factor;
 
    function Get_Rate_Factor (Object : in Recipe_Ref)
-                  return Integer is
+                  return Porion.Permille_Type is
       Impl : constant Recipe_Access
          := Recipe_Impl (Object.Get_Load_Object.all)'Access;
    begin
@@ -910,7 +916,7 @@ package body Porion.Builds.Models is
       end if;
       if Object.Is_Modified (6) then
          Stmt.Save_Field (Name  => COL_5_2_NAME, --  rate_factor
-                          Value => Object.Rate_Factor);
+                          Value => Integer (Object.Rate_Factor));
          Object.Clear_Modified (6);
       end if;
       if Object.Is_Modified (7) then
@@ -980,7 +986,7 @@ package body Porion.Builds.Models is
       Query.Save_Field (Name  => COL_4_2_NAME, --  status
                         Value => Integer (Config_Status_Type'Enum_Rep (Object.Status)));
       Query.Save_Field (Name  => COL_5_2_NAME, --  rate_factor
-                        Value => Object.Rate_Factor);
+                        Value => Integer (Object.Rate_Factor));
       Query.Save_Field (Name  => COL_6_2_NAME, --  main_recipe
                         Value => Object.Main_Recipe);
       Query.Save_Field (Name  => COL_7_2_NAME, --  filter_rules
@@ -1074,7 +1080,7 @@ package body Porion.Builds.Models is
       Object.Name := Stmt.Get_Unbounded_String (2);
       Object.Description := Stmt.Get_Unbounded_String (3);
       Object.Status := Config_Status_Type'Enum_Val (Stmt.Get_Integer (4));
-      Object.Rate_Factor := Stmt.Get_Integer (5);
+      Object.Rate_Factor := Porion.Permille_Type (Stmt.Get_Integer (5));
       Object.Main_Recipe := Stmt.Get_Boolean (6);
       Object.Filter_Rules := Stmt.Get_Unbounded_String (7);
       if not Stmt.Is_Null (8) then
@@ -4795,8 +4801,14 @@ package body Porion.Builds.Models is
    begin
       if Name = "recipe_id" then
          return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Recipe_Id));
+      elsif Name = "rate_factor" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Rate_Factor));
       elsif Name = "build_status" then
-         return Build_Status_Type_Objects.To_Object (From.Build_Status);
+         if From.Build_Status.Is_Null then
+            return Util.Beans.Objects.Null_Object;
+         else
+            return Build_Status_Type_Objects.To_Object (From.Build_Status.Value);
+         end if;
       elsif Name = "build_tag" then
          return Util.Beans.Objects.To_Object (From.Build_Tag);
       elsif Name = "build_number" then
@@ -4828,8 +4840,13 @@ package body Porion.Builds.Models is
    begin
       if Name = "recipe_id" then
          Item.Recipe_Id := ADO.Identifier (Util.Beans.Objects.To_Long_Long_Integer (Value));
+      elsif Name = "rate_factor" then
+         Item.Rate_Factor := Porion.Rate_Type (Util.Beans.Objects.To_Integer (Value));
       elsif Name = "build_status" then
-         Item.Build_Status := Build_Status_Type_Objects.To_Value (Value);
+         Item.Build_Status.Is_Null := Util.Beans.Objects.Is_Null (Value);
+         if not Item.Build_Status.Is_Null then
+            Item.Build_Status.Value := Build_Status_Type_Objects.To_Value (Value);
+         end if;
       elsif Name = "build_tag" then
          Item.Build_Tag := Util.Beans.Objects.To_Unbounded_String (Value);
       elsif Name = "build_number" then
@@ -4873,13 +4890,17 @@ package body Porion.Builds.Models is
       procedure Read (Into : in out Build_Status) is
       begin
          Into.Recipe_Id := Stmt.Get_Identifier (0);
-         Into.Build_Status := Build_Status_Type'Enum_Val (Stmt.Get_Integer (1));
-         Into.Build_Tag := Stmt.Get_Unbounded_String (2);
-         Into.Build_Number := Stmt.Get_Integer (3);
-         Into.Pass_Count := Stmt.Get_Integer (4);
-         Into.Fail_Count := Stmt.Get_Integer (5);
-         Into.Timeout_Count := Stmt.Get_Integer (6);
-         Into.Build_Date := Stmt.Get_Nullable_Time (7);
+         Into.Rate_Factor := Porion.Rate_Type (Stmt.Get_Integer (1));
+         Into.Build_Status.Is_Null := Stmt.Is_Null (2);
+         if not Into.Build_Status.Is_Null then
+            Into.Build_Status.Value := Build_Status_Type'Enum_Val (Stmt.Get_Integer (2));
+         end if;
+         Into.Build_Tag := Stmt.Get_Unbounded_String (3);
+         Into.Build_Number := Stmt.Get_Integer (4);
+         Into.Pass_Count := Stmt.Get_Integer (5);
+         Into.Fail_Count := Stmt.Get_Integer (6);
+         Into.Timeout_Count := Stmt.Get_Integer (7);
+         Into.Build_Date := Stmt.Get_Nullable_Time (8);
       end Read;
    begin
       Stmt.Execute;

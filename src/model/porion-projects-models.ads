@@ -157,35 +157,35 @@ package Porion.Projects.Models is
 
    --  Set the test success rate for the last builds with build configuration of this project (all branches)
    procedure Set_Pass_Rate (Object : in out Project_Ref;
-                            Value  : in Integer);
+                            Value  : in Porion.Permille_Type);
 
    --  Get the test success rate for the last builds with build configuration of this project (all branches)
    function Get_Pass_Rate (Object : in Project_Ref)
-                 return Integer;
+                 return Porion.Permille_Type;
 
    --  Set the test failure rate for the last builds with build configuration of this project (all branches)
    procedure Set_Fail_Rate (Object : in out Project_Ref;
-                            Value  : in Integer);
+                            Value  : in Porion.Permille_Type);
 
    --  Get the test failure rate for the last builds with build configuration of this project (all branches)
    function Get_Fail_Rate (Object : in Project_Ref)
-                 return Integer;
+                 return Porion.Permille_Type;
 
    --  Set the test timeout rate for the last builds with build configuration of this project (all branches)
    procedure Set_Timeout_Rate (Object : in out Project_Ref;
-                               Value  : in Integer);
+                               Value  : in Porion.Permille_Type);
 
    --  Get the test timeout rate for the last builds with build configuration of this project (all branches)
    function Get_Timeout_Rate (Object : in Project_Ref)
-                 return Integer;
+                 return Porion.Permille_Type;
 
    --  Set the build success rate for the build configuration of this project (all branches).
    procedure Set_Build_Rate (Object : in out Project_Ref;
-                             Value  : in Integer);
+                             Value  : in Porion.Permille_Type);
 
    --  Get the build success rate for the build configuration of this project (all branches).
    function Get_Build_Rate (Object : in Project_Ref)
-                 return Integer;
+                 return Porion.Permille_Type;
 
    --  Set the date and time when the sources were checked.
    procedure Set_Check_Date (Object : in out Project_Ref;
@@ -210,6 +210,14 @@ package Porion.Projects.Models is
    --  Get the next expected check date and time.
    function Get_Next_Check_Date (Object : in Project_Ref)
                  return Ada.Calendar.Time;
+
+   --  Set the build progress of all branches.
+   procedure Set_Build_Progress (Object : in out Project_Ref;
+                                 Value  : in Porion.Permille_Type);
+
+   --  Get the build progress of all branches.
+   function Get_Build_Progress (Object : in Project_Ref)
+                 return Porion.Permille_Type;
 
    --  Load the entity identified by 'Id'.
    --  Raises the NOT_FOUND exception if it does not exist.
@@ -345,43 +353,43 @@ package Porion.Projects.Models is
 
    --  Set the test success rate for the last builds with build configuration of this branch
    procedure Set_Pass_Rate (Object : in out Branch_Ref;
-                            Value  : in Integer);
+                            Value  : in Porion.Permille_Type);
 
    --  Get the test success rate for the last builds with build configuration of this branch
    function Get_Pass_Rate (Object : in Branch_Ref)
-                 return Integer;
+                 return Porion.Permille_Type;
 
    --  Set the test failure rate for the last builds with build configuration of this branch
    procedure Set_Fail_Rate (Object : in out Branch_Ref;
-                            Value  : in Integer);
+                            Value  : in Porion.Permille_Type);
 
    --  Get the test failure rate for the last builds with build configuration of this branch
    function Get_Fail_Rate (Object : in Branch_Ref)
-                 return Integer;
+                 return Porion.Permille_Type;
 
    --  Set the test timeout rate for the last builds with build configuration of this branch
    procedure Set_Timeout_Rate (Object : in out Branch_Ref;
-                               Value  : in Integer);
+                               Value  : in Porion.Permille_Type);
 
    --  Get the test timeout rate for the last builds with build configuration of this branch
    function Get_Timeout_Rate (Object : in Branch_Ref)
-                 return Integer;
+                 return Porion.Permille_Type;
 
    --  Set the build success rate for the build configuration of this branch.
    procedure Set_Build_Rate (Object : in out Branch_Ref;
-                             Value  : in Integer);
+                             Value  : in Porion.Permille_Type);
 
    --  Get the build success rate for the build configuration of this branch.
    function Get_Build_Rate (Object : in Branch_Ref)
-                 return Integer;
+                 return Porion.Permille_Type;
 
    --  Set a rate factor to apply when consolidating results on the project
    procedure Set_Rate_Factor (Object : in out Branch_Ref;
-                              Value  : in Integer);
+                              Value  : in Porion.Rate_Type);
 
    --  Get a rate factor to apply when consolidating results on the project
    function Get_Rate_Factor (Object : in Branch_Ref)
-                 return Integer;
+                 return Porion.Rate_Type;
 
    --  Set indicates whether this is considered as the main project branch.
    procedure Set_Main_Branch (Object : in out Branch_Ref;
@@ -398,6 +406,14 @@ package Porion.Projects.Models is
    --  Get the last build number that was used.
    function Get_Last_Build_Number (Object : in Branch_Ref)
                  return Integer;
+
+   --  Set the build progress.
+   procedure Set_Build_Progress (Object : in out Branch_Ref;
+                                 Value  : in Porion.Permille_Type);
+
+   --  Get the build progress.
+   function Get_Build_Progress (Object : in Branch_Ref)
+                 return Porion.Permille_Type;
 
    --
    procedure Set_Project (Object : in out Branch_Ref;
@@ -601,9 +617,10 @@ private
    COL_13_1_NAME : aliased constant String := "check_date";
    COL_14_1_NAME : aliased constant String := "check_delay";
    COL_15_1_NAME : aliased constant String := "next_check_date";
+   COL_16_1_NAME : aliased constant String := "build_progress";
 
    PROJECT_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 16,
+     (Count   => 17,
       Table   => PROJECT_NAME'Access,
       Members => (
          1 => COL_0_1_NAME'Access,
@@ -621,7 +638,8 @@ private
          13 => COL_12_1_NAME'Access,
          14 => COL_13_1_NAME'Access,
          15 => COL_14_1_NAME'Access,
-         16 => COL_15_1_NAME'Access)
+         16 => COL_15_1_NAME'Access,
+         17 => COL_16_1_NAME'Access)
      );
    PROJECT_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := PROJECT_DEF'Access;
@@ -656,13 +674,14 @@ private
        Status : Project_Status_Type;
        Scm : Porion.Sources.Source_Control_Type;
        Scm_Url : Ada.Strings.Unbounded.Unbounded_String;
-       Pass_Rate : Integer;
-       Fail_Rate : Integer;
-       Timeout_Rate : Integer;
-       Build_Rate : Integer;
+       Pass_Rate : Porion.Permille_Type;
+       Fail_Rate : Porion.Permille_Type;
+       Timeout_Rate : Porion.Permille_Type;
+       Build_Rate : Porion.Permille_Type;
        Check_Date : Ada.Calendar.Time;
        Check_Delay : Integer;
        Next_Check_Date : Ada.Calendar.Time;
+       Build_Progress : Porion.Permille_Type;
    end record;
 
    type Project_Access is access all Project_Impl;
@@ -712,10 +731,11 @@ private
    COL_12_2_NAME : aliased constant String := "rate_factor";
    COL_13_2_NAME : aliased constant String := "main_branch";
    COL_14_2_NAME : aliased constant String := "last_build_number";
-   COL_15_2_NAME : aliased constant String := "project_id";
+   COL_15_2_NAME : aliased constant String := "build_progress";
+   COL_16_2_NAME : aliased constant String := "project_id";
 
    BRANCH_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 16,
+     (Count   => 17,
       Table   => BRANCH_NAME'Access,
       Members => (
          1 => COL_0_2_NAME'Access,
@@ -733,7 +753,8 @@ private
          13 => COL_12_2_NAME'Access,
          14 => COL_13_2_NAME'Access,
          15 => COL_14_2_NAME'Access,
-         16 => COL_15_2_NAME'Access)
+         16 => COL_15_2_NAME'Access,
+         17 => COL_16_2_NAME'Access)
      );
    BRANCH_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := BRANCH_DEF'Access;
@@ -764,13 +785,14 @@ private
        Create_Date : Ada.Calendar.Time;
        Update_Date : Ada.Calendar.Time;
        Status : Branch_Status_Type;
-       Pass_Rate : Integer;
-       Fail_Rate : Integer;
-       Timeout_Rate : Integer;
-       Build_Rate : Integer;
-       Rate_Factor : Integer;
+       Pass_Rate : Porion.Permille_Type;
+       Fail_Rate : Porion.Permille_Type;
+       Timeout_Rate : Porion.Permille_Type;
+       Build_Rate : Porion.Permille_Type;
+       Rate_Factor : Porion.Rate_Type;
        Main_Branch : Boolean;
        Last_Build_Number : Integer;
+       Build_Progress : Porion.Permille_Type;
        Project : Project_Ref;
    end record;
 

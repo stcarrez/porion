@@ -483,4 +483,136 @@ package body Porion.Projects.Services is
       Service.DB.Commit;
    end Update;
 
+   procedure Set_Name (Service  : in out Context_Type;
+                       Name     : in String;
+                       Modified : out Boolean) is
+   begin
+      Service.DB.Begin_Transaction;
+      if not Service.Recipe.Is_Null then
+         declare
+            Stmt : ADO.Statements.Query_Statement :=
+               Service.DB.Create_Statement ("SELECT COUNT(*) FROM porion_recipe AS r "
+                                            & "WHERE r.project_id = :project_id "
+                                            & "AND r.branch_id = :branch_id "
+                                            & "AND r.name = :name");
+         begin
+            Stmt.Bind_Param ("project_id", Service.Project.Get_Id);
+            Stmt.Bind_Param ("branch_id", Service.Branch.Get_Id);
+            Stmt.Bind_Param ("name", Name);
+            Stmt.Execute;
+            if Stmt.Get_Result_Integer /= 0 then
+               Service.DB.Rollback;
+               Log.Warn ("Name {0} already used by another recipe", Name);
+               raise Invalid_Name;
+            end if;
+            Service.Recipe.Set_Name (Name);
+            Modified := Service.Recipe.Is_Modified;
+            Service.Recipe.Save (Service.DB);
+         end;
+      end if;
+      Service.DB.Commit;
+   end Set_Name;
+
+   --  ------------------------------
+   --  Set the description associated with the project.
+   --  ------------------------------
+   procedure Set_Description (Service     : in out Context_Type;
+                              Description : in String;
+                              Modified    : out Boolean) is
+   begin
+      Service.DB.Begin_Transaction;
+      if Service.Branch.Is_Null then
+         Log.Info ("Set project description on {0} to {1}",
+                   String '(Service.Project.Get_Name), Description);
+
+         Service.Project.Set_Description (Description);
+         Modified := Service.Project.Is_Modified;
+         Service.Project.Save (Service.DB);
+      else
+         Log.Info ("Set branch description on {0}#{1} to {2}",
+                   String '(Service.Project.Get_Name),
+                   Service.Branch.Get_Name, Description);
+
+         Service.Branch.Set_Description (Description);
+         Modified := Service.Branch.Is_Modified;
+         Service.Branch.Save (Service.DB);
+      end if;
+      Service.DB.Commit;
+   end Set_Description;
+
+   --  ------------------------------
+   --  Set the project status to enable, disable or put the project onhold.
+   --  ------------------------------
+   procedure Set_Status (Service  : in out Context_Type;
+                         Status   : in String;
+                         Modified : out Boolean) is
+      Project_Status : Models.Project_Status_Type;
+      Branch_Status  : Models.Branch_Status_Type;
+   begin
+      if Status = "enable" or Status = "1" then
+         Project_Status := Models.PROJECT_ACTIVE;
+         Branch_Status := Models.BUILD_DISABLED;
+      elsif Status = "disabled" or Status = "0" then
+         Project_Status := Models.PROJECT_DISABLED;
+         Branch_Status := Models.BUILD_DISABLED;
+      elsif Status = "hold" then
+         Project_Status := Models.PROJECT_ONHOLD;
+         Branch_Status := Models.BUILD_DISABLED;
+      else
+         Log.Warn ("Invalid status value {0}", Status);
+         raise Bad_Value;
+      end if;
+
+      Service.DB.Begin_Transaction;
+      if Service.Branch.Is_Null then
+         Log.Info ("Set project status on {0} to {1}",
+                   String '(Service.Project.Get_Name), Status);
+
+         Service.Project.Set_Status (Project_Status);
+         Modified := Service.Project.Is_Modified;
+         Service.Project.Save (Service.DB);
+      else
+         Log.Info ("Set branch status on {0}#{1} to {2}",
+                   String '(Service.Project.Get_Name),
+                   Service.Branch.Get_Name, Status);
+
+         Service.Branch.Set_Status (Branch_Status);
+         Modified := Service.Branch.Is_Modified;
+         Service.Branch.Save (Service.DB);
+      end if;
+      Service.DB.Commit;
+   end Set_Status;
+
+   --  ------------------------------
+   --  Set the branch or recipe rate factor.
+   --  ------------------------------
+   procedure Set_Rate_Factor (Service  : in out Context_Type;
+                              Factor   : in String;
+                              Modified : out Boolean) is
+      Value : Rate_Type;
+   begin
+      begin
+         Value := Rate_Type'Value (Factor);
+
+      exception
+         when Constraint_Error =>
+            raise Bad_Value;
+      end;
+
+      Service.DB.Begin_Transaction;
+      if Service.Recipe.Is_Null then
+         Service.Branch.Set_Rate_Factor (Value);
+         Modified := Service.Branch.Is_Modified;
+         Service.Branch.Save (Service.DB);
+      else
+         Service.Recipe.Set_Rate_Factor (Value);
+         Modified := Service.Recipe.Is_Modified;
+         Service.Recipe.Save (Service.DB);
+      end if;
+      if Modified then
+         Porion.Builds.Services.Update_Branch_Ratings (Service);
+      end if;
+      Service.DB.Commit;
+   end Set_Rate_Factor;
+
 end Porion.Projects.Services;

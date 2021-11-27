@@ -396,6 +396,9 @@ package body Porion.Commands.Info is
                Executor.Fetch_Commands (Commands);
                Printer.Put (Fields (3), Format (-("Recipe: {0}"), Ident));
                Printer.New_Line;
+               Printer.Put (Fields (3), Format (-("Filtering rules: {0}"), Recipe.Get_Filter_Rules));
+               Printer.New_Line;
+
                Porion.Reports.List_Commands (Commands, Context.Printer.all, Context.Styles);
             end;
          end loop;

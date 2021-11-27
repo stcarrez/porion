@@ -47,7 +47,7 @@ private
                          Context : in out Context_Type);
 
    type Command_Type is new Porion.Commands.Drivers.Command_Type with record
-      Recipe : aliased Boolean := False;
+      Recipe : aliased GNAT.Strings.String_Access;
       Quiet  : aliased Boolean := False;
    end record;
 

@@ -1215,12 +1215,42 @@ package body Porion.Projects.Models is
    end Get_Build_Progress;
 
 
+   procedure Set_Description (Object : in out Branch_Ref;
+                               Value : in String) is
+      Impl : Branch_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_String (Impl.all, 17, Impl.Description, Value);
+   end Set_Description;
+
+   procedure Set_Description (Object : in out Branch_Ref;
+                              Value  : in Ada.Strings.Unbounded.Unbounded_String) is
+      Impl : Branch_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Unbounded_String (Impl.all, 17, Impl.Description, Value);
+   end Set_Description;
+
+   function Get_Description (Object : in Branch_Ref)
+                 return String is
+   begin
+      return Ada.Strings.Unbounded.To_String (Object.Get_Description);
+   end Get_Description;
+   function Get_Description (Object : in Branch_Ref)
+                  return Ada.Strings.Unbounded.Unbounded_String is
+      Impl : constant Branch_Access
+         := Branch_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Description;
+   end Get_Description;
+
+
    procedure Set_Project (Object : in out Branch_Ref;
                           Value  : in Project_Ref'Class) is
       Impl : Branch_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 17, Impl.Project, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 18, Impl.Project, Value);
    end Set_Project;
 
    function Get_Project (Object : in Branch_Ref)
@@ -1260,6 +1290,7 @@ package body Porion.Projects.Models is
             Copy.Main_Branch := Impl.Main_Branch;
             Copy.Last_Build_Number := Impl.Last_Build_Number;
             Copy.Build_Progress := Impl.Build_Progress;
+            Copy.Description := Impl.Description;
             Copy.Project := Impl.Project;
          end;
       end if;
@@ -1461,9 +1492,14 @@ package body Porion.Projects.Models is
          Object.Clear_Modified (16);
       end if;
       if Object.Is_Modified (17) then
-         Stmt.Save_Field (Name  => COL_16_2_NAME, --  project_id
-                          Value => Object.Project);
+         Stmt.Save_Field (Name  => COL_16_2_NAME, --  description
+                          Value => Object.Description);
          Object.Clear_Modified (17);
+      end if;
+      if Object.Is_Modified (18) then
+         Stmt.Save_Field (Name  => COL_17_2_NAME, --  project_id
+                          Value => Object.Project);
+         Object.Clear_Modified (18);
       end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
@@ -1528,7 +1564,9 @@ package body Porion.Projects.Models is
                         Value => Object.Last_Build_Number);
       Query.Save_Field (Name  => COL_15_2_NAME, --  build_progress
                         Value => Integer (Object.Build_Progress));
-      Query.Save_Field (Name  => COL_16_2_NAME, --  project_id
+      Query.Save_Field (Name  => COL_16_2_NAME, --  description
+                        Value => Object.Description);
+      Query.Save_Field (Name  => COL_17_2_NAME, --  project_id
                         Value => Object.Project);
       Query.Execute (Result);
       if Result /= 1 then
@@ -1596,6 +1634,8 @@ package body Porion.Projects.Models is
          return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Last_Build_Number));
       elsif Name = "build_progress" then
          return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Build_Progress));
+      elsif Name = "description" then
+         return Util.Beans.Objects.To_Object (Impl.Description);
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -1644,8 +1684,9 @@ package body Porion.Projects.Models is
       Object.Main_Branch := Stmt.Get_Boolean (13);
       Object.Last_Build_Number := Stmt.Get_Integer (14);
       Object.Build_Progress := Porion.Permille_Type (Stmt.Get_Integer (15));
-      if not Stmt.Is_Null (16) then
-         Object.Project.Set_Key_Value (Stmt.Get_Identifier (16), Session);
+      Object.Description := Stmt.Get_Unbounded_String (16);
+      if not Stmt.Is_Null (17) then
+         Object.Project.Set_Key_Value (Stmt.Get_Identifier (17), Session);
       end if;
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);

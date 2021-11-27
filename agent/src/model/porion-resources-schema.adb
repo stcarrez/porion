@@ -83,8 +83,8 @@ package body Porion.Resources.Schema is
        & " NOT NULL, `pass_rate` INTEGER NOT NULL, `fail_rate` INTEGER NOT NULL, `"
        & "timeout_rate` INTEGER NOT NULL, `build_rate` INTEGER NOT NULL, `rate_fac"
        & "tor` INTEGER NOT NULL, `main_branch` TINYINT NOT NULL, `last_build_numbe"
-       & "r` INTEGER NOT NULL, `build_progress` INTEGER NOT NULL, `project_id` BIG"
-       & "INT NOT NULL, PRIMARY KEY (`id`))";
+       & "r` INTEGER NOT NULL, `build_progress` INTEGER NOT NULL, `description` VA"
+       & "RCHAR(255) NOT NULL, `project_id` BIGINT NOT NULL, PRIMARY KEY (`id`))";
    L_20  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_depende"
        & "ncy ( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `project_id` BIG"
        & "INT NOT NULL, `owner_id` BIGINT NOT NULL, PRIMARY KEY (`id`))";

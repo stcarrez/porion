@@ -415,6 +415,18 @@ package Porion.Projects.Models is
    function Get_Build_Progress (Object : in Branch_Ref)
                  return Porion.Permille_Type;
 
+   --  Set the branch description.
+   procedure Set_Description (Object : in out Branch_Ref;
+                              Value  : in Ada.Strings.Unbounded.Unbounded_String);
+   procedure Set_Description (Object : in out Branch_Ref;
+                              Value : in String);
+
+   --  Get the branch description.
+   function Get_Description (Object : in Branch_Ref)
+                 return Ada.Strings.Unbounded.Unbounded_String;
+   function Get_Description (Object : in Branch_Ref)
+                 return String;
+
    --
    procedure Set_Project (Object : in out Branch_Ref;
                           Value  : in Project_Ref'Class);
@@ -732,10 +744,11 @@ private
    COL_13_2_NAME : aliased constant String := "main_branch";
    COL_14_2_NAME : aliased constant String := "last_build_number";
    COL_15_2_NAME : aliased constant String := "build_progress";
-   COL_16_2_NAME : aliased constant String := "project_id";
+   COL_16_2_NAME : aliased constant String := "description";
+   COL_17_2_NAME : aliased constant String := "project_id";
 
    BRANCH_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 17,
+     (Count   => 18,
       Table   => BRANCH_NAME'Access,
       Members => (
          1 => COL_0_2_NAME'Access,
@@ -754,7 +767,8 @@ private
          14 => COL_13_2_NAME'Access,
          15 => COL_14_2_NAME'Access,
          16 => COL_15_2_NAME'Access,
-         17 => COL_16_2_NAME'Access)
+         17 => COL_16_2_NAME'Access,
+         18 => COL_17_2_NAME'Access)
      );
    BRANCH_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := BRANCH_DEF'Access;
@@ -793,6 +807,7 @@ private
        Main_Branch : Boolean;
        Last_Build_Number : Integer;
        Build_Progress : Porion.Permille_Type;
+       Description : Ada.Strings.Unbounded.Unbounded_String;
        Project : Project_Ref;
    end record;
 

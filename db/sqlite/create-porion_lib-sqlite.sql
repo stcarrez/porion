@@ -331,6 +331,8 @@ CREATE TABLE IF NOT EXISTS porion_branch (
   `last_build_number` INTEGER NOT NULL,
   /* the build progress. */
   `build_progress` INTEGER NOT NULL,
+  /* the branch description. */
+  `description` VARCHAR(255) NOT NULL,
   /*  */
   `project_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`)

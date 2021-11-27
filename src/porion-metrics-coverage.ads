@@ -27,6 +27,10 @@ package Porion.Metrics.Coverage is
    function Create (Session : in ADO.Sessions.Master_Session;
                     Params  : in UString) return Controller_Access;
 
+   type Reporter_Type is limited new Porion.Metrics.Reporter_Type with null record;
+
+   function Create return Reporter_Access;
+
 private
 
    type Controller_Type is limited new Porion.Metrics.Controller_Type with record
@@ -40,5 +44,12 @@ private
    procedure Collect (Controller : in out Controller_Type;
                       Path       : in String;
                       Executor   : in out Porion.Executors.Executor_Type'Class);
+
+   --  Produce a report with the metric values collected during a build.
+   overriding
+   procedure Report (Controller : in out Reporter_Type;
+                     Printer    : in out PT.Printer_Type'Class;
+                     Fields     : in PT.Texts.Field_Array;
+                     Values     : in Value_Map);
 
 end Porion.Metrics.Coverage;

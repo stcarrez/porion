@@ -44,6 +44,7 @@ with Porion.Commands.Depend;
 with Porion.Commands.Node;
 with Porion.Commands.Check;
 with Porion.Commands.Logs;
+with Porion.Commands.Set;
 package body Porion.Commands is
 
    Help_Command            : aliased Porion.Commands.Drivers.Help_Command_Type;
@@ -61,6 +62,7 @@ package body Porion.Commands is
    Node_Command            : aliased Porion.Commands.Node.Command_Type;
    Check_Command           : aliased Porion.Commands.Check.Command_Type;
    Logs_Command            : aliased Porion.Commands.Logs.Command_Type;
+   Set_Command             : aliased Porion.Commands.Set.Command_Type;
    Driver                  : Drivers.Driver_Type;
 
    Text_Printer            : aliased PT.Drivers.Texts.Printer_Type;
@@ -193,6 +195,9 @@ package body Porion.Commands is
       Driver.Add_Command ("logs",
                           -("display the build logs"),
                            Logs_Command'Access);
+      Driver.Add_Command ("set",
+                          -("set a project, branch or recipe variable"),
+                           Set_Command'Access);
    end Initialize;
 
    --  ------------------------------
@@ -282,6 +287,12 @@ package body Porion.Commands is
          Context.Styles.Warning := Context.Styles.Default;
       end if;
    end Setup_Printer;
+
+   procedure Remote (Context   : in out Context_Type;
+                     Arguments : out Util.Commands.Dynamic_Argument_List) is
+   begin
+      null;
+   end Remote;
 
    procedure Parse (Context   : in out Context_Type;
                     Arguments : out Util.Commands.Dynamic_Argument_List) is

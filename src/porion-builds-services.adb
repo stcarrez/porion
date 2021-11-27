@@ -1317,74 +1317,23 @@ package body Porion.Builds.Services is
       Builds.Models.List (List, Service.DB, Query);
    end Load_Recipes;
 
+   --  ------------------------------
+   --  Copy the recipe to another recipe with the given name.
+   --  ------------------------------
    procedure Copy_Recipe (Service  : in out Context_Type;
-                          Project  : in String;
-                          Branch   : in String;
-                          Node     : in String;
+                          Name     : in String;
                           Recipe   : in out Models.Recipe_Ref) is
       use type Porion.Projects.Models.Branch_Status_Type;
 
+      Ident   : constant String := Service.Get_Recipe_Name;
       Query   : ADO.SQL.Query;
       Found   : Boolean;
       Steps   : Build_Step_Vector;
    begin
-      Log.Info ("Copy build recipe {0} for branch {1} and node {2}", Project, Branch, Node);
-
-      Service.Load_Project (Project);
-
-      --  Find the project branch when specified.
-      if Branch'Length > 0 then
-         Query.Set_Filter ("o.project_id = :project_id and o.name = :branch");
-         Query.Bind_Param ("project_id", Service.Project.Get_Id);
-         Query.Bind_Param ("branch", Branch);
-         Service.Branch.Find (Service.DB, Query, Found);
-         if not Found then
-            Log.Error ("Branch {0} not found in database", Branch);
-            return;
-         end if;
-      end if;
-
-      --  Find the main project branch.
-      if Service.Branch.Is_Null then
-         Query.Clear;
-         Query.Set_Filter ("o.project_id = :project_id AND o.main_branch = 1");
-         Query.Bind_Param ("project_id", Service.Project.Get_Id);
-         Service.Branch.Find (Service.DB, Query, Found);
-         if not Found then
-            Log.Error ("No main branch for project {0}", Project);
-            return;
-         end if;
-      end if;
-
-      --  Find the main project recipe for the branch.
-      if Recipe.Is_Null then
-         Query.Clear;
-         Query.Set_Filter ("o.project_id = :project_id AND o.branch_id = :branch_id"
-                           & " AND o.main_recipe = 1");
-         Query.Bind_Param ("project_id", Service.Project.Get_Id);
-         Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
-         Recipe.Find (Service.DB, Query, Found);
-         if not Found then
-            Query.Clear;
-            Query.Set_Filter ("o.project_id = :project_id AND o.main_recipe = 1");
-            Query.Bind_Param ("project_id", Service.Project.Get_Id);
-            Recipe.Find (Service.DB, Query, Found);
-            if not Found then
-               Log.Error ("No main recipe for project {0}", Project);
-               return;
-            end if;
-         end if;
-      end if;
-
-      --  Find the build node or use the current recipe's build node.
-      if Node'Length > 0 then
-         Nodes.Services.Load_Node (Service, Node);
-      else
-         Service.Build_Node := Nodes.Models.Node_Ref (Recipe.Get_Node);
-      end if;
+      Log.Info ("Copy build recipe {0} to {1}", Ident, Name);
 
       --  Load the recipe steps.
-      Load_Recipe (Service, Recipe, Steps);
+      Load_Recipe (Service, Service.Recipe, Steps);
 
       --  Create the new recipe and copy the build steps.
       Service.DB.Begin_Transaction;
@@ -1392,7 +1341,7 @@ package body Porion.Builds.Services is
          New_Recipe : Models.Recipe_Ref;
          Added      : Boolean;
       begin
-         New_Recipe.Set_Name (String '(Recipe.Get_Name));
+         New_Recipe.Set_Name (Name);
          New_Recipe.Set_Description (String '(Recipe.Get_Description));
          New_Recipe.Set_Rate_Factor (Recipe.Get_Rate_Factor);
          New_Recipe.Set_Status (Builds.Models.CONFIG_BUILD_REQUIRED);

@@ -10,7 +10,7 @@
     </install>
   </resource>
 
-  <resource name='Porion.Resources.Schema'
+  <resource name='Porion.Resources.Server_Schema'
             format='lines'>
     <line-separator>;</line-separator>
 

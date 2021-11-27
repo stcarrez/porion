@@ -15,7 +15,9 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Ada.Calendar;
 with Util.Serialize.IO;
+with ADO;
 with Porion.Sources;
 with Porion.Services;
 with Porion.Executors;
@@ -104,5 +106,15 @@ package Porion.Projects.Services is
                               Factor   : in String;
                               Modified : out Boolean) with
       Pre => Service.Has_Project and Service.Has_Branch;
+
+private
+
+   procedure Write_Date (Stream : in out Util.Serialize.IO.Output_Stream'Class;
+                         Name   : in String;
+                         Date   : in ADO.Nullable_Time);
+
+   procedure Write_Date (Stream : in out Util.Serialize.IO.Output_Stream'Class;
+                         Name   : in String;
+                         Date   : in Ada.Calendar.Time);
 
 end Porion.Projects.Services;

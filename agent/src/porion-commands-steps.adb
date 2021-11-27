@@ -52,7 +52,7 @@ package body Porion.Commands.Steps is
       end loop;
 
       Builds.Services.Insert_Step (Context.Project_Service, Recipe,
-                                   Command.Insert_Pos, Kind, Step, Params);
+                                   Command.Insert_Pos - 1, Kind, Step, Params);
    end Add_Step;
 
    procedure Update_Step (Command : in out Command_Type;

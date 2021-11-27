@@ -68,12 +68,14 @@ EL_DIR=""
 UTIL_DIR=""
 SERVLET_DIR=""
 ASF_DIR=""
+KEYSTORE_ADA=""
 AC_SUBST(AWA_DIR)
 AC_SUBST(ADO_DIR)
 AC_SUBST(EL_DIR)
 AC_SUBST(UTIL_DIR)
 AC_SUBST(SERVLET_DIR)
 AC_SUBST(ASF_DIR)
+AC_SUBST(KEYSTORE_ADA)
 
 AC_OUTPUT(
 Makefile.conf agent/porion_agent.gpr server/porion_server.gpr porion_lib.gpr porion_tests.gpr

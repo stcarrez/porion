@@ -1,6 +1,6 @@
 [submodule "printer-toolkit"]
 	path = printer-toolkit
-	url = athena:/home/git/printer-toolkit.git
+	url = https://gitlab.com/stcarrez/printer-toolkit.git
 [submodule "ada-awa"]
 	path = awa
 	url = https://github.com/stcarrez/ada-awa.git

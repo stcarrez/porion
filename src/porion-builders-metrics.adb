@@ -80,9 +80,9 @@ package body Porion.Builders.Metrics is
       if Config.Exists ("metric") then
          declare
             Kind       : constant String := Config.Get ("metric");
-            Params     : constant UString := Config.Get ("params");            
+            Params     : constant UString := Config.Get ("params");
          begin
-            Controller.Metric := Porion.Metrics.Factories.Create (Kind, Session, Params);            
+            Controller.Metric := Porion.Metrics.Factories.Create (Kind, Session, Params);
             Controller.Params := Params;
          end;
       end if;

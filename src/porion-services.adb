@@ -96,6 +96,8 @@ package body Porion.Services is
             Log.Error ("Branch {0} not found in database", To_String (Ident.Branch));
             raise Not_Found;
          end if;
+
+         Log.Info ("Branch {0} loaded", Porion.Projects.To_String (Ident));
       end if;
 
       if Ident.Build > 0 then
@@ -121,6 +123,43 @@ package body Porion.Services is
          Nodes.Services.Load_Node (Service, To_String (Ident.Node));
       end if;
 
+      if Length (Ident.Recipe) > 0 then
+         Query.Clear;
+         Query.Bind_Param ("project_id", Service.Project.Get_Id);
+         Query.Bind_Param ("recipe_name", Ident.Recipe);
+         if not Service.Branch.Is_Null and not Service.Build_Node.Is_Null then
+            Query.Set_Filter ("o.project_id = :project_id AND o.name = :recipe_name "
+                              & "AND o.node_id = :node_id AND o.branch_id = :branch_id");
+            Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
+            Query.Bind_Param ("node_id", Service.Build_Node.Get_Id);
+         elsif not Service.Branch.Is_Null then
+            Query.Set_Filter ("o.project_id = :project_id AND o.name = :recipe_name "
+                              & " AND o.branch_id = :branch_id");
+            Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
+         elsif not Service.Build_Node.Is_Null then
+            Query.Set_Filter ("o.project_id = :project_id AND o.name = :recipe_name "
+                              & " AND o.node_id = :node_id");
+            Query.Bind_Param ("node_id", Service.Build_Node.Get_Id);
+         else
+            Query.Set_Filter ("o.project_id = :project_id AND o.name = :recipe_name ");
+         end if;
+         Service.Recipe.Find (Service.DB, Query, Found);
+         if not Found then
+            Log.Warn ("Recipe {0} not found for project {1}",
+                      To_String (Ident.Recipe), To_String (Ident.Name));
+            raise Not_Found;
+         end if;
+
+         Log.Info ("Recipe {0} loaded", Porion.Projects.To_String (Ident));
+         if Service.Build_Node.Is_Null then
+            Service.Build_Node := Porion.Nodes.Models.Node_Ref (Service.Recipe.Get_Node);
+         end if;
+         if Service.Branch.Is_Null then
+            Service.Branch := Porion.Projects.Models.Branch_Ref (Service.Recipe.Get_Branch);
+         end if;
+         return;
+      end if;
+
       if Service.Build_Node.Is_Null then
          Nodes.Services.Load_Default_Node (Service);
       end if;
@@ -130,10 +169,11 @@ package body Porion.Services is
       Query.Bind_Param ("node_id", Service.Build_Node.Get_Id);
       if not Service.Branch.Is_Null and not Service.Build_Node.Is_Null then
          Query.Set_Filter ("o.project_id = :project_id AND o.node_id = :node_id "
-                           & " AND o.branch_id = :branch_id");
+                           & " AND o.branch_id = :branch_id AND o.main_recipe = 1");
          Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
       else
-         Query.Set_Filter ("o.project_id = :project_id AND o.node_id = :node_id");
+         Query.Set_Filter ("o.project_id = :project_id AND o.node_id = :node_id "
+                           & "AND o.main_recipe = 1");
       end if;
       Service.Recipe.Find (Service.DB, Query, Found);
       if not Found then

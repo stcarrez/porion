@@ -105,6 +105,15 @@ private
                           Content    : in String := "") with
       Pre => Controller.Has_Build and Name'Length > 0;
 
+   --  Save a build percent metrix created from the value over the max.
+   --  The metric value is 10 times the percent value (ie, 45.6% is stored as 456).
+   procedure Save_Percent_Metric (Controller : in out Controller_Type;
+                                  Name       : in String;
+                                  Label      : in String;
+                                  Value      : in Integer;
+                                  Max        : in Integer) with
+      Pre => Controller.Has_Build and Max /= 0;
+
    procedure Collect (Controller : in out Controller_Type;
                       Path       : in String;
                       Executor   : in out Porion.Executors.Executor_Type'Class) is null;
@@ -125,5 +134,14 @@ private
 
    procedure Draw_Value_Bar is
       new PT.Charts.Draw_Bar (Integer);
+
+   type Integer_Array is array (Positive range <>) of Integer;
+
+   function Get_Integer_Count (Content : in String) return Integer;
+
+   --  Get the value identified by the name and if found, extract the integer list
+   --  defined in the value content.  Returns an empty array if there is no item.
+   function Get_Value_Array (Values : in Value_Map;
+                             Name   : in String) return Integer_Array;
 
 end Porion.Metrics;

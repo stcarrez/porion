@@ -17,7 +17,9 @@
 -----------------------------------------------------------------------
 with GNAT.Regpat;
 with EL.Contexts.Default;
+with PT.Colors;
 with Porion.Logs;
+with Porion.Reports;
 package body Porion.Metrics.Coverage is
 
    function Create (Session : in ADO.Sessions.Master_Session;
@@ -33,6 +35,11 @@ package body Porion.Metrics.Coverage is
       return Result.all'Access;
    end Create;
 
+   function Create return Reporter_Access is
+   begin
+      return new Reporter_Type;
+   end Create;
+
    overriding
    procedure Collect (Controller : in out Controller_Type;
                       Path       : in String;
@@ -46,7 +53,7 @@ package body Porion.Metrics.Coverage is
       --    functions..: 69.6% (514 of 738 functions)
       --    branches...: no data found
       LINE_REGEX : constant String
-         := "^ +lines\.+: [0-9]+\.[0-9]+% \(([0-9]+) of ([0-9]) lines\)";
+         := "^ +lines\.+: [0-9]+\.[0-9]+% \(([0-9]+) of ([0-9]+) lines\)";
       FUNC_REGEX : constant String
          := "^ +functions\.+: [0-9]+\.[0-9]+% \(([0-9]+) of ([0-9]+) functions\)";
 
@@ -91,14 +98,47 @@ package body Porion.Metrics.Coverage is
       end if;
 
       if Line_Covered_Count > 0 and Line_Total_Count > 0 then
-         Controller.Save_Metric ("lines_total", "Lines total", Line_Total_Count);
-         Controller.Save_Metric ("lines_covered", "Lines covered", Line_Covered_Count);
+         Controller.Save_Percent_Metric ("lines", "Lines coverage",
+                                         Line_Covered_Count, Line_Total_Count);
       end if;
 
       if Func_Covered_Count > 0 and Func_Total_Count > 0 then
-         Controller.Save_Metric ("func_total", "Functions total", Func_Total_Count);
-         Controller.Save_Metric ("func_covered", "Functions covered", Func_Covered_Count);
+         Controller.Save_Percent_Metric ("functions", "Functions coverage",
+                                         Func_Covered_Count, Func_Total_Count);
       end if;
    end Collect;
+
+   --  ------------------------------
+   --  Produce a report with the metric values collected during a build.
+   --  ------------------------------
+   overriding
+   procedure Report (Controller : in out Reporter_Type;
+                     Printer    : in out PT.Printer_Type'Class;
+                     Fields     : in PT.Texts.Field_Array;
+                     Values     : in Value_Map) is
+      Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
+      Chart  : PT.Charts.Printer_Type := PT.Charts.Create (Printer);
+      Green  : constant PT.Style_Type := Printer.Create_Style (PT.Colors.Green);
+      Red    : constant PT.Style_Type := Printer.Create_Style (PT.Colors.Red);
+      Lines  : constant Integer_Array := Get_Value_Array (Values, "lines");
+      Funcs  : constant Integer_Array := Get_Value_Array (Values, "functions");
+   begin
+      if Lines'Length = 2 and then Lines (2) /= 0 then
+         Writer.Put (Fields (1), -("Lines coverage"));
+         Writer.Put (Fields (2), Porion.Reports.Format_Percent (Lines (1), (Lines (2))) & "%");
+         Draw_Value_Bar (Chart, Writer.Get_Box (Fields (3)),
+                         Lines (1), 0, Lines (2), Green, Red);
+         Writer.New_Line;
+      end if;
+
+      if Funcs'Length = 2 and then Funcs (2) /= 0 then
+         Writer.Put (Fields (1), -("Functions coverage"));
+         Writer.Put (Fields (2), Porion.Reports.Format_Percent (Funcs (1), (Funcs (2))) & "%");
+         Draw_Value_Bar (Chart, Writer.Get_Box (Fields (3)),
+                         Funcs (1), 0, Funcs (2), Green, Red);
+         Writer.New_Line;
+      end if;
+
+   end Report;
 
 end Porion.Metrics.Coverage;

@@ -68,6 +68,13 @@ package body Porion.Commands.Set is
          end if;
          Porion.Projects.Services.Set_Rate_Factor (Context.Project_Service, Value, Modified);
 
+      elsif Name = "filter_rules" then
+         if not Context.Project_Service.Has_Recipe then
+            Commands.Error (-("The 'filter_rules' can be set on a recipe"));
+            return;
+         end if;
+         Porion.Projects.Services.Set_Filter_Rules (Context.Project_Service, Value, Modified);
+
       else
          Commands.Error (-("Unknown configuration '{0}"), Name);
          return;

@@ -52,6 +52,9 @@ package body Porion.Metrics.Factories is
          when METRIC_CLOC =>
             return Cloc.Create;
 
+         when METRIC_COVERAGE =>
+            return Coverage.Create;
+
          when others =>
             return null;
 

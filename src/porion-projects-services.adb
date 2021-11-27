@@ -615,4 +615,20 @@ package body Porion.Projects.Services is
       Service.DB.Commit;
    end Set_Rate_Factor;
 
+   --  ------------------------------
+   --  Set the recipe filter rules.
+   --  ------------------------------
+   procedure Set_Filter_Rules (Service  : in out Context_Type;
+                               Rules    : in String;
+                               Modified : out Boolean) is
+   begin
+      Log.Info ("Set filter rules to {0}", Rules);
+
+      Service.DB.Begin_Transaction;
+      Service.Recipe.Set_Filter_Rules (Rules);
+      Modified := Service.Recipe.Is_Modified;
+      Service.Recipe.Save (Service.DB);
+      Service.DB.Commit;
+   end Set_Filter_Rules;
+
 end Porion.Projects.Services;

@@ -62,6 +62,19 @@ AC_SUBST(USE_LIBINTL)
 AC_CHECK_PROG(HAVE_PANDOC,pandoc,yes)
 AC_CHECK_PROG(HAVE_DYNAMO,dynamo,yes)
 
+AWA_DIR=""
+ADO_DIR=""
+EL_DIR=""
+UTIL_DIR=""
+SERVLET_DIR=""
+ASF_DIR=""
+AC_SUBST(AWA_DIR)
+AC_SUBST(ADO_DIR)
+AC_SUBST(EL_DIR)
+AC_SUBST(UTIL_DIR)
+AC_SUBST(SERVLET_DIR)
+AC_SUBST(ASF_DIR)
+
 AC_OUTPUT(
 Makefile.conf agent/porion_agent.gpr server/porion_server.gpr porion_lib.gpr porion_tests.gpr
 )

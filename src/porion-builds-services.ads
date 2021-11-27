@@ -179,6 +179,14 @@ package Porion.Builds.Services is
    function Get_Queue_Size (Service : in Context_Type) return Natural
       with Pre => Service.Is_Open;
 
+   --  Update the ratings on the branch when a build is finished.
+   procedure Update_Branch_Ratings (Service : in out Context_Type) with
+      Pre => Service.Has_Project and Service.Has_Branch;
+
+   --  Update the ratings on the project by looking at the branches.
+   procedure Update_Project_Ratings (Service : in out Context_Type) with
+      Pre => Service.Has_Project;
+
 private
 
    --  Returns True if the recipe is contained in the build queue.
@@ -208,13 +216,5 @@ private
    procedure Update_Build_Reason (Service     : in out Context_Type;
                                   Is_Finished : in Boolean) with
       Pre => not Service.Queue.Is_Null;
-
-   --  Update the ratings on the branch when a build is finished.
-   procedure Update_Branch_Ratings (Service : in out Context_Type) with
-      Pre => Service.Has_Project and Service.Has_Branch and Service.Has_Build;
-
-   --  Update the ratings on the project by looking at the branches.
-   procedure Update_Project_Ratings (Service : in out Context_Type) with
-      Pre => Service.Has_Project;
 
 end Porion.Builds.Services;

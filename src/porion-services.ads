@@ -57,9 +57,13 @@ package Porion.Services is
    --  Get the current project id.
    function Get_Project_Id (Service : in Context_Type) return ADO.Identifier;
 
-   --  Get the project branch identification string in the form <project>^<branch>.
+   --  Get the project branch identification string in the form <project>#<branch>.
    function Get_Branch_Name (Service : in Context_Type) return String with
       Pre => Service.Has_Branch;
+
+   --  Get the identification of the current recipe in the form <project>#<branc>~<recipe>.
+   function Get_Recipe_Name (Service : in Context_Type) return String with
+      Pre => Service.Has_Recipe;
 
    procedure Load_Project (Service : in out Context_Type;
                            Name    : in String);
@@ -70,7 +74,8 @@ package Porion.Services is
       Post => Service.Has_Project
          and (Service.Has_Branch = (Projects.Has_Branch (Ident)
                                     or Projects.Has_Recipe (Ident)
-                                    or Projects.Has_Build (Ident)))
+                                    or Projects.Has_Build (Ident)
+                                    or Service.Has_Recipe))
          and (Service.Has_Build = Projects.Has_Build (Ident));
 
    procedure Open (Service  : in out Context_Type;

@@ -110,7 +110,11 @@ package body Porion.Commands.Add is
       Ident := Porion.Projects.Parse (Target);
 
       begin
-         Context.Project_Service.Load_Project (To_String (Ident.Name));
+         Context.Project_Service.Load (Ident);
+         if not Context.Project_Service.Has_Recipe then
+            Commands.Error (-("missing source recipe identification to copy"));
+            return;
+         end if;
 
       exception
          when Porion.Services.Not_Found =>
@@ -120,9 +124,7 @@ package body Porion.Commands.Add is
       end;
 
       Builds.Services.Copy_Recipe (Context.Project_Service,
-                                   To_String (Ident.Name),
-                                   To_String (Ident.Branch),
-                                   To_String (Ident.Node),
+                                   Command.Recipe.all,
                                    Context.Project_Service.Recipe);
 
       if Context.Project_Service.Branch.Is_Null then
@@ -158,7 +160,7 @@ package body Porion.Commands.Add is
       end if;
       Context.Open;
 
-      if Command.Recipe then
+      if Command.Recipe'Length > 0 then
          if Args.Get_Count = 2 then
             Command.Add_Recipe (Args.Get_Argument (1), Args.Get_Argument (2), Context);
          else
@@ -179,7 +181,9 @@ package body Porion.Commands.Add is
    begin
       Drivers.Command_Type (Command).Setup (Config, Context);
       GC.Define_Switch (Config, Command.Recipe'Access,
-                        "-r", "--recipe", -("Add a build configuration to a project"));
+                        "-r=", "--recipe=",
+                        Argument => "IDENT",
+                        Help     =>  -("Add a build recipe to a project"));
       GC.Define_Switch (Config, Command.Quiet'Access,
                         "-q", "--quiet", -("Quiet execution don't print the build steps"));
    end Setup;

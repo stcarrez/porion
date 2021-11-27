@@ -8,7 +8,10 @@
         <property type='ADO.Identifier' name="recipe_id">
             <comment>the build recipe id.</comment>
         </property>
-        <property type='Porion.Builds.Models.Build_Status_Type' name="build_status">
+        <property type='Porion.Rate_Type' name="rate_factor">
+            <comment>the recipe rate factor.</comment>
+        </property>
+        <property type='Porion.Builds.Models.Build_Status_Type' name="build_status" not-null="no">
             <comment>the last build status.</comment>
         </property>
         <property type='String' name="build_tag">
@@ -36,18 +39,19 @@
         <sql>
           SELECT
           recipe.id,
+          recipe.rate_factor,
           build.status,
-          build.tag,
-          build.number,
-          build.pass_count,
-          build.fail_count,
-          build.timeout_count,
+          COALESCE(build.tag, ''),
+          COALESCE(build.number, 0),
+          COALESCE(build.pass_count, 0),
+          COALESCE(build.fail_count, 0),
+          COALESCE(build.timeout_count, 0),
           build.finish_date
           FROM porion_recipe AS recipe
-          INNER JOIN porion_last_build AS last_build ON last_build.recipe_id = recipe.id
-          INNER JOIN porion_build AS build ON last_build.build_id = build.id
-          WHERE recipe.project_id = 1 AND
-             build.id IN (SELECT MAX(sb.build_id) FROM porion_last_build AS sb WHERE sb.recipe_id = recipe.id)
+          LEFT JOIN porion_last_build AS last_build ON last_build.recipe_id = recipe.id
+          LEFT JOIN porion_build AS build ON last_build.build_id = build.id
+          WHERE recipe.project_id = :project_id AND recipe.branch_id = :branch_id AND
+             (build.id IS NULL OR build.id IN (SELECT MAX(sb.build_id) FROM porion_last_build AS sb WHERE sb.recipe_id = recipe.id))
         </sql>
     </query>
 

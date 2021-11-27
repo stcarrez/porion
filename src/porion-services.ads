@@ -51,6 +51,9 @@ package Porion.Services is
    function Has_Build (Service : in Context_Type) return Boolean is
       (not Service.Build.Is_Null);
 
+   function Has_Recipe (Service : in Context_Type) return Boolean is
+      (not Service.Recipe.Is_Null);
+
    --  Get the current project id.
    function Get_Project_Id (Service : in Context_Type) return ADO.Identifier;
 

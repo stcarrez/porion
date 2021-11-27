@@ -209,4 +209,12 @@ private
                                   Is_Finished : in Boolean) with
       Pre => not Service.Queue.Is_Null;
 
+   --  Update the ratings on the branch when a build is finished.
+   procedure Update_Branch_Ratings (Service : in out Context_Type) with
+      Pre => Service.Has_Project and Service.Has_Branch and Service.Has_Build;
+
+   --  Update the ratings on the project by looking at the branches.
+   procedure Update_Project_Ratings (Service : in out Context_Type) with
+      Pre => Service.Has_Project;
+
 end Porion.Builds.Services;

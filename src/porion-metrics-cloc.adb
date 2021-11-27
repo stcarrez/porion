@@ -210,17 +210,6 @@ package body Porion.Metrics.Cloc is
       return new Reporter_Type;
    end Create;
 
-   function Format (Value : in Integer;
-                    Unit  : in String;
-                    Dv    : in Integer) return String is
-      Img : constant String := Util.Strings.Image (Value);
-   begin
-      if Value = 0 or Dv = 0 then
-         return Img & Unit;
-      end if;
-      return Img & Unit & " (" & Reports.Format_Percent (Dv, Value) & "%)";
-   end Format;
-
    --  ------------------------------
    --  Produce a report with the metric values collected during a build.
    --  ------------------------------
@@ -238,28 +227,25 @@ package body Porion.Metrics.Cloc is
 
       Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
       Chart  : PT.Charts.Printer_Type := PT.Charts.Create (Printer);
-      Total  : constant Stat_Info_Type := Get_Stat_Info (Values, "total_size");
-      Files  : constant Stat_Info_Type := Get_Stat_Info (Values, "file_count");
-      Dirs   : constant Stat_Info_Type := Get_Stat_Info (Values, "directory_count");
       Green  : constant PT.Style_Type := Printer.Create_Style (PT.Colors.Green);
       Red    : constant PT.Style_Type := Printer.Create_Style (PT.Colors.Red);
       List   : Porion.Metrics.Value_Vector;
       Max    : Natural := 0;
    begin
       for Value of Values loop
-          List.Append (Value);
-          if Value.Value > Max then
-             Max := Value.Value;
-          end if;
+         List.Append (Value);
+         if Value.Value > Max then
+            Max := Value.Value;
+         end if;
       end loop;
       Sort.Sort (List);
 
       for Value of List loop
-          Writer.Put (Fields (1), Value.Label);
-          Writer.Put_Int (Fields (2), Value.Value);
-          Draw_Value_Bar (Chart, Writer.Get_Box (Fields (3)),
-                          Value.Value, 0, Max, Green, Red);
-          Writer.New_Line;
+         Writer.Put (Fields (1), Value.Label);
+         Writer.Put_Int (Fields (2), Value.Value);
+         Draw_Value_Bar (Chart, Writer.Get_Box (Fields (3)),
+                         Value.Value, 0, Max, Green, Red);
+         Writer.New_Line;
       end loop;
 
    end Report;

@@ -62,6 +62,15 @@ package body Porion.Services is
       return Project_Name & "^" & Branch_Name;
    end Get_Branch_Name;
 
+   --  ------------------------------
+   --  Get the identification of the current recipe in the form <project>#<branc>~<recipe>.
+   --  ------------------------------
+   function Get_Recipe_Name (Service : in Context_Type) return String is
+      Branch_Name : constant String := Service.Get_Branch_Name;
+   begin
+      return Branch_Name & "~" & Service.Recipe.Get_Name;
+   end Get_Recipe_Name;
+
    procedure Load_Project (Service : in out Context_Type;
                            Name    : in String) is
       Query : ADO.SQL.Query;
@@ -179,6 +188,9 @@ package body Porion.Services is
       if not Found then
          Log.Error ("Recipe not found");
          raise Not_Found;
+      end if;
+      if Service.Branch.Is_Null then
+         Service.Branch := Porion.Projects.Models.Branch_Ref (Service.Recipe.Get_Branch);
       end if;
    end Load;
 

@@ -33,7 +33,8 @@ with ADO.Sqlite;
 
 with Porion.Configs;
 with Porion.Projects.Services;
-with Porion.Resources.Schema;
+with Porion.Nodes.Services;
+with Porion.Resources.Server_Schema;
 with Porion.Resources.Queries;
 with Porion.Applications;
 procedure Porion.Server is
@@ -70,7 +71,7 @@ procedure Porion.Server is
 
       Config_Path : constant String := Server_Commands.Get_Configuration_Path (Context);
       Schema      : constant Porion.Resources.Content_Access
-        := Porion.Resources.Schema.Get_Content ("create-porion_server-sqlite");
+        := Porion.Resources.Server_Schema.Get_Content ("create-porion_server-sqlite");
       Project_Service : Porion.Projects.Services.Context_Type;
    begin
       if Args.Get_Count = 0 then
@@ -93,8 +94,9 @@ procedure Porion.Server is
             Porion.Configs.Save;
          end;
          Project_Service.Open (Resources.Queries.Get_Content'Access, Schema);
-         Project_Service.Add_Node (Hostname => "localhost",
-                                   Login    => "");
+         Nodes.Services.Add_Default_Node (Project_Service,
+                                          Hostname => "localhost",
+                                          Login    => "");
       end if;
    end Execute;
 

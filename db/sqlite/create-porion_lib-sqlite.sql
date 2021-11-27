@@ -329,6 +329,8 @@ CREATE TABLE IF NOT EXISTS porion_branch (
   `main_branch` TINYINT NOT NULL,
   /* the last build number that was used. */
   `last_build_number` INTEGER NOT NULL,
+  /* the build progress. */
+  `build_progress` INTEGER NOT NULL,
   /*  */
   `project_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`)
@@ -379,6 +381,8 @@ CREATE TABLE IF NOT EXISTS porion_project (
   `check_delay` INTEGER NOT NULL,
   /* the next expected check date and time. */
   `next_check_date` DATETIME NOT NULL,
+  /* the build progress of all branches. */
+  `build_progress` INTEGER NOT NULL,
   PRIMARY KEY (`id`)
 );
 /*  */

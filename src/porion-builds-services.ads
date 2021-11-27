@@ -139,11 +139,11 @@ package Porion.Builds.Services is
                            List    : in out Porion.Builds.Models.Recipe_Vector) with
      Pre => Service.Is_Open;
 
+   --  Copy the recipe to another recipe with the given name.
    procedure Copy_Recipe (Service  : in out Context_Type;
-                          Project  : in String;
-                          Branch   : in String;
-                          Node     : in String;
-                          Recipe   : in out Models.Recipe_Ref);
+                          Name     : in String;
+                          Recipe   : in out Models.Recipe_Ref) with
+      Pre => Service.Is_Open and Service.Has_Recipe;
 
    procedure Guess (Service  : in out Context_Type;
                     Path     : in String;

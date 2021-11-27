@@ -31,6 +31,8 @@ package Porion.Projects.Services is
 
    Not_Found    : exception renames Porion.Services.Not_Found;
 
+   Bad_Value    : exception;
+
    subtype Context_Type is Porion.Services.Context_Type;
 
    --  Add a project with the source information.
@@ -77,5 +79,30 @@ package Porion.Projects.Services is
 
    procedure Update (Service : in out Context_Type;
                      Project : in out Porion.Projects.Models.Project_Ref);
+
+   procedure Set_Name (Service  : in out Context_Type;
+                       Name     : in String;
+                       Modified : out Boolean) with
+      Pre => Service.Has_Project;
+
+   --  Set the description associated with the project.
+   procedure Set_Description (Service     : in out Context_Type;
+                              Description : in String;
+                              Modified    : out Boolean) with
+      Pre => Service.Has_Project;
+
+   --  Set the project status to enable, disable or put the project onhold.
+   --  Raises Bad_Value if the status value is not correct.
+   procedure Set_Status (Service  : in out Context_Type;
+                         Status   : in String;
+                         Modified : out Boolean) with
+      Pre => Service.Has_Project;
+
+   --  Set the branch or recipe rate factor.
+   --  Raises Bad_Value if the factor is not a number.
+   procedure Set_Rate_Factor (Service  : in out Context_Type;
+                              Factor   : in String;
+                              Modified : out Boolean) with
+      Pre => Service.Has_Project and Service.Has_Branch;
 
 end Porion.Projects.Services;

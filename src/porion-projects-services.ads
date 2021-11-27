@@ -107,6 +107,12 @@ package Porion.Projects.Services is
                               Modified : out Boolean) with
       Pre => Service.Has_Project and Service.Has_Branch;
 
+   --  Set the recipe filter rules.
+   procedure Set_Filter_Rules (Service  : in out Context_Type;
+                               Rules    : in String;
+                               Modified : out Boolean) with
+      Pre => Service.Has_Project and Service.Has_Recipe;
+
 private
 
    procedure Write_Date (Stream : in out Util.Serialize.IO.Output_Stream'Class;

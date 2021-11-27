@@ -15,7 +15,7 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Util.Strings;
+with Util.Strings.Tokenizers;
 with ADO.Queries;
 with Porion.Metrics.Models;
 package body Porion.Metrics is
@@ -88,6 +88,23 @@ package body Porion.Metrics is
       Build_Metric.Save (Controller.Session);
    end Save_Metric;
 
+   function Get_Percent (Value, Max : in Integer) return Integer
+      is ((Value * 1000) / Max);
+
+   --  ------------------------------
+   --  Save a build percent metrix created from the value over the max.
+   --  The metric value is 10 times the percent value (ie, 45.6% is stored as 456).
+   --  ------------------------------
+   procedure Save_Percent_Metric (Controller : in out Controller_Type;
+                                  Name       : in String;
+                                  Label      : in String;
+                                  Value      : in Integer;
+                                  Max        : in Integer) is
+      Content : constant String := Util.Strings.Image (Value) & ":" & Util.Strings.Image (Max);
+   begin
+      Controller.Save_Metric (Name, Label, Get_Percent (Value, Max), Content);
+   end Save_Percent_Metric;
+
    function Get_Stat_Info (Values : in Value_Map;
                            Name   : in String) return Stat_Info_Type is
       Result : Stat_Info_Type;
@@ -118,5 +135,57 @@ package body Porion.Metrics is
       end if;
       return Result;
    end Get_Stat_Info;
+
+   Empty_Array : constant Integer_Array (1 .. 0) := (others => <>);
+
+   function Get_Integer_Count (Content : in String) return Integer is
+      Count : Natural := 1;
+   begin
+      if Content'Length = 0 then
+         return 0;
+      end if;
+      for C of Content loop
+         if C = ':' then
+            Count := Count + 1;
+         end if;
+      end loop;
+      return Count;
+   end Get_Integer_Count;
+
+   --  ------------------------------
+   --  Get the value identified by the name and if found, extract the integer list
+   --  defined in the value content.  Returns an empty array if there is no item.
+   --  ------------------------------
+   function Get_Value_Array (Values : in Value_Map;
+                             Name   : in String) return Integer_Array is
+      Pos : constant Value_Maps.Cursor := Values.Find (Name);
+   begin
+      if not Value_Maps.Has_Element (Pos) then
+         return Empty_Array;
+      end if;
+      declare
+         procedure Add_Value (Token : in String;
+                              Done  :  out Boolean);
+
+         Content : constant String := To_String (Value_Maps.Element (Pos).Content);
+         Length  : constant Natural := Get_Integer_Count (Content);
+         Result  : Integer_Array (1 .. Length);
+         Index   : Natural := 0;
+
+         procedure Add_Value (Token : in String;
+                              Done  :  out Boolean) is
+         begin
+            Done := False;
+            Index := Index + 1;
+            Result (Index) := Integer'Value (Token);
+         end Add_Value;
+
+      begin
+         Util.Strings.Tokenizers.Iterate_Tokens (Content => Content,
+                                                 Pattern => ":",
+                                                 Process => Add_Value'Access);
+         return Result;
+      end;
+   end Get_Value_Array;
 
 end Porion.Metrics;

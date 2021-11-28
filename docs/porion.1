@@ -1,6 +1,6 @@
 .\"
 .\"
-.TH PORION 1 "Oct 31, 2021" "Continuous build system"
+.TH PORION 1 "Nov 28, 2021" "Continuous build system"
 .SH NAME
 porion - Continuous build system
 .SH SYNOPSIS
@@ -15,7 +15,7 @@ porion - Continuous build system
 \fIporion\fR is a continuous integration server and agent that helps automate the building,
 testing and deployment of software development projects written in any language.
 \fIporion\fR maintains a list of projects with build recipes to build these projects.
-It periodically checks for changes in projects and schedule a build when a project
+It periodically checks for changes in projects and schedules a build when a project
 is modified.  \fIporion\fR uses a build node to build a project and the build node can
 be the current host or a specific remote host registered for that purpose.
 .\"
@@ -34,13 +34,38 @@ the \fIporion\fR workspace directory is created by using the \fIporion init\fR c
 .IP \(bu 4
 projects are registered by using the \fIporion add\fR command with enough information to
 allow \fIporion\fR to checkout the source and detect changes.  When a project is added
-\fIporion\fR will guess a set of build recipes for the new project.
+\fIporion\fR will guess a set of build recipes for the new project,
 .\"
 .IP \(bu 4
 project build recipes and build steps are updated and configured on the project
-by using either \fIporion add --recipe\fR or \fIporion step\fR commands.
+by using either \fIporion add --recipe\fR or \fIporion step\fR commands.  These build
+recipes describe the steps that must be executed to build, test and deploy the project,
 .\"
 .IP \(bu 4
+source changes are detected by running the \fIporion check\fR command.  This command can
+be executed explicitly for a given project or globally from a
+.IR cron (8)
+job for example.  When it detect a change in a project, it adds the project to the
+build queue,
+.\"
+.IP \(bu 4
+the build queue is processed by running the \fIporion build\fR command.
+It looks at the build queue and executes the build either on the current host or
+on the build node specified by the recipe,
+.\"
+.IP \(bu 4
+when the build is finished, the user can look at the build result by
+using either the \fIporion info\fR or the \fIporion logs\fR commands.
+.\"
+.PP
+\fIporion\fR uses an identification string to reference a project, a branch,
+a build recipe or a build.  That identification string has the following pattern:
+.PP
+.RE
+.RS 0
+\fIproject-name\fR[#\fIbranch-name\fR][~\fIrecipe-name\fR][@\fIhostname\fR][:\fIbuild-number\fR]
+.RE
+.PP
 .\"
 .PP
 .SH OPTIONS
@@ -73,20 +98,31 @@ configuration file.
 porion \fBinit\fR \fIdirectory\fR
 .RE
 .PP
-Setup the build workpace directory.
+Setup the build workspace directory used by the porion build agent.
+This directory is created by the command and is used for:
+.IP \(bu 4
+the SQLite database that describes projects, builds, tests
+.IP \(bu 4
+the project directories where projects are built
 .\"
 .SS The add command
 .RS 0
 porion \fBadd\fP \fIurl\fR
 .RE
 .RS 0
-porion \fBadd\fP \fI--recipe\fR {\fIname\fR...}
+porion \fBadd\fP \fI--recipe\fR {\fIname\fR} {\fIident\fR} [\fIsource-ident\fR]
 .RE
 .PP
-Create a new project with the source scheme.
+The \fIporion add\fR command is used to add a new project or a new recipe to an existing project.
+The first form creates a new project with the source scheme.
 A default project name is created from the source scheme name
 and a set of build recipes are guessed by analysing the sources.
 .\"
+.PP
+The second form adds a new recipe with the given identification and initializes
+it from either the main project recipe or from the given source identification
+recipe.  You may also specify a build number as the identification in which case
+the recipe used by that build number will be copied.
 .\"
 .SS The build command
 .RS 0
@@ -194,34 +230,24 @@ be modified with the
 .B config
 command.
 .\"
-.SS gpg-encrypt
-This property defines the
-.IR gpg2 (1)
-command to be used to encrypt a content.  The content to encrypt is
-passed in the standard input and the encrypted content is read from
-the standard output.  The GPG key parameter can be retrieved
-by using the
-.I $USER
-pattern.
+.SS workspace_dir
+This property defines the absolute path of the
+.I porion
+workspace directory.
 .\"
-.SS gpg-decrypt
-This property defines the
-.IR gpg2 (1)
-command to be used to decrypt a content.  The content to decrypt is
-passed in the standard input and the decrypted content is read from
-the standard output.
+.SS project_dir
+This property defines the absolute path where project directories
+are stored.  The default is
+.IR workspace_dir /projects.
 .\"
-.SS gpg-list-keys
-This property defines the
-.IR gpg2 (1)
-command to be used to retrieve the list of available secret keys.
-This command is executed when the keystore file is protected by a
-GPG key to identify the possible GPG Key ids that
-are capable of decrypting it.
+.SS rules_dir
+This property defines the path of the rules directory which contains
+description of filtering rules that can be configured in a project recipe.
 .\"
 .SH SEE ALSO
 \fIeditor(1)\fR, \fIupdate-alternative(1)\fR, \fImake(1)\fR,
-\fImvn(1)\fR
+\fImvn(1)\fR,
+\fIcron(8)\fR
 .\"
 .\"
 .SH AUTHOR

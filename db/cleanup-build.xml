@@ -33,4 +33,11 @@
        </sql>
     </query>
 
+    <query name='cleanup-build-last-build'>
+       <comment>Cleanup the project last build reference.</comment>
+       <sql>
+    DELETE FROM porion_last_build WHERE build_id = :build_id
+       </sql>
+    </query>
+
 </query-mapping>

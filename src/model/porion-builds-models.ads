@@ -1361,6 +1361,8 @@ package Porion.Builds.Models is
 
    Query_Cleanup_Build_Test_Run_Group : constant ADO.Queries.Query_Definition_Access;
 
+   Query_Cleanup_Build_Last_Build : constant ADO.Queries.Query_Definition_Access;
+
 
    Query_Cleanup_Recipe_Build_Step : constant ADO.Queries.Query_Definition_Access;
 
@@ -2194,6 +2196,12 @@ private
                                      File => File_1.File'Access);
    Query_Cleanup_Build_Test_Run_Group : constant ADO.Queries.Query_Definition_Access
    := Def_Cleanup_Build_Test_Run_Group.Query'Access;
+
+   package Def_Cleanup_Build_Last_Build is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-build-last-build",
+                                     File => File_1.File'Access);
+   Query_Cleanup_Build_Last_Build : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Build_Last_Build.Query'Access;
 
    package File_2 is
       new ADO.Queries.Loaders.File (Path => "cleanup-recipe.xml",

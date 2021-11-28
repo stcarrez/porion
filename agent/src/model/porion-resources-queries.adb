@@ -83,7 +83,12 @@ package body Porion.Resources.Queries is
        & "ent>Cleanup the test run group of a build.</comment>" & ASCII.LF & "    "
        & "   <sql>" & ASCII.LF & "    DELETE FROM porion_test_run_group WHERE pori"
        & "on_test_run_group.build_id = :build_id" & ASCII.LF & "       </sql>" & ASCII.LF
-       & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+       & "    </query>" & ASCII.LF & ASCII.LF & "    <query name='cleanup-build-l"
+       & "ast-build'>" & ASCII.LF & "       <comment>Cleanup the project last buil"
+       & "d reference.</comment>" & ASCII.LF & "       <sql>" & ASCII.LF & "    DE"
+       & "LETE FROM porion_last_build WHERE build_id = :build_id" & ASCII.LF & "  "
+       & "     </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</que"
+       & "ry-mapping>" & ASCII.LF;
 
    C_2 : aliased constant String := "<query-mapping package='Porion.Projects.M"
        & "odels'>" & ASCII.LF & "    <description>" & ASCII.LF & "      Queries to"

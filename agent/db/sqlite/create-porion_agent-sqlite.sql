@@ -233,7 +233,7 @@ CREATE TABLE IF NOT EXISTS porion_recipe_step (
   /*  */
   `execution` TINYINT NOT NULL,
   /*  */
-  `previous_version_id` BIGINT ,
+  `next_version_id` BIGINT ,
   /* the build configuration that contains this build step.
 the recipe that this step belongs to */
   `recipe_id` BIGINT NOT NULL,

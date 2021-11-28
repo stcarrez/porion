@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 with Ada.Calendar.Formatting;
 with Ada.Calendar.Time_Zones;
+with Ada.Unchecked_Deallocation;
 with Util.Strings;
 with ADO.Queries;
 with Porion.Projects;
@@ -28,6 +29,10 @@ package body Porion.Reports is
    function Get_Tag (Tag : in UString) return String;
    function Get_Image (Step : in Porion.Builds.Step_Type) return String;
    function Get_Kind (Kind : in Porion.Nodes.Node_Type) return String;
+
+   procedure Free is
+      new Ada.Unchecked_Deallocation (Object => Porion.Metrics.Reporter_Type'Class,
+                                      Name   => Porion.Metrics.Reporter_Access);
 
    To_Digit : constant array (0 .. 9) of Character := "0123456789";
 
@@ -761,6 +766,8 @@ package body Porion.Reports is
                            Printer  : in out PT.Printer_Type'Class;
                            Fields   : in PT.Texts.Field_Array;
                            Styles   : in Style_Configuration) is
+      pragma Unreferenced (Styles);
+
       use type Porion.Metrics.Metric_Type;
       use type Porion.Metrics.Reporter_Access;
 
@@ -781,11 +788,11 @@ package body Porion.Reports is
          end if;
       end loop;
 
-      if Values.Is_Empty then
-         return;
+      if not Values.Is_Empty then
+         Controller.Report (Printer, Fields, Values);
       end if;
 
-      Controller.Report (Printer, Fields, Values);
+      Free (Controller);
    end List_Metrics;
 
 end Porion.Reports;

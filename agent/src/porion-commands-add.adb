@@ -136,6 +136,10 @@ package body Porion.Commands.Add is
       Context.Notice (-("New recipe added to project {0} branch {1}"),
                       To_String (Ident.Name), Context.Project_Service.Branch.Get_Name);
 
+      if not Command.Quiet then
+         Porion.Commands.Print_Recipe_Steps (Context);
+      end if;
+
    exception
       when Porion.Nodes.Services.Not_Found =>
          Commands.Error (-("invalid build node '{0}'"), To_String (Ident.Node));

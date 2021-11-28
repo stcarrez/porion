@@ -12,3 +12,6 @@ Usage: porion check [--all] [project ...]
   specified in the command line.
 
   The --all option allows to force a check for every active project.
+
+  Use 'porion set <project> check_delay=<delay>' to configure the
+  per-project check delay.

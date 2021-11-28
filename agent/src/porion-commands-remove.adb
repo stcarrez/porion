@@ -16,6 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Porion.Projects.Services;
+with Porion.Builds.Services;
 with Porion.Services;
 package body Porion.Commands.Remove is
 
@@ -33,27 +34,50 @@ package body Porion.Commands.Remove is
          Porion.Commands.Error (-("missing project name"));
          return;
       end if;
+
       Context.Open;
 
       for I in 1 .. Args.Get_Count loop
          declare
-            Project_Name : constant String := Args.Get_Argument (I);
+            Arg   : constant String := Args.Get_Argument (I);
+            Ident : Porion.Projects.Ident_Type;
          begin
-            if not Command.Interactive
-              or else Command.Force
-              or else Confirm (Format (-("remove project '{0}'?"), Project_Name))
-            then
-               Context.Project_Service.Load_Project (Project_Name);
-               Projects.Services.Remove_Project (Context.Project_Service, Project_Name);
-               Context.Notice (-("Project {0} is removed"), Project_Name);
+            Ident := Porion.Projects.Parse (Arg);
+            Context.Project_Service.Load (Ident);
+
+            if Porion.Projects.Has_Build (Ident) then
+               if not Command.Interactive
+                 or else Command.Force
+                 or else Confirm (Format (-("remove build '{0}'?"), Arg))
+               then
+                  Builds.Services.Remove_Build (Context.Project_Service);
+               end if;
+            elsif Porion.Projects.Has_Recipe (Ident) then
+               if not Command.Interactive
+                 or else Command.Force
+                 or else Confirm (Format (-("remove build recipe '{0}'?"), Arg))
+               then
+                  Builds.Services.Remove_Recipe (Context.Project_Service);
+               end if;
+            else
+               if not Command.Interactive
+                 or else Command.Force
+                 or else Confirm (Format (-("remove project '{0}'?"), Arg))
+               then
+                  Projects.Services.Remove_Project (Context.Project_Service, Arg);
+                  Context.Notice (-("Project {0} is removed"), Arg);
+               end if;
             end if;
 
          exception
             when Porion.Services.Not_Found =>
                if not Command.Force then
-                  Porion.Commands.Error (-("project '{0}' not found"),
-                                         Project_Name);
+                  Context.Error_Not_Found (Ident);
                end if;
+
+            when Porion.Projects.Invalid_Ident =>
+               Commands.Error (-("invalid project or build identifier: {0}"), Arg);
+
          end;
       end loop;
    end Execute;

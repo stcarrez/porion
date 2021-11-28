@@ -92,6 +92,7 @@ package body Porion.Projects.Services is
          Service.Branch.Set_Name (Name);
          Service.Branch.Set_Main_Branch (Is_Head);
          Service.Branch.Set_Tag (Item.Tag);
+         Service.Branch.Set_Rate_Factor (100);
          if Is_Head then
             Service.Branch.Set_Status (Models.BUILD_REQUIRED);
          else

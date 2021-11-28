@@ -1,0 +1,36 @@
+<query-mapping package='Porion.Builds.Models'>
+    <description>
+      Queries to cleanup a build
+    </description>
+
+    <query name='cleanup-build-step'>
+       <comment>Cleanup the build steps of a project.</comment>
+       <sql>
+    DELETE FROM porion_build_step WHERE build_id = :build_id
+       </sql>
+    </query>
+
+    <query name='cleanup-build-metrics'>
+       <comment>Cleanup the build metrics.</comment>
+       <sql>
+    DELETE FROM porion_build_metric WHERE build_id = :build_id
+       </sql>
+    </query>
+
+    <query name='cleanup-build-test-run'>
+       <comment>Cleanup the test run of a build.</comment>
+       <sql>
+    DELETE FROM porion_test_run WHERE group_id IN
+      (SELECT porion_test_run_group.id FROM porion_test_run_group
+                WHERE porion_test_run_group.build_id = :build_id)
+       </sql>
+    </query>
+
+    <query name='cleanup-build-test-run-group'>
+       <comment>Cleanup the test run group of a build.</comment>
+       <sql>
+    DELETE FROM porion_test_run_group WHERE porion_test_run_group.build_id = :build_id
+       </sql>
+    </query>
+
+</query-mapping>

@@ -92,7 +92,9 @@
             LEFT JOIN porion_branch AS branch ON project.id = branch.project_id AND branch.status != 0
             LEFT JOIN porion_last_build AS last_build ON last_build.branch_id = branch.id
             LEFT JOIN porion_build AS build ON last_build.build_id = build.id
-            WHERE dependency.owner_id = :project_id
+            WHERE dependency.owner_id = :project_id AND
+            (build.id IS NULL OR build.id IN (SELECT MAX(sb.build_id) FROM porion_last_build AS sb
+                INNER JOIN porion_branch AS br ON sb.branch_id = br.id WHERE br.project_id = project.id))
         </sql>
         <sql-count>
             SELECT

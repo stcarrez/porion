@@ -596,11 +596,14 @@ package body Porion.Resources.Queries is
        & "on_last_build AS last_build ON last_build.branch_id = branch.id" & ASCII.LF
        & "            LEFT JOIN porion_build AS build ON last_build.build_id = bui"
        & "ld.id" & ASCII.LF & "            WHERE dependency.owner_id = :project_id"
-       & ASCII.LF & "        </sql>" & ASCII.LF & "        <sql-count>" & ASCII.LF
-       & "            SELECT" & ASCII.LF & "            count(project.id)" & ASCII.LF
-       & "            FROM porion_project AS project" & ASCII.LF & "        </sql-"
-       & "count>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</query-ma"
-       & "pping>" & ASCII.LF;
+       & " AND" & ASCII.LF & "            (build.id IS NULL OR build.id IN (SELECT"
+       & " MAX(sb.build_id) FROM porion_last_build AS sb" & ASCII.LF & "          "
+       & "      INNER JOIN porion_branch AS br ON sb.branch_id = br.id WHERE br.pr"
+       & "oject_id = project.id))" & ASCII.LF & "        </sql>" & ASCII.LF & "   "
+       & "     <sql-count>" & ASCII.LF & "            SELECT" & ASCII.LF & "      "
+       & "      count(project.id)" & ASCII.LF & "            FROM porion_project A"
+       & "S project" & ASCII.LF & "        </sql-count>" & ASCII.LF & "    </query"
+       & ">" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
    C_11 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List the tests" & ASCII.LF & " "

@@ -47,4 +47,8 @@ private
                      Fields     : in PT.Texts.Field_Array;
                      Values     : in Value_Map);
 
+   function Format (Value : in Integer;
+                    Unit  : in String;
+                    Dv    : in Integer) return String;
+
 end Porion.Metrics.DiskUsage;

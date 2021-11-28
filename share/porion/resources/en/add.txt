@@ -1,15 +1,22 @@
 porion add: add a new project or a new recipe
 
+  The porion add command is used to add a new project or a new recipe
+  to an existing project.
+
 Usage: porion add {<git|tar>}
 
   Create a new project with the source scheme.
   A default project name is created from the source scheme name
   and a set of build recipes are guessed by analysing the sources.
 
-Usage: porion add --recipe {<ident>} [<source-ident>]
+Usage: porion add --recipe {name} {<ident>} [<source-ident>]
 
   Add a new recipe with the given identification and initialize
-  it from either the main project recipe or the given source identification
-  recipe.  The recipe identification string is composed of:
+  it from either the main project recipe or from the given source
+  identification recipe.  The recipe identification string is composed of:
 
   <project-name>[#<branch-name>][~<recipe-name>][@<node-name]
+
+  You may also specify a build number with the pattern:
+
+  <project-name>:<build-number>

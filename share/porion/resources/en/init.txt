@@ -2,7 +2,7 @@ porion init: setup the build agent node
 
 Usage: porion init <directory>
 
-  Setup the directory for the porion build agent.
+  Setup the build workspace directory used by the porion build agent.
   This directory is created by the command and is used for:
   - the SQLite database that describes projects, builds, tests
   - the project directories where projects are built

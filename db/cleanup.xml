@@ -11,6 +11,22 @@
        </sql>
     </query>
 
+    <query name='cleanup-project-build-metrics'>
+       <comment>Cleanup the project build metrics.</comment>
+       <sql>
+    DELETE FROM porion_build_metric WHERE build_id IN
+      (SELECT porion_build.id FROM porion_build WHERE porion_build.project_id = :project_id)   
+       </sql>
+    </query>
+
+    <query name='cleanup-project-build-queue'>
+       <comment>Remove the project from build queue.</comment>
+       <sql>
+    DELETE FROM porion_build_queue WHERE recipe_id IN
+      (SELECT porion_recipe.id FROM porion_recipe WHERE porion_recipe.project_id = :project_id)   
+       </sql>
+    </query>
+
     <query name='cleanup-project-test-run'>
        <comment>Cleanup the test run of a project.</comment>
        <sql>

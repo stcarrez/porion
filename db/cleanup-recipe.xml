@@ -32,7 +32,7 @@
     DELETE FROM porion_test_run WHERE group_id IN
       (SELECT porion_test_run_group.id FROM porion_test_run_group INNER JOIN porion_test_group ON
            porion_test_run_group.group_id = porion_test_group.id
-           INNER JOIN porion_build ON porion_build.id = porion_test_group.build_id
+           INNER JOIN porion_build ON porion_build.id = porion_test_run_group.build_id
                 WHERE porion_build.recipe_id = :recipe_id)
        </sql>
     </query>
@@ -41,8 +41,8 @@
        <comment>Cleanup the test run group of all builds for the recipe.</comment>
        <sql>
     DELETE FROM porion_test_run_group WHERE group_id IN
-      (SELECT id FROM porion_test_group
-           INNER JOIN porion_build ON porion_build.id = porion_test_group.build_id
+      (SELECT porion_test_run_group.id FROM porion_test_run_group
+           INNER JOIN porion_build ON porion_build.id = porion_test_run_group.build_id
               WHERE porion_build.recipe_id = :recipe_id)
        </sql>
     </query>

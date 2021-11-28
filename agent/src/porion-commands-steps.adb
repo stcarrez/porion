@@ -209,9 +209,9 @@ package body Porion.Commands.Steps is
       Drivers.Command_Type (Command).Setup (Config, Context);
       GC.Define_Switch (Config => Config,
                         Output => Command.Delete_Pos'Access,
-                        Long_Switch => "--delete=",
+                        Long_Switch => "--remove=",
                         Argument => "POSITION",
-                        Help => -("Delete the build step"));
+                        Help => -("Remove the build step"));
       GC.Define_Switch (Config => Config,
                         Output => Command.Insert_Pos'Access,
                         Long_Switch => "--insert=",

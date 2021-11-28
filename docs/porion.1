@@ -138,13 +138,23 @@ This command is available when the
 .\"
 .SS The check command
 .RS 0
-porion \fBcheck\fR \fIproject\fR
+porion \fBcheck\fR [--all] [\fIproject\fR...]
 .RE
 .PP
 The
 .I check
-command is used to check for changes on a project.
-.\"
+command is used to check for changes in projects and when a change is detected in a
+project branch, the build recipes are added to the build queue
+if that branch is active.
+.PP
+For each project, porion maintains a check date and a check delay
+controls the periodicity of the check.  A project is checked
+only when its check date has been passed or when its name is
+specified in the command line.
+.PP
+The
+.I --all
+option allows to force a check for every active project.
 .\"
 .SS The config command
 .RS 0

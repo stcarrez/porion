@@ -15,7 +15,6 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Calendar;
 with Porion.Projects.Models;
 with Porion.Services;
 with Porion.Queries;
@@ -53,7 +52,6 @@ package body Porion.Commands.Info is
       Fields  : PT.Texts.Field_Array (1 .. 10);
       Build   : constant Builds.Models.Build_Ref := Context.Project_Service.Build;
       Bar_Box : PT.Rect_Type;
-      Values  : Porion.Queries.Metric_Info_Vector;
    begin
       Printer.Create_Field (Fields (1), Context.Styles.Default, 20.0);
       Printer.Create_Field (Fields (2), Context.Styles.Success, 80.0);
@@ -172,7 +170,8 @@ package body Porion.Commands.Info is
                            Style2 => Context.Styles.Error);
             Printer.New_Line;
 
-            Porion.Reports.List_Tests (Context.Project_Service, Build, Printer, Context.Styles, True);
+            Porion.Reports.List_Tests (Context.Project_Service, Build,
+                                       Printer, Context.Styles, True);
          end if;
       end if;
    end Print_Build;
@@ -182,7 +181,6 @@ package body Porion.Commands.Info is
                             Context : in out Context_Type) is
       function Count_Active_Branches return Natural;
       use type Porion.Projects.Models.Branch_Status_Type;
-      use type Porion.Builds.Models.Build_Status_Type;
 
       Printer : PT.Texts.Printer_Type := PT.Texts.Create (Context.Printer.all);
       Fields  : PT.Texts.Field_Array (1 .. 10);
@@ -396,7 +394,8 @@ package body Porion.Commands.Info is
                Executor.Fetch_Commands (Commands);
                Printer.Put (Fields (3), Format (-("Recipe: {0}"), Ident));
                Printer.New_Line;
-               Printer.Put (Fields (3), Format (-("Filtering rules: {0}"), Recipe.Get_Filter_Rules));
+               Printer.Put (Fields (3), Format (-("Filtering rules: {0}"),
+                            Recipe.Get_Filter_Rules));
                Printer.New_Line;
 
                Porion.Reports.List_Commands (Commands, Context.Printer.all, Context.Styles);

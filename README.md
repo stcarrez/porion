@@ -19,7 +19,7 @@ Then register a project to build:
    porion add project-2.0.tar.gz
 ```
 
-Build a project from the build queue or a specific project:
+Build a project from the build queue or build a specific project:
 ```
    porion build
    porion build ada-util
@@ -38,13 +38,19 @@ Add a remote build node:
 
 Add a build recipe on a project:
 ```
-   porion add --recipe ada-util@hostname
+   porion add --recipe=remote ada-util@hostname
+```
+
+Get information about a project or a build number:
+```
+   porion info ada-util
+   porion info ada-util:2
 ```
 
 ## Version 0.1.0  - Under development
 - Minor compilation warning fixes
 
-[List all versions](https://github.com/stcarrez/porion/blob/master/NEWS.md)
+[List all versions](https://gitlab.com/stcarrez/porion/blob/master/NEWS.md)
 
 # Overview
 
@@ -75,18 +81,20 @@ The steps to use Porion are the following:
 
 `porion` provides the following commands:
 
+* `add`:      add a new project or a new recipe
 * `build`:    build the project
 * `check`:    check for changes and update the build queue
 * `config`:   get or configure a global parameter
 * `depend`:   add or remove project dependencies
 * `edit`:     edit the project configuration
 * `help`:     print some help
-* `info`:     report some information about a project
+* `info`:     report some information about a project or a build
 * `init`:     setup the build agent node
 * `list`:     list the projects, nodes, builds
 * `logs`:     display the build logs
 * `node`:     add, update or remove build nodes
 * `remove`:   remove a project and its build data
+* `set`:      set a project, branch or recipe variable
 * `status`:   status about the workspace or a project
 * `step`:     control the build steps
 
@@ -150,30 +158,30 @@ The project uses a sub-module to help you in the integration and build
 process.  You should checkout the project with the following commands:
 
 ```
-   git clone --recursive https://github.com/stcarrez/porion.git
-   cd porion
+git clone --recursive git@gitlab.com:stcarrez/porion.git
+cd porion
 ```
 
 ## Configuration
 
 To configure `porion`, use the following command:
 ```
-   ./configure
+./configure
 ```
 
 ## Build
 
 Then, build the application:
 ```
-   make
+make
 ```
 
 And install it:
 ```
-   make install
+make install
 ```
 
 # Documents
 
-* [Porion User Guide](https://porion.readthedocs.io/en/latest/) [PDF](https://github.com/stcarrez/porion/blob/master/docs/porion-book.pdf)
-* Man page: [porion (1)](https://github.com/stcarrez/porion/blob/master/docs/porion.md)
+* [Porion User Guide](https://porion.readthedocs.io/en/latest/) [PDF](https://gitlab.com/stcarrez/porion/blob/master/docs/porion-book.pdf)
+* Man page: [porion (1)](https://gitlab.com/stcarrez/porion/blob/master/docs/porion.md)

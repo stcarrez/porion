@@ -767,7 +767,7 @@ package body Porion.Builds.Services is
    begin
       Service.Branch := Projects.Models.Branch_Ref (Recipe.Get_Branch);
       Steps.Clear;
-      Query.Set_Filter ("o.recipe_id = :recipe_id ORDER BY o.number");
+      Query.Set_Filter ("o.recipe_id = :recipe_id AND o.next_version_id IS NULL ORDER BY o.number");
       Query.Bind_Param ("recipe_id", Recipe.Get_Id);
       Models.List (List, Service.DB, Query);
 
@@ -915,13 +915,25 @@ package body Porion.Builds.Services is
 
       Service.DB.Begin_Transaction;
       declare
-         Step : Build_Step := Steps.Element (Position);
+         Step    : Build_Step := Steps.Element (Position);
+         Updated : Porion.Builds.Models.Recipe_Step_Ref;
       begin
          Update (Step.Step);
          if not Step.Step.Is_Modified then
             Service.DB.Rollback;
             return;
          end if;
+
+         Updated.Set_Parameters (String '(Step.Step.Get_Parameters));
+         Updated.Set_Number (Step.Step.Get_Number);
+         Updated.Set_Builder (Step.Step.Get_Builder);
+         Updated.Set_Step (Step.Step.Get_Step);
+         Updated.Set_Recipe (Step.Step.Get_Recipe);
+         Updated.Set_Timeout (Step.Step.Get_Timeout);
+         Updated.Set_Execution (Step.Step.Get_Execution);
+         Updated.Save (Service.DB);
+
+         Step.Step.Set_Next_Version (Updated);
          Step.Step.Save (Service.DB);
       end;
 

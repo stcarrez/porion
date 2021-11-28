@@ -51,6 +51,7 @@ package body Porion.Commands.Remove is
                  or else Confirm (Format (-("remove build '{0}'?"), Arg))
                then
                   Builds.Services.Remove_Build (Context.Project_Service);
+                  Context.Notice (-("Build {0} is removed"), Arg);
                end if;
             elsif Porion.Projects.Has_Recipe (Ident) then
                if not Command.Interactive
@@ -58,6 +59,7 @@ package body Porion.Commands.Remove is
                  or else Confirm (Format (-("remove build recipe '{0}'?"), Arg))
                then
                   Builds.Services.Remove_Recipe (Context.Project_Service);
+                  Context.Notice (-("Project recipe {0} is removed"), Arg);
                end if;
             else
                if not Command.Interactive

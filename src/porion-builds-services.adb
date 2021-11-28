@@ -738,6 +738,7 @@ package body Porion.Builds.Services is
       Execute (Porion.Builds.Models.Query_Cleanup_Build_Test_Run);
       Execute (Porion.Builds.Models.Query_Cleanup_Build_Test_Run_Group);
       Execute (Porion.Builds.Models.Query_Cleanup_Build_Step);
+      Execute (Porion.Builds.Models.Query_Cleanup_Build_Last_Build);
 
       Service.Build.Delete (Service.DB);
       Service.DB.Commit;

@@ -76,14 +76,20 @@ package body Porion.Reports is
       Ms2  : constant Natural := Ms mod 100;
       Ms3  : constant Natural := Ms2 mod 10;
       Secs : constant Natural := Natural (Value / 1000);
+      Mins : Natural;
    begin
       if Ms2 = 0 then
          return Util.Strings.Image (Secs) & "." & To_Digit (Ms / 100);
       elsif Ms3 = 0 then
          return Util.Strings.Image (Secs) & "." & To_Digit (Ms / 100) & To_Digit (Ms2 / 10);
-      else
+      elsif Secs < 60 then
          return Util.Strings.Image (Secs) & "." & To_Digit (Ms / 100) & To_Digit (Ms2 / 10)
                    & To_Digit (Ms3);
+      else
+         Mins := Secs / 60;
+         return Util.Strings.Image (Mins) & ":"
+                   & Util.Strings.Image (Secs mod 60)
+                   & "." & To_Digit (Ms / 100);
       end if;
    end Format;
 

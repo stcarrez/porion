@@ -16,7 +16,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Porion.Services;
-with Porion.Configs.Rules;
 with Porion.Logs.Analysis;
 package body Porion.Commands.Logs is
 
@@ -53,7 +52,6 @@ package body Porion.Commands.Logs is
          declare
             Arg   : constant String := Args.Get_Argument (I);
             Ident : constant Porion.Projects.Ident_Type := Porion.Projects.Parse (Arg);
-            Path  : constant String := Args.Get_Argument (I);
          begin
             Context.Project_Service.Load (Ident);
             if Ident.Build > 0 then

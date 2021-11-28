@@ -17,18 +17,17 @@
 -----------------------------------------------------------------------
 with Util.Strings.Builders;
 with Porion.Services;
-with Porion.Projects.Services;
-with Porion.Builds.Services;
 package body Porion.Commands.Set is
 
    VAR_NAME         : constant String := "name";
    VAR_DESCRIPTION  : constant String := "description";
+   VAR_CHECK_DELAY  : constant String := "check_delay";
    VAR_STATUS       : constant String := "status";
    VAR_RATE_FACTOR  : constant String := "rate_factor";
    VAR_FILTER_RULES : constant String := "filter_rules";
 
    function Get_Name (Args : in Argument_List'Class;
-                      Pos   :in Positive) return String is
+                      Pos  : in Positive) return String is
       Arg     : constant String := Args.Get_Argument (Pos);
       Sep_Pos : constant Natural := Util.Strings.Index (Arg, '=');
    begin
@@ -76,6 +75,8 @@ package body Porion.Commands.Set is
          Porion.Projects.Services.Set_Description (Context.Project_Service, Value, Modified);
       elsif Name = VAR_STATUS then
          Porion.Projects.Services.Set_Status (Context.Project_Service, Value, Modified);
+      elsif Name = VAR_CHECK_DELAY then
+         Porion.Projects.Services.Set_Check_Delay (Context.Project_Service, Value, Modified);
       elsif Name = VAR_RATE_FACTOR then
          if not Context.Project_Service.Has_Branch then
             Commands.Error (-("The 'rate_factor' can be set on a branch or a recipe"));
@@ -134,6 +135,8 @@ package body Porion.Commands.Set is
             Print_Help (Context, VAR_NAME, -("name of the project, recipe"));
             Print_Help (Context, VAR_DESCRIPTION, -("description of the project, branch, recipe"));
             Print_Help (Context, VAR_STATUS, -("enable or disable the project, branch, recipe"));
+            Print_Help (Context, VAR_CHECK_DELAY,
+                        -("the delay in seconds between source checks for changes"));
             if Porion.Projects.Has_Recipe (Ident) then
                Print_Help (Context, VAR_FILTER_RULES, -("recipe filtering rules for log reports"));
                Print_Help (Context, VAR_RATE_FACTOR, -("recipe rate factor"));

@@ -920,7 +920,7 @@ private
    := Def_Project_Branches.Query'Access;
 
    package File_2 is
-      new ADO.Queries.Loaders.File (Path => "cleanup.xml",
+      new ADO.Queries.Loaders.File (Path => "cleanup-project.xml",
                                     Sha1 => "9B2B599473F75F92CB5AB5045675E4CCEF926543");
 
    package Def_Cleanup_Project_Build_Step is

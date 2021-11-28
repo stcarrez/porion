@@ -58,8 +58,8 @@ package body Porion.Resources.Schema is
        & "step ( `id` BIGINT NOT NULL, `parameters` VARCHAR(65536) NOT NULL, `numb"
        & "er` INTEGER NOT NULL, `builder` INTEGER NOT NULL, `timeout` INTEGER NOT "
        & "NULL, `step` INTEGER NOT NULL, `version` INTEGER NOT NULL, `execution` T"
-       & "INYINT NOT NULL, `previous_version_id` BIGINT , `recipe_id` BIGINT NOT N"
-       & "ULL, PRIMARY KEY (`id`))";
+       & "INYINT NOT NULL, `next_version_id` BIGINT , `recipe_id` BIGINT NOT NULL,"
+       & " PRIMARY KEY (`id`))";
    L_16  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_build_m"
        & "etric ( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `value` INTEGE"
        & "R NOT NULL, `content` VARCHAR(255) NOT NULL, `build_id` BIGINT NOT NULL,"

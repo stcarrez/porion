@@ -911,11 +911,11 @@ package Porion.Builds.Models is
                  return Execution_Type;
 
    --
-   procedure Set_Previous_Version (Object : in out Recipe_Step_Ref;
-                                   Value  : in Recipe_Step_Ref'Class);
+   procedure Set_Next_Version (Object : in out Recipe_Step_Ref;
+                               Value  : in Recipe_Step_Ref'Class);
 
    --
-   function Get_Previous_Version (Object : in Recipe_Step_Ref)
+   function Get_Next_Version (Object : in Recipe_Step_Ref)
                  return Recipe_Step_Ref'Class;
 
    --  Set the build configuration that contains this build step.
@@ -1875,7 +1875,7 @@ private
    COL_5_6_NAME : aliased constant String := "step";
    COL_6_6_NAME : aliased constant String := "version";
    COL_7_6_NAME : aliased constant String := "execution";
-   COL_8_6_NAME : aliased constant String := "previous_version_id";
+   COL_8_6_NAME : aliased constant String := "next_version_id";
    COL_9_6_NAME : aliased constant String := "recipe_id";
 
    RECIPE_STEP_DEF : aliased constant ADO.Schemas.Class_Mapping :=
@@ -1911,7 +1911,7 @@ private
        Step : Porion.Builds.Step_Type;
        Version : Integer;
        Execution : Execution_Type;
-       Previous_Version : Recipe_Step_Ref;
+       Next_Version : Recipe_Step_Ref;
        Recipe : Recipe_Ref;
    end record;
 

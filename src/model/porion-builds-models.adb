@@ -3028,21 +3028,21 @@ package body Porion.Builds.Models is
    end Get_Execution;
 
 
-   procedure Set_Previous_Version (Object : in out Recipe_Step_Ref;
-                                   Value  : in Recipe_Step_Ref'Class) is
+   procedure Set_Next_Version (Object : in out Recipe_Step_Ref;
+                               Value  : in Recipe_Step_Ref'Class) is
       Impl : Recipe_Step_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 9, Impl.Previous_Version, Value);
-   end Set_Previous_Version;
+      ADO.Objects.Set_Field_Object (Impl.all, 9, Impl.Next_Version, Value);
+   end Set_Next_Version;
 
-   function Get_Previous_Version (Object : in Recipe_Step_Ref)
+   function Get_Next_Version (Object : in Recipe_Step_Ref)
                   return Recipe_Step_Ref'Class is
       Impl : constant Recipe_Step_Access
          := Recipe_Step_Impl (Object.Get_Load_Object.all)'Access;
    begin
-      return Impl.Previous_Version;
-   end Get_Previous_Version;
+      return Impl.Next_Version;
+   end Get_Next_Version;
 
 
    procedure Set_Recipe (Object : in out Recipe_Step_Ref;
@@ -3082,7 +3082,7 @@ package body Porion.Builds.Models is
             Copy.Step := Impl.Step;
             Copy.Version := Impl.Version;
             Copy.Execution := Impl.Execution;
-            Copy.Previous_Version := Impl.Previous_Version;
+            Copy.Next_Version := Impl.Next_Version;
             Copy.Recipe := Impl.Recipe;
          end;
       end if;
@@ -3224,8 +3224,8 @@ package body Porion.Builds.Models is
          Object.Clear_Modified (8);
       end if;
       if Object.Is_Modified (9) then
-         Stmt.Save_Field (Name  => COL_8_6_NAME, --  previous_version_id
-                          Value => Object.Previous_Version);
+         Stmt.Save_Field (Name  => COL_8_6_NAME, --  next_version_id
+                          Value => Object.Next_Version);
          Object.Clear_Modified (9);
       end if;
       if Object.Is_Modified (10) then
@@ -3272,8 +3272,8 @@ package body Porion.Builds.Models is
                         Value => Object.Version);
       Query.Save_Field (Name  => COL_7_6_NAME, --  execution
                         Value => Integer (Execution_Type'Enum_Rep (Object.Execution)));
-      Query.Save_Field (Name  => COL_8_6_NAME, --  previous_version_id
-                        Value => Object.Previous_Version);
+      Query.Save_Field (Name  => COL_8_6_NAME, --  next_version_id
+                        Value => Object.Next_Version);
       Query.Save_Field (Name  => COL_9_6_NAME, --  recipe_id
                         Value => Object.Recipe);
       Query.Execute (Result);
@@ -3365,7 +3365,7 @@ package body Porion.Builds.Models is
       Object.Version := Stmt.Get_Integer (6);
       Object.Execution := Execution_Type'Enum_Val (Stmt.Get_Integer (7));
       if not Stmt.Is_Null (8) then
-         Object.Previous_Version.Set_Key_Value (Stmt.Get_Identifier (8), Session);
+         Object.Next_Version.Set_Key_Value (Stmt.Get_Identifier (8), Session);
       end if;
       if not Stmt.Is_Null (9) then
          Object.Recipe.Set_Key_Value (Stmt.Get_Identifier (9), Session);

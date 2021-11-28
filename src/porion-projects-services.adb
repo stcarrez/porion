@@ -585,6 +585,33 @@ package body Porion.Projects.Services is
    end Set_Status;
 
    --  ------------------------------
+   --  Set the project check delay used by the check command to periodically
+   --  check for source changes in the project branches.
+   --  Raises Bad_Value if the status value is not correct.
+   --  ------------------------------
+   procedure Set_Check_Delay (Service  : in out Context_Type;
+                              Value    : in String;
+                              Modified : out Boolean) is
+      Check_Delay : Natural;
+   begin
+      begin
+         Check_Delay := Natural'Value (Value);
+
+      exception
+         when Constraint_Error =>
+            raise Bad_Value;
+      end;
+
+      Log.Info ("Set project check delay on {0} to {1}",
+                String '(Service.Project.Get_Name), Value);
+      Service.DB.Begin_Transaction;
+      Service.Project.Set_Check_Delay (Check_Delay);
+      Modified := Service.Project.Is_Modified;
+      Service.Project.Save (Service.DB);
+      Service.DB.Commit;
+   end Set_Check_Delay;
+
+   --  ------------------------------
    --  Set the branch or recipe rate factor.
    --  ------------------------------
    procedure Set_Rate_Factor (Service  : in out Context_Type;

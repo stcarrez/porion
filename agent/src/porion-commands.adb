@@ -427,21 +427,18 @@ package body Porion.Commands is
    procedure Print_Recipe_Steps (Context : in out Context_Type) is
       Printer  : PT.Texts.Printer_Type := PT.Texts.Create (Context.Printer.all);
       Executor : Porion.Executors.Executor_Type;
-      Recipes  : Porion.Builds.Models.Recipe_Vector;
+      Commands : Porion.Executors.Command_Vector;
    begin
       Executor.Enable_Dry_Run;
-      Builds.Services.Find_Build_Configs (Context.Project_Service, True, Recipes);
-      for Recipe of Recipes loop
-         Porion.Builds.Services.Build (Context.Project_Service, Recipe, Executor);
-         declare
-            Commands : Porion.Executors.Command_Vector;
-         begin
-            Printer.New_Line;
-            Executor.Fetch_Commands (Commands);
-            Porion.Reports.List_Commands (Commands, Context.Printer.all, Context.Styles);
-            Printer.New_Line;
-         end;
-      end loop;
+
+      Porion.Builds.Services.Build (Context.Project_Service,
+                                    Context.Project_Service.Recipe,
+                                    Executor);
+
+      Printer.New_Line;
+      Executor.Fetch_Commands (Commands);
+      Porion.Reports.List_Commands (Commands, Context.Printer.all, Context.Styles);
+      Printer.New_Line;
    end Print_Recipe_Steps;
 
    procedure Print_Build_Logs (Levels  : in Porion.Logs.Analysis.Level_Map;
@@ -461,6 +458,7 @@ package body Porion.Commands is
       Fields  : PT.Texts.Field_Array (1 .. 2);
       List    : Analysis.Line_Vector;
       Ctx     : Analysis.Analyser_Type;
+      Rules   : constant String := Context.Project_Service.Recipe.Get_Filter_Rules;
    begin
       Printer.Create_Field (Fields (1), Context.Styles.Default, 0.0);
       Printer.Create_Field (Fields (2), Context.Styles.Success, 90.0);
@@ -468,7 +466,7 @@ package body Porion.Commands is
       Printer.Set_Max_Dimension (Fields (1), (4, 0));
       Printer.Layout_Fields (Fields (1 .. 2));
 
-      Porion.Logs.Analysis.Set_Rules (Ctx, To_String (Context.Project_Service.Recipe.Get_Filter_Rules));
+      Porion.Logs.Analysis.Set_Rules (Ctx, Rules);
       Porion.Logs.Analysis.Set_Filter (Ctx, Levels);
       Porion.Logs.Analysis.Read (Ctx, Path, List);
 

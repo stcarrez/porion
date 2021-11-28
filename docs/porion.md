@@ -50,7 +50,7 @@ using either the _porion info_ or the _porion logs_ commands.
 
 _porion_ uses an identification string to reference a project, a branch,
 a build recipe or a build.  That identification string has the following pattern:
-```
+
 ```
 project-name[#branch-name][~recipe-name][@hostname][:build-number]
 ```

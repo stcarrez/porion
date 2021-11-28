@@ -1,6 +1,16 @@
-porion remove: remove a project and its build data
+porion remove: remove a project, a recipe or a build
 
-Usage: porion remove [--force] [--interactive] project1 [project2 ...]
+Usage: porion remove [--force] [--interactive] <ident> [<ident2> ...]
 
-  Remove a project and all its build and test data.
+  Remove a project, a recipe or a build and all its data.
+  When the ident string indicates a build number, only the build number
+  is removed.  The project rating are then updated.
 
+  When the ident string contains a recipe name, the recipe is removed
+  as well as all the builds that were made with it.  The project rating
+  are then updated.
+
+  With the `--interactive` option, a confirmation is asked before removal.
+
+  The `--force` option forces the removal and ignores any error.
+  

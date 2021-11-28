@@ -100,6 +100,14 @@ package Porion.Projects.Services is
                          Modified : out Boolean) with
       Pre => Service.Has_Project;
 
+   --  Set the project check delay used by the check command to periodically
+   --  check for source changes in the project branches.
+   --  Raises Bad_Value if the status value is not correct.
+   procedure Set_Check_Delay (Service  : in out Context_Type;
+                              Value    : in String;
+                              Modified : out Boolean) with
+      Pre => Service.Has_Project;
+
    --  Set the branch or recipe rate factor.
    --  Raises Bad_Value if the factor is not a number.
    procedure Set_Rate_Factor (Service  : in out Context_Type;

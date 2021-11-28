@@ -15,8 +15,9 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Calendar;
 with Ada.Directories;
+with Ada.Strings.Maps;
+with Ada.Strings.Fixed;
 with Util.Log.Loggers;
 with Util.Properties;
 with Util.Strings;
@@ -615,17 +616,25 @@ package body Porion.Projects.Services is
       Service.DB.Commit;
    end Set_Rate_Factor;
 
+   --  Replace several special characters by ' ' which is the separator
+   --  used to split filtering rules.
+   Rule_Translate_Map : constant Ada.Strings.Maps.Character_Mapping
+     := Ada.Strings.Maps.To_Mapping
+       (From => ",;/\",
+        To   => "    ");
+
    --  ------------------------------
    --  Set the recipe filter rules.
    --  ------------------------------
    procedure Set_Filter_Rules (Service  : in out Context_Type;
                                Rules    : in String;
                                Modified : out Boolean) is
+      Value : constant String := Ada.Strings.Fixed.Translate (Rules, Rule_Translate_Map);
    begin
-      Log.Info ("Set filter rules to {0}", Rules);
+      Log.Info ("Set filter rules to '{0}'' on recipe {1}", Value, Service.Get_Recipe_Name);
 
       Service.DB.Begin_Transaction;
-      Service.Recipe.Set_Filter_Rules (Rules);
+      Service.Recipe.Set_Filter_Rules (Value);
       Modified := Service.Recipe.Is_Modified;
       Service.Recipe.Save (Service.DB);
       Service.DB.Commit;

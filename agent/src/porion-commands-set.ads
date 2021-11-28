@@ -44,4 +44,14 @@ private
                           Args    : in Argument_List'Class;
                           Context : in out Context_Type);
 
+   function Get_Name (Args : in Argument_List'Class;
+                      Pos  : in Positive) return String;
+
+   function Get_Value (Args : in Argument_List'Class;
+                       Pos  : in Positive) return String;
+
+   procedure Print_Help (Context : in out Context_Type;
+                         Name    : in String;
+                         Help    : in String);
+
 end Porion.Commands.Set;

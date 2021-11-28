@@ -163,7 +163,7 @@ package body Porion.Commands is
                           -("get or configure a global parameter"),
                           Config_Command'Access);
       Driver.Add_Command ("add",
-                          -("add a new project"),
+                          -("add a new project or a new recipe"),
                           Add_Command'Access);
       Driver.Add_Command ("list",
                           -("list the projects, nodes, builds"),
@@ -181,7 +181,7 @@ package body Porion.Commands is
                           -("remove a project and its build data"),
                           Remove_Command'Access);
       Driver.Add_Command ("info",
-                          -("report some information about a project"),
+                          -("report some information about a project or a build"),
                           Info_Command'Access);
       Driver.Add_Command ("depend",
                           -("add or remove project dependencies"),

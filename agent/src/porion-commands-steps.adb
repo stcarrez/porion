@@ -140,8 +140,6 @@ package body Porion.Commands.Steps is
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Context   : in out Context_Type) is
-      Ident   : Porion.Projects.Ident_Type;
-      Recipes : Porion.Builds.Models.Recipe_Vector;
    begin
       if Args.Get_Count = 0 then
          Porion.Commands.Error (-("missing project name"));
@@ -156,45 +154,37 @@ package body Porion.Commands.Steps is
 
       declare
          Name    : constant String := Args.Get_Argument (1);
+         Ident   : Porion.Projects.Ident_Type;
       begin
          Ident := Porion.Projects.Parse (Name);
-         Builds.Services.Load_Recipes (Context.Project_Service, Ident, Recipes);
+         Context.Project_Service.Load (Ident);
 
-      exception
-         when Porion.Services.Not_Found =>
-            Porion.Commands.Error (-("project '{0}' not found"), Name);
-            return;
-      end;
-
-      if Recipes.Length = 0 then
-         Porion.Commands.Error (-("no build recipe matching {0}"), Name);
-         return;
-      end if;
-
-      if Recipes.Length /= 1 then
-         Porion.Commands.Error (-("several recipe found matching {0}"), Name);
-         return;
-      end if;
-
-      declare
-         Recipe : Builds.Models.Recipe_Ref := Recipes.First_Element;
-      begin
          if Command.Delete_Pos > 0 then
-            Command.Delete_Step (Recipe, Context);
+            Command.Delete_Step (Context.Project_Service.Recipe, Context);
          elsif Command.Update_Pos > 0 then
-            Command.Update_Step (Recipe, Args, Context);
+            Command.Update_Step (Context.Project_Service.Recipe, Args, Context);
          else
             if Args.Get_Count = 1 then
                Porion.Commands.Error (-("missing step action"));
                return;
             end if;
 
-            Command.Add_Step (Recipe, Args, Context);
+            Command.Add_Step (Context.Project_Service.Recipe, Args, Context);
          end if;
 
          if not Command.Quiet then
             Porion.Commands.Print_Recipe_Steps (Context);
          end if;
+
+      exception
+         when Porion.Services.Not_Found =>
+            Context.Error_Not_Found (Ident);
+            return;
+
+         when Porion.Projects.Invalid_Ident =>
+            Commands.Error (-("invalid project or build identifier: {0}"), Name);
+            return;
+
       end;
    end Execute;
 

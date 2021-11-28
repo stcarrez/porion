@@ -21,6 +21,12 @@ with Porion.Projects.Services;
 with Porion.Builds.Services;
 package body Porion.Commands.Set is
 
+   VAR_NAME         : constant String := "name";
+   VAR_DESCRIPTION  : constant String := "description";
+   VAR_STATUS       : constant String := "status";
+   VAR_RATE_FACTOR  : constant String := "rate_factor";
+   VAR_FILTER_RULES : constant String := "filter_rules";
+
    function Get_Name (Args : in Argument_List'Class;
                       Pos   :in Positive) return String is
       Arg     : constant String := Args.Get_Argument (Pos);
@@ -48,6 +54,15 @@ package body Porion.Commands.Set is
       return Util.Strings.Builders.To_Array (Val);
    end Get_Value;
 
+   procedure Print_Help (Context : in out Context_Type;
+                         Name    : in String;
+                         Help    : in String) is
+      Var_Name : String (1 .. 32) := (others => ' ');
+   begin
+      Var_Name (1 .. Name'Length) := Name;
+      Context.Notice (Var_Name & Help);
+   end Print_Help;
+
    procedure Set_Project (Command : in out Command_Type;
                           Args    : in Argument_List'Class;
                           Context : in out Context_Type) is
@@ -55,20 +70,20 @@ package body Porion.Commands.Set is
       Value    : constant String := Get_Value (Args, 2);
       Modified : Boolean;
    begin
-      if Name = "name" then
+      if Name = VAR_NAME then
          Porion.Projects.Services.Set_Name (Context.Project_Service, Value, Modified);
-      elsif Name = "description" then
+      elsif Name = VAR_DESCRIPTION then
          Porion.Projects.Services.Set_Description (Context.Project_Service, Value, Modified);
-      elsif Name = "status" then
+      elsif Name = VAR_STATUS then
          Porion.Projects.Services.Set_Status (Context.Project_Service, Value, Modified);
-      elsif Name = "rate_factor" then
+      elsif Name = VAR_RATE_FACTOR then
          if not Context.Project_Service.Has_Branch then
             Commands.Error (-("The 'rate_factor' can be set on a branch or a recipe"));
             return;
          end if;
          Porion.Projects.Services.Set_Rate_Factor (Context.Project_Service, Value, Modified);
 
-      elsif Name = "filter_rules" then
+      elsif Name = VAR_FILTER_RULES then
          if not Context.Project_Service.Has_Recipe then
             Commands.Error (-("The 'filter_rules' can be set on a recipe"));
             return;
@@ -99,8 +114,10 @@ package body Porion.Commands.Set is
                       Args      : in Argument_List'Class;
                       Context   : in out Context_Type) is
       pragma Unreferenced (Name);
+
+      Count : constant Natural := Args.Get_Count;
    begin
-      if Args.Get_Count <= 1 then
+      if Count = 0 then
          Porion.Commands.Error (-("missing project name and variable to set"));
          return;
       end if;
@@ -113,6 +130,20 @@ package body Porion.Commands.Set is
       begin
          Ident := Porion.Projects.Parse (Arg);
          Context.Project_Service.Load (Ident);
+         if Count = 1 then
+            Print_Help (Context, VAR_NAME, -("name of the project, recipe"));
+            Print_Help (Context, VAR_DESCRIPTION, -("description of the project, branch, recipe"));
+            Print_Help (Context, VAR_STATUS, -("enable or disable the project, branch, recipe"));
+            if Porion.Projects.Has_Recipe (Ident) then
+               Print_Help (Context, VAR_FILTER_RULES, -("recipe filtering rules for log reports"));
+               Print_Help (Context, VAR_RATE_FACTOR, -("recipe rate factor"));
+
+            elsif Porion.Projects.Has_Branch (Ident) then
+               Print_Help (Context, VAR_RATE_FACTOR, -("branch rate factor"));
+
+            end if;
+            return;
+         end if;
 
          Command.Set_Project (Args, Context);
 

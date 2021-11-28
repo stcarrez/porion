@@ -214,10 +214,26 @@ porion \fBlist\fR
 .PP
 .\"
 .\"
+.\"
 .SS The logs command
 .RS 0
-porion \fBlogs\fR \fIproject\fR
+porion \fBlogs\fR [--no-filter] <ident> ...
 .RE
+.PP
+.\"
+Displays the logs produced by a build with the given identification.
+Each identifier must define at least the project name and the build
+number (the branch, recipe and build host are optional).
+.PP
+By default, the displayed logs are filtered according to the filtering
+rules defined on the recipe.  The
+.I --no-filter
+option can be used to disable this filtering.
+.P
+Use \fIporion set <recipe> filter_rules=<filter1,...,filterN>\fR to configure
+the recipe filtering rules.  The recipe filtering rules can be changed
+after a build.
+.\"
 .\"
 .SS The node command
 .RS 0
@@ -238,7 +254,9 @@ porion \fBstep\fR [--quiet] [--ignore-error] [--timeout \fItimeout\fR]
        [--remove \fIpos\fR] \fIidentification\fR command args...
 .RE
 .PP
-The `porion step` command is used to add, update or remove a recipe
+The
+.I step
+command is used to add, update or remove a recipe
 build step.  After updating the recipe, the list of build steps is
 printed unless the
 .I --quiet

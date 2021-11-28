@@ -164,9 +164,15 @@ porion \fBconfig\fP \fIkeystore.akt\fR -- \fIname\fR
 .\"
 .SS The depend command
 .RS 0
-porion \fBdepend\fP \fIproject\fR \fIname\fR ...
+porion \fBdepend\fP [--remove] \fIproject\fR \fIdependency1\fR ...
 .RE
 .PP
+Add or remove a project dependency.  When a dependency project is modified
+this triggers a build of the project.
+.PP
+The
+.I --remove
+option allows to remove one or several project dependencies.
 .\"
 .SS The edit command
 .RS 0
@@ -227,9 +233,30 @@ porion \fBremove\fR [--new-passfile \fIfile\fR] \fIproject\fR
 .\"
 .SS The step command
 .RS 0
-porion \fBstep\fR [--new-passfile \fIfile\fR] \fIproject\fR
+porion \fBstep\fR [--quiet] [--ignore-error] [--timeout \fItimeout\fR]
+       [--disable] [--insert \fIpos\fR] [--update \fIpos\fR]
+       [--remove \fIpos\fR] \fIidentification\fR command args...
 .RE
 .PP
+The `porion step` command is used to add, update or remove a recipe
+build step.  After updating the recipe, the list of build steps is
+printed unless the
+.I --quiet
+option is passed.
+.PP
+By default a build step is added at the end of the build recipe as a last
+step.  The position can be controlled by using the
+.I --insert
+.I pos
+option.
+.PP
+With the
+.I --update
+option, the build step at the given position is replaced.
+.PP
+With the
+.I --remove
+option, the build step is removed.
 .\"
 .SH CONFIGURATION
 The

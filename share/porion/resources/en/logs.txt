@@ -1,0 +1,15 @@
+porion logs: display the build logs
+
+Usage: porion logs [--no-filter] <ident> ...
+
+  Displays the logs produced by a build with the given identification.
+  Each identifier must define at least the project name and the build
+  number (the branch, recipe and build host are optional).
+
+  By default, the displayed logs are filtered according to the filtering
+  rules defined on the recipe.  The `--no-filter` option can be used to
+  disable this filtering.
+
+  Use 'porion set <recipe> filter_rules=<filter1,...,filterN>' to configure
+  the recipe filtering rules.  The recipe filtering rules can be changed
+  after a build.

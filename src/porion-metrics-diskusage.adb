@@ -45,7 +45,8 @@ package body Porion.Metrics.DiskUsage is
       Prefix : constant String := To_String (Controller.Prefix);
    begin
       Porion.Tools.Find_Stats (Path, Stats);
-      Controller.Save_Metric (Prefix & "total_size", "Total size (Kb)", Natural (Stats.Total_Size / 1024));
+      Controller.Save_Metric (Prefix & "total_size", "Total size (Kb)",
+                              Natural (Stats.Total_Size / 1024));
       Controller.Save_Metric (Prefix & "file_count", "File count", Stats.File_Count);
       Controller.Save_Metric (Prefix & "directory_count", "Directory count", Stats.Dir_Count);
    end Collect;
@@ -74,6 +75,8 @@ package body Porion.Metrics.DiskUsage is
                      Printer    : in out PT.Printer_Type'Class;
                      Fields     : in PT.Texts.Field_Array;
                      Values     : in Value_Map) is
+      pragma Unreferenced (Controller);
+
       Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
       Chart  : PT.Charts.Printer_Type := PT.Charts.Create (Printer);
       Total  : constant Stat_Info_Type := Get_Stat_Info (Values, "total_size");

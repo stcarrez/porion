@@ -187,6 +187,14 @@ package Porion.Builds.Services is
    procedure Update_Project_Ratings (Service : in out Context_Type) with
       Pre => Service.Has_Project;
 
+   --  Remove the recipe and all its materials (including the builds).
+   procedure Remove_Recipe (Service : in out Context_Type) with
+      Pre => Service.Has_Project and Service.Has_Recipe;
+
+   --  Remove the build.
+   procedure Remove_Build (Service : in out Context_Type) with
+      Pre => Service.Has_Project and Service.Has_Build;
+
 private
 
    --  Returns True if the recipe is contained in the build queue.

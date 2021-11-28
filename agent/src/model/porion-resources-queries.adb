@@ -70,47 +70,58 @@ package body Porion.Resources.Queries is
        & "   <sql>" & ASCII.LF & "    DELETE FROM porion_build_step WHERE build_id"
        & " IN" & ASCII.LF & "      (SELECT id FROM porion_build WHERE project_id ="
        & " :project_id)" & ASCII.LF & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF
-       & ASCII.LF & "    <query name='cleanup-project-test-run'>" & ASCII.LF & " "
-       & "      <comment>Cleanup the test run of a project.</comment>" & ASCII.LF
-       & "       <sql>" & ASCII.LF & "    DELETE FROM porion_test_run WHERE group_"
-       & "id IN" & ASCII.LF & "      (SELECT porion_test_run_group.id FROM porion_"
-       & "test_run_group INNER JOIN porion_test_group ON" & ASCII.LF & "          "
-       & " porion_test_run_group.group_id = porion_test_group.id" & ASCII.LF & "  "
-       & "              WHERE porion_test_group.project_id = :project_id)" & ASCII.LF
-       & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "   "
-       & " <query name='cleanup-project-test-run-group'>" & ASCII.LF & "       <co"
-       & "mment>Cleanup the test run group of a project.</comment>" & ASCII.LF & " "
-       & "      <sql>" & ASCII.LF & "    DELETE FROM porion_test_run_group WHERE g"
-       & "roup_id IN" & ASCII.LF & "      (SELECT id FROM porion_test_group WHERE "
-       & "porion_test_group.project_id = :project_id)" & ASCII.LF & "       </sql>"
-       & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "    <query name='cle"
-       & "anup-project-test'>" & ASCII.LF & "       <comment>Cleanup the test of a"
-       & " project.</comment>" & ASCII.LF & "       <sql>" & ASCII.LF & "    DELET"
-       & "E FROM porion_test WHERE group_id IN" & ASCII.LF & "      (SELECT id FRO"
-       & "M porion_test_group WHERE porion_test_group.project_id = :project_id)" & ASCII.LF
-       & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "   "
-       & " <query name='cleanup-project-test-group'>" & ASCII.LF & "       <commen"
-       & "t>Cleanup the test group of a project.</comment>" & ASCII.LF & "       <"
-       & "sql>" & ASCII.LF & "    DELETE FROM porion_test_group WHERE porion_test_"
-       & "group.project_id = :project_id" & ASCII.LF & "       </sql>" & ASCII.LF
-       & "    </query>" & ASCII.LF & ASCII.LF & "    <query name='cleanup-project"
-       & "-last-build'>" & ASCII.LF & "       <comment>Cleanup the project last bu"
-       & "ild references of a project.</comment>" & ASCII.LF & "       <sql>" & ASCII.LF
-       & "    DELETE FROM porion_last_build WHERE recipe_id IN" & ASCII.LF & "    "
-       & "  (SELECT id FROM porion_recipe WHERE project_id = :project_id)" & ASCII.LF
-       & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "   "
-       & " <query name='cleanup-project-build'>" & ASCII.LF & "       <comment>Cle"
-       & "anup the project builds.</comment>" & ASCII.LF & "       <sql>" & ASCII.LF
-       & "    DELETE FROM porion_build WHERE project_id = :project_id" & ASCII.LF
-       & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "   "
-       & " <query name='cleanup-project-environment'>" & ASCII.LF & "       <comme"
-       & "nt>Cleanup the project specific environment.</comment>" & ASCII.LF & "  "
-       & "     <sql>" & ASCII.LF & "    DELETE FROM porion_environment WHERE recip"
-       & "e_id IN" & ASCII.LF & "      (SELECT id FROM porion_recipe WHERE project"
+       & ASCII.LF & "    <query name='cleanup-project-build-metrics'>" & ASCII.LF
+       & "       <comment>Cleanup the project build metrics.</comment>" & ASCII.LF
+       & "       <sql>" & ASCII.LF & "    DELETE FROM porion_build_metric WHERE bu"
+       & "ild_id IN" & ASCII.LF & "      (SELECT porion_build.id FROM porion_build"
+       & " WHERE porion_build.project_id = :project_id)   " & ASCII.LF & "       <"
+       & "/sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "    <query "
+       & "name='cleanup-project-build-queue'>" & ASCII.LF & "       <comment>Remov"
+       & "e the project from build queue.</comment>" & ASCII.LF & "       <sql>" & ASCII.LF
+       & "    DELETE FROM porion_build_queue WHERE recipe_id IN" & ASCII.LF & "   "
+       & "   (SELECT porion_recipe.id FROM porion_recipe WHERE porion_recipe.proje"
+       & "ct_id = :project_id)   " & ASCII.LF & "       </sql>" & ASCII.LF & "    "
+       & "</query>" & ASCII.LF & ASCII.LF & "    <query name='cleanup-project-tes"
+       & "t-run'>" & ASCII.LF & "       <comment>Cleanup the test run of a project"
+       & ".</comment>" & ASCII.LF & "       <sql>" & ASCII.LF & "    DELETE FROM p"
+       & "orion_test_run WHERE group_id IN" & ASCII.LF & "      (SELECT porion_tes"
+       & "t_run_group.id FROM porion_test_run_group INNER JOIN porion_test_group O"
+       & "N" & ASCII.LF & "           porion_test_run_group.group_id = porion_test"
+       & "_group.id" & ASCII.LF & "                WHERE porion_test_group.project"
        & "_id = :project_id)" & ASCII.LF & "       </sql>" & ASCII.LF & "    </que"
-       & "ry>" & ASCII.LF & ASCII.LF & "    <query name='cleanup-project-build-co"
-       & "nfig-step'>" & ASCII.LF & "       <comment>Cleanup the project build con"
-       & "fig of a project.</comment>" & ASCII.LF & "       <sql>" & ASCII.LF & " "
+       & "ry>" & ASCII.LF & ASCII.LF & "    <query name='cleanup-project-test-run"
+       & "-group'>" & ASCII.LF & "       <comment>Cleanup the test run group of a "
+       & "project.</comment>" & ASCII.LF & "       <sql>" & ASCII.LF & "    DELETE"
+       & " FROM porion_test_run_group WHERE group_id IN" & ASCII.LF & "      (SELE"
+       & "CT id FROM porion_test_group WHERE porion_test_group.project_id = :proje"
+       & "ct_id)" & ASCII.LF & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF
+       & ASCII.LF & "    <query name='cleanup-project-test'>" & ASCII.LF & "     "
+       & "  <comment>Cleanup the test of a project.</comment>" & ASCII.LF & "     "
+       & "  <sql>" & ASCII.LF & "    DELETE FROM porion_test WHERE group_id IN" & ASCII.LF
+       & "      (SELECT id FROM porion_test_group WHERE porion_test_group.project_"
+       & "id = :project_id)" & ASCII.LF & "       </sql>" & ASCII.LF & "    </quer"
+       & "y>" & ASCII.LF & ASCII.LF & "    <query name='cleanup-project-test-grou"
+       & "p'>" & ASCII.LF & "       <comment>Cleanup the test group of a project.<"
+       & "/comment>" & ASCII.LF & "       <sql>" & ASCII.LF & "    DELETE FROM por"
+       & "ion_test_group WHERE porion_test_group.project_id = :project_id" & ASCII.LF
+       & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "   "
+       & " <query name='cleanup-project-last-build'>" & ASCII.LF & "       <commen"
+       & "t>Cleanup the project last build references of a project.</comment>" & ASCII.LF
+       & "       <sql>" & ASCII.LF & "    DELETE FROM porion_last_build WHERE reci"
+       & "pe_id IN" & ASCII.LF & "      (SELECT id FROM porion_recipe WHERE projec"
+       & "t_id = :project_id)" & ASCII.LF & "       </sql>" & ASCII.LF & "    </qu"
+       & "ery>" & ASCII.LF & ASCII.LF & "    <query name='cleanup-project-build'>"
+       & ASCII.LF & "       <comment>Cleanup the project builds.</comment>" & ASCII.LF
+       & "       <sql>" & ASCII.LF & "    DELETE FROM porion_build WHERE project_i"
+       & "d = :project_id" & ASCII.LF & "       </sql>" & ASCII.LF & "    </query>"
+       & ASCII.LF & ASCII.LF & "    <query name='cleanup-project-environment'>" & ASCII.LF
+       & "       <comment>Cleanup the project specific environment.</comment>" & ASCII.LF
+       & "       <sql>" & ASCII.LF & "    DELETE FROM porion_environment WHERE rec"
+       & "ipe_id IN" & ASCII.LF & "      (SELECT id FROM porion_recipe WHERE proje"
+       & "ct_id = :project_id)" & ASCII.LF & "       </sql>" & ASCII.LF & "    </q"
+       & "uery>" & ASCII.LF & ASCII.LF & "    <query name='cleanup-project-build-"
+       & "config-step'>" & ASCII.LF & "       <comment>Cleanup the project build c"
+       & "onfig of a project.</comment>" & ASCII.LF & "       <sql>" & ASCII.LF & " "
        & "   DELETE FROM porion_recipe_step WHERE recipe_id IN" & ASCII.LF & "    "
        & "  (SELECT id FROM porion_recipe WHERE project_id = :project_id)" & ASCII.LF
        & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "   "

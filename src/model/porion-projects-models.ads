@@ -581,6 +581,10 @@ package Porion.Projects.Models is
 
    Query_Cleanup_Project_Build_Step : constant ADO.Queries.Query_Definition_Access;
 
+   Query_Cleanup_Project_Build_Metrics : constant ADO.Queries.Query_Definition_Access;
+
+   Query_Cleanup_Project_Build_Queue : constant ADO.Queries.Query_Definition_Access;
+
    Query_Cleanup_Project_Test_Run : constant ADO.Queries.Query_Definition_Access;
 
    Query_Cleanup_Project_Test_Run_Group : constant ADO.Queries.Query_Definition_Access;
@@ -924,6 +928,18 @@ private
                                      File => File_2.File'Access);
    Query_Cleanup_Project_Build_Step : constant ADO.Queries.Query_Definition_Access
    := Def_Cleanup_Project_Build_Step.Query'Access;
+
+   package Def_Cleanup_Project_Build_Metrics is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-project-build-metrics",
+                                     File => File_2.File'Access);
+   Query_Cleanup_Project_Build_Metrics : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Project_Build_Metrics.Query'Access;
+
+   package Def_Cleanup_Project_Build_Queue is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-project-build-queue",
+                                     File => File_2.File'Access);
+   Query_Cleanup_Project_Build_Queue : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Project_Build_Queue.Query'Access;
 
    package Def_Cleanup_Project_Test_Run is
       new ADO.Queries.Loaders.Query (Name => "cleanup-project-test-run",

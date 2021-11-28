@@ -192,34 +192,35 @@ package body Porion.Resources.Queries is
        & "id IN" & ASCII.LF & "      (SELECT porion_test_run_group.id FROM porion_"
        & "test_run_group INNER JOIN porion_test_group ON" & ASCII.LF & "          "
        & " porion_test_run_group.group_id = porion_test_group.id" & ASCII.LF & "  "
-       & "         INNER JOIN porion_build ON porion_build.id = porion_test_group."
-       & "build_id" & ASCII.LF & "                WHERE porion_build.recipe_id = :"
-       & "recipe_id)" & ASCII.LF & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF
+       & "         INNER JOIN porion_build ON porion_build.id = porion_test_run_gr"
+       & "oup.build_id" & ASCII.LF & "                WHERE porion_build.recipe_id"
+       & " = :recipe_id)" & ASCII.LF & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF
        & ASCII.LF & "    <query name='cleanup-recipe-test-run-group'>" & ASCII.LF
        & "       <comment>Cleanup the test run group of all builds for the recipe."
        & "</comment>" & ASCII.LF & "       <sql>" & ASCII.LF & "    DELETE FROM po"
-       & "rion_test_run_group WHERE group_id IN" & ASCII.LF & "      (SELECT id FR"
-       & "OM porion_test_group" & ASCII.LF & "           INNER JOIN porion_build O"
-       & "N porion_build.id = porion_test_group.build_id" & ASCII.LF & "          "
-       & "    WHERE porion_build.recipe_id = :recipe_id)" & ASCII.LF & "       </s"
-       & "ql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "    <query na"
-       & "me='cleanup-recipe-last-build'>" & ASCII.LF & "       <comment>Cleanup t"
-       & "he project last build references of a recipe.</comment>" & ASCII.LF & " "
-       & "      <sql>" & ASCII.LF & "    DELETE FROM porion_last_build WHERE recip"
-       & "e_id = :recipe_id" & ASCII.LF & "       </sql>" & ASCII.LF & "    </quer"
-       & "y>" & ASCII.LF & ASCII.LF & "    <query name='cleanup-recipe-build'>" & ASCII.LF
-       & "       <comment>Cleanup the project builds of a recipe.</comment>" & ASCII.LF
-       & "       <sql>" & ASCII.LF & "    DELETE FROM porion_build WHERE recipe_id"
-       & " = :recipe_id" & ASCII.LF & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF
-       & ASCII.LF & "    <query name='cleanup-recipe-environment'>" & ASCII.LF & " "
-       & "      <comment>Cleanup the project specific environment.</comment>" & ASCII.LF
-       & "       <sql>" & ASCII.LF & "    DELETE FROM porion_environment WHERE rec"
-       & "ipe_id = :recipe_id" & ASCII.LF & "       </sql>" & ASCII.LF & "    </qu"
-       & "ery>" & ASCII.LF & ASCII.LF & "    <query name='cleanup-recipe-step'>" & ASCII.LF
-       & "       <comment>Cleanup the project build recipe steps.</comment>" & ASCII.LF
-       & "       <sql>" & ASCII.LF & "    DELETE FROM porion_recipe_step WHERE rec"
-       & "ipe_id = :recipe_id" & ASCII.LF & "       </sql>" & ASCII.LF & "    </qu"
-       & "ery>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+       & "rion_test_run_group WHERE group_id IN" & ASCII.LF & "      (SELECT porio"
+       & "n_test_run_group.id FROM porion_test_run_group" & ASCII.LF & "          "
+       & " INNER JOIN porion_build ON porion_build.id = porion_test_run_group.buil"
+       & "d_id" & ASCII.LF & "              WHERE porion_build.recipe_id = :recipe"
+       & "_id)" & ASCII.LF & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF
+       & ASCII.LF & "    <query name='cleanup-recipe-last-build'>" & ASCII.LF & " "
+       & "      <comment>Cleanup the project last build references of a recipe.</c"
+       & "omment>" & ASCII.LF & "       <sql>" & ASCII.LF & "    DELETE FROM porio"
+       & "n_last_build WHERE recipe_id = :recipe_id" & ASCII.LF & "       </sql>" & ASCII.LF
+       & "    </query>" & ASCII.LF & ASCII.LF & "    <query name='cleanup-recipe-"
+       & "build'>" & ASCII.LF & "       <comment>Cleanup the project builds of a r"
+       & "ecipe.</comment>" & ASCII.LF & "       <sql>" & ASCII.LF & "    DELETE F"
+       & "ROM porion_build WHERE recipe_id = :recipe_id" & ASCII.LF & "       </sq"
+       & "l>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "    <query nam"
+       & "e='cleanup-recipe-environment'>" & ASCII.LF & "       <comment>Cleanup t"
+       & "he project specific environment.</comment>" & ASCII.LF & "       <sql>" & ASCII.LF
+       & "    DELETE FROM porion_environment WHERE recipe_id = :recipe_id" & ASCII.LF
+       & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "   "
+       & " <query name='cleanup-recipe-step'>" & ASCII.LF & "       <comment>Clean"
+       & "up the project build recipe steps.</comment>" & ASCII.LF & "       <sql>"
+       & ASCII.LF & "    DELETE FROM porion_recipe_step WHERE recipe_id = :recipe"
+       & "_id" & ASCII.LF & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF
+       & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
    C_4 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of project branches" & ASCII.LF

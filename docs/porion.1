@@ -243,15 +243,30 @@ porion \fBnode\fR \fIhostname\fR
 .\"
 .SS The remove command
 .RS 0
-porion \fBremove\fR [--new-passfile \fIfile\fR] \fIproject\fR
+porion \fBremove\fR [--force] [--interactive] \fIident\fR [\fIident\fR...]
 .RE
 .PP
+Remove a project, a recipe or a build and all its data.
+When the ident string indicates a build number, only the build number
+is removed.  The project rating are then updated.
+.PP
+When the ident string contains a recipe name, the recipe is removed
+as well as all the builds that were made with it.  The project rating
+are then updated.
+.PP
+With the
+.I --interactive
+option, a confirmation is asked before removal.
+.PP
+The
+.I --force
+option forces the removal and ignores any error.
 .\"
 .SS The step command
 .RS 0
 porion \fBstep\fR [--quiet] [--ignore-error] [--timeout \fItimeout\fR]
        [--disable] [--insert \fIpos\fR] [--update \fIpos\fR]
-       [--remove \fIpos\fR] \fIidentification\fR command args...
+       [--remove \fIpos\fR] \fIident\fR command args...
 .RE
 .PP
 The

@@ -676,6 +676,73 @@ package body Porion.Builds.Services is
       Service.Project.Save (Service.DB);
    end Update_Project_Ratings;
 
+   --  ------------------------------
+   --  Remove the recipe and all its materials (including the builds).
+   --  ------------------------------
+   procedure Remove_Recipe (Service : in out Context_Type) is
+      procedure Execute (Definition : in ADO.Queries.Query_Definition_Access);
+
+      procedure Execute (Definition : in ADO.Queries.Query_Definition_Access) is
+         Query  : ADO.Queries.Context;
+      begin
+         Query.Set_Query (Definition);
+         Query.Bind_Param ("recipe_id", Service.Recipe.Get_Id);
+         declare
+            Stmt   : ADO.Statements.Query_Statement := Service.DB.Create_Statement (Query);
+         begin
+            Stmt.Execute;
+         end;
+      end Execute;
+
+   begin
+      Service.DB.Begin_Transaction;
+
+      --  Cleanup the build information.
+      Execute (Porion.Builds.Models.Query_Cleanup_Recipe_Build_Metrics);
+      Execute (Porion.Builds.Models.Query_Cleanup_Recipe_Test_Run);
+      Execute (Porion.Builds.Models.Query_Cleanup_Recipe_Test_Run_Group);
+      Execute (Porion.Builds.Models.Query_Cleanup_Recipe_Last_Build);
+      Execute (Porion.Builds.Models.Query_Cleanup_Recipe_Build_Step);
+      Execute (Porion.Builds.Models.Query_Cleanup_Recipe_Environment);
+      Execute (Porion.Builds.Models.Query_Cleanup_Recipe_Build_Queue);
+      Execute (Porion.Builds.Models.Query_Cleanup_Recipe_Step);
+      Execute (Porion.Builds.Models.Query_Cleanup_Recipe_Build);
+
+      Service.Recipe.Delete (Service.DB);
+      Service.DB.Commit;
+   end Remove_Recipe;
+
+   --  ------------------------------
+   --  Remove the build.
+   --  ------------------------------
+   procedure Remove_Build (Service : in out Context_Type) is
+      procedure Execute (Definition : in ADO.Queries.Query_Definition_Access);
+
+      procedure Execute (Definition : in ADO.Queries.Query_Definition_Access) is
+         Query  : ADO.Queries.Context;
+      begin
+         Query.Set_Query (Definition);
+         Query.Bind_Param ("build_id", Service.Build.Get_Id);
+         declare
+            Stmt   : ADO.Statements.Query_Statement := Service.DB.Create_Statement (Query);
+         begin
+            Stmt.Execute;
+         end;
+      end Execute;
+
+   begin
+      Service.DB.Begin_Transaction;
+
+      --  Cleanup the build information.
+      Execute (Porion.Builds.Models.Query_Cleanup_Build_Metrics);
+      Execute (Porion.Builds.Models.Query_Cleanup_Build_Test_Run);
+      Execute (Porion.Builds.Models.Query_Cleanup_Build_Test_Run_Group);
+      Execute (Porion.Builds.Models.Query_Cleanup_Build_Step);
+
+      Service.Build.Delete (Service.DB);
+      Service.DB.Commit;
+   end Remove_Build;
+
    procedure Load_Environment (Service : in out Context_Type;
                                Recipe  : in Models.Recipe_Ref) is
       Envs  : Porion.Builds.Models.Environment_Vector;

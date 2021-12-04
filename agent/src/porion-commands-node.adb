@@ -28,6 +28,13 @@ package body Porion.Commands.Node is
                       Args      : in Argument_List'Class;
                       Context   : in out Context_Type) is
       pragma Unreferenced (Name);
+
+      function Get_Scheme (URI : in String) return String;
+      function Get_Login (URI : in String) return String;
+      function Get_Hostname (URI : in String) return String;
+      function Get_Path (URI : in String) return String;
+      function Get_Type (Scheme : in String) return Porion.Nodes.Node_Type;
+
       Count : constant Natural := Args.Get_Count;
 
       function Get_Node_Status return String is

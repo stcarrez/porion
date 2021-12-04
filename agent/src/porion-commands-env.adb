@@ -34,12 +34,14 @@ package body Porion.Commands.Env is
 
       Count : constant Natural := Args.Get_Count;
    begin
+      Context.Open;
+
       if Count = 0 then
-         Porion.Commands.Error (-("missing project name and variable to set"));
+         Porion.Reports.List_Environment (Service => Context.Project_Service,
+                                          Printer => Context.Printer.all,
+                                          Styles  => Context.Styles);
          return;
       end if;
-
-      Context.Open;
 
       declare
          Arg   : constant String := Args.Get_Argument (1);
@@ -54,7 +56,9 @@ package body Porion.Commands.Env is
                Context.Project_Service.Recipe := Porion.Builds.Models.Null_Recipe;
             end if;
 
-            if not Porion.Projects.Has_Branch (Ident) and not Porion.Projects.Has_Recipe (Ident) then
+            if not Porion.Projects.Has_Branch (Ident)
+              and not Porion.Projects.Has_Recipe (Ident)
+            then
                Context.Project_Service.Branch := Porion.Projects.Models.Null_Branch;
             end if;
 

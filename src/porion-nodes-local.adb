@@ -16,7 +16,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Directories;
-with Util.Processes;
 with Util.Log.Loggers;
 with Util.Streams;
 with Util.Streams.Texts;
@@ -37,6 +36,42 @@ package body Porion.Nodes.Local is
       Controller.Listener := Listener;
       return Controller.all'Access;
    end Create;
+
+   --  ------------------------------
+   --  Set the environment variables when running commands in the build node.
+   --  ------------------------------
+   overriding
+   procedure Set_Environment (Controller : in out Controller_Type;
+                              Env        : in Util.Strings.Maps.Map) is
+   begin
+      Controller.Env := Env;
+   end Set_Environment;
+
+   --  ------------------------------
+   --  Set the environment variables before launching the process.
+   --  ------------------------------
+   procedure Set_Environment (Controller : in out Controller_Type;
+                              Proc       : in out Util.Processes.Process) is
+      procedure Iterate (Process_Env : not null access procedure (Name, Value : in String));
+
+      procedure Iterate (Process_Env : not null access procedure (Name, Value : in String)) is
+      begin
+         for Env in Controller.Env.Iterate loop
+            declare
+               Name  : constant String := Util.Strings.Maps.Key (Env);
+               Value : constant String := Util.Strings.Maps.Element (Env);
+            begin
+               Log.Debug ("setenv {0} {1}", Name, Value);
+
+               Process_Env (Name, Value);               
+            end;
+         end loop;
+      end Iterate;
+   begin
+      if not Controller.Env.Is_Empty then
+         Util.Processes.Set_Environment (Proc, Iterate'Access);
+      end if;
+   end Set_Environment;
 
    --  ------------------------------
    --  Execute the command in the working directory and for each output
@@ -71,6 +106,7 @@ package body Porion.Nodes.Local is
             Log.Info ("Running '{0}'", Command);
          end if;
 
+         Controller.Set_Environment (Proc);
          Sys_Rusage (Start);
          Util.Processes.Spawn (Proc    => Proc,
                                Command => Command,
@@ -130,6 +166,7 @@ package body Porion.Nodes.Local is
             Log.Info ("Running '{0}'", Command);
          end if;
 
+         Controller.Set_Environment (Proc);
          Sys_Rusage (Start);
          Util.Processes.Spawn (Proc      => Proc,
                                Arguments => Args,

@@ -23,7 +23,6 @@ with Util.Properties;
 with Util.Strings;
 with Util.Dates.ISO8601;
 with Porion.Configs;
-with Porion.Sources.Factories;
 with Porion.Builds.Models;
 with ADO.SQL;
 with ADO.Queries;
@@ -143,6 +142,7 @@ package body Porion.Projects.Services is
       end if;
 
       --  Cleanup unit test data.
+      Execute (Porion.Projects.Models.Query_Cleanup_Project_Build_Metrics);
       Execute (Porion.Projects.Models.Query_Cleanup_Project_Test_Run);
       Execute (Porion.Projects.Models.Query_Cleanup_Project_Test_Run_Group);
       Execute (Porion.Projects.Models.Query_Cleanup_Project_Test);
@@ -151,12 +151,14 @@ package body Porion.Projects.Services is
       --  Cleanup build data.
       Execute (Porion.Projects.Models.Query_Cleanup_Project_Build_Step);
       Execute (Porion.Projects.Models.Query_Cleanup_Project_Last_Build);
+      Execute (Porion.Projects.Models.Query_Cleanup_Project_Build_Reason);
       Execute (Porion.Projects.Models.Query_Cleanup_Project_Build);
 
-      --  Cleanup build config.
+      --  Cleanup build recipes.
       Execute (Porion.Projects.Models.Query_Cleanup_Project_Environment);
-      Execute (Porion.Projects.Models.Query_Cleanup_Project_Build_Config_Step);
-      Execute (Porion.Projects.Models.Query_Cleanup_Project_Build_Config);
+      Execute (Porion.Projects.Models.Query_Cleanup_Project_Build_Recipe_Step);
+      Execute (Porion.Projects.Models.Query_Cleanup_Project_Build_Recipe);
+      Execute (Porion.Projects.Models.Query_Cleanup_Project_Build_Queue);
 
       --  Cleanup project branches.
       Execute (Porion.Projects.Models.Query_Cleanup_Project_Branch);
@@ -299,7 +301,6 @@ package body Porion.Projects.Services is
       Branches   : Porion.Projects.Models.Branch_Vector;
       Src_Status : Porion.Sources.Status_Type;
       Queue_Added : Boolean := False;
-      Source_Controller : Porion.Sources.Controller_Access;
       Now        : constant Ada.Calendar.Time := Ada.Calendar.Clock;
    begin
       Log.Info ("Checking changes in {0}", Name);
@@ -308,9 +309,8 @@ package body Porion.Projects.Services is
       Executor.Set_Step (Builds.STEP_CHECKOUT);
 
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
-      Source_Controller := Sources.Factories.Create (Service.Project.Get_Scm, Config);
 
-      Source_Controller.Check (Src_Status, Executor);
+      Sources.Check (Service.Project.Get_Scm, Config, Src_Status, Executor);
 
       --  Get the current known branches.
       Query.Bind_Param ("project_id", Service.Project.Get_Id);

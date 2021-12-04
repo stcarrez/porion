@@ -24,12 +24,12 @@ with Servlet.Server.Web;
 
 with AWA.Commands.Drivers;
 with AWA.Commands.Start;
---  with AWA.Commands.Setup;
 with AWA.Commands.Stop;
 with AWA.Commands.List;
 with AWA.Commands.Info;
 
 with ADO.Sqlite;
+with ADO.Configs;
 
 with Porion.Configs;
 with Porion.Projects.Services;
@@ -47,7 +47,7 @@ procedure Porion.Server is
    package Start_Command is new AWA.Commands.Start (Server_Commands);
    package Stop_Command is new AWA.Commands.Stop (Server_Commands);
    package Info_Command is new AWA.Commands.Info (Server_Commands);
-   --  package Setup_Command is new AWA.Commands.Setup (Start_Command);
+   pragma Unreferenced (List_Command, Start_Command, Stop_Command, Info_Command);
 
    type Init_Command_Type is new Server_Commands.Command_Type with null record;
 
@@ -58,7 +58,8 @@ procedure Porion.Server is
                       Context : in out AWA.Commands.Context_Type);
 
    Log       : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Server");
-   App       : constant Porion.Applications.Application_Access := new Porion.Applications.Application;
+   App       : constant Porion.Applications.Application_Access
+      := new Porion.Applications.Application;
    WS        : Servlet.Server.Web.AWS_Container renames Server_Commands.WS;
    Context   : AWA.Commands.Context_Type;
    Arguments : Util.Commands.Dynamic_Argument_List;
@@ -91,12 +92,20 @@ procedure Porion.Server is
             Ada.Directories.Create_Path (Path);
             Porion.Configs.Initialize (Config_Path);
             Porion.Configs.Set (Porion.Configs.WORKSPACE_DIR_NAME, Path);
+            Porion.Configs.Set (Porion.Configs.DATABASE_NAME, Porion.Configs.Get_Default_Database_Path);
+            Ada.Directories.Create_Path (Porion.Configs.Get_Config_Directory);
+            Ada.Directories.Create_Path (Porion.Configs.Get_Project_Directory);
+            Ada.Directories.Create_Path (Porion.Configs.Get_Rules_Directory);
             Porion.Configs.Save;
+            Project_Service.Open (Resources.Queries.Get_Content'Access, Schema);
+            Log.Info (-("Porion workspace created in {0}"), Path);
+            Nodes.Services.Add_Default_Node (Project_Service,
+                                             Hostname => "localhost",
+                                             Login    => "");
+            Nodes.Services.Probe_Node (Project_Service);
+            Log.Info (-("Default build node 'localhost' is registered"));
+            Log.Info (-("Use 'porion add' to register a first project"));
          end;
-         Project_Service.Open (Resources.Queries.Get_Content'Access, Schema);
-         Nodes.Services.Add_Default_Node (Project_Service,
-                                          Hostname => "localhost",
-                                          Login    => "");
       end if;
    end Execute;
 
@@ -115,6 +124,9 @@ begin
    Server_Commands.Run (Context, Arguments);
 
 exception
+   when E : ADO.Configs.Connection_Error =>
+      Log.Error ("Cannot open the database");
+
    when E : others =>
       Context.Print (E);
 end Porion.Server;

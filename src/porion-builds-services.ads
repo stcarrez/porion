@@ -18,6 +18,7 @@
 with Ada.Containers.Vectors;
 with Util.Strings.Vectors;
 with Util.Serialize.IO;
+with Util.Strings.Maps;
 with Porion.Configs;
 with Porion.Builds.Models;
 with Porion.Projects;
@@ -195,6 +196,12 @@ package Porion.Builds.Services is
    procedure Remove_Build (Service : in out Context_Type) with
       Pre => Service.Has_Project and Service.Has_Build;
 
+   --  Set the environment variable for the build.
+   procedure Set_Environment (Service : in out Context_Type;
+                              Name    : in String;
+                              Value   : in String) with
+      Pre => Service.Has_Project;
+
 private
 
    --  Returns True if the recipe is contained in the build queue.
@@ -212,7 +219,8 @@ private
                            Status  : in Builds.Models.Build_Status_Type);
 
    procedure Load_Environment (Service : in out Context_Type;
-                               Recipe  : in Models.Recipe_Ref);
+                               Recipe  : in Models.Recipe_Ref;
+                               Env     : in out Util.Strings.Maps.Map);
 
    procedure Load_Recipe (Service : in out Context_Type;
                           Recipe  : in Models.Recipe_Ref;

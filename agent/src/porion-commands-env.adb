@@ -16,6 +16,9 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Porion.Services;
+with Porion.Nodes.Models;
+with Porion.Projects.Models;
+with Porion.Builds.Models;
 with Porion.Builds.Services;
 package body Porion.Commands.Env is
 
@@ -44,6 +47,18 @@ package body Porion.Commands.Env is
       begin
          Ident := Porion.Projects.Parse (Arg);
          Context.Project_Service.Load (Ident);
+
+         if not Porion.Projects.Has_Recipe (Ident) then
+            Context.Project_Service.Recipe := Porion.Builds.Models.Null_Recipe;
+         end if;
+
+         if not Porion.Projects.Has_Branch (Ident) and not Porion.Projects.Has_Recipe (Ident) then
+            Context.Project_Service.Branch := Porion.Projects.Models.Null_Branch;
+         end if;
+
+         if not Porion.Projects.Has_Node (Ident) then
+            Context.Project_Service.Build_Node := Porion.Nodes.Models.Null_Node;
+         end if;
 
          for I in 2 .. Count loop
             declare

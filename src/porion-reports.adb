@@ -813,6 +813,8 @@ package body Porion.Reports is
    procedure List_Environment (List     : in Porion.Queries.Environment_Info_Vector;
                                Printer  : in out PT.Printer_Type'Class;
                                Styles   : in Style_Configuration) is
+      use Ada.Strings.Unbounded;
+
       Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
       Fields : PT.Texts.Field_Array (1 .. 2);
       Style1 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
@@ -829,20 +831,23 @@ package body Porion.Reports is
       Writer.New_Line;
 
       for Env of List loop
-         declare
-            use Ada.Strings.Unbounded;
-
-            Ident : Porion.Projects.Ident_Type;
-         begin
-            Ident.Name := Env.Project_Name;
-            Ident.Branch := Env.Branch_Name;
-            Ident.Recipe := Env.Recipe_Name;
-            Ident.Node := Env.Node_Name;
-
-            Writer.Put (Fields (1), Porion.Projects.To_String (Ident));
-            Writer.Put_UString (Fields (2), Env.Name & "=" & Env.Value);
-            Writer.New_Line;
-         end;
+         if Length (Env.Project_Name) = 0 and then Length (Env.Node_Name) = 0 then
+            Writer.Put (Fields (1), "* GLOBAL *");
+         elsif Length (Env.Project_Name) = 0 then
+            Writer.Put (Fields (1), "@" & To_String (Env.Node_Name));
+         else
+            declare
+               Ident : Porion.Projects.Ident_Type;
+            begin
+               Ident.Name := Env.Project_Name;
+               Ident.Branch := Env.Branch_Name;
+               Ident.Recipe := Env.Recipe_Name;
+               Ident.Node := Env.Node_Name;
+               Writer.Put (Fields (1), Porion.Projects.To_String (Ident));
+            end;
+         end if;
+         Writer.Put_UString (Fields (2), Env.Name & "=" & Env.Value);
+         Writer.New_Line;
       end loop;
    end List_Environment;
 

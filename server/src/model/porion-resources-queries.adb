@@ -8,14 +8,14 @@ package body Porion.Resources.Queries is
      (1, 12, 13);
 
    T1 : constant array (0 .. 2) of Unsigned_8 :=
-     (29, 11, 19);
+     (13, 15, 28);
 
    T2 : constant array (0 .. 2) of Unsigned_8 :=
-     (27, 27, 2);
+     (13, 14, 32);
 
-   G : constant array (0 .. 30) of Unsigned_8 :=
-     (0, 0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 8, 4, 0, 6, 9, 0, 0, 0, 9, 0, 10,
-      1, 0, 11, 0, 5, 9, 6, 14);
+   G : constant array (0 .. 32) of Unsigned_8 :=
+     (0, 15, 6, 0, 0, 0, 0, 0, 0, 0, 14, 0, 6, 0, 0, 0, 0, 2, 0, 0, 0, 6, 4,
+      5, 0, 3, 7, 10, 1, 0, 2, 10, 10);
 
    function Hash (S : String) return Natural is
       F : constant Natural := S'First - 1;
@@ -26,10 +26,10 @@ package body Porion.Resources.Queries is
       for K in P'Range loop
          exit when L < P (K);
          J  := Character'Pos (S (P (K) + F));
-         F1 := (F1 + Natural (T1 (K)) * J) mod 31;
-         F2 := (F2 + Natural (T2 (K)) * J) mod 31;
+         F1 := (F1 + Natural (T1 (K)) * J) mod 33;
+         F2 := (F2 + Natural (T2 (K)) * J) mod 33;
       end loop;
-      return (Natural (G (F1)) + Natural (G (F2))) mod 15;
+      return (Natural (G (F1)) + Natural (G (F2))) mod 16;
    end Hash;
 
    C_0 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
@@ -627,6 +627,63 @@ package body Porion.Resources.Queries is
        & "</query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
    C_12 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+       & "    <description>" & ASCII.LF & "        List of environment variables" & ASCII.LF
+       & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
+       & "ueries.Environment_Info"" bean=""yes"">" & ASCII.LF & "        <comment>"
+       & "Information about a project.</comment>" & ASCII.LF & "        <property "
+       & "type='String' name=""name"">" & ASCII.LF & "            <comment>the env"
+       & "ironment variable name.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='String' name=""value"">" & ASCII.LF & "         "
+       & "   <comment>the environment variable value.</comment>" & ASCII.LF & "   "
+       & "     </property>" & ASCII.LF & "        <property type='String' name=""p"
+       & "roject_name"">" & ASCII.LF & "            <comment>the optional project "
+       & "name.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "      "
+       & "  <property type='String' name=""branch_name"">" & ASCII.LF & "         "
+       & "   <comment>the optional branch name.</comment>" & ASCII.LF & "        <"
+       & "/property>" & ASCII.LF & "        <property type='String' name=""recipe_"
+       & "name"">" & ASCII.LF & "            <comment>the optional recipe name.</c"
+       & "omment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <prope"
+       & "rty type='String' name=""node_name"">" & ASCII.LF & "            <commen"
+       & "t>the optional build node name.</comment>" & ASCII.LF & "        </prope"
+       & "rty>" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF & "    <query n"
+       & "ame='environment-list'>" & ASCII.LF & "        <comment>Get the list of "
+       & "environment variables</comment>" & ASCII.LF & "        <sql>" & ASCII.LF
+       & "            SELECT" & ASCII.LF & "            env.name AS name," & ASCII.LF
+       & "            env.value AS value," & ASCII.LF & "            COALESCE(proj"
+       & "ect.name, '') AS project_name," & ASCII.LF & "            COALESCE(branc"
+       & "h.name, '') AS branch_name," & ASCII.LF & "            COALESCE(recipe.n"
+       & "ame, '') AS recipe_name," & ASCII.LF & "            COALESCE(node.name, "
+       & "'') AS node_name" & ASCII.LF & "            FROM porion_environment AS e"
+       & "nv" & ASCII.LF & "            LEFT JOIN porion_branch AS branch ON env.b"
+       & "ranch_id = branch.id" & ASCII.LF & "            LEFT JOIN porion_project"
+       & " AS project ON env.project_id = project.id" & ASCII.LF & "            LE"
+       & "FT JOIN porion_node AS node ON env.node_id = node.id" & ASCII.LF & "    "
+       & "        LEFT JOIN porion_recipe AS recipe ON env.recipe_id = recipe.id" & ASCII.LF
+       & "            ORDER BY node_name, project_name, branch_name, recipe_name, "
+       & "name" & ASCII.LF & "        </sql>" & ASCII.LF & "        <sql-count>" & ASCII.LF
+       & "            SELECT" & ASCII.LF & "            count(env.id)" & ASCII.LF
+       & "            FROM porion_environment AS env" & ASCII.LF & "        </sql-"
+       & "count>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "    <query"
+       & " name='project-environment-list'>" & ASCII.LF & "        <comment>Get th"
+       & "e list of environment variables</comment>" & ASCII.LF & "        <sql>" & ASCII.LF
+       & "            SELECT" & ASCII.LF & "            env.name AS name," & ASCII.LF
+       & "            env.value AS value," & ASCII.LF & "            project.name "
+       & "AS name," & ASCII.LF & "            COALESCE(branch.name, '') AS branch_"
+       & "name," & ASCII.LF & "            COALESCE(recipe.name, '') AS recipe_nam"
+       & "e," & ASCII.LF & "            COALESCE(node.name, '') AS node_name" & ASCII.LF
+       & "            FROM porion_environment AS env" & ASCII.LF & "            LE"
+       & "FT JOIN porion_branch AS branch ON env.branch_id = branch.id" & ASCII.LF
+       & "            LEFT JOIN porion_project AS project ON env.project_id = proj"
+       & "ect.id" & ASCII.LF & "            LEFT JOIN porion_node AS node ON env.n"
+       & "ode_id = node.id" & ASCII.LF & "            WHERE env.project_id = :proj"
+       & "ect_id OR env.project_id IS NULL" & ASCII.LF & "        </sql>" & ASCII.LF
+       & "        <sql-count>" & ASCII.LF & "            SELECT" & ASCII.LF & "   "
+       & "         count(env.id)" & ASCII.LF & "            FROM porion_environmen"
+       & "t AS env" & ASCII.LF & "            WHERE env.project_id = :project_id O"
+       & "R env.project_id IS NULL" & ASCII.LF & "        </sql-count>" & ASCII.LF
+       & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+
+   C_13 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of projects" & ASCII.LF & " "
        & "   </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Qu"
        & "eries.Project_Info"" bean=""yes"">" & ASCII.LF & "        <comment>Infor"
@@ -738,7 +795,7 @@ package body Porion.Resources.Queries is
        & "M porion_project AS project" & ASCII.LF & "        </sql-count>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_13 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_14 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List the tests" & ASCII.LF & " "
        & "   </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Qu"
        & "eries.Test_Info"" bean=""yes"">" & ASCII.LF & "        <comment>Informat"
@@ -782,7 +839,7 @@ package body Porion.Resources.Queries is
        & "id = :build_id" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>"
        & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_14 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_15 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        Stats for the builds" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
        & "ueries.Build_Stat"" bean=""no"">" & ASCII.LF & "        <comment>Informa"
@@ -814,7 +871,7 @@ package body Porion.Resources.Queries is
    Contents : constant Content_List_Array := (
       C_0'Access, C_1'Access, C_2'Access, C_3'Access, C_4'Access, C_5'Access,
       C_6'Access, C_7'Access, C_8'Access, C_9'Access, C_10'Access, C_11'Access,
-      C_12'Access, C_13'Access, C_14'Access);
+      C_12'Access, C_13'Access, C_14'Access, C_15'Access);
 
    function Get_Content (Name : String) return access constant String is
       H : constant Natural := Hash (Name);

@@ -131,6 +131,97 @@ package body Porion.Queries is
       end loop;
    end List;
 
+
+
+   --  ------------------------------
+   --  Get the bean attribute identified by the name.
+   --  ------------------------------
+   overriding
+   function Get_Value (From : in Environment_Info;
+                       Name : in String) return Util.Beans.Objects.Object is
+   begin
+      if Name = "name" then
+         return Util.Beans.Objects.To_Object (From.Name);
+      elsif Name = "value" then
+         return Util.Beans.Objects.To_Object (From.Value);
+      elsif Name = "project_name" then
+         return Util.Beans.Objects.To_Object (From.Project_Name);
+      elsif Name = "branch_name" then
+         return Util.Beans.Objects.To_Object (From.Branch_Name);
+      elsif Name = "recipe_name" then
+         return Util.Beans.Objects.To_Object (From.Recipe_Name);
+      elsif Name = "node_name" then
+         return Util.Beans.Objects.To_Object (From.Node_Name);
+      end if;
+      return Util.Beans.Objects.Null_Object;
+   end Get_Value;
+
+
+   --  ------------------------------
+   --  Set the value identified by the name
+   --  ------------------------------
+   overriding
+   procedure Set_Value (Item  : in out Environment_Info;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object) is
+   begin
+      if Name = "name" then
+         Item.Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "value" then
+         Item.Value := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "project_name" then
+         Item.Project_Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "branch_name" then
+         Item.Branch_Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "recipe_name" then
+         Item.Recipe_Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "node_name" then
+         Item.Node_Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      end if;
+   end Set_Value;
+
+
+   --  --------------------
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   --  --------------------
+   procedure List (Object  : in out Environment_Info_List_Bean'Class;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+   begin
+      List (Object.List, Session, Context);
+   end List;
+
+   --  --------------------
+   --  Information about a project.
+   --  --------------------
+   procedure List (Object  : in out Environment_Info_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+      procedure Read (Into : in out Environment_Info);
+
+      Stmt : ADO.Statements.Query_Statement
+          := Session.Create_Statement (Context);
+      Pos  : Positive := 1;
+      procedure Read (Into : in out Environment_Info) is
+      begin
+         Into.Name := Stmt.Get_Unbounded_String (0);
+         Into.Value := Stmt.Get_Unbounded_String (1);
+         Into.Project_Name := Stmt.Get_Unbounded_String (2);
+         Into.Branch_Name := Stmt.Get_Unbounded_String (3);
+         Into.Recipe_Name := Stmt.Get_Unbounded_String (4);
+         Into.Node_Name := Stmt.Get_Unbounded_String (5);
+      end Read;
+   begin
+      Stmt.Execute;
+      Environment_Info_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         Object.Insert_Space (Before => Pos);
+         Object.Update_Element (Index => Pos, Process => Read'Access);
+         Pos := Pos + 1;
+         Stmt.Next;
+      end loop;
+   end List;
+
    --  --------------------
    --  A metric collected during the build.
    --  --------------------

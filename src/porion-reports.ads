@@ -57,7 +57,9 @@ package Porion.Reports is
    --  a project, the report only indicates the builds of the project.
    procedure List_Builds (Service : in out Porion.Services.Context_Type'Class;
                           Printer : in out PT.Printer_Type'Class;
-                          Styles  : in Style_Configuration);
+                          Styles  : in Style_Configuration) with
+      Pre => Service.Is_Open;
+
    procedure List_Builds (List    : in Porion.Queries.Build_Info_Vector;
                           Printer : in out PT.Printer_Type'Class;
                           Styles  : in Style_Configuration;
@@ -66,7 +68,9 @@ package Porion.Reports is
    --  Create a report about the projects.
    procedure List_Projects (Service : in out Porion.Services.Context_Type'Class;
                             Printer : in out PT.Printer_Type'Class;
-                            Styles  : in Style_Configuration);
+                            Styles  : in Style_Configuration) with
+      Pre => Service.Is_Open;
+
    procedure List_Projects (List    : in Porion.Queries.Project_Info_Vector;
                             Printer : in out PT.Printer_Type'Class;
                             Styles  : in Style_Configuration;
@@ -81,7 +85,9 @@ package Porion.Reports is
    --  a project, the report only indicates the build nodes of the project.
    procedure List_Nodes (Service : in out Porion.Services.Context_Type'Class;
                          Printer : in out PT.Printer_Type'Class;
-                         Styles  : in Style_Configuration);
+                         Styles  : in Style_Configuration) with
+      Pre => Service.Is_Open;
+
    procedure List_Nodes (List    : in Porion.Queries.Node_Info_Vector;
                          Printer : in out PT.Printer_Type'Class;
                          Styles  : in Style_Configuration;
@@ -91,7 +97,9 @@ package Porion.Reports is
    --  a project, the report only indicates the build queued of the project.
    procedure List_Queues (Service : in out Porion.Services.Context_Type'Class;
                           Printer : in out PT.Printer_Type'Class;
-                          Styles  : in Style_Configuration);
+                          Styles  : in Style_Configuration) with
+      Pre => Service.Is_Open;
+
    procedure List_Queues (List    : in Porion.Queries.Queue_Info_Vector;
                           Printer : in out PT.Printer_Type'Class;
                           Styles  : in Style_Configuration;
@@ -103,7 +111,8 @@ package Porion.Reports is
                          Build   : in Porion.Builds.Models.Build_Ref;
                          Printer : in out PT.Printer_Type'Class;
                          Styles  : in Style_Configuration;
-                         Failed_Only : in Boolean);
+                         Failed_Only : in Boolean) with
+      Pre => Service.Is_Open;
 
    --  Create a report with the unit tests.
    procedure List_Tests (List     : in Porion.Queries.Test_Info_Vector;
@@ -114,7 +123,8 @@ package Porion.Reports is
    procedure List_Metrics (Service : in out Porion.Services.Context_Type'Class;
                            Build   : in Porion.Builds.Models.Build_Ref;
                            Printer : in out PT.Printer_Type'Class;
-                           Styles  : in Style_Configuration);
+                           Styles  : in Style_Configuration) with
+      Pre => Service.Is_Open;
 
    --  Create a report with the build metrics.
    procedure List_Metrics (List     : in Porion.Queries.Metric_Info_Vector;
@@ -130,7 +140,8 @@ package Porion.Reports is
    --  Create a report with the build environment variables.
    procedure List_Environment (Service : in out Porion.Services.Context_Type'Class;
                                Printer : in out PT.Printer_Type'Class;
-                               Styles  : in Style_Configuration);
+                               Styles  : in Style_Configuration) with
+      Pre => Service.Is_Open;
 
    procedure List_Environment (List     : in Porion.Queries.Environment_Info_Vector;
                                Printer  : in out PT.Printer_Type'Class;

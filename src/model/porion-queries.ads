@@ -147,7 +147,7 @@ package Porion.Queries is
    Query_Project_Last_Build_List : constant ADO.Queries.Query_Definition_Access;
 
    --  --------------------
-   --    Information about a build.
+   --    Statistics about a list of builds.
    --  --------------------
    type Build_Stat is record
 
@@ -156,6 +156,27 @@ package Porion.Queries is
 
       --  the number of builds.
       Count : Natural;
+
+      --  the total number of tests that passed.
+      Pass_Count : Natural;
+
+      --  the total number of tests that failed.
+      Fail_Count : Natural;
+
+      --  the total number of tests that timeout.
+      Timeout_Count : Natural;
+
+      --  the total duration of all tests.
+      Test_Duration : Natural;
+
+      --  the total build duration.
+      Build_Duration : Porion.Millisecond_Type;
+
+      --  the total system time.
+      Sys_Time : Porion.Millisecond_Type;
+
+      --  the total user time.
+      User_Time : Porion.Millisecond_Type;
    end record;
 
    package Build_Stat_Vectors is
@@ -170,9 +191,9 @@ package Porion.Queries is
                    Session : in out ADO.Sessions.Session'Class;
                    Context : in out ADO.Queries.Context'Class);
 
-   Query_Stat_Project_Config_Status : constant ADO.Queries.Query_Definition_Access;
+   Query_Stat_Builds : constant ADO.Queries.Query_Definition_Access;
 
-   Query_Stat_Project_Build_Status : constant ADO.Queries.Query_Definition_Access;
+   Query_Stat_Project_Builds : constant ADO.Queries.Query_Definition_Access;
 
    --  --------------------
    --    Information about a project.
@@ -605,19 +626,19 @@ private
 
    package File_3 is
       new ADO.Queries.Loaders.File (Path => "stat-builds.xml",
-                                    Sha1 => "63C1A2D3608E0593226DF62572ED445DB216B473");
+                                    Sha1 => "B5F21D0AE7996351083C02153A41A5F010E74C09");
 
-   package Def_Buildstat_Stat_Project_Config_Status is
-      new ADO.Queries.Loaders.Query (Name => "stat-project-config-status",
+   package Def_Buildstat_Stat_Builds is
+      new ADO.Queries.Loaders.Query (Name => "stat-builds",
                                      File => File_3.File'Access);
-   Query_Stat_Project_Config_Status : constant ADO.Queries.Query_Definition_Access
-   := Def_Buildstat_Stat_Project_Config_Status.Query'Access;
+   Query_Stat_Builds : constant ADO.Queries.Query_Definition_Access
+   := Def_Buildstat_Stat_Builds.Query'Access;
 
-   package Def_Buildstat_Stat_Project_Build_Status is
-      new ADO.Queries.Loaders.Query (Name => "stat-project-build-status",
+   package Def_Buildstat_Stat_Project_Builds is
+      new ADO.Queries.Loaders.Query (Name => "stat-project-builds",
                                      File => File_3.File'Access);
-   Query_Stat_Project_Build_Status : constant ADO.Queries.Query_Definition_Access
-   := Def_Buildstat_Stat_Project_Build_Status.Query'Access;
+   Query_Stat_Project_Builds : constant ADO.Queries.Query_Definition_Access
+   := Def_Buildstat_Stat_Project_Builds.Query'Access;
 
    package File_4 is
       new ADO.Queries.Loaders.File (Path => "report-env.xml",

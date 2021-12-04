@@ -842,29 +842,61 @@ package body Porion.Resources.Queries is
    C_15 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        Stats for the builds" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
-       & "ueries.Build_Stat"" bean=""no"">" & ASCII.LF & "        <comment>Informa"
-       & "tion about a build.</comment>" & ASCII.LF & "        <property type='Por"
-       & "ion.Builds.Models.Build_Status_Type' name=""build_status"">" & ASCII.LF
+       & "ueries.Build_Stat"" bean=""no"">" & ASCII.LF & "        <comment>Statist"
+       & "ics about a list of builds.</comment>" & ASCII.LF & "        <property t"
+       & "ype='Porion.Builds.Models.Build_Status_Type' name=""build_status"">" & ASCII.LF
        & "            <comment>the build status.</comment>" & ASCII.LF & "        "
        & "</property>" & ASCII.LF & "        <property type='Natural' name=""count"
        & """>" & ASCII.LF & "            <comment>the number of builds.</comment>" & ASCII.LF
-       & "        </property>" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF
-       & "    <query name='stat-project-config-status'>" & ASCII.LF & "        <co"
-       & "mment>Project build recipes status for a dashboard</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Natural' name"
+       & "=""pass_count"">" & ASCII.LF & "            <comment>the total number of"
+       & " tests that passed.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Natural' name=""fail_count"">" & ASCII.LF & "   "
+       & "         <comment>the total number of tests that failed.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Natural' name"
+       & "=""timeout_count"">" & ASCII.LF & "            <comment>the total number"
+       & " of tests that timeout.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Natural' name=""test_duration"">" & ASCII.LF & " "
+       & "           <comment>the total duration of all tests.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Porion.Millis"
+       & "econd_Type' name=""build_duration"" not-null=""yes"">" & ASCII.LF & "   "
+       & "         <comment>the total build duration.</comment>" & ASCII.LF & "   "
+       & "     </property>" & ASCII.LF & "        <property type='Porion.Milliseco"
+       & "nd_Type' name=""sys_time"" not-null=""yes"">" & ASCII.LF & "            "
+       & "<comment>the total system time.</comment>" & ASCII.LF & "        </prope"
+       & "rty>" & ASCII.LF & "        <property type='Porion.Millisecond_Type' nam"
+       & "e=""user_time"" not-null=""yes"">" & ASCII.LF & "            <comment>th"
+       & "e total user time.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "    </class>" & ASCII.LF & ASCII.LF & "    <query name='stat-builds'>" & ASCII.LF
+       & "        <comment>Statistics about the last project builds</comment>" & ASCII.LF
        & "        <sql>" & ASCII.LF & "          SELECT" & ASCII.LF & "          b"
-       & "uild.status," & ASCII.LF & "          count(build.id)" & ASCII.LF & "   "
-       & "       FROM porion_recipe AS recipe" & ASCII.LF & "          LEFT JOIN p"
-       & "orion_last_build AS build on build.recipe_id = recipe.id" & ASCII.LF & " "
-       & "         WHERE build.project_id = :project_id" & ASCII.LF & "          G"
-       & "ROUP BY build.status" & ASCII.LF & "        </sql>" & ASCII.LF & "    </"
-       & "query> " & ASCII.LF & ASCII.LF & "    <query name='stat-project-build-s"
-       & "tatus'>" & ASCII.LF & "        <comment>Project build status for a dashb"
-       & "oard</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & "          SEL"
-       & "ECT" & ASCII.LF & "          build.status," & ASCII.LF & "          coun"
-       & "t(build.id)" & ASCII.LF & "          FROM porion_build AS build" & ASCII.LF
-       & "          WHERE build.project_id = :project_id" & ASCII.LF & "          "
-       & "GROUP BY build.status" & ASCII.LF & "        </sql>" & ASCII.LF & "    <"
-       & "/query> " & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+       & "uild.status AS status," & ASCII.LF & "          COUNT(build.id) AS cnt," & ASCII.LF
+       & "          SUM(build.pass_count) AS pass_count," & ASCII.LF & "          "
+       & "SUM(build.fail_count) AS fail_count," & ASCII.LF & "          SUM(build."
+       & "timeout_count) AS timeout_count," & ASCII.LF & "          SUM(build.test"
+       & "_duration) AS test_duration," & ASCII.LF & "          SUM(build.build_du"
+       & "ration) AS build_duration," & ASCII.LF & "          SUM(build.sys_time) "
+       & "AS sys_time," & ASCII.LF & "          SUM(build.user_time) AS user_time" & ASCII.LF
+       & "          FROM porion_last_build AS last_build" & ASCII.LF & "          "
+       & "INNER JOIN porion_build AS build ON last_build.build_id = build.id" & ASCII.LF
+       & "          WHERE last_build.last_build = 1" & ASCII.LF & "          GROUP"
+       & " BY build.status" & ASCII.LF & "        </sql>" & ASCII.LF & "    </quer"
+       & "y> " & ASCII.LF & ASCII.LF & "    <query name='stat-project-builds'>" & ASCII.LF
+       & "        <comment>Stats about the last project builds</comment>" & ASCII.LF
+       & "        <sql>" & ASCII.LF & "          SELECT" & ASCII.LF & "          b"
+       & "uild.status AS status," & ASCII.LF & "          COUNT(build.id) AS cnt," & ASCII.LF
+       & "          SUM(build.pass_count) AS pass_count," & ASCII.LF & "          "
+       & "SUM(build.fail_count) AS fail_count," & ASCII.LF & "          SUM(build."
+       & "timeout_count) AS timeout_count," & ASCII.LF & "          SUM(build.test"
+       & "_duration) AS test_duration," & ASCII.LF & "          SUM(build.build_du"
+       & "ration) AS build_duration," & ASCII.LF & "          SUM(build.sys_time) "
+       & "AS sys_time," & ASCII.LF & "          SUM(build.user_time) AS user_time" & ASCII.LF
+       & "          FROM porion_last_build AS last_build" & ASCII.LF & "          "
+       & "INNER JOIN porion_build AS build ON last_build.build_id = build.id" & ASCII.LF
+       & "          WHERE last_build.last_build = 1 AND build.project_id = :projec"
+       & "t_id" & ASCII.LF & "          GROUP BY build.status" & ASCII.LF & "     "
+       & "   </sql>" & ASCII.LF & "    </query> " & ASCII.LF & ASCII.LF & "</quer"
+       & "y-mapping>" & ASCII.LF;
 
 
    type Content_List_Array is array (Natural range <>) of access constant String;

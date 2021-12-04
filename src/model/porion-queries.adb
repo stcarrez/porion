@@ -105,7 +105,7 @@ package body Porion.Queries is
    end List;
 
    --  --------------------
-   --  Information about a build.
+   --  Statistics about a list of builds.
    --  --------------------
    procedure List (Object  : in out Build_Stat_Vector;
                    Session : in out ADO.Sessions.Session'Class;
@@ -119,6 +119,13 @@ package body Porion.Queries is
       begin
          Into.Build_Status := Porion.Builds.Models.Build_Status_Type'Enum_Val (Stmt.Get_Integer (0));
          Into.Count := Stmt.Get_Natural (1);
+         Into.Pass_Count := Stmt.Get_Natural (2);
+         Into.Fail_Count := Stmt.Get_Natural (3);
+         Into.Timeout_Count := Stmt.Get_Natural (4);
+         Into.Test_Duration := Stmt.Get_Natural (5);
+         Into.Build_Duration := Porion.Millisecond_Type (Stmt.Get_Integer (6));
+         Into.Sys_Time := Porion.Millisecond_Type (Stmt.Get_Integer (7));
+         Into.User_Time := Porion.Millisecond_Type (Stmt.Get_Integer (8));
       end Read;
    begin
       Stmt.Execute;

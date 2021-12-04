@@ -127,4 +127,13 @@ package Porion.Reports is
                            Fields   : in PT.Texts.Field_Array;
                            Styles   : in Style_Configuration);
 
+   --  Create a report with the build environment variables.
+   procedure List_Environment (Service : in out Porion.Services.Context_Type'Class;
+                               Printer : in out PT.Printer_Type'Class;
+                               Styles  : in Style_Configuration);
+
+   procedure List_Environment (List     : in Porion.Queries.Environment_Info_Vector;
+                               Printer  : in out PT.Printer_Type'Class;
+                               Styles   : in Style_Configuration);
+
 end Porion.Reports;

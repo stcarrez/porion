@@ -17,7 +17,6 @@
 -----------------------------------------------------------------------
 
 with Util.Test_Caller;
-with ADO.Sessions;
 with Porion.Configs;
 with Porion.Sources;
 with Porion.XUnit.Analysis;
@@ -50,8 +49,6 @@ package body Porion.XUnit.Tests is
       Builder   : Porion.Builds.Services.Context_Type;
       Info      : Porion.Sources.Source_Info_Type;
       Branch    : Porion.Sources.Branch_Type;
-      Build     : Porion.Builds.Models.Build_Ref;
-      Session   : ADO.Sessions.Master_Session;
       Executor  : Porion.Executors.Executor_Type;
       Recipe    : Porion.Builds.Models.Recipe_Ref;
    begin

@@ -21,7 +21,6 @@ with Util.Test_Caller;
 
 with Porion.Configs;
 with Porion.Executors;
-with Porion.Sources.Factories;
 package body Porion.Sources.Tests is
 
    procedure Assert_Equals is
@@ -42,18 +41,18 @@ package body Porion.Sources.Tests is
       Result   : Porion.Sources.Source_Info_Type;
       Config   : Porion.Configs.Config_Type;
    begin
-      Porion.Sources.Factories.Guess (Path     => ".",
-                                      Config   => Config,
-                                      Result   => Result,
-                                      Executor => Executor);
+      Porion.Sources.Guess (Path     => ".",
+                            Config   => Config,
+                            Result   => Result,
+                            Executor => Executor);
 
       T.Assert_Equals ("porion", Result.Name, "invalid project name");
       Assert_Equals (T, Porion.Sources.SRC_GIT, Result.Kind, "invalid source kind");
 
-      Porion.Sources.Factories.Guess (Path     => "src/model",
-                                      Config   => Config,
-                                      Result   => Result,
-                                      Executor => Executor);
+      Porion.Sources.Guess (Path     => "src/model",
+                            Config   => Config,
+                            Result   => Result,
+                            Executor => Executor);
 
       T.Assert_Equals ("porion", Result.Name, "invalid project name");
       Assert_Equals (T, Porion.Sources.SRC_GIT, Result.Kind, "invalid source kind");
@@ -65,10 +64,10 @@ package body Porion.Sources.Tests is
       Result   : Porion.Sources.Source_Info_Type;
       Config   : Porion.Configs.Config_Type;
    begin
-      Porion.Sources.Factories.Guess (Path     => Path,
-                                      Config   => Config,
-                                      Result   => Result,
-                                      Executor => Executor);
+      Porion.Sources.Guess (Path     => Path,
+                            Config   => Config,
+                            Result   => Result,
+                            Executor => Executor);
 
       T.Assert_Equals ("hello-1.0", Result.Name, "invalid project name");
       Assert_Equals (T, Porion.Sources.SRC_FILE, Result.Kind, "invalid source kind");

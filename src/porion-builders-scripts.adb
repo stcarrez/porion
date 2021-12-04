@@ -15,13 +15,9 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Util.Log.Loggers;
 with EL.Contexts.Default;
 with Porion.Tools;
 package body Porion.Builders.Scripts is
-
-   --  The logger
-   Log   : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Builders.Scripts");
 
    overriding
    procedure Build (Controller : in out Controller_Type;

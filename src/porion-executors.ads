@@ -19,6 +19,7 @@ with Ada.Finalization;
 with Ada.Containers.Indefinite_Vectors;
 with EL.Expressions;
 with Util.Properties;
+with Util.Strings.Maps;
 with Porion.Logs;
 with Porion.Builds;
 with Porion.Nodes.Models;
@@ -43,6 +44,9 @@ package Porion.Executors is
    overriding
    function Is_Dry_Run (Executor : in Executor_Type) return Boolean;
 
+   --  Returns true if this executor is configured and can be used.
+   function Is_Configured (Executor : in Executor_Type) return Boolean;
+
    --  Enable the dry run execution mode.
    procedure Enable_Dry_Run (Executor : in out Executor_Type);
 
@@ -65,7 +69,8 @@ package Porion.Executors is
 
    --  Setup the executor to build with the given build node.
    procedure Set_Build_Node (Executor : in out Executor_Type;
-                             Node     : in Porion.Nodes.Models.Node_Ref);
+                             Node     : in Porion.Nodes.Models.Node_Ref;
+                             Env      : in Util.Strings.Maps.Map);
 
    --  Create the directory and optionally make sure it is cleaned.
    procedure Create_Directory (Executor : in out Executor_Type;
@@ -78,14 +83,16 @@ package Porion.Executors is
                       Process     : not null access procedure (Line : in String);
                       Working_Dir : in String := "";
                       Strip_Crlf  : in Boolean := False;
-                      Status      : out Integer);
+                      Status      : out Integer) with
+      Pre => Executor.Is_Configured;
 
    procedure Execute (Executor    : in out Executor_Type;
                       Command     : in EL.Expressions.Expression;
                       Parameters  : in Util.Properties.Manager;
                       Working_Dir : in String := "";
                       Strip_Crlf  : in Boolean := False;
-                      Status      : out Integer);
+                      Status      : out Integer) with
+      Pre => Executor.Is_Configured;
 
    procedure Create_Logger (Executor : in out Executor_Type;
                             Dir      : in String;
@@ -108,7 +115,8 @@ package Porion.Executors is
                       Process     : not null access procedure (Line : in String);
                       Working_Dir : in String := "";
                       Strip_Crlf  : in Boolean := False;
-                      Status      : out Integer);
+                      Status      : out Integer) with
+      Pre => Executor.Is_Configured;
 
    --  Record a command that is executed during the build step.
    --  The command is not executed but added to the list of commands.

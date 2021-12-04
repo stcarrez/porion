@@ -21,6 +21,14 @@ with Util.Files;
 package body Porion.Logs is
 
    --  ------------------------------
+   --  Returns true if this logger is opened and we can write on it.
+   --  ------------------------------
+   function Is_Opened (Logger : in Logger_Type) return Boolean is
+   begin
+      return Ada.Text_IO.Is_Open (Logger.File);
+   end Is_Opened;
+
+   --  ------------------------------
    --  Create and open the logger to write on the given path.
    --  ------------------------------
    procedure Create (Logger : in out Logger_Type;

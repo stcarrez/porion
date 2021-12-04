@@ -174,6 +174,8 @@ CREATE TABLE IF NOT EXISTS porion_last_build (
   `status` TINYINT NOT NULL,
   /* the optimistic lock version. */
   `version` INTEGER NOT NULL,
+  /* indicates the last build */
+  `last_build` TINYINT NOT NULL,
   /*  */
   `build_id` BIGINT NOT NULL,
   /*  */

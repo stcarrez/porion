@@ -325,67 +325,23 @@ CREATE TABLE IF NOT EXISTS porion_build (
   /* the test total duration in us. */
   `test_duration` INTEGER NOT NULL,
   /*  */
-  `status`  NOT NULL,
+  `status` TINYINT NOT NULL,
   /* the source tag that was used when building the project. */
   `tag` VARCHAR(255) NOT NULL,
-  /* the build configuration. */
-  `build_config_id` BIGINT NOT NULL,
-  /* the node where the build was made. */
-  `node_id` BIGINT NOT NULL,
+  /* the build duration in seconds. */
+  `build_duration` INTEGER NOT NULL,
+  /* the system time of cumulated processes in milliseconds. */
+  `sys_time` INTEGER NOT NULL,
+  /* the user time of cumulated processes in milliseconds. */
+  `user_time` INTEGER NOT NULL,
   /* the branch associated with the build. */
   `branch_id` BIGINT NOT NULL,
+  /* the recipe used for the build. */
+  `recipe_id` BIGINT NOT NULL,
+  /* the node where the build was made. */
+  `node_id` BIGINT NOT NULL,
   /* the project. */
   `project_id` BIGINT NOT NULL,
-  PRIMARY KEY (`id`)
-);
-/* Describes a configuration to build a project.
-The build configuration can be associated with a build node and
-it is decomposed in several build steps. Each step is managed by
-a specific builder which can perform specific operations. */
-CREATE TABLE IF NOT EXISTS porion_build_config (
-  /* identifier */
-  `id` BIGINT NOT NULL,
-  /* optimistic locking */
-  `version` INTEGER NOT NULL,
-  /* the build configuration name. */
-  `name` VARCHAR(255) NOT NULL,
-  /* a description of the build configuration. */
-  `description` VARCHAR(4096) NOT NULL,
-  /* the build configuration status. */
-  `status` INTEGER NOT NULL,
-  /*  */
-  `node_id` BIGINT ,
-  /*  */
-  `project_id` BIGINT NOT NULL,
-  /*  */
-  `branch_id` BIGINT NOT NULL,
-  PRIMARY KEY (`id`)
-);
-/* Describes a step in the build process.
-Members are fozen to force the creation
-of a new instance when the build configuration
-is modified. */
-CREATE TABLE IF NOT EXISTS porion_build_config_step (
-  /* build step identifier */
-  `id` BIGINT NOT NULL,
-  /* the build step command. */
-  `parameters` VARCHAR(65536) NOT NULL,
-  /* the build step number. */
-  `number` INTEGER NOT NULL,
-  /* the builder controller that handles execution of this build step. */
-  `builder` INTEGER NOT NULL,
-  /* the maximum execution time in seconds. */
-  `timeout` INTEGER NOT NULL,
-  /* the step classification type. */
-  `step` INTEGER NOT NULL,
-  /*  */
-  `version` INTEGER NOT NULL,
-  /*  */
-  `execution`  NOT NULL,
-  /* the build configuration that contains this build step. */
-  `build_config_id` BIGINT NOT NULL,
-  /*  */
-  `previous_version_id` BIGINT ,
   PRIMARY KEY (`id`)
 );
 /* Tracks a porion agent that is building something. */
@@ -411,13 +367,35 @@ CREATE TABLE IF NOT EXISTS porion_build_queue (
   /* the optimistic lock version. */
   `version` INTEGER NOT NULL,
   /* the creation date. */
-  `creation_date` DATETIME NOT NULL,
+  `create_date` DATETIME NOT NULL,
   /* the last update date. */
   `update_date` DATETIME NOT NULL,
   /* the builder order. */
   `order` INTEGER NOT NULL,
+  /* indicates whether a build is running. */
+  `building` TINYINT NOT NULL,
+  /* the node for which the build was queued. */
+  `node_id` BIGINT NOT NULL,
+  /* the recipe that must be built. */
+  `recipe_id` BIGINT NOT NULL,
+  PRIMARY KEY (`id`)
+);
+/*  */
+CREATE TABLE IF NOT EXISTS porion_build_reason (
+  /* the build reason identifier. */
+  `id` BIGINT NOT NULL,
+  /* the creation date of this build reason. */
+  `create_date` DATETIME NOT NULL,
+  /* the optimistic lock version. */
+  `version` INTEGER NOT NULL,
+  /* the reason for triggering the build. */
+  `reason` TINYINT NOT NULL,
   /*  */
-  `build_config_id` BIGINT NOT NULL,
+  `build_id` BIGINT ,
+  /*  */
+  `queue_id` BIGINT ,
+  /*  */
+  `upstream_build_id` BIGINT ,
   PRIMARY KEY (`id`)
 );
 /*  */
@@ -430,10 +408,16 @@ CREATE TABLE IF NOT EXISTS porion_build_step (
   `end_date` DATETIME ,
   /* the command exit status. */
   `exit_status` INTEGER NOT NULL,
+  /* the user CPU time to execute this step. */
+  `user_time` INTEGER NOT NULL,
+  /* the system CPU time to execute this step. */
+  `sys_time` INTEGER NOT NULL,
+  /* this step duration. */
+  `step_duration` INTEGER NOT NULL,
   /* the build that used this build step */
   `build_id` BIGINT NOT NULL,
   /* the build step configuration that was used. */
-  `config_id` BIGINT NOT NULL,
+  `recipe_step_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`)
 );
 /* Specific environment variables
@@ -452,7 +436,7 @@ CREATE TABLE IF NOT EXISTS porion_environment (
   /*  */
   `node_id` BIGINT ,
   /*  */
-  `build_config_id` BIGINT ,
+  `recipe_id` BIGINT ,
   PRIMARY KEY (`id`)
 );
 /*  */
@@ -460,15 +444,104 @@ CREATE TABLE IF NOT EXISTS porion_last_build (
   /* the record identifier. */
   `id` BIGINT NOT NULL,
   /* the build status. */
-  `status`  NOT NULL,
+  `status` TINYINT NOT NULL,
   /* the optimistic lock version. */
   `version` INTEGER NOT NULL,
+  /* indicates the last build */
+  `last_build` TINYINT NOT NULL,
   /*  */
   `build_id` BIGINT NOT NULL,
   /*  */
   `branch_id` BIGINT NOT NULL,
   /*  */
-  `build_config_id` BIGINT NOT NULL,
+  `recipe_id` BIGINT NOT NULL,
+  PRIMARY KEY (`id`)
+);
+/* Describes a recipe to build a project.
+The build recipe can be associated with a build node and
+it is decomposed in several build steps. Each step is managed by
+a specific builder which can perform specific operations. */
+CREATE TABLE IF NOT EXISTS porion_recipe (
+  /* identifier */
+  `id` BIGINT NOT NULL,
+  /* optimistic locking */
+  `version` INTEGER NOT NULL,
+  /* the build configuration name. */
+  `name` VARCHAR(255) NOT NULL,
+  /* a description of the build configuration. */
+  `description` VARCHAR(4096) NOT NULL,
+  /* the build configuration status. */
+  `status` INTEGER NOT NULL,
+  /* a rate factor to apply on the build for this build configuration. */
+  `rate_factor` INTEGER NOT NULL,
+  /* the main recipe. */
+  `main_recipe` TINYINT NOT NULL,
+  /* a list of comma separated filtering rules to activate when displaying logs. */
+  `filter_rules` VARCHAR(255) NOT NULL,
+  /*  */
+  `node_id` BIGINT ,
+  /*  */
+  `branch_id` BIGINT NOT NULL,
+  /*  */
+  `project_id` BIGINT NOT NULL,
+  PRIMARY KEY (`id`)
+);
+/* Describes a step in the build process.
+Members are fozen to force the creation
+of a new instance when the build configuration
+is modified. */
+CREATE TABLE IF NOT EXISTS porion_recipe_step (
+  /* build step identifier */
+  `id` BIGINT NOT NULL,
+  /* the build step command. */
+  `parameters` VARCHAR(65536) NOT NULL,
+  /* the build step number. */
+  `number` INTEGER NOT NULL,
+  /* the builder controller that handles execution of this build step. */
+  `builder` INTEGER NOT NULL,
+  /* the maximum execution time in seconds. */
+  `timeout` INTEGER NOT NULL,
+  /* the step classification type. */
+  `step` INTEGER NOT NULL,
+  /*  */
+  `version` INTEGER NOT NULL,
+  /*  */
+  `execution` TINYINT NOT NULL,
+  /*  */
+  `next_version_id` BIGINT ,
+  /* the build configuration that contains this build step.
+the recipe that this step belongs to */
+  `recipe_id` BIGINT NOT NULL,
+  PRIMARY KEY (`id`)
+);
+/*  */
+CREATE TABLE IF NOT EXISTS porion_build_metric (
+  /* the build metric identifier. */
+  `id` BIGINT NOT NULL,
+  /* the optimistic lock version. */
+  `version` INTEGER NOT NULL,
+  /* the metric value. */
+  `value` INTEGER NOT NULL,
+  /* the optional metric detailed content. */
+  `content` VARCHAR(255) NOT NULL,
+  /* the build associated with the metric. */
+  `build_id` BIGINT NOT NULL,
+  /* the metric definition. */
+  `metric_id` BIGINT NOT NULL,
+  PRIMARY KEY (`id`)
+);
+/*  */
+CREATE TABLE IF NOT EXISTS porion_metric (
+  /* the metric identifier. */
+  `id` BIGINT NOT NULL,
+  /* the metric name. */
+  `name` VARCHAR(255) NOT NULL,
+  /* the metric label. */
+  `label` VARCHAR(255) NOT NULL,
+  /* the optimistic lock version. */
+  `version` INTEGER NOT NULL,
+  /* the metric that produced this entry. */
+  `metric` TINYINT NOT NULL,
   PRIMARY KEY (`id`)
 );
 /*  */
@@ -483,6 +556,28 @@ CREATE TABLE IF NOT EXISTS porion_node (
   `login` VARCHAR(255) NOT NULL,
   /* the repository directory. */
   `repository_dir` VARCHAR(255) NOT NULL,
+  /* node launcher specific parameters. */
+  `parameters` VARCHAR(255) NOT NULL,
+  /* date when the node was created. */
+  `create_date` DATETIME NOT NULL,
+  /* date when the node was updated. */
+  `update_date` DATETIME ,
+  /* the type of node */
+  `kind` TINYINT NOT NULL,
+  /* whether the build node was deleted. */
+  `deleted` TINYINT NOT NULL,
+  /* the node status. */
+  `status` TINYINT NOT NULL,
+  /* the OS name. */
+  `os_name` VARCHAR(255) NOT NULL,
+  /* the OS version or additional information. */
+  `os_version` VARCHAR(255) NOT NULL,
+  /* the date when the node system information was collected. */
+  `info_date` DATETIME ,
+  /* the CPU type on this build node. */
+  `cpu_type` VARCHAR(255) NOT NULL,
+  /*  */
+  `main_node` TINYINT NOT NULL,
   PRIMARY KEY (`id`)
 );
 /*  */
@@ -503,6 +598,24 @@ CREATE TABLE IF NOT EXISTS porion_branch (
   `update_date` DATETIME NOT NULL,
   /* the branch status. */
   `status` INTEGER NOT NULL,
+  /* the test success rate for the last builds with build configuration of this branch */
+  `pass_rate` INTEGER NOT NULL,
+  /* the test failure rate for the last builds with build configuration of this branch */
+  `fail_rate` INTEGER NOT NULL,
+  /* the test timeout rate for the last builds with build configuration of this branch */
+  `timeout_rate` INTEGER NOT NULL,
+  /* the build success rate for the build configuration of this branch. */
+  `build_rate` INTEGER NOT NULL,
+  /* a rate factor to apply when consolidating results on the project */
+  `rate_factor` INTEGER NOT NULL,
+  /* indicates whether this is considered as the main project branch. */
+  `main_branch` TINYINT NOT NULL,
+  /* the last build number that was used. */
+  `last_build_number` INTEGER NOT NULL,
+  /* the build progress. */
+  `build_progress` INTEGER NOT NULL,
+  /* the branch description. */
+  `description` VARCHAR(255) NOT NULL,
   /*  */
   `project_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`)
@@ -539,6 +652,22 @@ CREATE TABLE IF NOT EXISTS porion_project (
   `scm` INTEGER NOT NULL,
   /* source control information parameter */
   `scm_url` VARCHAR(255) NOT NULL,
+  /* the test success rate for the last builds with build configuration of this project (all branches) */
+  `pass_rate` INTEGER NOT NULL,
+  /* the test failure rate for the last builds with build configuration of this project (all branches) */
+  `fail_rate` INTEGER NOT NULL,
+  /* the test timeout rate for the last builds with build configuration of this project (all branches) */
+  `timeout_rate` INTEGER NOT NULL,
+  /* the build success rate for the build configuration of this project (all branches). */
+  `build_rate` INTEGER NOT NULL,
+  /* the date and time when the sources were checked. */
+  `check_date` DATETIME NOT NULL,
+  /* the prefered delay between two source checks. */
+  `check_delay` INTEGER NOT NULL,
+  /* the next expected check date and time. */
+  `next_check_date` DATETIME NOT NULL,
+  /* the build progress of all branches. */
+  `build_progress` INTEGER NOT NULL,
   PRIMARY KEY (`id`)
 );
 /*  */
@@ -636,19 +765,22 @@ CREATE TABLE IF NOT EXISTS porion_test_run_group (
   /* total duration for the execution of the test group */
   `duration` INTEGER NOT NULL,
   /*  */
-  `build_id` BIGINT NOT NULL,
-  /*  */
   `group_id` BIGINT NOT NULL,
+  /*  */
+  `build_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`)
 );
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_config");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_config_step");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_executor");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_queue");
+INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_reason");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_step");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_environment");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_last_build");
+INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_recipe");
+INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_recipe_step");
+INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_metric");
+INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_metric");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_node");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_branch");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_dependency");
@@ -658,13 +790,19 @@ INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_test_group");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_test_run");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_test_run_group");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_config"), "name");
-INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_config"), "description");
-INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_build_config"), "status");
-INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_environment"), "value");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_recipe"), "name");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_recipe"), "description");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_recipe"), "status");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_recipe"), "rate_factor");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_recipe"), "main_recipe");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_recipe"), "filter_rules");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "name");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
@@ -672,9 +810,17 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "repository_dir");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "kind");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "deleted");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "main_node");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "tag");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "last_date");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "main_branch");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "name");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
@@ -685,3 +831,7 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "scm");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "scm_url");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "check_delay");
+/* Copied from porion_server-sqlite.sql*/
+/* File generated automatically by dynamo */

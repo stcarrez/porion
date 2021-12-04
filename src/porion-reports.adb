@@ -795,4 +795,57 @@ package body Porion.Reports is
       Free (Controller);
    end List_Metrics;
 
+   --  ------------------------------
+   --  Create a report with the build environment variables.
+   --  ------------------------------
+   procedure List_Environment (Service : in out Porion.Services.Context_Type'Class;
+                               Printer : in out PT.Printer_Type'Class;
+                               Styles  : in Style_Configuration) is
+      List   : Porion.Queries.Environment_Info_Vector;
+      Query  : ADO.Queries.Context;
+   begin
+      Query.Set_Query (Porion.Queries.Query_Environment_List);
+      Porion.Queries.List (List, Service.DB, Query);
+
+      List_Environment (List, Printer, Styles);
+   end List_Environment;
+
+   procedure List_Environment (List     : in Porion.Queries.Environment_Info_Vector;
+                               Printer  : in out PT.Printer_Type'Class;
+                               Styles   : in Style_Configuration) is
+      use type Porion.XUnit.Models.Test_Status_Type;
+
+      Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
+      Fields : PT.Texts.Field_Array (1 .. 2);
+      Style1 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
+   begin
+      Writer.Create_Field (Fields (1), Style1, 30.0);
+      Writer.Create_Field (Fields (2), Style1, 70.0);
+
+      Writer.Set_Bottom_Right_Padding (Fields (1), (1, 0));
+      Writer.Set_Bottom_Right_Padding (Fields (2), (1, 0));
+
+      Writer.Layout_Fields (Fields);
+      Writer.Put (Fields (1), -("Ident"));
+      Writer.Put (Fields (2), -("Environment"));
+      Writer.New_Line;
+
+      for Env of List loop
+         declare
+            use Ada.Strings.Unbounded;
+
+            Ident : Porion.Projects.Ident_Type;
+         begin
+            Ident.Name := Env.Project_Name;
+            Ident.Branch := Env.Branch_Name;
+            Ident.Recipe := Env.Recipe_Name;
+            Ident.Node := Env.Node_Name;
+
+            Writer.Put (Fields (1), Porion.Projects.To_String (Ident));
+            Writer.Put_UString (Fields (2), Env.Name & "=" & Env.Value);
+            Writer.New_Line;
+         end;
+      end loop;
+   end List_Environment;
+
 end Porion.Reports;

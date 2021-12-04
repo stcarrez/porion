@@ -1128,32 +1128,41 @@ package body Porion.Builds.Services is
    procedure Set_Environment (Service : in out Context_Type;
                               Name    : in String;
                               Value   : in String) is
+      use Ada.Strings.Unbounded;
+
       Query  : ADO.Queries.Context;
       Env    : Porion.Builds.Models.Environment_Ref;
       Found  : Boolean;
+      Filter : UString;
    begin
-      if not Service.Recipe.Is_Null then
-         Query.Set_Filter ("o.node_id = :node_id AND "
-                           & "o.recipe_id = : recipe_id AND o.name = :name");
-         Query.Bind_Param ("node_id", Service.Build_Node.Get_Id);
-         Query.Bind_Param ("recipe_id", Service.Recipe.Get_Id);
-
-      elsif not Service.Build_Node.Is_Null then
-         Query.Set_Filter ("o.node_id = :node_id AND o.recipe_id IS NULL "
-                           & " AND o.name = :name");
-         Query.Bind_Param ("node_id", Service.Build_Node.Get_Id);
-
-      else
-         Query.Set_Filter ("o.node_id IS NULL AND o.recipe_id IS NULL "
-                           & "AND o.name = :name");
+      Append (Filter, "o.name = :name");
+      Query.Bind_Param (Name, Name);
+      if not Service.Branch.Is_Null then
+         Append (Filter, " AND o.branch_id = :branch_id");
+         Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
       end if;
-      Query.Bind_Param ("name", Name);
+      if not Service.Project.Is_Null then
+         Append (Filter, "AND o.project_id = :project_id");
+         Query.Bind_Param ("project_id", Service.Project.Get_Id);
+      end if;
+      if not Service.Recipe.Is_Null then
+         Append (Filter, " AND o.recipe_id = :recipe_id");
+         Query.Bind_Param ("recipe_id", Service.Recipe.Get_Id);
+      end if;
+      if not Service.Build_Node.Is_Null then
+         Append (Filter, " AND o.node_id = :node_id");
+         Query.Bind_Param ("node_id", Service.Build_Node.Get_Id);
+      end if;
+      Query.Set_Filter (To_String (Filter));
 
       Service.DB.Begin_Transaction;
       Env.Find (Service.DB, Query, Found);
       if not Found then
          Env.Set_Name (Name);
          Env.Set_Node (Service.Build_Node);
+         Env.Set_Recipe (Service.Recipe);
+         Env.Set_Branch (Service.Branch);
+         Env.Set_Project (Service.Project);
       end if;
       Env.Set_Value (Value);
       Env.Save (Service.DB);

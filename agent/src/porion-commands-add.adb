@@ -22,7 +22,7 @@ with Porion.Services;
 with Porion.Nodes.Services;
 with Porion.Builds.Models;
 with Porion.Builds.Services;
-with Porion.Sources.Factories;
+with Porion.Sources;
 package body Porion.Commands.Add is
 
    --  ------------------------------
@@ -37,10 +37,10 @@ package body Porion.Commands.Add is
       Executor : Porion.Executors.Executor_Type;
    begin
       --  Step 1: guess the source manager to be used with project info.
-      Porion.Sources.Factories.Guess (Path     => URI,
-                                      Config   => Config,
-                                      Result   => Info,
-                                      Executor => Executor);
+      Porion.Sources.Guess (Path     => URI,
+                            Config   => Config,
+                            Result   => Info,
+                            Executor => Executor);
 
       Projects.Services.Add_Project (Context.Project_Service, Info);
       Context.Notice (-("Project {0} - {1} added"), To_String (Info.Name), URI);

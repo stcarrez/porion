@@ -47,7 +47,10 @@ package body Porion.Commands.Set is
       if Sep_Pos > 0 then
          Util.Strings.Builders.Append (Val, Arg (Sep_Pos + 1 .. Arg'Last));
       end if;
-      for I in Pos + 1 .. Args.Get_Count - 1 loop
+      for I in Pos + 1 .. Args.Get_Count loop
+         if Util.Strings.Builders.Length (Val) > 0 then
+            Util.Strings.Builders.Append (Val, " ");
+         end if;
          Util.Strings.Builders.Append (Val, Args.Get_Argument (I));
       end loop;
       return Util.Strings.Builders.To_Array (Val);

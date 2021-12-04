@@ -1,0 +1,76 @@
+<query-mapping package='Porion.Queries'>
+    <description>
+        List of environment variables
+    </description>
+
+    <class name="Porion.Queries.Environment_Info" bean="yes">
+        <comment>Information about a project.</comment>
+        <property type='String' name="name">
+            <comment>the environment variable name.</comment>
+        </property>
+        <property type='String' name="value">
+            <comment>the environment variable value.</comment>
+        </property>
+        <property type='String' name="project_name">
+            <comment>the optional project name.</comment>
+        </property>
+        <property type='String' name="branch_name">
+            <comment>the optional branch name.</comment>
+        </property>
+        <property type='String' name="recipe_name">
+            <comment>the optional recipe name.</comment>
+        </property>
+        <property type='String' name="node_name">
+            <comment>the optional build node name.</comment>
+        </property>
+    </class>
+
+    <query name='environment-list'>
+        <comment>Get the list of environment variables</comment>
+        <sql>
+            SELECT
+            env.name AS name,
+            env.value AS value,
+            COALESCE(project.name, '') AS project_name,
+            COALESCE(branch.name, '') AS branch_name,
+            COALESCE(recipe.name, '') AS recipe_name,
+            COALESCE(node.name, '') AS node_name
+            FROM porion_environment AS env
+            LEFT JOIN porion_branch AS branch ON env.branch_id = branch.id
+            LEFT JOIN porion_project AS project ON env.project_id = project.id
+            LEFT JOIN porion_node AS node ON env.node_id = node.id
+            LEFT JOIN porion_recipe AS recipe ON env.recipe_id = recipe.id
+            ORDER BY node_name, project_name, branch_name, recipe_name, name
+        </sql>
+        <sql-count>
+            SELECT
+            count(env.id)
+            FROM porion_environment AS env
+        </sql-count>
+    </query>
+
+    <query name='project-environment-list'>
+        <comment>Get the list of environment variables</comment>
+        <sql>
+            SELECT
+            env.name AS name,
+            env.value AS value,
+            project.name AS name,
+            COALESCE(branch.name, '') AS branch_name,
+            COALESCE(recipe.name, '') AS recipe_name,
+            COALESCE(node.name, '') AS node_name
+            FROM porion_environment AS env
+            LEFT JOIN porion_branch AS branch ON env.branch_id = branch.id
+            LEFT JOIN porion_project AS project ON env.project_id = project.id
+            LEFT JOIN porion_node AS node ON env.node_id = node.id
+            WHERE env.project_id = :project_id OR env.project_id IS NULL
+        </sql>
+        <sql-count>
+            SELECT
+            count(env.id)
+            FROM porion_environment AS env
+            WHERE env.project_id = :project_id OR env.project_id IS NULL
+        </sql-count>
+    </query>
+
+</query-mapping>

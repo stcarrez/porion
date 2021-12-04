@@ -12,3 +12,6 @@ gprbuild
 [log-warning]
 .*[0-9]+: warning:
 
+[log-info]
+^gprbuild .*
+^gprinstall .*

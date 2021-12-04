@@ -36,6 +36,14 @@ package body Porion.Executors is
    end Is_Dry_Run;
 
    --  ------------------------------
+   --  Returns true if this executor is configured and can be used.
+   --  ------------------------------
+   function Is_Configured (Executor : in Executor_Type) return Boolean is
+   begin
+      return Executor.Dry_Run or Executor.Logger.Is_Opened;
+   end Is_Configured;
+
+   --  ------------------------------
    --  Enable the dry run execution mode.
    --  ------------------------------
    procedure Enable_Dry_Run (Executor : in out Executor_Type) is
@@ -81,9 +89,11 @@ package body Porion.Executors is
    --  Setup the executor to build with the given build node.
    --  ------------------------------
    procedure Set_Build_Node (Executor : in out Executor_Type;
-                             Node     : in Porion.Nodes.Models.Node_Ref) is
+                             Node     : in Porion.Nodes.Models.Node_Ref;
+                             Env      : in Util.Strings.Maps.Map) is
    begin
       Executor.Controller := Nodes.Services.Create_Controller (Executor'Unchecked_Access, Node);
+      Executor.Controller.Set_Environment (Env);
    end Set_Build_Node;
 
    --  ------------------------------

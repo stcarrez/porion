@@ -10,6 +10,13 @@
        </sql>
     </query>
 
+    <query name='cleanup-build-reason'>
+       <comment>Cleanup the build reaon.</comment>
+       <sql>
+    DELETE FROM porion_build_reason WHERE build_id = :build_id
+       </sql>
+    </query>
+
     <query name='cleanup-build-metrics'>
        <comment>Cleanup the build metrics.</comment>
        <sql>

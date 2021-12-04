@@ -19,6 +19,14 @@
        </sql>
     </query>
 
+    <query name='cleanup-project-build-reason'>
+       <comment>Cleanup the project build reason.</comment>
+       <sql>
+    DELETE FROM porion_build_reason WHERE build_id IN
+      (SELECT porion_build.id FROM porion_build WHERE porion_build.project_id = :project_id)
+       </sql>
+    </query>
+
     <query name='cleanup-project-build-queue'>
        <comment>Remove the project from build queue.</comment>
        <sql>
@@ -83,15 +91,15 @@
        </sql>
     </query>
 
-    <query name='cleanup-project-build-config-step'>
-       <comment>Cleanup the project build config of a project.</comment>
+    <query name='cleanup-project-build-recipe-step'>
+       <comment>Cleanup the project build recipe of a project.</comment>
        <sql>
     DELETE FROM porion_recipe_step WHERE recipe_id IN
       (SELECT id FROM porion_recipe WHERE project_id = :project_id)
        </sql>
     </query>
 
-    <query name='cleanup-project-build-config'>
+    <query name='cleanup-project-build-recipe'>
        <comment>Cleanup the project build recipe of a project.</comment>
        <sql>
     DELETE FROM porion_recipe WHERE project_id = :project_id

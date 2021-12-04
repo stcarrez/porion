@@ -19,6 +19,14 @@
        </sql>
     </query>
 
+    <query name='cleanup-recipe-build-reason'>
+       <comment>Cleanup the build reason.</comment>
+       <sql>
+    DELETE FROM porion_build_reason WHERE build_id IN
+      (SELECT porion_build.id FROM porion_build WHERE porion_build.recipe_id = :recipe_id)   
+       </sql>
+    </query>
+
     <query name='cleanup-recipe-build-queue'>
        <comment>Remove the recipe from build queue.</comment>
        <sql>

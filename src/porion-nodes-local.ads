@@ -16,6 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Util.Strings.Vectors;
+private with Util.Processes;
 private package Porion.Nodes.Local is
 
    type Controller_Type is limited new Porion.Nodes.Controller_Type with private;
@@ -23,6 +24,11 @@ private package Porion.Nodes.Local is
 
    --  Create the controller for the management of the given build node.
    function Create (Listener : in Listener_Access) return Nodes.Controller_Access;
+
+   --  Set the environment variables when running commands in the build node.
+   overriding
+   procedure Set_Environment (Controller : in out Controller_Type;
+                              Env        : in Util.Strings.Maps.Map);
 
    --  Execute the command in the working directory and for each output
    --  line produced by the command call the Process procedure.
@@ -51,6 +57,12 @@ private package Porion.Nodes.Local is
 
 private
 
-   type Controller_Type is limited new Porion.Nodes.Controller_Type with null record;
+   type Controller_Type is limited new Porion.Nodes.Controller_Type with record
+      Env : Util.Strings.Maps.Map;
+   end record;
+
+   --  Set the environment variables before launching the process.
+   procedure Set_Environment (Controller : in out Controller_Type;
+                              Proc       : in out Util.Processes.Process);
 
 end Porion.Nodes.Local;

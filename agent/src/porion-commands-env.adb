@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 with Porion.Services;
 with Porion.Nodes.Models;
+with Porion.Nodes.Services;
 with Porion.Projects.Models;
 with Porion.Builds.Models;
 with Porion.Builds.Services;
@@ -48,7 +49,12 @@ package body Porion.Commands.Env is
          First : Positive := 1;
          Ident : Porion.Projects.Ident_Type;
       begin
-         if Util.Strings.Index (Arg, '=') = 0 then
+         if Util.Strings.Starts_With (Arg, "@") then
+            Porion.Nodes.Services.Load_Node (Context.Project_Service,
+                                             Arg (Arg'First + 1 .. Arg'Last));
+            First := 2;
+
+         elsif Util.Strings.Index (Arg, '=') = 0 then
             Ident := Porion.Projects.Parse (Arg);
             Context.Project_Service.Load (Ident);
 
@@ -85,6 +91,9 @@ package body Porion.Commands.Env is
          end loop;
 
       exception
+         when Porion.Nodes.Services.Not_Found =>
+            Commands.Error (-("build node {0} not found"), Arg (Arg'First + 1 .. Arg'Last));
+
          when Porion.Services.Not_Found =>
             Context.Error_Not_Found (Ident);
 

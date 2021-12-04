@@ -79,20 +79,20 @@ package body Porion.Commands.Set is
          Porion.Projects.Services.Set_Check_Delay (Context.Project_Service, Value, Modified);
       elsif Name = VAR_RATE_FACTOR then
          if not Context.Project_Service.Has_Branch then
-            Commands.Error (-("The 'rate_factor' can be set on a branch or a recipe"));
+            Commands.Error (-("the 'rate_factor' can be set on a branch or a recipe"));
             return;
          end if;
          Porion.Projects.Services.Set_Rate_Factor (Context.Project_Service, Value, Modified);
 
       elsif Name = VAR_FILTER_RULES then
          if not Context.Project_Service.Has_Recipe then
-            Commands.Error (-("The 'filter_rules' can be set on a recipe"));
+            Commands.Error (-("the 'filter_rules' can be set on a recipe"));
             return;
          end if;
          Porion.Projects.Services.Set_Filter_Rules (Context.Project_Service, Value, Modified);
 
       else
-         Commands.Error (-("Unknown configuration '{0}"), Name);
+         Commands.Error (-("unknown configuration '{0}"), Name);
          return;
       end if;
 

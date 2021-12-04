@@ -38,7 +38,6 @@ package body Porion.Commands.Edit is
                            Path    : in String);
 
    procedure Import_Value (Context : in out Context_Type;
-                           Name    : in String;
                            Path    : in String);
 
    procedure Make_Directory (Path : in String);
@@ -80,7 +79,6 @@ package body Porion.Commands.Edit is
    end Export_Value;
 
    procedure Import_Value (Context : in out Context_Type;
-                           Name    : in String;
                            Path    : in String) is
    begin
       Context.Project_Service.Import (Path);
@@ -176,7 +174,7 @@ package body Porion.Commands.Edit is
                                        Natural'Image (Util.Processes.Get_Exit_Status (Proc)));
                Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
             else
-               Import_Value (Context, Args.Get_Argument (Context.First_Arg), Path);
+               Import_Value (Context, Path);
             end if;
             Cleanup;
 

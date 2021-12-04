@@ -116,6 +116,8 @@ package body Porion.Metrics.Coverage is
                      Printer    : in out PT.Printer_Type'Class;
                      Fields     : in PT.Texts.Field_Array;
                      Values     : in Value_Map) is
+      pragma Unreferenced (Controller);
+
       Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
       Chart  : PT.Charts.Printer_Type := PT.Charts.Create (Printer);
       Green  : constant PT.Style_Type := Printer.Create_Style (PT.Colors.Green);

@@ -30,7 +30,7 @@ package body Porion.Commands.List is
       Context.Open;
 
       if not Command.List_Projects and not Command.List_Nodes and not Command.List_Builds
-        and not Command.List_Queues
+        and not Command.List_Queues and not Command.List_Env
       then
          Command.List_Projects := True;
       end if;
@@ -57,6 +57,12 @@ package body Porion.Commands.List is
          Porion.Reports.List_Queues (Service => Context.Project_Service,
                                      Printer => Context.Printer.all,
                                      Styles  => Context.Styles);
+      end if;
+
+      if Command.List_Env then
+         Porion.Reports.List_Environment (Service => Context.Project_Service,
+                                          Printer => Context.Printer.all,
+                                          Styles  => Context.Styles);
       end if;
    end Execute;
 
@@ -87,6 +93,11 @@ package body Porion.Commands.List is
                         Switch => "-Q",
                         Long_Switch => "--queue",
                         Help => -("List the content of build queue"));
+      GC.Define_Switch (Config => Config,
+                        Output => Command.List_Env'Access,
+                        Switch => "-E",
+                        Long_Switch => "--env",
+                        Help => -("List the environment variables"));
    end Setup;
 
 end Porion.Commands.List;

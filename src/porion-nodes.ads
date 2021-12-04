@@ -16,6 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Finalization;
+with Util.Strings.Maps;
 with Util.Beans.Objects.Enums;
 package Porion.Nodes is
 
@@ -84,6 +85,10 @@ package Porion.Nodes is
    procedure Start (Controller : in out Controller_Type) is null;
 
    procedure Stop (Controller : in out Controller_Type) is null;
+
+   --  Set the environment variables when running commands in the build node.
+   procedure Set_Environment (Controller : in out Controller_Type;
+                              Env        : in Util.Strings.Maps.Map) is abstract;
 
    --  Execute the command in the working directory and for each output
    --  line produced by the command call the Process procedure.

@@ -1172,6 +1172,14 @@ package Porion.Builds.Models is
                  return String;
 
    --
+   procedure Set_Branch (Object : in out Environment_Ref;
+                         Value  : in Porion.Projects.Models.Branch_Ref'Class);
+
+   --
+   function Get_Branch (Object : in Environment_Ref)
+                 return Porion.Projects.Models.Branch_Ref'Class;
+
+   --
    procedure Set_Node (Object : in out Environment_Ref;
                        Value  : in Porion.Nodes.Models.Node_Ref'Class);
 
@@ -1186,6 +1194,14 @@ package Porion.Builds.Models is
    --
    function Get_Recipe (Object : in Environment_Ref)
                  return Recipe_Ref'Class;
+
+   --
+   procedure Set_Project (Object : in out Environment_Ref;
+                          Value  : in Porion.Projects.Models.Project_Ref'Class);
+
+   --
+   function Get_Project (Object : in Environment_Ref)
+                 return Porion.Projects.Models.Project_Ref'Class;
 
    --  Load the entity identified by 'Id'.
    --  Raises the NOT_FOUND exception if it does not exist.
@@ -2040,11 +2056,13 @@ private
    COL_1_8_NAME : aliased constant String := "version";
    COL_2_8_NAME : aliased constant String := "name";
    COL_3_8_NAME : aliased constant String := "value";
-   COL_4_8_NAME : aliased constant String := "node_id";
-   COL_5_8_NAME : aliased constant String := "recipe_id";
+   COL_4_8_NAME : aliased constant String := "branch_id";
+   COL_5_8_NAME : aliased constant String := "node_id";
+   COL_6_8_NAME : aliased constant String := "recipe_id";
+   COL_7_8_NAME : aliased constant String := "project_id";
 
    ENVIRONMENT_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 6,
+     (Count   => 8,
       Table   => ENVIRONMENT_NAME'Access,
       Members => (
          1 => COL_0_8_NAME'Access,
@@ -2052,7 +2070,9 @@ private
          3 => COL_2_8_NAME'Access,
          4 => COL_3_8_NAME'Access,
          5 => COL_4_8_NAME'Access,
-         6 => COL_5_8_NAME'Access)
+         6 => COL_5_8_NAME'Access,
+         7 => COL_6_8_NAME'Access,
+         8 => COL_7_8_NAME'Access)
      );
    ENVIRONMENT_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := ENVIRONMENT_DEF'Access;
@@ -2077,8 +2097,10 @@ private
        Version : Integer;
        Name : Ada.Strings.Unbounded.Unbounded_String;
        Value : Ada.Strings.Unbounded.Unbounded_String;
+       Branch : Porion.Projects.Models.Branch_Ref;
        Node : Porion.Nodes.Models.Node_Ref;
        Recipe : Recipe_Ref;
+       Project : Porion.Projects.Models.Project_Ref;
    end record;
 
    type Environment_Access is access all Environment_Impl;

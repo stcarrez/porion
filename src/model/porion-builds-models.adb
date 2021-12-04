@@ -4037,12 +4037,29 @@ package body Porion.Builds.Models is
    end Get_Value;
 
 
+   procedure Set_Branch (Object : in out Environment_Ref;
+                         Value  : in Porion.Projects.Models.Branch_Ref'Class) is
+      Impl : Environment_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Object (Impl.all, 5, Impl.Branch, Value);
+   end Set_Branch;
+
+   function Get_Branch (Object : in Environment_Ref)
+                  return Porion.Projects.Models.Branch_Ref'Class is
+      Impl : constant Environment_Access
+         := Environment_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Branch;
+   end Get_Branch;
+
+
    procedure Set_Node (Object : in out Environment_Ref;
                        Value  : in Porion.Nodes.Models.Node_Ref'Class) is
       Impl : Environment_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 5, Impl.Node, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 6, Impl.Node, Value);
    end Set_Node;
 
    function Get_Node (Object : in Environment_Ref)
@@ -4059,7 +4076,7 @@ package body Porion.Builds.Models is
       Impl : Environment_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 6, Impl.Recipe, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 7, Impl.Recipe, Value);
    end Set_Recipe;
 
    function Get_Recipe (Object : in Environment_Ref)
@@ -4069,6 +4086,23 @@ package body Porion.Builds.Models is
    begin
       return Impl.Recipe;
    end Get_Recipe;
+
+
+   procedure Set_Project (Object : in out Environment_Ref;
+                          Value  : in Porion.Projects.Models.Project_Ref'Class) is
+      Impl : Environment_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Object (Impl.all, 8, Impl.Project, Value);
+   end Set_Project;
+
+   function Get_Project (Object : in Environment_Ref)
+                  return Porion.Projects.Models.Project_Ref'Class is
+      Impl : constant Environment_Access
+         := Environment_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Project;
+   end Get_Project;
 
    --  Copy of the object.
    procedure Copy (Object : in Environment_Ref;
@@ -4087,8 +4121,10 @@ package body Porion.Builds.Models is
             Copy.Version := Impl.Version;
             Copy.Name := Impl.Name;
             Copy.Value := Impl.Value;
+            Copy.Branch := Impl.Branch;
             Copy.Node := Impl.Node;
             Copy.Recipe := Impl.Recipe;
+            Copy.Project := Impl.Project;
          end;
       end if;
       Into := Result;
@@ -4229,14 +4265,24 @@ package body Porion.Builds.Models is
          Object.Clear_Modified (4);
       end if;
       if Object.Is_Modified (5) then
-         Stmt.Save_Field (Name  => COL_4_8_NAME, --  node_id
-                          Value => Object.Node);
+         Stmt.Save_Field (Name  => COL_4_8_NAME, --  branch_id
+                          Value => Object.Branch);
          Object.Clear_Modified (5);
       end if;
       if Object.Is_Modified (6) then
-         Stmt.Save_Field (Name  => COL_5_8_NAME, --  recipe_id
-                          Value => Object.Recipe);
+         Stmt.Save_Field (Name  => COL_5_8_NAME, --  node_id
+                          Value => Object.Node);
          Object.Clear_Modified (6);
+      end if;
+      if Object.Is_Modified (7) then
+         Stmt.Save_Field (Name  => COL_6_8_NAME, --  recipe_id
+                          Value => Object.Recipe);
+         Object.Clear_Modified (7);
+      end if;
+      if Object.Is_Modified (8) then
+         Stmt.Save_Field (Name  => COL_7_8_NAME, --  project_id
+                          Value => Object.Project);
+         Object.Clear_Modified (8);
       end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
@@ -4277,10 +4323,14 @@ package body Porion.Builds.Models is
                         Value => Object.Name);
       Query.Save_Field (Name  => COL_3_8_NAME, --  value
                         Value => Object.Value);
-      Query.Save_Field (Name  => COL_4_8_NAME, --  node_id
+      Query.Save_Field (Name  => COL_4_8_NAME, --  branch_id
+                        Value => Object.Branch);
+      Query.Save_Field (Name  => COL_5_8_NAME, --  node_id
                         Value => Object.Node);
-      Query.Save_Field (Name  => COL_5_8_NAME, --  recipe_id
+      Query.Save_Field (Name  => COL_6_8_NAME, --  recipe_id
                         Value => Object.Recipe);
+      Query.Save_Field (Name  => COL_7_8_NAME, --  project_id
+                        Value => Object.Project);
       Query.Execute (Result);
       if Result /= 1 then
          raise ADO.Objects.INSERT_ERROR;
@@ -4356,10 +4406,16 @@ package body Porion.Builds.Models is
       Object.Name := Stmt.Get_Unbounded_String (2);
       Object.Value := Stmt.Get_Unbounded_String (3);
       if not Stmt.Is_Null (4) then
-         Object.Node.Set_Key_Value (Stmt.Get_Identifier (4), Session);
+         Object.Branch.Set_Key_Value (Stmt.Get_Identifier (4), Session);
       end if;
       if not Stmt.Is_Null (5) then
-         Object.Recipe.Set_Key_Value (Stmt.Get_Identifier (5), Session);
+         Object.Node.Set_Key_Value (Stmt.Get_Identifier (5), Session);
+      end if;
+      if not Stmt.Is_Null (6) then
+         Object.Recipe.Set_Key_Value (Stmt.Get_Identifier (6), Session);
+      end if;
+      if not Stmt.Is_Null (7) then
+         Object.Project.Set_Key_Value (Stmt.Get_Identifier (7), Session);
       end if;
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);

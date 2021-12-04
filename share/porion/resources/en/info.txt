@@ -1,6 +1,6 @@
-porion info: report some information about a project
+porion info: report some information about a project, a recipe or a build
 
-Usage: porion info [--all] [--recipes] [--nodes] [--builds] project...
+Usage: porion info [--all] [--recipes] [--nodes] [--builds] ident...
 
   For each project, report a short description of the project and its branches.
   If the project has been built, report the last build of the project.

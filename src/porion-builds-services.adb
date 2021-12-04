@@ -1140,18 +1140,26 @@ package body Porion.Builds.Services is
       if not Service.Branch.Is_Null then
          Append (Filter, " AND o.branch_id = :branch_id");
          Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
+      else
+         Append (Filter, " AND o.branch_id IS NULL");
       end if;
       if not Service.Project.Is_Null then
          Append (Filter, "AND o.project_id = :project_id");
          Query.Bind_Param ("project_id", Service.Project.Get_Id);
+      else
+         Append (Filter, " AND o.project_id IS NULL");
       end if;
       if not Service.Recipe.Is_Null then
          Append (Filter, " AND o.recipe_id = :recipe_id");
          Query.Bind_Param ("recipe_id", Service.Recipe.Get_Id);
+      else
+         Append (Filter, " AND o.recipe_id IS NULL");
       end if;
       if not Service.Build_Node.Is_Null then
          Append (Filter, " AND o.node_id = :node_id");
          Query.Bind_Param ("node_id", Service.Build_Node.Get_Id);
+      else
+         Append (Filter, " AND o.node_id IS NULL");
       end if;
       Query.Set_Filter (To_String (Filter));
 

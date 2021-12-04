@@ -23,10 +23,17 @@ with Util.Serialize.IO.XML;
 with EL.Contexts.Default;
 with PT.Colors;
 with Porion.Logs;
-with Porion.Reports;
 package body Porion.Metrics.Cloc is
 
    package UBO renames Util.Beans.Objects;
+
+   procedure Scan (Content : in String;
+                   Process : not null access
+                      procedure (Language      : in String;
+                                 Files_Count   : in Natural;
+                                 Blank_Count   : in Natural;
+                                 Comment_Count : in Natural;
+                                 Code_Count    : in Natural));
 
    use Ada.Strings.Unbounded;
 
@@ -152,6 +159,8 @@ package body Porion.Metrics.Cloc is
 
    function Create (Session : in ADO.Sessions.Master_Session;
                     Params  : in UString) return Controller_Access is
+      pragma Unreferenced (Params);
+
       Result  : constant Cloc_Controller_Access := new Controller_Type;
       Command : constant String := Configs.Get ("command_cloc", CLOC_COMMAND);
       Ctx     : EL.Contexts.Default.Default_Context;
@@ -167,6 +176,11 @@ package body Porion.Metrics.Cloc is
                       Path       : in String;
                       Executor   : in out Porion.Executors.Executor_Type'Class) is
       procedure Process (Line : in String);
+      procedure Process_Metric (Language      : in String;
+                                Files_Count   : in Natural;
+                                Blank_Count   : in Natural;
+                                Comment_Count : in Natural;
+                                Code_Count    : in Natural);
 
       Content : UString;
 
@@ -218,6 +232,7 @@ package body Porion.Metrics.Cloc is
                      Printer    : in out PT.Printer_Type'Class;
                      Fields     : in PT.Texts.Field_Array;
                      Values     : in Value_Map) is
+      pragma Unreferenced (Controller);
 
       function "<" (Left, Right : in Label_Value_Type) return Boolean
          is (Left.Value > Right.Value);

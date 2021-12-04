@@ -15,14 +15,11 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Containers;
 with Util.Strings.Vectors;
 with Porion.Services;
 with Porion.Projects;
 with Porion.Builds.Services;
 package body Porion.Commands.Steps is
-
-   use type Ada.Containers.Count_Type;
 
    procedure Add_Step (Command : in out Command_Type;
                        Recipe  : in out Porion.Builds.Models.Recipe_Ref;
@@ -51,8 +48,11 @@ package body Porion.Commands.Steps is
          Pos := Pos + 1;
       end loop;
 
+      if Command.Insert_Pos > 0 then
+         Command.Insert_Pos := Command.Insert_Pos - 1;
+      end if;
       Builds.Services.Insert_Step (Context.Project_Service, Recipe,
-                                   Command.Insert_Pos - 1, Kind, Step, Params);
+                                   Command.Insert_Pos, Kind, Step, Params);
    end Add_Step;
 
    procedure Update_Step (Command : in out Command_Type;

@@ -200,7 +200,7 @@ package Porion.Builds.Services is
    procedure Set_Environment (Service : in out Context_Type;
                               Name    : in String;
                               Value   : in String) with
-      Pre => Service.Has_Project;
+      Pre => Service.Is_Open;
 
 private
 

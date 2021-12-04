@@ -153,9 +153,13 @@ CREATE TABLE IF NOT EXISTS porion_environment (
   /* the environment variable value. */
   `value` VARCHAR(4096) NOT NULL,
   /*  */
+  `branch_id` BIGINT ,
+  /*  */
   `node_id` BIGINT ,
   /*  */
   `recipe_id` BIGINT ,
+  /*  */
+  `project_id` BIGINT ,
   PRIMARY KEY (`id`)
 );
 /*  */

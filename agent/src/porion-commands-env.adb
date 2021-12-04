@@ -43,24 +43,29 @@ package body Porion.Commands.Env is
 
       declare
          Arg   : constant String := Args.Get_Argument (1);
+         First : Positive := 1;
          Ident : Porion.Projects.Ident_Type;
       begin
-         Ident := Porion.Projects.Parse (Arg);
-         Context.Project_Service.Load (Ident);
+         if Util.Strings.Index (Arg, '=') = 0 then
+            Ident := Porion.Projects.Parse (Arg);
+            Context.Project_Service.Load (Ident);
 
-         if not Porion.Projects.Has_Recipe (Ident) then
-            Context.Project_Service.Recipe := Porion.Builds.Models.Null_Recipe;
+            if not Porion.Projects.Has_Recipe (Ident) then
+               Context.Project_Service.Recipe := Porion.Builds.Models.Null_Recipe;
+            end if;
+
+            if not Porion.Projects.Has_Branch (Ident) and not Porion.Projects.Has_Recipe (Ident) then
+               Context.Project_Service.Branch := Porion.Projects.Models.Null_Branch;
+            end if;
+
+            if not Porion.Projects.Has_Node (Ident) then
+               Context.Project_Service.Build_Node := Porion.Nodes.Models.Null_Node;
+            end if;
+
+            First := 2;
          end if;
 
-         if not Porion.Projects.Has_Branch (Ident) and not Porion.Projects.Has_Recipe (Ident) then
-            Context.Project_Service.Branch := Porion.Projects.Models.Null_Branch;
-         end if;
-
-         if not Porion.Projects.Has_Node (Ident) then
-            Context.Project_Service.Build_Node := Porion.Nodes.Models.Null_Node;
-         end if;
-
-         for I in 2 .. Count loop
+         for I in First .. Count loop
             declare
                Env : constant String := Args.Get_Argument (I);
                Sep : constant Natural := Util.Strings.Index (Env, '=');

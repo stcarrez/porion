@@ -1,0 +1,77 @@
+<query-mapping package='Porion.Queries'>
+    <description>
+        Stats for the builds
+    </description>
+
+    <class name="Porion.Queries.Build_Stat" bean="no">
+        <comment>Statistics about a list of builds.</comment>
+        <property type='Porion.Builds.Models.Build_Status_Type' name="build_status">
+            <comment>the build status.</comment>
+        </property>
+        <property type='Natural' name="count">
+            <comment>the number of builds.</comment>
+        </property>
+        <property type='Natural' name="pass_count">
+            <comment>the total number of tests that passed.</comment>
+        </property>
+        <property type='Natural' name="fail_count">
+            <comment>the total number of tests that failed.</comment>
+        </property>
+        <property type='Natural' name="timeout_count">
+            <comment>the total number of tests that timeout.</comment>
+        </property>
+        <property type='Natural' name="test_duration">
+            <comment>the total duration of all tests.</comment>
+        </property>
+        <property type='Porion.Millisecond_Type' name="build_duration" not-null="yes">
+            <comment>the total build duration.</comment>
+        </property>
+        <property type='Porion.Millisecond_Type' name="sys_time" not-null="yes">
+            <comment>the total system time.</comment>
+        </property>
+        <property type='Porion.Millisecond_Type' name="user_time" not-null="yes">
+            <comment>the total user time.</comment>
+        </property>
+    </class>
+
+    <query name='stat-builds'>
+        <comment>Statistics about the last project builds</comment>
+        <sql>
+          SELECT
+          build.status AS status,
+          COUNT(build.id) AS cnt,
+          SUM(build.pass_count) AS pass_count,
+          SUM(build.fail_count) AS fail_count,
+          SUM(build.timeout_count) AS timeout_count,
+          SUM(build.test_duration) AS test_duration,
+          SUM(build.build_duration) AS build_duration,
+          SUM(build.sys_time) AS sys_time,
+          SUM(build.user_time) AS user_time
+          FROM porion_last_build AS last_build
+          INNER JOIN porion_build AS build ON last_build.build_id = build.id
+          WHERE last_build.last_build = 1
+          GROUP BY build.status
+        </sql>
+    </query> 
+
+    <query name='stat-project-builds'>
+        <comment>Stats about the last project builds</comment>
+        <sql>
+          SELECT
+          build.status AS status,
+          COUNT(build.id) AS cnt,
+          SUM(build.pass_count) AS pass_count,
+          SUM(build.fail_count) AS fail_count,
+          SUM(build.timeout_count) AS timeout_count,
+          SUM(build.test_duration) AS test_duration,
+          SUM(build.build_duration) AS build_duration,
+          SUM(build.sys_time) AS sys_time,
+          SUM(build.user_time) AS user_time
+          FROM porion_last_build AS last_build
+          INNER JOIN porion_build AS build ON last_build.build_id = build.id
+          WHERE last_build.last_build = 1 AND build.project_id = :project_id
+          GROUP BY build.status
+        </sql>
+    </query> 
+
+</query-mapping>

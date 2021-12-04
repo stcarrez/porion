@@ -19,6 +19,7 @@ with Ada.Calendar;
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Util.Beans.Objects.Enums;
 with Porion.Executors;
+with Porion.Configs;
 package Porion.Sources is
 
    Not_Supported : exception;
@@ -56,6 +57,34 @@ package Porion.Sources is
       Head       : UString;
       Changes    : Maps.Map;
    end record;
+
+   --  Check for changes in the project by using the executor.
+   --  The source control parameters are configured in Config.
+   procedure Check (Kind      : in Source_Control_Type;
+                    Config    : in Porion.Configs.Config_Type;
+                    Status    : out Status_Type;
+                    Executor  : in out Porion.Executors.Executor_Type'Class) with
+      Pre => Executor.Is_Configured;
+
+   --  Checkout the source of the project by using the executor.
+   --  The checkout parameters are configured in Config and the
+   --  files are extracted in the Path directory (possibly on a remote host).
+   procedure Checkout (Kind     : in Source_Control_Type;
+                       Config   : in Porion.Configs.Config_Type;
+                       Path     : in String;
+                       Executor : in out Porion.Executors.Executor_Type'Class) with
+      Pre => Executor.Is_Configured and Path'Length > 0;
+
+   --  Guess some information about the sources located in the given directory.
+   --  The source controller tries to find if it can manage the files at the given location
+   --  and provides information on how to manage those files.
+   procedure Guess (Path       : in String;
+                    Config     : in Porion.Configs.Config_Type;
+                    Result     : out Source_Info_Type;
+                    Executor   : in out Porion.Executors.Executor_Type'Class) with
+      Pre => Executor.Is_Configured and Path'Length > 0;
+
+private
 
    type Controller_Type is limited interface;
 

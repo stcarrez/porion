@@ -42,6 +42,7 @@ private
       List_Nodes    : aliased Boolean := False;
       List_Builds   : aliased Boolean := False;
       List_Queues   : aliased Boolean := False;
+      List_Env      : aliased Boolean := False;
    end record;
 
 end Porion.Commands.List;

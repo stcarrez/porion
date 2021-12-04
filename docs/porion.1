@@ -161,6 +161,20 @@ porion \fBconfig\fP \fIkeystore.akt\fR -- \fIname\fR
 .RE
 .PP
 .\"
+.SS The env command
+.RS 0
+porion \fBenv\fP [--unset \fIname\fR] {\fIident\fR} [NAME=VALUE]
+.RE
+.PP
+Configure the environment variables used to build a project, a branch
+a specific recipe or on a build node.  The environment variable is
+associated with
+.IR ident .
+.PP
+The
+.I --unset name
+option allows to remove a past definition.
+.\"
 .SS The depend command
 .RS 0
 porion \fBdepend\fP [--remove] \fIproject\fR \fIdependency1\fR ...

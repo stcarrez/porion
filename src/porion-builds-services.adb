@@ -1136,7 +1136,7 @@ package body Porion.Builds.Services is
       Filter : UString;
    begin
       Append (Filter, "o.name = :name");
-      Query.Bind_Param (Name, Name);
+      Query.Bind_Param ("name", Name);
       if not Service.Branch.Is_Null then
          Append (Filter, " AND o.branch_id = :branch_id");
          Query.Bind_Param ("branch_id", Service.Branch.Get_Id);

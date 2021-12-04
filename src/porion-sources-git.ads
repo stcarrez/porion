@@ -17,7 +17,7 @@
 -----------------------------------------------------------------------
 with Porion.Configs;
 private with EL.Expressions;
-package Porion.Sources.Git is
+private package Porion.Sources.Git is
 
    GIT_TEST_COMMAND        : constant String := "git ls-remote -h -- #{repository_url}";
    GIT_SHOW_REMOTE_COMMAND : constant String := "git remote show #{repository_url}";

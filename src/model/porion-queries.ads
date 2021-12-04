@@ -276,6 +276,21 @@ package Porion.Queries is
       --  the project status.
       Project_Status : Porion.Projects.Models.Project_Status_Type;
 
+      --  the build progress (how much pending build have been made).
+      Build_Progress : Porion.Permille_Type;
+
+      --  the build success rate (how much success on builds).
+      Build_Rate : Porion.Permille_Type;
+
+      --  the build test success rate (how much success on unit tests).
+      Pass_Rate : Porion.Permille_Type;
+
+      --  the build test failure rate (how much failure on unit tests).
+      Failure_Rate : Porion.Permille_Type;
+
+      --  the build test timeout rate (how much timeout on unit tests).
+      Timeout_Rate : Porion.Permille_Type;
+
       --  the branch name.
       Branch_Name : Ada.Strings.Unbounded.Unbounded_String;
 
@@ -572,7 +587,7 @@ private
 
    package File_6 is
       new ADO.Queries.Loaders.File (Path => "report-projects.xml",
-                                    Sha1 => "96375E20177918A20C634ACAAE0D686D04E00104");
+                                    Sha1 => "1FFA4E073FB7C85C6EFFF6906DF1AAB2B71133F2");
 
    package Def_Projectinfo_Project_List is
       new ADO.Queries.Loaders.Query (Name => "project-list",

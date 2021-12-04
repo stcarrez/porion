@@ -583,6 +583,8 @@ package Porion.Projects.Models is
 
    Query_Cleanup_Project_Build_Metrics : constant ADO.Queries.Query_Definition_Access;
 
+   Query_Cleanup_Project_Build_Reason : constant ADO.Queries.Query_Definition_Access;
+
    Query_Cleanup_Project_Build_Queue : constant ADO.Queries.Query_Definition_Access;
 
    Query_Cleanup_Project_Test_Run : constant ADO.Queries.Query_Definition_Access;
@@ -599,9 +601,9 @@ package Porion.Projects.Models is
 
    Query_Cleanup_Project_Environment : constant ADO.Queries.Query_Definition_Access;
 
-   Query_Cleanup_Project_Build_Config_Step : constant ADO.Queries.Query_Definition_Access;
+   Query_Cleanup_Project_Build_Recipe_Step : constant ADO.Queries.Query_Definition_Access;
 
-   Query_Cleanup_Project_Build_Config : constant ADO.Queries.Query_Definition_Access;
+   Query_Cleanup_Project_Build_Recipe : constant ADO.Queries.Query_Definition_Access;
 
    Query_Cleanup_Project_Branch : constant ADO.Queries.Query_Definition_Access;
 
@@ -935,6 +937,12 @@ private
    Query_Cleanup_Project_Build_Metrics : constant ADO.Queries.Query_Definition_Access
    := Def_Cleanup_Project_Build_Metrics.Query'Access;
 
+   package Def_Cleanup_Project_Build_Reason is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-project-build-reason",
+                                     File => File_2.File'Access);
+   Query_Cleanup_Project_Build_Reason : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Project_Build_Reason.Query'Access;
+
    package Def_Cleanup_Project_Build_Queue is
       new ADO.Queries.Loaders.Query (Name => "cleanup-project-build-queue",
                                      File => File_2.File'Access);
@@ -983,17 +991,17 @@ private
    Query_Cleanup_Project_Environment : constant ADO.Queries.Query_Definition_Access
    := Def_Cleanup_Project_Environment.Query'Access;
 
-   package Def_Cleanup_Project_Build_Config_Step is
-      new ADO.Queries.Loaders.Query (Name => "cleanup-project-build-config-step",
+   package Def_Cleanup_Project_Build_Recipe_Step is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-project-build-recipe-step",
                                      File => File_2.File'Access);
-   Query_Cleanup_Project_Build_Config_Step : constant ADO.Queries.Query_Definition_Access
-   := Def_Cleanup_Project_Build_Config_Step.Query'Access;
+   Query_Cleanup_Project_Build_Recipe_Step : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Project_Build_Recipe_Step.Query'Access;
 
-   package Def_Cleanup_Project_Build_Config is
-      new ADO.Queries.Loaders.Query (Name => "cleanup-project-build-config",
+   package Def_Cleanup_Project_Build_Recipe is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-project-build-recipe",
                                      File => File_2.File'Access);
-   Query_Cleanup_Project_Build_Config : constant ADO.Queries.Query_Definition_Access
-   := Def_Cleanup_Project_Build_Config.Query'Access;
+   Query_Cleanup_Project_Build_Recipe : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Project_Build_Recipe.Query'Access;
 
    package Def_Cleanup_Project_Branch is
       new ADO.Queries.Loaders.Query (Name => "cleanup-project-branch",

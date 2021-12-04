@@ -3213,6 +3213,11 @@ package body Porion.Builds.Models is
       Stmt : ADO.Statements.Update_Statement
          := Session.Create_Statement (RECIPE_STEP_DEF'Access);
    begin
+      if Object.Is_Modified (3) then
+         Stmt.Save_Field (Name  => COL_2_6_NAME, --  number
+                          Value => Object.Number);
+         Object.Clear_Modified (3);
+      end if;
       if Object.Is_Modified (7) then
          Stmt.Save_Field (Name  => COL_6_6_NAME, --  version
                           Value => Object.Version);
@@ -4395,6 +4400,7 @@ package body Porion.Builds.Models is
       Impl := new Last_Build_Impl;
       Impl.Status := Build_Status_Type'First;
       Impl.Version := 0;
+      Impl.Last_Build := False;
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Allocate;
 
@@ -4448,12 +4454,29 @@ package body Porion.Builds.Models is
    end Get_Version;
 
 
+   procedure Set_Last_Build (Object : in out Last_Build_Ref;
+                             Value  : in Boolean) is
+      Impl : Last_Build_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Boolean (Impl.all, 4, Impl.Last_Build, Value);
+   end Set_Last_Build;
+
+   function Get_Last_Build (Object : in Last_Build_Ref)
+                  return Boolean is
+      Impl : constant Last_Build_Access
+         := Last_Build_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Last_Build;
+   end Get_Last_Build;
+
+
    procedure Set_Build (Object : in out Last_Build_Ref;
                         Value  : in Build_Ref'Class) is
       Impl : Last_Build_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 4, Impl.Build, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 5, Impl.Build, Value);
    end Set_Build;
 
    function Get_Build (Object : in Last_Build_Ref)
@@ -4470,7 +4493,7 @@ package body Porion.Builds.Models is
       Impl : Last_Build_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 5, Impl.Branch, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 6, Impl.Branch, Value);
    end Set_Branch;
 
    function Get_Branch (Object : in Last_Build_Ref)
@@ -4487,7 +4510,7 @@ package body Porion.Builds.Models is
       Impl : Last_Build_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 6, Impl.Recipe, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 7, Impl.Recipe, Value);
    end Set_Recipe;
 
    function Get_Recipe (Object : in Last_Build_Ref)
@@ -4514,6 +4537,7 @@ package body Porion.Builds.Models is
             Copy.Copy (Impl.all);
             Copy.Status := Impl.Status;
             Copy.Version := Impl.Version;
+            Copy.Last_Build := Impl.Last_Build;
             Copy.Build := Impl.Build;
             Copy.Branch := Impl.Branch;
             Copy.Recipe := Impl.Recipe;
@@ -4652,19 +4676,24 @@ package body Porion.Builds.Models is
          Object.Clear_Modified (1);
       end if;
       if Object.Is_Modified (4) then
-         Stmt.Save_Field (Name  => COL_3_9_NAME, --  build_id
-                          Value => Object.Build);
+         Stmt.Save_Field (Name  => COL_3_9_NAME, --  last_build
+                          Value => Object.Last_Build);
          Object.Clear_Modified (4);
       end if;
       if Object.Is_Modified (5) then
-         Stmt.Save_Field (Name  => COL_4_9_NAME, --  branch_id
-                          Value => Object.Branch);
+         Stmt.Save_Field (Name  => COL_4_9_NAME, --  build_id
+                          Value => Object.Build);
          Object.Clear_Modified (5);
       end if;
       if Object.Is_Modified (6) then
-         Stmt.Save_Field (Name  => COL_5_9_NAME, --  recipe_id
-                          Value => Object.Recipe);
+         Stmt.Save_Field (Name  => COL_5_9_NAME, --  branch_id
+                          Value => Object.Branch);
          Object.Clear_Modified (6);
+      end if;
+      if Object.Is_Modified (7) then
+         Stmt.Save_Field (Name  => COL_6_9_NAME, --  recipe_id
+                          Value => Object.Recipe);
+         Object.Clear_Modified (7);
       end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
@@ -4702,11 +4731,13 @@ package body Porion.Builds.Models is
                         Value => Integer (Build_Status_Type'Enum_Rep (Object.Status)));
       Query.Save_Field (Name  => COL_2_9_NAME, --  version
                         Value => Object.Version);
-      Query.Save_Field (Name  => COL_3_9_NAME, --  build_id
+      Query.Save_Field (Name  => COL_3_9_NAME, --  last_build
+                        Value => Object.Last_Build);
+      Query.Save_Field (Name  => COL_4_9_NAME, --  build_id
                         Value => Object.Build);
-      Query.Save_Field (Name  => COL_4_9_NAME, --  branch_id
+      Query.Save_Field (Name  => COL_5_9_NAME, --  branch_id
                         Value => Object.Branch);
-      Query.Save_Field (Name  => COL_5_9_NAME, --  recipe_id
+      Query.Save_Field (Name  => COL_6_9_NAME, --  recipe_id
                         Value => Object.Recipe);
       Query.Execute (Result);
       if Result /= 1 then
@@ -4743,6 +4774,8 @@ package body Porion.Builds.Models is
          return ADO.Objects.To_Object (Impl.Get_Key);
       elsif Name = "status" then
          return Build_Status_Type_Objects.To_Object (Impl.Status);
+      elsif Name = "last_build" then
+         return Util.Beans.Objects.To_Object (Impl.Last_Build);
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -4778,14 +4811,15 @@ package body Porion.Builds.Models is
    begin
       Object.Set_Key_Value (Stmt.Get_Identifier (0));
       Object.Status := Build_Status_Type'Enum_Val (Stmt.Get_Integer (1));
-      if not Stmt.Is_Null (3) then
-         Object.Build.Set_Key_Value (Stmt.Get_Identifier (3), Session);
-      end if;
+      Object.Last_Build := Stmt.Get_Boolean (3);
       if not Stmt.Is_Null (4) then
-         Object.Branch.Set_Key_Value (Stmt.Get_Identifier (4), Session);
+         Object.Build.Set_Key_Value (Stmt.Get_Identifier (4), Session);
       end if;
       if not Stmt.Is_Null (5) then
-         Object.Recipe.Set_Key_Value (Stmt.Get_Identifier (5), Session);
+         Object.Branch.Set_Key_Value (Stmt.Get_Identifier (5), Session);
+      end if;
+      if not Stmt.Is_Null (6) then
+         Object.Recipe.Set_Key_Value (Stmt.Get_Identifier (6), Session);
       end if;
       Object.Version := Stmt.Get_Integer (2);
       ADO.Objects.Set_Created (Object);

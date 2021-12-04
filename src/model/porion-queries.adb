@@ -210,6 +210,16 @@ package body Porion.Queries is
          return Util.Beans.Objects.To_Object (From.Name);
       elsif Name = "project_status" then
          return Porion.Projects.Models.Project_Status_Type_Objects.To_Object (From.Project_Status);
+      elsif Name = "build_progress" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Build_Progress));
+      elsif Name = "build_rate" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Build_Rate));
+      elsif Name = "pass_rate" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Pass_Rate));
+      elsif Name = "failure_rate" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Failure_Rate));
+      elsif Name = "timeout_rate" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Timeout_Rate));
       elsif Name = "branch_name" then
          return Util.Beans.Objects.To_Object (From.Branch_Name);
       elsif Name = "branch_tag" then
@@ -251,6 +261,16 @@ package body Porion.Queries is
          Item.Name := Util.Beans.Objects.To_Unbounded_String (Value);
       elsif Name = "project_status" then
          Item.Project_Status := Porion.Projects.Models.Project_Status_Type_Objects.To_Value (Value);
+      elsif Name = "build_progress" then
+         Item.Build_Progress := Porion.Permille_Type (Util.Beans.Objects.To_Integer (Value));
+      elsif Name = "build_rate" then
+         Item.Build_Rate := Porion.Permille_Type (Util.Beans.Objects.To_Integer (Value));
+      elsif Name = "pass_rate" then
+         Item.Pass_Rate := Porion.Permille_Type (Util.Beans.Objects.To_Integer (Value));
+      elsif Name = "failure_rate" then
+         Item.Failure_Rate := Porion.Permille_Type (Util.Beans.Objects.To_Integer (Value));
+      elsif Name = "timeout_rate" then
+         Item.Timeout_Rate := Porion.Permille_Type (Util.Beans.Objects.To_Integer (Value));
       elsif Name = "branch_name" then
          Item.Branch_Name := Util.Beans.Objects.To_Unbounded_String (Value);
       elsif Name = "branch_tag" then
@@ -303,16 +323,21 @@ package body Porion.Queries is
       begin
          Into.Name := Stmt.Get_Unbounded_String (0);
          Into.Project_Status := Porion.Projects.Models.Project_Status_Type'Enum_Val (Stmt.Get_Integer (1));
-         Into.Branch_Name := Stmt.Get_Unbounded_String (2);
-         Into.Branch_Tag := Stmt.Get_Unbounded_String (3);
-         Into.Branch_Status := Porion.Projects.Models.Branch_Status_Type'Enum_Val (Stmt.Get_Integer (4));
-         Into.Build_Date := Stmt.Get_Nullable_Time (5);
-         Into.Build_Status := Porion.Builds.Models.Build_Status_Type'Enum_Val (Stmt.Get_Integer (6));
-         Into.Build_Tag := Stmt.Get_Unbounded_String (7);
-         Into.Build_Number := Stmt.Get_Integer (8);
-         Into.Pass_Count := Stmt.Get_Integer (9);
-         Into.Fail_Count := Stmt.Get_Integer (10);
-         Into.Timeout_Count := Stmt.Get_Integer (11);
+         Into.Build_Progress := Porion.Permille_Type (Stmt.Get_Integer (2));
+         Into.Build_Rate := Porion.Permille_Type (Stmt.Get_Integer (3));
+         Into.Pass_Rate := Porion.Permille_Type (Stmt.Get_Integer (4));
+         Into.Failure_Rate := Porion.Permille_Type (Stmt.Get_Integer (5));
+         Into.Timeout_Rate := Porion.Permille_Type (Stmt.Get_Integer (6));
+         Into.Branch_Name := Stmt.Get_Unbounded_String (7);
+         Into.Branch_Tag := Stmt.Get_Unbounded_String (8);
+         Into.Branch_Status := Porion.Projects.Models.Branch_Status_Type'Enum_Val (Stmt.Get_Integer (9));
+         Into.Build_Date := Stmt.Get_Nullable_Time (10);
+         Into.Build_Status := Porion.Builds.Models.Build_Status_Type'Enum_Val (Stmt.Get_Integer (11));
+         Into.Build_Tag := Stmt.Get_Unbounded_String (12);
+         Into.Build_Number := Stmt.Get_Integer (13);
+         Into.Pass_Count := Stmt.Get_Integer (14);
+         Into.Fail_Count := Stmt.Get_Integer (15);
+         Into.Timeout_Count := Stmt.Get_Integer (16);
       end Read;
    begin
       Stmt.Execute;

@@ -46,8 +46,9 @@ package body Porion.Resources.Schema is
        & "e_id` BIGINT , PRIMARY KEY (`id`))";
    L_13  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_last_bu"
        & "ild ( `id` BIGINT NOT NULL, `status` TINYINT NOT NULL, `version` INTEGER"
-       & " NOT NULL, `build_id` BIGINT NOT NULL, `branch_id` BIGINT NOT NULL, `rec"
-       & "ipe_id` BIGINT NOT NULL, PRIMARY KEY (`id`))";
+       & " NOT NULL, `last_build` TINYINT NOT NULL, `build_id` BIGINT NOT NULL, `b"
+       & "ranch_id` BIGINT NOT NULL, `recipe_id` BIGINT NOT NULL, PRIMARY KEY (`id"
+       & "`))";
    L_14  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_recipe "
        & "( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `name` VARCHAR(255) "
        & "NOT NULL, `description` VARCHAR(4096) NOT NULL, `status` INTEGER NOT NUL"

@@ -1271,6 +1271,14 @@ package Porion.Builds.Models is
    function Get_Version (Object : in Last_Build_Ref)
                  return Integer;
 
+   --  Set indicates the last build
+   procedure Set_Last_Build (Object : in out Last_Build_Ref;
+                             Value  : in Boolean);
+
+   --  Get indicates the last build
+   function Get_Last_Build (Object : in Last_Build_Ref)
+                 return Boolean;
+
    --
    procedure Set_Build (Object : in out Last_Build_Ref;
                         Value  : in Build_Ref'Class);
@@ -1355,6 +1363,8 @@ package Porion.Builds.Models is
 
    Query_Cleanup_Build_Step : constant ADO.Queries.Query_Definition_Access;
 
+   Query_Cleanup_Build_Reason : constant ADO.Queries.Query_Definition_Access;
+
    Query_Cleanup_Build_Metrics : constant ADO.Queries.Query_Definition_Access;
 
    Query_Cleanup_Build_Test_Run : constant ADO.Queries.Query_Definition_Access;
@@ -1367,6 +1377,8 @@ package Porion.Builds.Models is
    Query_Cleanup_Recipe_Build_Step : constant ADO.Queries.Query_Definition_Access;
 
    Query_Cleanup_Recipe_Build_Metrics : constant ADO.Queries.Query_Definition_Access;
+
+   Query_Cleanup_Recipe_Build_Reason : constant ADO.Queries.Query_Definition_Access;
 
    Query_Cleanup_Recipe_Build_Queue : constant ADO.Queries.Query_Definition_Access;
 
@@ -2104,12 +2116,13 @@ private
    COL_0_9_NAME : aliased constant String := "id";
    COL_1_9_NAME : aliased constant String := "status";
    COL_2_9_NAME : aliased constant String := "version";
-   COL_3_9_NAME : aliased constant String := "build_id";
-   COL_4_9_NAME : aliased constant String := "branch_id";
-   COL_5_9_NAME : aliased constant String := "recipe_id";
+   COL_3_9_NAME : aliased constant String := "last_build";
+   COL_4_9_NAME : aliased constant String := "build_id";
+   COL_5_9_NAME : aliased constant String := "branch_id";
+   COL_6_9_NAME : aliased constant String := "recipe_id";
 
    LAST_BUILD_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 6,
+     (Count   => 7,
       Table   => LAST_BUILD_NAME'Access,
       Members => (
          1 => COL_0_9_NAME'Access,
@@ -2117,7 +2130,8 @@ private
          3 => COL_2_9_NAME'Access,
          4 => COL_3_9_NAME'Access,
          5 => COL_4_9_NAME'Access,
-         6 => COL_5_9_NAME'Access)
+         6 => COL_5_9_NAME'Access,
+         7 => COL_6_9_NAME'Access)
      );
    LAST_BUILD_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := LAST_BUILD_DEF'Access;
@@ -2132,6 +2146,7 @@ private
    with record
        Status : Build_Status_Type;
        Version : Integer;
+       Last_Build : Boolean;
        Build : Build_Ref;
        Branch : Porion.Projects.Models.Branch_Ref;
        Recipe : Recipe_Ref;
@@ -2179,6 +2194,12 @@ private
    Query_Cleanup_Build_Step : constant ADO.Queries.Query_Definition_Access
    := Def_Cleanup_Build_Step.Query'Access;
 
+   package Def_Cleanup_Build_Reason is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-build-reason",
+                                     File => File_1.File'Access);
+   Query_Cleanup_Build_Reason : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Build_Reason.Query'Access;
+
    package Def_Cleanup_Build_Metrics is
       new ADO.Queries.Loaders.Query (Name => "cleanup-build-metrics",
                                      File => File_1.File'Access);
@@ -2218,6 +2239,12 @@ private
                                      File => File_2.File'Access);
    Query_Cleanup_Recipe_Build_Metrics : constant ADO.Queries.Query_Definition_Access
    := Def_Cleanup_Recipe_Build_Metrics.Query'Access;
+
+   package Def_Cleanup_Recipe_Build_Reason is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-recipe-build-reason",
+                                     File => File_2.File'Access);
+   Query_Cleanup_Recipe_Build_Reason : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Recipe_Build_Reason.Query'Access;
 
    package Def_Cleanup_Recipe_Build_Queue is
       new ADO.Queries.Loaders.Query (Name => "cleanup-recipe-build-queue",

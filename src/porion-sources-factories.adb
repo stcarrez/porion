@@ -15,7 +15,6 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Unchecked_Deallocation;
 with Porion.Sources.Git;
 with Porion.Sources.Files;
 package body Porion.Sources.Factories is
@@ -38,32 +37,5 @@ package body Porion.Sources.Factories is
 
       end case;
    end Create;
-
-   --  ------------------------------
-   --  Guess some information about the sources located in the given directory.
-   --  The source controller tries to find if it can manage the files at the given location
-   --  and provides information on how to manage those files.
-   --  ------------------------------
-   procedure Guess (Path       : in String;
-                    Config     : in Porion.Configs.Config_Type;
-                    Result     : out Source_Info_Type;
-                    Executor   : in out Porion.Executors.Executor_Type'Class) is
-      procedure Free is
-        new Ada.Unchecked_Deallocation (Object => Controller_Type'Class,
-                                        Name   => Controller_Access);
-   begin
-      for Kind in SRC_GIT .. SRC_FILE loop
-         declare
-            C : Controller_Access := Create (Kind, Config);
-         begin
-            Result.Kind := SRC_UNKNOWN;
-            C.Guess (Path     => Path,
-                     Result   => Result,
-                     Executor => Executor);
-            Free (C);
-            exit when Result.Kind = Kind;
-         end;
-      end loop;
-   end Guess;
 
 end Porion.Sources.Factories;

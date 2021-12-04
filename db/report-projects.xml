@@ -11,6 +11,21 @@
         <property type='Porion.Projects.Models.Project_Status_Type' name="project_status">
             <comment>the project status.</comment>
         </property>
+        <property type='Porion.Permille_Type' name="build_progress">
+            <comment>the build progress (how much pending build have been made).</comment>
+        </property>
+        <property type='Porion.Permille_Type' name="build_rate">
+            <comment>the build success rate (how much success on builds).</comment>
+        </property>
+        <property type='Porion.Permille_Type' name="pass_rate">
+            <comment>the build test success rate (how much success on unit tests).</comment>
+        </property>
+        <property type='Porion.Permille_Type' name="failure_rate">
+            <comment>the build test failure rate (how much failure on unit tests).</comment>
+        </property>
+        <property type='Porion.Permille_Type' name="timeout_rate">
+            <comment>the build test timeout rate (how much timeout on unit tests).</comment>
+        </property>
         <property type='String' name="branch_name">
             <comment>the branch name.</comment>
         </property>
@@ -49,6 +64,11 @@
             SELECT
             project.name AS name,
             project.status AS status,
+            project.build_progress AS build_progress,
+            project.build_rate AS build_rate,
+            project.pass_rate AS pass_rate,
+            project.fail_rate AS fail_rate,
+            project.timeout_rate AS timeout_rate,
             COALESCE(branch.name, '') AS branch_name,
             COALESCE(branch.tag, '') AS branch_tag,
             COALESCE(branch.status, 0) AS branch_status,
@@ -61,7 +81,7 @@
             COALESCE(build.timeout_count, 0) AS timeout_count
             FROM porion_project AS project
             LEFT JOIN porion_branch AS branch ON project.id = branch.project_id AND branch.status != 0
-            LEFT JOIN porion_last_build AS last_build ON last_build.branch_id = branch.id
+            LEFT JOIN porion_last_build AS last_build ON last_build.branch_id = branch.id AND last_build.last_build = 1
             LEFT JOIN porion_build AS build ON last_build.build_id = build.id
         </sql>
         <sql-count>
@@ -77,6 +97,11 @@
             SELECT
             project.name AS name,
             project.status AS status,
+            project.build_progress AS build_progress,
+            project.build_rate AS build_rate,
+            project.pass_rate AS pass_rate,
+            project.fail_rate AS fail_rate,
+            project.timeout_rate AS timeout_rate,
             COALESCE(branch.name, '') AS branch_name,
             COALESCE(branch.tag, '') AS branch_tag,
             COALESCE(branch.status, 0) AS branch_status,
@@ -90,7 +115,7 @@
             FROM porion_dependency AS dependency
             INNER JOIN porion_project AS project ON dependency.project_id = project.id
             LEFT JOIN porion_branch AS branch ON project.id = branch.project_id AND branch.status != 0
-            LEFT JOIN porion_last_build AS last_build ON last_build.branch_id = branch.id
+            LEFT JOIN porion_last_build AS last_build ON last_build.branch_id = branch.id AND last_build.last_build = 1
             LEFT JOIN porion_build AS build ON last_build.build_id = build.id
             WHERE dependency.owner_id = :project_id AND
             (build.id IS NULL OR build.id IN (SELECT MAX(sb.build_id) FROM porion_last_build AS sb

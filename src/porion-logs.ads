@@ -27,6 +27,9 @@ package Porion.Logs is
 
    type Logger_Type is tagged limited private;
 
+   --  Returns true if this logger is opened and we can write on it.
+   function Is_Opened (Logger : in Logger_Type) return Boolean;
+
    --  Create and open the logger to write on the given path.
    procedure Create (Logger : in out Logger_Type;
                      Path   : in String);

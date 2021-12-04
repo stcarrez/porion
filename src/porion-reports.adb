@@ -536,7 +536,7 @@ package body Porion.Reports is
       Writer.Layout_Fields (Fields);
       Writer.Put (Fields (1), Label);
       Writer.Put (Fields (2), -("Status"));
-      Writer.Put (Fields (3), -("Configs"));
+      Writer.Put (Fields (3), -("Recipes"));
       Writer.Put (Fields (4), -("Builds"));
       Writer.Put (Fields (5), -("OS"));
       Writer.Put (Fields (6), -("CPU"));
@@ -813,8 +813,6 @@ package body Porion.Reports is
    procedure List_Environment (List     : in Porion.Queries.Environment_Info_Vector;
                                Printer  : in out PT.Printer_Type'Class;
                                Styles   : in Style_Configuration) is
-      use type Porion.XUnit.Models.Test_Status_Type;
-
       Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
       Fields : PT.Texts.Field_Array (1 .. 2);
       Style1 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);

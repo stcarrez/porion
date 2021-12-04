@@ -240,6 +240,14 @@ package body Porion.Configs is
    end Get_Source_Log_Directory;
 
    --  ------------------------------
+   --  Get the default path of the local database.
+   --  ------------------------------
+   function Get_Default_Database_Path return String is
+   begin
+      return "sqlite:///" & Util.Files.Compose (Get_Config_Directory, "porion.db");
+   end Get_Default_Database_Path;
+
+   --  ------------------------------
    --  Get the path of the local database.
    --  ------------------------------
    function Get_Database_Path return String is
@@ -247,7 +255,7 @@ package body Porion.Configs is
       if Exists (DATABASE_NAME) then
          return Get (DATABASE_NAME);
       else
-         return "sqlite:///" & Util.Files.Compose (Get_Config_Directory, "porion.db");
+         return Get_Default_Database_Path;
       end if;
    end Get_Database_Path;
 

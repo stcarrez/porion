@@ -3,7 +3,7 @@
         Stats with the build metrics
     </description>
 
-    <class name="Porion.Queries.Metric_Stat" bean="no">
+    <class name="Porion.Queries.Metric_Stat" bean="yes">
         <comment>Statistics with build metrics.</comment>
         <property type='Porion.Metrics.Metric_Type' name="kind">
             <comment>the metric type.</comment>

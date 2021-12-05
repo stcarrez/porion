@@ -3,7 +3,7 @@
         Stats for the builds
     </description>
 
-    <class name="Porion.Queries.Build_Stat" bean="no">
+    <class name="Porion.Queries.Build_Stat" bean="yes">
         <comment>Statistics about a list of builds.</comment>
         <property type='Porion.Builds.Models.Build_Status_Type' name="build_status">
             <comment>the build status.</comment>

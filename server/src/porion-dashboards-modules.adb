@@ -16,10 +16,12 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
+with AWA.Applications;
 with AWA.Modules.Beans;
 with AWA.Modules.Get;
 with Util.Log.Loggers;
 with Porion.Dashboards.Beans;
+with Porion.Dashboards.Beans.Stats;
 package body Porion.Dashboards.Modules is
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Dashboards.Module");
@@ -41,6 +43,16 @@ package body Porion.Dashboards.Modules is
       Register.Register (Plugin => Plugin,
                          Name   => "Porion.Dashboards.Beans.Project_List_Bean",
                          Handler => Porion.Dashboards.Beans.Create_Project_List_Bean'Access);
+      Register.Register (Plugin => Plugin,
+                         Name   => "Porion.Dashboards.Beans.Stats.Last_Builds_Bean",
+                         Handler => Porion.Dashboards.Beans.Stats.Create_Last_Builds_Bean'Access);
+      Register.Register (Plugin => Plugin,
+                         Name   => "Porion.Dashboards.Beans.Stats.Metrics_Bean",
+                         Handler => Porion.Dashboards.Beans.Stats.Create_Metrics_Bean'Access);
+
+      Plugin.Percent_Converter.Set_Picture ("ZZ9.9");
+      App.Add_Converter (Name      => "percentConverter",
+                         Converter => Plugin.Percent_Converter'Unchecked_Access);
 
       AWA.Modules.Module (Plugin).Initialize (App, Props);
 

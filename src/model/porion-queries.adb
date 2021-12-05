@@ -261,6 +261,37 @@ package body Porion.Queries is
    end List;
 
    --  --------------------
+   --  Statistics with build metrics.
+   --  --------------------
+   procedure List (Object  : in out Metric_Stat_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+      procedure Read (Into : in out Metric_Stat);
+
+      Stmt : ADO.Statements.Query_Statement
+          := Session.Create_Statement (Context);
+      Pos  : Positive := 1;
+      procedure Read (Into : in out Metric_Stat) is
+      begin
+         Into.Kind := Porion.Metrics.Metric_Type'Enum_Val (Stmt.Get_Integer (0));
+         Into.Name := Stmt.Get_Unbounded_String (1);
+         Into.Label := Stmt.Get_Unbounded_String (2);
+         Into.Sum_Value := Stmt.Get_Integer (3);
+         Into.Max_Value := Stmt.Get_Integer (4);
+         Into.Count := Stmt.Get_Integer (5);
+      end Read;
+   begin
+      Stmt.Execute;
+      Metric_Stat_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         Object.Insert_Space (Before => Pos);
+         Object.Update_Element (Index => Pos, Process => Read'Access);
+         Pos := Pos + 1;
+         Stmt.Next;
+      end loop;
+   end List;
+
+   --  --------------------
    --  Information about a build node.
    --  --------------------
    procedure List (Object  : in out Node_Info_Vector;

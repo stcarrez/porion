@@ -8,14 +8,14 @@ package body Porion.Resources.Queries is
      (1, 12, 13);
 
    T1 : constant array (0 .. 2) of Unsigned_8 :=
-     (13, 15, 28);
+     (16, 28, 30);
 
    T2 : constant array (0 .. 2) of Unsigned_8 :=
-     (13, 14, 32);
+     (4, 21, 5);
 
-   G : constant array (0 .. 32) of Unsigned_8 :=
-     (0, 15, 6, 0, 0, 0, 0, 0, 0, 0, 14, 0, 6, 0, 0, 0, 0, 2, 0, 0, 0, 6, 4,
-      5, 0, 3, 7, 10, 1, 0, 2, 10, 10);
+   G : constant array (0 .. 35) of Unsigned_8 :=
+     (0, 0, 0, 0, 13, 3, 0, 0, 0, 10, 9, 0, 12, 15, 0, 0, 11, 0, 0, 0, 0, 0,
+      0, 0, 2, 0, 1, 0, 0, 3, 9, 2, 6, 4, 0, 2);
 
    function Hash (S : String) return Natural is
       F : constant Natural := S'First - 1;
@@ -26,10 +26,10 @@ package body Porion.Resources.Queries is
       for K in P'Range loop
          exit when L < P (K);
          J  := Character'Pos (S (P (K) + F));
-         F1 := (F1 + Natural (T1 (K)) * J) mod 33;
-         F2 := (F2 + Natural (T2 (K)) * J) mod 33;
+         F1 := (F1 + Natural (T1 (K)) * J) mod 36;
+         F2 := (F2 + Natural (T2 (K)) * J) mod 36;
       end loop;
-      return (Natural (G (F1)) + Natural (G (F2))) mod 16;
+      return (Natural (G (F1)) + Natural (G (F2))) mod 17;
    end Hash;
 
    C_0 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
@@ -898,12 +898,60 @@ package body Porion.Resources.Queries is
        & "   </sql>" & ASCII.LF & "    </query> " & ASCII.LF & ASCII.LF & "</quer"
        & "y-mapping>" & ASCII.LF;
 
+   C_16 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+       & "    <description>" & ASCII.LF & "        Stats with the build metrics" & ASCII.LF
+       & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
+       & "ueries.Metric_Stat"" bean=""no"">" & ASCII.LF & "        <comment>Statis"
+       & "tics with build metrics.</comment>" & ASCII.LF & "        <property type"
+       & "='Porion.Metrics.Metric_Type' name=""kind"">" & ASCII.LF & "            "
+       & "<comment>the metric type.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='String' name=""name"">" & ASCII.LF & "          "
+       & "  <comment>the metric logical name.</comment>" & ASCII.LF & "        </p"
+       & "roperty>" & ASCII.LF & "        <property type='String' name=""label"">" & ASCII.LF
+       & "            <comment>the metric label.</comment>" & ASCII.LF & "        "
+       & "</property>" & ASCII.LF & "        <property type='Integer' name=""sum_v"
+       & "alue"">" & ASCII.LF & "            <comment>the sum of metric value.</co"
+       & "mment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <proper"
+       & "ty type='Integer' name=""max_value"">" & ASCII.LF & "            <commen"
+       & "t>the max metric value.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Integer' name=""count"">" & ASCII.LF & "        "
+       & "    <comment>the number of metric.</comment>" & ASCII.LF & "        </pr"
+       & "operty>" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF & "    <quer"
+       & "y name='stat-metrics'>" & ASCII.LF & "        <comment>Statistics about "
+       & "the last project build metrics (all projects)</comment>" & ASCII.LF & " "
+       & "       <sql>" & ASCII.LF & "          SELECT" & ASCII.LF & "          me"
+       & "tric.metric," & ASCII.LF & "          metric.name," & ASCII.LF & "      "
+       & "    metric.label," & ASCII.LF & "          SUM(mb.value) AS value," & ASCII.LF
+       & "          MAX(mb.value) AS max_value," & ASCII.LF & "          COUNT(mb."
+       & "id) AS CNT" & ASCII.LF & "          FROM porion_last_build AS last_build"
+       & ASCII.LF & "          INNER JOIN porion_build_metric AS mb ON mb.build_i"
+       & "d = last_build.build_id" & ASCII.LF & "          INNER JOIN porion_metri"
+       & "c AS metric ON mb.metric_id = metric.id" & ASCII.LF & "          WHERE l"
+       & "ast_build.status = 2 AND last_build.last_build = 1" & ASCII.LF & "      "
+       & "    GROUP BY metric.name" & ASCII.LF & "        </sql>" & ASCII.LF & "  "
+       & "  </query> " & ASCII.LF & ASCII.LF & "    <query name='stat-project-met"
+       & "rics'>" & ASCII.LF & "        <comment>Statistics about the last project"
+       & " build metrics (specific project)</comment>" & ASCII.LF & "        <sql>"
+       & ASCII.LF & "          SELECT" & ASCII.LF & "          metric.metric," & ASCII.LF
+       & "          metric.name," & ASCII.LF & "          metric.label," & ASCII.LF
+       & "          SUM(mb.value) AS value," & ASCII.LF & "          MAX(mb.value)"
+       & " AS max_value," & ASCII.LF & "          COUNT(mb.id) AS CNT" & ASCII.LF
+       & "          FROM porion_last_build AS last_build" & ASCII.LF & "          "
+       & "INNER JOIN porion_build AS build ON last_build.build_id = build.id" & ASCII.LF
+       & "          INNER JOIN porion_build_metric AS mb ON mb.build_id = last_bui"
+       & "ld.build_id" & ASCII.LF & "          INNER JOIN porion_metric AS metric "
+       & "ON mb.metric_id = metric.id" & ASCII.LF & "          WHERE last_build.st"
+       & "atus = 2 AND last_build.last_build = 1" & ASCII.LF & "          AND buil"
+       & "d.project_id = :project_id" & ASCII.LF & "          GROUP BY metric.name"
+       & ASCII.LF & "        </sql>" & ASCII.LF & "    </query> " & ASCII.LF & ASCII.LF
+       & "</query-mapping>" & ASCII.LF;
+
 
    type Content_List_Array is array (Natural range <>) of access constant String;
    Contents : constant Content_List_Array := (
       C_0'Access, C_1'Access, C_2'Access, C_3'Access, C_4'Access, C_5'Access,
       C_6'Access, C_7'Access, C_8'Access, C_9'Access, C_10'Access, C_11'Access,
-      C_12'Access, C_13'Access, C_14'Access, C_15'Access);
+      C_12'Access, C_13'Access, C_14'Access, C_15'Access, C_16'Access);
 
    function Get_Content (Name : String) return access constant String is
       H : constant Natural := Hash (Name);

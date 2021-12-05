@@ -332,6 +332,66 @@ package body Porion.Queries is
       end loop;
    end List;
 
+
+
+   --  ------------------------------
+   --  Get the bean attribute identified by the name.
+   --  ------------------------------
+   overriding
+   function Get_Value (From : in Metric_Stat;
+                       Name : in String) return Util.Beans.Objects.Object is
+   begin
+      if Name = "kind" then
+         return Porion.Metrics.Metric_Type_Objects.To_Object (From.Kind);
+      elsif Name = "name" then
+         return Util.Beans.Objects.To_Object (From.Name);
+      elsif Name = "label" then
+         return Util.Beans.Objects.To_Object (From.Label);
+      elsif Name = "sum_value" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Sum_Value));
+      elsif Name = "max_value" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Max_Value));
+      elsif Name = "count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Count));
+      end if;
+      return Util.Beans.Objects.Null_Object;
+   end Get_Value;
+
+
+   --  ------------------------------
+   --  Set the value identified by the name
+   --  ------------------------------
+   overriding
+   procedure Set_Value (Item  : in out Metric_Stat;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object) is
+   begin
+      if Name = "kind" then
+         Item.Kind := Porion.Metrics.Metric_Type_Objects.To_Value (Value);
+      elsif Name = "name" then
+         Item.Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "label" then
+         Item.Label := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "sum_value" then
+         Item.Sum_Value := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "max_value" then
+         Item.Max_Value := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "count" then
+         Item.Count := Util.Beans.Objects.To_Integer (Value);
+      end if;
+   end Set_Value;
+
+
+   --  --------------------
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   --  --------------------
+   procedure List (Object  : in out Metric_Stat_List_Bean'Class;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+   begin
+      List (Object.List, Session, Context);
+   end List;
+
    --  --------------------
    --  Statistics with build metrics.
    --  --------------------

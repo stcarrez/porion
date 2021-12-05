@@ -901,10 +901,10 @@ package body Porion.Resources.Queries is
    C_16 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        Stats with the build metrics" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
-       & "ueries.Metric_Stat"" bean=""no"">" & ASCII.LF & "        <comment>Statis"
-       & "tics with build metrics.</comment>" & ASCII.LF & "        <property type"
-       & "='Porion.Metrics.Metric_Type' name=""kind"">" & ASCII.LF & "            "
-       & "<comment>the metric type.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "ueries.Metric_Stat"" bean=""yes"">" & ASCII.LF & "        <comment>Stati"
+       & "stics with build metrics.</comment>" & ASCII.LF & "        <property typ"
+       & "e='Porion.Metrics.Metric_Type' name=""kind"">" & ASCII.LF & "           "
+       & " <comment>the metric type.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
        & "        <property type='String' name=""name"">" & ASCII.LF & "          "
        & "  <comment>the metric logical name.</comment>" & ASCII.LF & "        </p"
        & "roperty>" & ASCII.LF & "        <property type='String' name=""label"">" & ASCII.LF

@@ -316,7 +316,8 @@ package Porion.Queries is
    --  --------------------
    --    Statistics with build metrics.
    --  --------------------
-   type Metric_Stat is record
+   type Metric_Stat is
+     new Util.Beans.Basic.Bean with  record
 
       --  the metric type.
       Kind : Porion.Metrics.Metric_Type;
@@ -337,10 +338,29 @@ package Porion.Queries is
       Count : Integer;
    end record;
 
-   package Metric_Stat_Vectors is
-      new Ada.Containers.Vectors (Index_Type   => Positive,
-                                  Element_Type => Metric_Stat,
-                                  "="          => "=");
+   --  Get the bean attribute identified by the name.
+   overriding
+   function Get_Value (From : in Metric_Stat;
+                       Name : in String) return Util.Beans.Objects.Object;
+
+   --  Set the bean attribute identified by the name.
+   overriding
+   procedure Set_Value (Item  : in out Metric_Stat;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object);
+
+
+   package Metric_Stat_Beans is
+      new Util.Beans.Basic.Lists (Element_Type => Metric_Stat);
+   package Metric_Stat_Vectors renames Metric_Stat_Beans.Vectors;
+   subtype Metric_Stat_List_Bean is Metric_Stat_Beans.List_Bean;
+
+   type Metric_Stat_List_Bean_Access is access all Metric_Stat_List_Bean;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Metric_Stat_List_Bean'Class;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
 
    subtype Metric_Stat_Vector is Metric_Stat_Vectors.Vector;
 

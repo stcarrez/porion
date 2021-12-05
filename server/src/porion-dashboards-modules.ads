@@ -18,6 +18,7 @@
 with ASF.Applications;
 
 with AWA.Modules;
+with ASF.Converters.Numbers;
 package Porion.Dashboards.Modules is
 
    --  The name under which the module is registered.
@@ -40,6 +41,8 @@ package Porion.Dashboards.Modules is
 
 private
 
-   type Dashboard_Module is new AWA.Modules.Module with null record;
+   type Dashboard_Module is new AWA.Modules.Module with record
+      Percent_Converter : aliased ASF.Converters.Numbers.Number_Converter;
+   end record;
 
 end Porion.Dashboards.Modules;

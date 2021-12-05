@@ -556,3 +556,14 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "scm_url");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "check_delay");
+/* Copied from porion_lib-init-sqlite.sql*/
+/* Setup indexes */
+CREATE INDEX IF NOT EXISTS porion_last_build_idx_1 ON porion_last_build (
+  build_id
+);
+CREATE INDEX IF NOT EXISTS porion_last_build_idx_2 ON porion_last_build (
+  branch_id
+);
+CREATE INDEX IF NOT EXISTS porion_last_build_idx_3 ON porion_last_build (
+  recipe_id
+);

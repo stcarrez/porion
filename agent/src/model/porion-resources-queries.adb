@@ -842,9 +842,9 @@ package body Porion.Resources.Queries is
    C_15 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        Stats for the builds" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
-       & "ueries.Build_Stat"" bean=""no"">" & ASCII.LF & "        <comment>Statist"
-       & "ics about a list of builds.</comment>" & ASCII.LF & "        <property t"
-       & "ype='Porion.Builds.Models.Build_Status_Type' name=""build_status"">" & ASCII.LF
+       & "ueries.Build_Stat"" bean=""yes"">" & ASCII.LF & "        <comment>Statis"
+       & "tics about a list of builds.</comment>" & ASCII.LF & "        <property "
+       & "type='Porion.Builds.Models.Build_Status_Type' name=""build_status"">" & ASCII.LF
        & "            <comment>the build status.</comment>" & ASCII.LF & "        "
        & "</property>" & ASCII.LF & "        <property type='Natural' name=""count"
        & """>" & ASCII.LF & "            <comment>the number of builds.</comment>" & ASCII.LF

@@ -104,6 +104,78 @@ package body Porion.Queries is
       end loop;
    end List;
 
+
+
+   --  ------------------------------
+   --  Get the bean attribute identified by the name.
+   --  ------------------------------
+   overriding
+   function Get_Value (From : in Build_Stat;
+                       Name : in String) return Util.Beans.Objects.Object is
+   begin
+      if Name = "build_status" then
+         return Porion.Builds.Models.Build_Status_Type_Objects.To_Object (From.Build_Status);
+      elsif Name = "count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Count));
+      elsif Name = "pass_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Pass_Count));
+      elsif Name = "fail_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Fail_Count));
+      elsif Name = "timeout_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Timeout_Count));
+      elsif Name = "test_duration" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Test_Duration));
+      elsif Name = "build_duration" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Build_Duration));
+      elsif Name = "sys_time" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Sys_Time));
+      elsif Name = "user_time" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.User_Time));
+      end if;
+      return Util.Beans.Objects.Null_Object;
+   end Get_Value;
+
+
+   --  ------------------------------
+   --  Set the value identified by the name
+   --  ------------------------------
+   overriding
+   procedure Set_Value (Item  : in out Build_Stat;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object) is
+   begin
+      if Name = "build_status" then
+         Item.Build_Status := Porion.Builds.Models.Build_Status_Type_Objects.To_Value (Value);
+      elsif Name = "count" then
+         Item.Count := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "pass_count" then
+         Item.Pass_Count := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "fail_count" then
+         Item.Fail_Count := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "timeout_count" then
+         Item.Timeout_Count := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "test_duration" then
+         Item.Test_Duration := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "build_duration" then
+         Item.Build_Duration := Porion.Millisecond_Type (Util.Beans.Objects.To_Integer (Value));
+      elsif Name = "sys_time" then
+         Item.Sys_Time := Porion.Millisecond_Type (Util.Beans.Objects.To_Integer (Value));
+      elsif Name = "user_time" then
+         Item.User_Time := Porion.Millisecond_Type (Util.Beans.Objects.To_Integer (Value));
+      end if;
+   end Set_Value;
+
+
+   --  --------------------
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   --  --------------------
+   procedure List (Object  : in out Build_Stat_List_Bean'Class;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+   begin
+      List (Object.List, Session, Context);
+   end List;
+
    --  --------------------
    --  Statistics about a list of builds.
    --  --------------------

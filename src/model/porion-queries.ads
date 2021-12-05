@@ -149,7 +149,8 @@ package Porion.Queries is
    --  --------------------
    --    Statistics about a list of builds.
    --  --------------------
-   type Build_Stat is record
+   type Build_Stat is
+     new Util.Beans.Basic.Bean with  record
 
       --  the build status.
       Build_Status : Porion.Builds.Models.Build_Status_Type;
@@ -179,10 +180,29 @@ package Porion.Queries is
       User_Time : Porion.Millisecond_Type;
    end record;
 
-   package Build_Stat_Vectors is
-      new Ada.Containers.Vectors (Index_Type   => Positive,
-                                  Element_Type => Build_Stat,
-                                  "="          => "=");
+   --  Get the bean attribute identified by the name.
+   overriding
+   function Get_Value (From : in Build_Stat;
+                       Name : in String) return Util.Beans.Objects.Object;
+
+   --  Set the bean attribute identified by the name.
+   overriding
+   procedure Set_Value (Item  : in out Build_Stat;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object);
+
+
+   package Build_Stat_Beans is
+      new Util.Beans.Basic.Lists (Element_Type => Build_Stat);
+   package Build_Stat_Vectors renames Build_Stat_Beans.Vectors;
+   subtype Build_Stat_List_Bean is Build_Stat_Beans.List_Bean;
+
+   type Build_Stat_List_Bean_Access is access all Build_Stat_List_Bean;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Build_Stat_List_Bean'Class;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
 
    subtype Build_Stat_Vector is Build_Stat_Vectors.Vector;
 

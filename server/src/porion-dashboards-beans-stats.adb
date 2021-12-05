@@ -18,12 +18,17 @@
 with ADO.Sessions;
 with ADO.Queries;
 with AWA.Services.Contexts;
+with Porion.Metrics;
 with Porion.Builds.Models;
 package body Porion.Dashboards.Beans.Stats is
 
    use type Porion.Builds.Models.Build_Status_Type;
 
    package ASC renames AWA.Services.Contexts;
+
+   Empty_Metric : constant Porion.Queries.Metric_Stat := (Kind => Porion.Metrics.METRIC_SPACE,
+                                                          Sum_Value => 0, Max_Value => 0,
+                                                          Count => 0, others => <>);
 
    --  ------------------------------
    --  Load the stats.
@@ -100,5 +105,106 @@ package body Porion.Dashboards.Beans.Stats is
                        others         => 0);
       return Object.all'Access;
    end Create_Last_Builds_Bean;
+
+   function "<" (Left, Right : in Porion.Queries.Metric_Stat) return Boolean
+      is (Left.Sum_Value > Right.Sum_Value);
+
+   package Sort is
+      new Porion.Queries.Metric_Stat_Vectors.Generic_Sorting ("<" => "<");
+
+   --  ------------------------------
+   --  Load the stats.
+   --  ------------------------------
+   procedure Load (Bean    : in out Metrics_Bean;
+                   Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
+      Ctx     : constant ASC.Service_Context_Access := ASC.Current;
+      Session : ADO.Sessions.Session := ASC.Get_Session (Ctx);
+      Query   : ADO.Queries.Context;
+      List    : Porion.Queries.Metric_Stat_List_Bean;
+   begin
+      Query.Set_Query (Porion.Queries.Query_Stat_Metrics);
+      Porion.Queries.List (List, Session, Query);
+      for Stat of List.List loop
+         case Stat.Kind is
+            when Porion.Metrics.METRIC_COVERAGE =>
+               if Stat.Name = "lines" then
+                  Bean.Line_Coverage := Stat;
+               elsif Stat.Name = "functions" then
+                  Bean.Func_Coverage := Stat;
+               end if;
+
+            when Porion.Metrics.METRIC_SPACE =>
+               if Stat.Name = "before.total_size" then
+                  Bean.Total_Size := Stat;
+               elsif Stat.Name = "before.file_count" then
+                  Bean.File_Count := Stat;
+               end if;
+
+            when Porion.Metrics.METRIC_CLOC =>
+               if Stat.Name /= "total" then
+                  Bean.Cloc.List.Append (Stat);
+               else
+                  Bean.Cloc_Total := Stat;
+               end if;
+
+            when others =>
+               null;
+
+         end case;
+      end loop;
+      Sort.Sort (Bean.Cloc.List);
+   end Load;
+
+   --  ------------------------------
+   --  Get the value identified by the name.
+   --  ------------------------------
+   overriding
+   function Get_Value (From : in Metrics_Bean;
+                       Name : in String) return Util.Beans.Objects.Object is
+   begin
+      if Name = "files" then
+         return Util.Beans.Objects.To_Object (Value   => From.File_Count_Bean,
+                                              Storage => Util.Beans.Objects.STATIC);
+      elsif Name = "sizes" then
+         return Util.Beans.Objects.To_Object (Value   => From.Total_Size_Bean,
+                                              Storage => Util.Beans.Objects.STATIC);
+      elsif Name = "lines" then
+         return Util.Beans.Objects.To_Object (Value   => From.Line_Coverage_Bean,
+                                              Storage => Util.Beans.Objects.STATIC);
+      elsif Name = "functions" then
+         return Util.Beans.Objects.To_Object (Value   => From.Func_Coverage_Bean,
+                                              Storage => Util.Beans.Objects.STATIC);
+      elsif Name = "cloc" then
+         return Util.Beans.Objects.To_Object (Value   => From.Cloc_Bean,
+                                              Storage => Util.Beans.Objects.STATIC);
+      elsif Name = "total_cloc" then
+         return Util.Beans.Objects.To_Object (Value   => From.Cloc_Total_Bean,
+                                              Storage => Util.Beans.Objects.STATIC);
+      else
+         return From.Total_Size.Get_Value (Name);
+      end if;
+   end Get_Value;
+
+   --  ------------------------------
+   --  Create the stats build bean instance.
+   --  ------------------------------
+   function Create_Metrics_Bean (Module : in Modules.Dashboard_Module_Access)
+      return Util.Beans.Basic.Readonly_Bean_Access is
+      Object : constant Metrics_Bean_Access := new Metrics_Bean;
+   begin
+      Object.Module := Module;
+      Object.Func_Coverage_Bean := Object.Func_Coverage'Access;
+      Object.Func_Coverage := Empty_Metric;
+      Object.Line_Coverage_Bean := Object.Line_Coverage'Access;
+      Object.Line_Coverage := Empty_Metric;
+      Object.Total_Size_Bean := Object.Total_Size'Access;
+      Object.Total_Size := Empty_Metric;
+      Object.File_Count_Bean := Object.File_Count'Access;
+      Object.File_Count := Empty_Metric;
+      Object.Cloc_Bean := Object.Cloc'Access;
+      Object.Cloc_Total_Bean := Object.Cloc_Total'Access;
+      Object.Cloc_Total := Empty_Metric;
+      return Object.all'Access;
+   end Create_Metrics_Bean;
 
 end Porion.Dashboards.Beans.Stats;

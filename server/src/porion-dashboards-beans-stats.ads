@@ -51,4 +51,36 @@ package Porion.Dashboards.Beans.Stats is
    function Create_Last_Builds_Bean (Module : in Modules.Dashboard_Module_Access)
       return Util.Beans.Basic.Readonly_Bean_Access;
 
+   type Metrics_Stat_Bean_Access is access all Porion.Queries.Metric_Stat;
+
+   type Metrics_Bean is new Porion.Dashboards.Models.Project_List_Bean with record
+      Module             : Porion.Dashboards.Modules.Dashboard_Module_Access := null;
+      Func_Coverage      : aliased Porion.Queries.Metric_Stat;
+      Func_Coverage_Bean : Metrics_Stat_Bean_Access;
+      Line_Coverage      : aliased Porion.Queries.Metric_Stat;
+      Line_Coverage_Bean : Metrics_Stat_Bean_Access;
+      Total_Size         : aliased Porion.Queries.Metric_Stat;
+      Total_Size_Bean    : Metrics_Stat_Bean_Access;
+      File_Count         : aliased Porion.Queries.Metric_Stat;
+      File_Count_Bean    : Metrics_Stat_Bean_Access;
+      Cloc               : aliased Porion.Queries.Metric_Stat_List_Bean;
+      Cloc_Bean          : Porion.Queries.Metric_Stat_List_Bean_Access;
+      Cloc_Total         : aliased Porion.Queries.Metric_Stat;
+      Cloc_Total_Bean    : Metrics_Stat_Bean_Access;
+   end record;
+   type Metrics_Bean_Access is access all Metrics_Bean'Class;
+
+   --  Get the value identified by the name.
+   overriding
+   function Get_Value (From : in Metrics_Bean;
+                       Name : in String) return Util.Beans.Objects.Object;
+
+   --  Load the stats.
+   procedure Load (Bean    : in out Metrics_Bean;
+                   Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
+
+   --  Create the stats metric bean instance.
+   function Create_Metrics_Bean (Module : in Modules.Dashboard_Module_Access)
+      return Util.Beans.Basic.Readonly_Bean_Access;
+
 end Porion.Dashboards.Beans.Stats;

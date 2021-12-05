@@ -29,7 +29,6 @@ with AWA.Commands.List;
 with AWA.Commands.Info;
 
 with ADO.Sqlite;
-with ADO.Configs;
 
 with Porion.Configs;
 with Porion.Projects.Services;
@@ -37,6 +36,7 @@ with Porion.Nodes.Services;
 with Porion.Resources.Server_Schema;
 with Porion.Resources.Queries;
 with Porion.Applications;
+with Porion.Globals;
 procedure Porion.Server is
 
    package Server_Commands is
@@ -58,8 +58,6 @@ procedure Porion.Server is
                       Context : in out AWA.Commands.Context_Type);
 
    Log       : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Server");
-   App       : constant Porion.Applications.Application_Access
-      := new Porion.Applications.Application;
    WS        : Servlet.Server.Web.AWS_Container renames Server_Commands.WS;
    Context   : AWA.Commands.Context_Type;
    Arguments : Util.Commands.Dynamic_Argument_List;
@@ -92,7 +90,8 @@ procedure Porion.Server is
             Ada.Directories.Create_Path (Path);
             Porion.Configs.Initialize (Config_Path);
             Porion.Configs.Set (Porion.Configs.WORKSPACE_DIR_NAME, Path);
-            Porion.Configs.Set (Porion.Configs.DATABASE_NAME, Porion.Configs.Get_Default_Database_Path);
+            Porion.Configs.Set (Porion.Configs.DATABASE_NAME,
+                                Porion.Configs.Get_Default_Database_Path);
             Ada.Directories.Create_Path (Porion.Configs.Get_Config_Directory);
             Ada.Directories.Create_Path (Porion.Configs.Get_Project_Directory);
             Ada.Directories.Create_Path (Porion.Configs.Get_Rules_Directory);
@@ -119,14 +118,11 @@ begin
    Server_Commands.Driver.Add_Command ("init", -("setup the build server"),
                                        Init_Command'Access);
 
-   WS.Register_Application (Porion.Applications.CONTEXT_PATH, App.all'Access);
+   WS.Register_Application (Porion.Applications.CONTEXT_PATH, Globals.App'Access);
 
    Server_Commands.Run (Context, Arguments);
 
 exception
-   when E : ADO.Configs.Connection_Error =>
-      Log.Error ("Cannot open the database");
-
    when E : others =>
       Context.Print (E);
 end Porion.Server;

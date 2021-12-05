@@ -12,6 +12,20 @@
     <managed-bean-scope>request</managed-bean-scope>
   </managed-bean>
 
+  <managed-bean>
+    <description>Statistics about project last builds</description>
+    <managed-bean-name>statLastBuilds</managed-bean-name>
+    <managed-bean-class>Porion.Dashboards.Beans.Stats.Last_Builds_Bean</managed-bean-class>
+    <managed-bean-scope>request</managed-bean-scope>
+  </managed-bean>
+
+  <managed-bean>
+    <description>Metrics about project builds</description>
+    <managed-bean-name>metricLastBuilds</managed-bean-name>
+    <managed-bean-class>Porion.Dashboards.Beans.Stats.Metrics_Bean</managed-bean-class>
+    <managed-bean-scope>request</managed-bean-scope>
+  </managed-bean>
+
   <filter-mapping>
     <filter-name>service</filter-name>
     <url-pattern>/dashboards/*.html</url-pattern>

@@ -8,9 +8,12 @@
   <!-- Main page body -->
   <ui:define name="pageBody">
     <f:metadata>
+      <f:viewAction action='#{statLastBuilds.load}'/>
+      <f:viewAction action='#{metricLastBuilds.load}'/>
       <f:viewAction action='#{projectList.load}'/>
     </f:metadata>
     <div id='awa-content'>
+        <ui:include src="dashboards/views/test-stats.xhtml"/>
         <ui:include src="dashboards/lists/projects-grid.xhtml"/>
      </div>
   </ui:define>

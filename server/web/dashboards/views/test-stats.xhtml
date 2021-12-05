@@ -1,0 +1,106 @@
+<!-- Statistics about tests for all projects
+  -  Copyright (C) 2021 Stephane Carrez
+  -  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
+  -
+  -  Licensed under the Apache License, Version 2.0 (the "License");
+  -  you may not use this file except in compliance with the License.
+  -  You may obtain a copy of the License at
+  -
+  -      http://www.apache.org/licenses/LICENSE-2.0
+  -
+  -  Unless required by applicable law or agreed to in writing, software
+  -  distributed under the License is distributed on an "AS IS" BASIS,
+  -  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  -  See the License for the specific language governing permissions and
+  -  limitations under the License.
+  -->
+<ui:composition
+        xmlns:awa="http://code.google.com/p/ada-awa/jsf"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:c="http://java.sun.com/jstl/core"
+        xmlns:u="http://code.google.com/p/ada-asf/util"
+        xmlns:h="http://java.sun.com/jsf/html">
+  <div class='dashboard-stats'>
+    <ul class='project-dashboard'>
+      <li>
+        <div class='dashboard-title'>
+          Projects
+        </div>
+        <div class='dashboard-value'>
+          #{statLastBuilds.count}
+          (<h:outputText value="#{(statLastBuilds.pass.count * 100) / statLastBuilds.count}">
+            <f:converter converterId="percentConverter"/>
+          </h:outputText> % OK)
+        </div>
+        <div class='dashboard-value'>
+          <div class="progress-bar">
+            <span class="progress-status" style="width: #{statLastBuilds.count == 0 ? 0 : (statLastBuilds.pass.count * 100) / statLastBuilds.count}%"/>
+          </div>
+        </div>
+      </li>
+
+      <li>
+        <div class='dashboard-title'>
+          Tests
+        </div>
+        <div class='dashboard-value'>
+          #{statLastBuilds.pass_count}
+        </div>
+        <div class='dashboard-value'>
+          <div class="progress-bar">
+            <span class="progress-status" style="width: #{(statLastBuilds.pass_count + statLastBuilds.fail_count) == 0 ? 0 : (statLastBuilds.pass.pass_count * 100) / (statLastBuilds.pass_count + statLastBuilds.fail_count + statLastBuilds.timeout_count)}%"/>
+          </div>
+        </div>
+      </li>
+
+      <li>
+        <div class='dashboard-title'>
+          Coverage
+        </div>
+        <div class='dashboard-value'>
+          <h:outputText value="#{(metricLastBuilds.lines.sum_value) / (metricLastBuilds.lines.count * 10)}">
+            <f:converter converterId="percentConverter"/>
+          </h:outputText> %
+        </div>
+        <div class='dashboard-value'>
+          <div class="progress-bar">
+            <span class="progress-status" style="width: #{metricLastBuilds.lines.count == 0 ? 0 : metricLastBuilds.lines.sum_value / (10 * metricLastBuilds.lines.count)}%"/>
+          </div>
+        </div>
+      </li>
+
+      <li>
+        <div class='dashboard-title'>
+          Duration
+        </div>
+        <div class='dashboard-value'>
+          #{statLastBuilds.build_duration}
+        </div>
+        <div class='dashboard-value'>
+          <div class="progress-bar">
+            <span class="progress-status" style="width: #{metricLastBuilds.lines.count == 0 ? 0 : metricLastBuilds.lines.sum_value / (10 * metricLastBuilds.lines.count)}%"/>
+          </div>
+        </div>
+      </li>
+
+      <li>
+        <div class='dashboard-title'>
+          Languages
+        </div>
+        <div class='dashboard-value'>
+          #{metricLastBuilds.cloc.count}
+        </div>
+        <div class='dashboard-value dashboard-cloc'>
+          <h:list var="cloc" value="#{metricLastBuilds.cloc}">
+            <span>#{cloc.name}(<h:outputText value="#{(cloc.sum_value * 100) / metricLastBuilds.total_cloc.sum_value}">
+                <f:converter converterId="percentConverter"/>
+              </h:outputText>%)
+            </span>
+          </h:list>
+        </div>
+      </li>
+
+    </ul>
+  </div>
+</ui:composition>

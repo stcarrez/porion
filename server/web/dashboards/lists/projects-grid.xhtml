@@ -21,17 +21,62 @@
         xmlns:c="http://java.sun.com/jstl/core"
         xmlns:u="http://code.google.com/p/ada-asf/util"
         xmlns:h="http://java.sun.com/jsf/html">
+  <div class='dashboard-list'>
     <h:panelGroup rendered="#{projectList.count == 0}">
         #{porionMsg.porion_no_project_message}
     </h:panelGroup>
     <h:list var="project" value="#{projectList.projects}">
         <div class='project-page-grid' id="p_#{project.id}">
           <div class='project-page-grid-info build-status-${project.build_status}'>
-            <span class="project-build-status"/>
-            <a href="#{contextPath}/projects/view/#{projectList.project_id}/#{project.name}" title="#{project.name}">
-              <span class="project-page-title">#{project.name}</span>
-            </a>
+            <div class='project-title'>
+              <span class="project-build-status"/>
+              <a href="#{contextPath}/projects/view/#{projectList.project_id}/#{project.name}" title="#{project.name}">
+                <span class="project-page-title">#{project.name}</span>
+              </a>
+              <span class="project-build-status"/>
+            </div>
+            <div class='project-build-info'>
+              <ul>
+                <li>
+                  <div class='project-build-info-title'>
+                    Build
+                  </div>
+                  <div class='project-build-info-value'>
+                    #{project.build_number}
+                  </div>
+                </li>
+                <li>
+                  <div class='project-build-info-title'>
+                    Progress
+                  </div>
+                  <div class='project-build-info-value'>
+                    <h:outputText value="#{project.build_progress / 10}">
+                      <f:converter converterId="percentConverter"/>
+                    </h:outputText>%
+                  </div>
+                </li>
+                <li>
+                  <div class='project-build-info-title'>
+                    Rate
+                  </div>
+                  <div class='project-build-info-value'>
+                    <h:outputText value="#{project.build_rate / 10}">
+                      <f:converter converterId="percentConverter"/>
+                    </h:outputText>%
+                  </div>
+                </li>
+                <li>
+                  <div class='project-build-info-title'>
+                    Tests
+                  </div>
+                  <div class='project-build-info-value'>
+                    #{project.pass_count}/#{project.fail_count}/#{project.timeout_count}
+                  </div>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
     </h:list>
+  </div>
 </ui:composition>

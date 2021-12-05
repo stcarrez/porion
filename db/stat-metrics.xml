@@ -1,0 +1,66 @@
+<query-mapping package='Porion.Queries'>
+    <description>
+        Stats with the build metrics
+    </description>
+
+    <class name="Porion.Queries.Metric_Stat" bean="no">
+        <comment>Statistics with build metrics.</comment>
+        <property type='Porion.Metrics.Metric_Type' name="kind">
+            <comment>the metric type.</comment>
+        </property>
+        <property type='String' name="name">
+            <comment>the metric logical name.</comment>
+        </property>
+        <property type='String' name="label">
+            <comment>the metric label.</comment>
+        </property>
+        <property type='Integer' name="sum_value">
+            <comment>the sum of metric value.</comment>
+        </property>
+        <property type='Integer' name="max_value">
+            <comment>the max metric value.</comment>
+        </property>
+        <property type='Integer' name="count">
+            <comment>the number of metric.</comment>
+        </property>
+    </class>
+
+    <query name='stat-metrics'>
+        <comment>Statistics about the last project build metrics (all projects)</comment>
+        <sql>
+          SELECT
+          metric.metric,
+          metric.name,
+          metric.label,
+          SUM(mb.value) AS value,
+          MAX(mb.value) AS max_value,
+          COUNT(mb.id) AS CNT
+          FROM porion_last_build AS last_build
+          INNER JOIN porion_build_metric AS mb ON mb.build_id = last_build.build_id
+          INNER JOIN porion_metric AS metric ON mb.metric_id = metric.id
+          WHERE last_build.status = 2 AND last_build.last_build = 1
+          GROUP BY metric.name
+        </sql>
+    </query> 
+
+    <query name='stat-project-metrics'>
+        <comment>Statistics about the last project build metrics (specific project)</comment>
+        <sql>
+          SELECT
+          metric.metric,
+          metric.name,
+          metric.label,
+          SUM(mb.value) AS value,
+          MAX(mb.value) AS max_value,
+          COUNT(mb.id) AS CNT
+          FROM porion_last_build AS last_build
+          INNER JOIN porion_build AS build ON last_build.build_id = build.id
+          INNER JOIN porion_build_metric AS mb ON mb.build_id = last_build.build_id
+          INNER JOIN porion_metric AS metric ON mb.metric_id = metric.id
+          WHERE last_build.status = 2 AND last_build.last_build = 1
+          AND build.project_id = :project_id
+          GROUP BY metric.name
+        </sql>
+    </query> 
+
+</query-mapping>

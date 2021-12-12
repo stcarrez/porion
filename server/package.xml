@@ -16,6 +16,12 @@
          <include name="**/*.properties"/>
        </fileset>
      </install>
+     <install mode='copy' dir="share">
+       <fileset dir="share">
+         <include name="**/*.txt"/>
+         <include name="**/*.rules"/>
+       </fileset>
+     </install>
      <install mode='copy' dir='licenses'>
          <include name="LICENSE"/>
          <include name="LICENSE.*"/>

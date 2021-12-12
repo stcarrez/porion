@@ -63,7 +63,7 @@ package body Porion.Nodes.Local is
             begin
                Log.Debug ("setenv {0} {1}", Name, Value);
 
-               Process_Env (Name, Value);               
+               Process_Env (Name, Value);
             end;
          end loop;
       end Iterate;

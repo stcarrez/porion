@@ -1,0 +1,8 @@
+[availability]
+which lcov
+
+[version]
+lcov --version
+
+[command]
+lcov --summary #{path}

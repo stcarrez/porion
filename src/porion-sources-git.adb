@@ -20,6 +20,7 @@ with Ada.Directories;
 with GNAT.Regpat;
 with Util.Strings;
 with EL.Contexts.Default;
+with Porion.Configs.Rules;
 with Porion.Logs;
 package body Porion.Sources.Git is
 
@@ -182,6 +183,7 @@ package body Porion.Sources.Git is
 
    function Create (Config : in Porion.Configs.Config_Type) return Controller_Access is
       Ctx        : EL.Contexts.Default.Default_Context;
+      Git_Rule   : Porion.Configs.Rules.Rule_Type := Porion.Configs.Rules.Get_Definition ("git");
       Check      : constant String := Configs.Get ("command_check", GIT_TEST_COMMAND);
       Checkout   : constant String := Configs.Get ("command_checkout", GIT_CHECKOUT_COMMAND);
       Guess      : constant String := Configs.Get ("command_guess", GIT_GUESS_COMMAND);
@@ -189,8 +191,8 @@ package body Porion.Sources.Git is
       Init       : constant String := Configs.Get ("command_init", GIT_INIT_COMMAND);
       Controller : constant Git_Controller_Access := new Controller_Type;
    begin
-      Controller.Check_Command := EL.Expressions.Create_Expression (Check, Ctx);
-      Controller.Checkout_Command := EL.Expressions.Create_Expression (Checkout, Ctx);
+      Controller.Check_Command := Configs.Rules.Get_Command (Git_Rule, "check", GIT_TEST_COMMAND);
+      Controller.Checkout_Command := Configs.Rules.Get_Command (Git_Rule, "checkout", GIT_CHECKOUT_COMMAND);
       Controller.Guess_Command := EL.Expressions.Create_Expression (Guess, Ctx);
       Controller.Show_Remote_Command := EL.Expressions.Create_Expression (Show, Ctx);
       Controller.Init_Command := EL.Expressions.Create_Expression (Init, Ctx);

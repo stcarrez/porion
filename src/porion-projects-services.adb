@@ -311,6 +311,9 @@ package body Porion.Projects.Services is
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
 
       Sources.Check (Service.Project.Get_Scm, Config, Src_Status, Executor);
+      if Executor.Get_Status /= 0 then
+         return;
+      end if;
 
       --  Get the current known branches.
       Query.Bind_Param ("project_id", Service.Project.Get_Id);

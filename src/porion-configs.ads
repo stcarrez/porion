@@ -28,6 +28,7 @@ package Porion.Configs is
    RULES_DIR_NAME         : constant String := "rules_dir";
    RULES_SEARCH_PATH_NAME : constant String := "rules_search_path";
    DATABASE_NAME          : constant String := "database";
+   DEFAUL_LOG_DIR_NAME    : constant String := "log_dir";
 
    subtype Config_Type is Util.Properties.Manager;
 
@@ -66,6 +67,9 @@ package Porion.Configs is
 
    --  Get the search path to find filtering rules.
    function Get_Rules_Search_Path return String;
+
+   --  Get the default log directory (global).
+   function Get_Default_Log_Directory return String;
 
    --  Get the directory holding the projects.
    function Get_Project_Directory (Name : in String) return String;

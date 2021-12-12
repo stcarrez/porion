@@ -188,6 +188,18 @@ package body Porion.Configs is
    end Get_Rules_Search_Path;
 
    --  ------------------------------
+   --  Get the default log directory (global).
+   --  ------------------------------
+   function Get_Default_Log_Directory return String is
+   begin
+      if Exists (DEFAUL_LOG_DIR_NAME) then
+         return Get (DEFAUL_LOG_DIR_NAME);
+      else
+         return Util.Files.Compose (Get_Porion_Directory, "logs");
+      end if;
+   end Get_Default_Log_Directory;
+
+   --  ------------------------------
    --  Get the directory holding all the projects.
    --  ------------------------------
    function Get_Project_Directory return String is

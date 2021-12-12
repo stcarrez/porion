@@ -190,7 +190,7 @@ package body Porion.Sources.Git is
       Controller.Checkout_Command := PCR.Get_Command (Git_Rule, "checkout", GIT_CHECKOUT_COMMAND);
       Controller.Guess_Command := PCR.Get_Command (Git_Rule, "guess", GIT_GUESS_COMMAND);
       Controller.Show_Remote_Command := PCR.Get_Command (Git_Rule, "show_remote",
-                                                         GIT_GUESS_COMMAND);
+                                                         GIT_SHOW_REMOTE_COMMAND);
       Controller.Init_Command := PCR.Get_Command (Git_Rule, "init", GIT_GUESS_COMMAND);
       Controller.Config := Config;
       return Controller.all'Access;

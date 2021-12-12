@@ -97,9 +97,14 @@ package body Porion.Nodes.Services is
    --  ------------------------------
    --  Probe the current node to check and update its status.
    --  ------------------------------
-   procedure Probe_Node (Service : in out Context_Type) is
+   procedure Probe_Node (Service : in out Context_Type;
+                         Rules   : in out Rule_Status_Vector) is
       procedure Probe_Uname (Controller : in Controller_Access);
       procedure Probe_Os_Release (Controller : in Controller_Access);
+      procedure Probe_Rule (Controller : in Controller_Access;
+                            Rule       : in out Rule_Status_Type);
+      procedure Read_Rules (Token : in String;
+                            Done  : out Boolean);
 
       --  Parse result of uname -a which provides most information.
       --  Examples:
@@ -230,6 +235,84 @@ package body Porion.Nodes.Services is
          end if;
       end Probe_Os_Release;
 
+      --  Check if the given rule is available on the node and get its version.
+      procedure Probe_Rule (Controller : in Controller_Access;
+                            Rule       : in out Rule_Status_Type) is
+
+         procedure Process_Availability (Line : in String);
+         procedure Process_Version (Line : in String);
+
+         Status      : Natural;
+
+         procedure Process_Availability (Line : in String) is
+         begin
+            if Line'Length > 0 then
+               Log.Info ("{0}", Line);
+
+               Rule.Path := To_UString (Line);
+            end if;
+         end Process_Availability;
+
+         procedure Process_Version (Line : in String) is
+         begin
+            if Line'Length > 0 then
+               Log.Info ("{0}", Line);
+
+               Rule.Version := To_UString (Line);
+            end if;
+         end Process_Version;
+
+         Availability_Command : constant String
+            := Configs.Rules.Get_Command (Rule.Rule, "availability", "");
+         Version_Command      : constant String
+            := Configs.Rules.Get_Command (Rule.Rule, "version", "");
+      begin
+         if Availability_Command'Length = 0 then
+            return;
+         end if;
+
+         Controller.Execute (Command     => Availability_Command,
+                             Working_Dir => "",
+                             Process     => Process_Availability'Access,
+                             Strip_Crlf  => True,
+                             Status      => Status);
+
+         if Status /= 0 then
+            return;
+         end if;
+
+         if Version_Command'Length = 0 then
+            return;
+         end if;
+
+         Controller.Execute (Command     => Version_Command,
+                             Working_Dir => "",
+                             Process     => Process_Version'Access,
+                             Strip_Crlf  => True,
+                             Status      => Status);
+
+         if Status /= 0 then
+            return;
+         end if;
+
+      end Probe_Rule;
+
+      --  Read the rule definition that must be checked.
+      procedure Read_Rules (Token : in String;
+                            Done  : out Boolean) is
+      begin
+         Done := False;
+         if Token'Length > 0 then
+            declare
+               R : constant Configs.Rules.Rule_Type := Configs.Rules.Get_Definition (Token);
+            begin
+               if not Configs.Rules.Is_Null (R) then
+                  Rules.Append ((Rule => R, others => <>));
+               end if;
+            end;
+         end if;
+      end Read_Rules;
+
       Controller : Controller_Access;
    begin
       if Service.Build_Node.Get_Status = NODE_DISABLED then
@@ -245,6 +328,16 @@ package body Porion.Nodes.Services is
 
       if Service.Build_Node.Get_Status /= NODE_ERROR then
          Probe_Os_Release (Controller);
+
+         if Rules.Is_Empty then
+            Util.Strings.Tokenizers.Iterate_Tokens (Content => Service.Build_Node.Get_Check_Rules,
+                                                    Pattern => " ",
+                                                    Process => Read_Rules'Access);
+         end if;
+
+         for Rule of Rules loop
+            Probe_Rule (Controller, Rule);
+         end loop;
       end if;
 
       Service.Build_Node.Set_Info_Date ((Is_Null => False,

@@ -43,6 +43,7 @@ package body Porion.Nodes.Tests is
    procedure Test_Add_Remove_Node (T : in out Test) is
       Path    : constant String := Util.Tests.Get_Test_Path ("nodes-1");
       Service : Porion.Services.Context_Type;
+      Rules   : Porion.Nodes.Services.Rule_Status_Vector;
    begin
       Porion.Testsuite.Create (Service, Path, True);
 
@@ -52,7 +53,7 @@ package body Porion.Nodes.Tests is
                        "Invalid node name");
       T.Assert (Service.Build_Node.Get_Main_Node, "not the main node");
 
-      Nodes.Services.Probe_Node (Service);
+      Nodes.Services.Probe_Node (Service, Rules);
       Assert_Equals (T, Nodes.NODE_ONLINE, Service.Build_Node.Get_Status,
                      "invalid localhost node state");
 

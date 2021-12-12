@@ -15,9 +15,40 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with PT.Texts;
+with Porion.Configs.Rules;
 with Porion.Nodes.Services;
 with Porion.Reports;
 package body Porion.Commands.Node is
+
+   procedure List_Rules (Rules   : in Porion.Nodes.Services.Rule_Status_Vector;
+                         Printer : in out PT.Printer_Type'Class;
+                         Styles  : in Porion.Reports.Style_Configuration) is
+      Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
+      Fields : PT.Texts.Field_Array (1 .. 8);
+      Style1 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
+   begin
+      Writer.Create_Field (Fields (1), Style1, 10.0);
+      Writer.Create_Field (Fields (2), Style1, 40.0);
+      Writer.Create_Field (Fields (3), Style1, 50.0);
+      Writer.Layout_Fields (Fields);
+
+      for Rule of Rules loop
+         if Length (Rule.Path) = 0 then
+            Writer.Copy_Style (To => Style1, From => Styles.Error);
+         else
+            Writer.Copy_Style (To => Style1, From => Styles.Default);
+         end if;
+         Writer.Put (Fields (1), Porion.Configs.Rules.Get_Name (Rule.Rule));
+         if Length (Rule.Path) = 0 then
+            Writer.Put (Fields (2), -("* not found *"));
+         else
+            Writer.Put_UString (Fields (2), Rule.Path);
+         end if;
+         Writer.Put_UString (Fields (3), Rule.Version);
+         Writer.New_Line;
+      end loop;
+   end List_Rules;
 
    --  ------------------------------
    --  Add, remove or update build nodes.
@@ -142,11 +173,13 @@ package body Porion.Commands.Node is
       elsif Command.Probe then
          for I in 1 .. Count loop
             declare
-               Name : constant String := Args.Get_Argument (I);
+               Name  : constant String := Args.Get_Argument (I);
+               Rules : Porion.Nodes.Services.Rule_Status_Vector;
             begin
                Nodes.Services.Load_Node (Context.Project_Service, Name);
-               Nodes.Services.Probe_Node (Context.Project_Service);
+               Nodes.Services.Probe_Node (Context.Project_Service, Rules);
                Context.Notice (-("Node {0} is {1}"), Name, Get_Node_Status);
+               List_Rules (Rules, Context.Printer.all, Context.Styles);
 
             exception
                when Porion.Nodes.Services.Not_Found =>
@@ -160,6 +193,7 @@ package body Porion.Commands.Node is
             Login     : constant String := Get_Login (URI);
             Hostname  : constant String := Get_Hostname (URI);
             Directory : constant String := Get_Path (URI);
+            Rules     : Porion.Nodes.Services.Rule_Status_Vector;
          begin
             Nodes.Services.Add_Node (Context.Project_Service,
                                      Kind       => Get_Type (Scheme),
@@ -167,8 +201,9 @@ package body Porion.Commands.Node is
                                      Login      => Login,
                                      Repository => Directory);
 
-            Nodes.Services.Probe_Node (Context.Project_Service);
+            Nodes.Services.Probe_Node (Context.Project_Service, Rules);
             Context.Notice (-("Node {0} is {1}"), Hostname, Get_Node_Status);
+            List_Rules (Rules, Context.Printer.all, Context.Styles);
 
          exception
             when Porion.Nodes.Services.Name_Used =>

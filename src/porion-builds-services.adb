@@ -210,12 +210,12 @@ package body Porion.Builds.Services is
 
       Config.Set ("branch", Branch_Name);
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
+      Config.Set ("build_dir", Path);
 
       Executor.Create_Logger (Log_Dir, "build.log");
       Executor.Log (Porion.Logs.LOG_INFO, "Build '" & Ident & "' in " & Path);
       Porion.Sources.Checkout (Service.Project.Get_Scm, Config, Path, Executor);
 
-      Config.Set ("build_dir", Path);
       for Step of Steps loop
          if Step.Step.Get_Execution /= Builds.Models.EXEC_DISABLED then
             declare

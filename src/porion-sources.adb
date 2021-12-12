@@ -61,7 +61,9 @@ package body Porion.Sources is
                     Config     : in Porion.Configs.Config_Type;
                     Result     : out Source_Info_Type;
                     Executor   : in out Porion.Executors.Executor_Type'Class) is
+      Log_Dir : constant String := Porion.Configs.Get_Default_Log_Directory;
    begin
+      Executor.Create_Logger (Log_Dir, "guess.log");
       for Kind in SRC_GIT .. SRC_FILE loop
          declare
             C : Controller_Access := Factories.Create (Kind, Config);

@@ -25,6 +25,8 @@ with Porion.Builds.Services;
 with Porion.Sources;
 package body Porion.Commands.Add is
 
+   use type Porion.Sources.Source_Control_Type;
+
    --  ------------------------------
    --  Add a project with source control described by the URI.
    --  ------------------------------
@@ -41,12 +43,20 @@ package body Porion.Commands.Add is
                             Config   => Config,
                             Result   => Info,
                             Executor => Executor);
+      if Info.Kind = Porion.Sources.SRC_UNKNOWN then
+         Porion.Commands.Error (-("cannot identify source type of {0}"), URI);
+         return;
+      end if;
 
       Projects.Services.Add_Project (Context.Project_Service, Info);
       Context.Notice (-("Project {0} - {1} added"), To_String (Info.Name), URI);
 
       --  Step 2: identify the branches of the project (only the main branch is enabled).
       Projects.Services.Check_Sources (Context.Project_Service, Status, Executor);
+      if Executor.Get_Status /= 0 then
+         Porion.Commands.Error (-("cannot identify the branches of project {0}"), URI);
+         return;
+      end if;
 
       --  Step 3: make a default build config for the branch.
       Builds.Services.Make_Recipes (Context.Project_Service, To_String (Status.Head), Executor);

@@ -43,6 +43,7 @@ package body Porion.Commands.Init is
       else
          declare
             Path  : constant String := Args.Get_Argument (1);
+            Rules : Porion.Nodes.Services.Rule_Status_Vector;
          begin
             if Ada.Directories.Exists (Path) then
                Porion.Commands.Error (-("directory {0} exists"), Path);
@@ -60,7 +61,7 @@ package body Porion.Commands.Init is
             Nodes.Services.Add_Default_Node (Context.Project_Service,
                                              Hostname => "localhost",
                                              Login    => "");
-            Nodes.Services.Probe_Node (Context.Project_Service);
+            Nodes.Services.Probe_Node (Context.Project_Service, Rules);
             Context.Notice (-("Default build node 'localhost' is registered"));
             Context.Notice (-("Use 'porion add' to register a first project"));
          end;

@@ -24,6 +24,7 @@ private package Porion.Sources.Git is
    GIT_CHECKOUT_COMMAND    : constant String := "git clone "
      & "#{not empty branch ? '-b' : ''} #{branch} --recursive #{repository_url} #{build_dir}";
    GIT_GUESS_COMMAND       : constant String := "git -C #{path} config remote.origin.url";
+   GIT_INIT_COMMAND        : constant String := "git init --bare #{git_tmp_dir}";
 
    type Controller_Type is limited new Porion.Sources.Controller_Type with private;
 
@@ -61,6 +62,7 @@ private
       Checkout_Command    : EL.Expressions.Expression;
       Guess_Command       : EL.Expressions.Expression;
       Show_Remote_Command : EL.Expressions.Expression;
+      Init_Command        : EL.Expressions.Expression;
    end record;
 
    type Git_Controller_Access is access all Controller_Type'Class;

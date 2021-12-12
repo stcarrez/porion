@@ -81,6 +81,7 @@ procedure Porion.Server is
       else
          declare
             Path  : constant String := Args.Get_Argument (1);
+            Rules : Porion.Nodes.Services.Rule_Status_Vector;
          begin
             if Ada.Directories.Exists (Path) then
                Log.Error (-("directory {0} exists"), Path);
@@ -101,7 +102,7 @@ procedure Porion.Server is
             Nodes.Services.Add_Default_Node (Project_Service,
                                              Hostname => "localhost",
                                              Login    => "");
-            Nodes.Services.Probe_Node (Project_Service);
+            Nodes.Services.Probe_Node (Project_Service, Rules);
             Log.Info (-("Default build node 'localhost' is registered"));
             Log.Info (-("Use 'porion add' to register a first project"));
          end;

@@ -1,3 +1,9 @@
+[availability]
+which git
+
+[version]
+git --version
+
 [check]
 git ls-remote -h -- #{repository_url}
 

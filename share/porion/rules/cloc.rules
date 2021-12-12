@@ -1,5 +1,11 @@
-[build]
-cloc
+[availability]
+which lcov
+
+[version]
+lcov --version
+
+[command]
+cloc --quiet --xml #{path}
 
 [log-ignore]
 <\?xml version="1.0" encoding="UTF-8"\?><results>

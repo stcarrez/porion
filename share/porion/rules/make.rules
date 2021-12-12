@@ -1,3 +1,9 @@
+[availability]
+which make
+
+[version]
+make --version | head -1
+
 [build]
 make
 

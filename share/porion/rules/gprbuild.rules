@@ -1,3 +1,9 @@
+[availability]
+which gprbuild
+
+[version]
+gprbuild --version | head -1
+
 [command]
 gprbuild
 

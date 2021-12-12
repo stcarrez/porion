@@ -64,6 +64,7 @@ package body Porion.Sources.Git is
       end Process_Show;
 
       Result : Integer;
+      Dir    : constant String := Porion.Configs.Get_Work_Directory ("git");
    begin
       Status.Check_Date := Ada.Calendar.Clock;
       Executor.Execute (Controller.Check_Command, Controller.Config,
@@ -72,8 +73,20 @@ package body Porion.Sources.Git is
          return;
       end if;
 
+      if not Ada.Directories.Exists (Dir) then
+         Ada.Directories.Create_Path (Dir);
+
+         Controller.Config.Set ("git_tmp_dir", Dir);
+         Executor.Execute (Controller.Init_Command, Controller.Config,
+                           Process_Show'Access, Strip_Crlf => True, Status => Result);
+         if Result /= 0 then
+            return;
+         end if;
+      end if;
+
       Executor.Execute (Controller.Show_Remote_Command, Controller.Config,
-                        Process_Show'Access, Strip_Crlf => True, Status => Result);
+                        Process_Show'Access, Working_Dir => Dir,
+                        Strip_Crlf => True, Status => Result);
    end Check;
 
    overriding
@@ -173,12 +186,14 @@ package body Porion.Sources.Git is
       Checkout   : constant String := Configs.Get ("command_checkout", GIT_CHECKOUT_COMMAND);
       Guess      : constant String := Configs.Get ("command_guess", GIT_GUESS_COMMAND);
       Show       : constant String := Configs.Get ("command_show_remote", GIT_SHOW_REMOTE_COMMAND);
+      Init       : constant String := Configs.Get ("command_init", GIT_INIT_COMMAND);
       Controller : constant Git_Controller_Access := new Controller_Type;
    begin
       Controller.Check_Command := EL.Expressions.Create_Expression (Check, Ctx);
       Controller.Checkout_Command := EL.Expressions.Create_Expression (Checkout, Ctx);
       Controller.Guess_Command := EL.Expressions.Create_Expression (Guess, Ctx);
       Controller.Show_Remote_Command := EL.Expressions.Create_Expression (Show, Ctx);
+      Controller.Init_Command := EL.Expressions.Create_Expression (Init, Ctx);
       Controller.Config := Config;
       return Controller.all'Access;
    end Create;

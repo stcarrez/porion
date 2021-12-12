@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 with Ada.Environment_Variables;
 with Ada.Directories;
+with Ada.Command_Line;
 with Ada.Strings.Unbounded;
 with Interfaces.C.Strings;
 with Util.Files;
@@ -144,6 +145,24 @@ package body Porion.Configs is
    end Exists;
 
    --  ------------------------------
+   --  Get the share directory path which contains other porion installation files.
+   --  ------------------------------
+   function Get_Share_Directory return String is
+      Path : constant String := Porion.Configs.PREFIX & Porion.Configs.SHARE_DIR;
+   begin
+      if Ada.Directories.Exists (Path) then
+         return Path;
+      end if;
+      declare
+         Name : constant String := Ada.Command_Line.Command_Name;
+         Path : constant String := Ada.Directories.Containing_Directory (Name);
+         Dir  : constant String := Ada.Directories.Containing_Directory (Path);
+      begin
+         return Dir & Porion.Configs.SHARE_DIR;
+      end;
+   end Get_Share_Directory;
+
+   --  ------------------------------
    --  Get the porion installation directory.
    --  ------------------------------
    function Get_Porion_Directory return String is
@@ -183,7 +202,8 @@ package body Porion.Configs is
       if Exists (RULES_SEARCH_PATH_NAME) then
          return Get (RULES_SEARCH_PATH_NAME);
       else
-         return Get_Rules_Directory & ";" & "share/porion/rules";
+         return Get_Rules_Directory & ";"
+            & Util.Files.Compose (Get_Share_Directory, "rules");
       end if;
    end Get_Rules_Search_Path;
 

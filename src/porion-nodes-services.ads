@@ -15,6 +15,8 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Ada.Containers.Vectors;
+with Porion.Configs.Rules;
 with Porion.Services;
 with Porion.Nodes.Models;
 package Porion.Nodes.Services is
@@ -31,6 +33,18 @@ package Porion.Nodes.Services is
 
    Not_Found    : exception;
 
+   type Rule_Status_Type is record
+      Rule    : Porion.Configs.Rules.Rule_Type;
+      Version : UString;
+      Path    : UString;
+   end record;
+
+   package Rule_Status_Vectors is
+      new Ada.Containers.Vectors (Index_Type   => Positive,
+                                  Element_Type => Rule_Status_Type);
+   subtype Rule_Status_Vector is Rule_Status_Vectors.Vector;
+   subtype Rule_Status_Cursor is Rule_Status_Vectors.Cursor;
+
    subtype Context_Type is Porion.Services.Context_Type;
 
    --  Load the build node corresponding to the given hostname.
@@ -45,7 +59,8 @@ package Porion.Nodes.Services is
      Post => Service.Build_Node.Is_Loaded;
 
    --  Probe the current node to check and update its status.
-   procedure Probe_Node (Service : in out Context_Type) with
+   procedure Probe_Node (Service : in out Context_Type;
+                         Rules   : in out Rule_Status_Vector) with
      Pre => Service.Is_Open and Service.Build_Node.Is_Loaded;
 
    --  Add a default build node.

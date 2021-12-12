@@ -16,14 +16,141 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Exceptions;
+with Ada.Containers.Indefinite_Hashed_Maps;
+with Ada.Strings.Hash;
+with EL.Contexts.Default;
 with Util.Files;
 with Util.Strings;
 with Util.Log.Loggers;
 package body Porion.Configs.Rules is
 
+   use Ada.Strings.Unbounded;
    use type Logs.Analysis.Level_Type;
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Configs.Rules");
+
+   function Read_Rule (Name : in String) return Rule_Type;
+
+   package Rule_Maps is
+      new Ada.Containers.Indefinite_Hashed_Maps (Key_Type     => String,
+                                                 Element_Type => Definition_Access,
+                                                 Hash         => Ada.Strings.Hash,
+                                                 Equivalent_Keys => "=");
+
+   use Rule_Maps;
+
+   Rules : Rule_Maps.Map;
+
+   --  ------------------------------
+   --  Returns True if the rule is empty.
+   --  ------------------------------
+   function Is_Null (Rule : in Rule_Type) return Boolean is
+   begin
+      return Rule.Def = null;
+   end Is_Null;
+
+   function Get_Command (Rule    : in Rule_Type;
+                         Name    : in String;
+                         Default : in String) return EL.Expressions.Expression is
+      Ctx : EL.Contexts.Default.Default_Context;
+   begin
+      if Rule.Def = null then
+         return EL.Expressions.Create_Expression (Default, Ctx);
+      else
+         declare
+            Cmd : constant String := Rule.Def.Config.Get (Name, Default);
+         begin
+            return EL.Expressions.Create_Expression (Cmd, Ctx);
+         end;
+      end if;
+   end Get_Command;
+
+   function Get_Command (Rule    : in Rule_Type;
+                         Name    : in String;
+                         Default : in String) return String is
+   begin
+      if Rule.Def = null then
+         return Default;
+      else
+         return Rule.Def.Config.Get (Name, Default);
+      end if;
+   end Get_Command;
+
+   function Get_Definition (Name : in String) return Rule_Type is
+      Pos : constant Rule_Maps.Cursor := Rules.Find (Name);
+   begin
+      if not Rule_Maps.Has_Element (Pos) then
+         return Read_Rule (Name);
+      end if;
+
+      return Rule : Rule_Type do
+         Rule.Def := Rule_Maps.Element (Pos);
+      end return;
+   end Get_Definition;
+
+   --  ------------------------------
+   --  Get the name of this rule.
+   --  ------------------------------
+   function Get_Name (Rule : in Rule_Type) return String is
+   begin
+      if Rule.Def = null then
+         return "";
+      else
+         return To_String (Rule.Def.Name);
+      end if;
+   end Get_Name;
+
+   function Read_Rule (Name : in String) return Rule_Type is
+      procedure Process_Line (Line : in String);
+
+      Rule        : constant Definition_Access := new Definition_Type;
+      Line_Number : Natural := 1;
+      Section     : UString;
+      Value       : UString;
+
+      procedure Process_Line (Line : in String) is
+         Last : Natural;
+      begin
+         Line_Number := Line_Number + 1;
+         if Line'Length = 0 then
+            return;
+         end if;
+
+         if Line (Line'First) = '[' then
+            if Length (Section) > 0 then
+               Rule.Config.Set (Section, Value);
+               Section := Null_Unbounded_String;
+               Value := Null_Unbounded_String;
+            end if;
+
+            Last := Util.Strings.Rindex (Line, ']');
+            if Last = 0 then
+               return;
+            end if;
+
+            Section := To_UString (Line (Line'First + 1 .. Last - 1));
+            return;
+         end if;
+
+         Append (Value, Line);
+      end Process_Line;
+
+      Dirs : constant String := Porion.Configs.Get_Rules_Search_Path;
+      Path : constant String := Util.Files.Find_File_Path (Name & ".rules", Dirs);
+   begin
+      Log.Info ("Loading rules {0}", Path);
+
+      Rule.Name := To_UString (Name);
+      if Ada.Directories.Exists (Path) then
+         Util.Files.Read_File (Path, Process_Line'Access);
+      end if;
+
+      Rules.Insert (Name, Rule);
+
+      return Result : Rule_Type do
+         Result.Def := Rule;
+      end return;
+   end Read_Rule;
 
    --  ------------------------------
    --  Read the rule configuration file.

@@ -82,7 +82,7 @@ package Porion.Sources is
                     Config     : in Porion.Configs.Config_Type;
                     Result     : out Source_Info_Type;
                     Executor   : in out Porion.Executors.Executor_Type'Class) with
-      Pre => Executor.Is_Configured and Path'Length > 0;
+      Pre => Path'Length > 0;
 
 private
 

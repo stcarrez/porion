@@ -16,6 +16,9 @@ git clone #{not empty branch ? '-b' : ''} #{branch} --recursive #{repository_url
 [guess]
 git -C #{path} config remote.origin.url
 
+[init]
+git init --bare #{git_tmp_dir}
+
 [log-ignore]
 Cloning into .*
 Submodule .*

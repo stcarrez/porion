@@ -252,6 +252,15 @@ package body Porion.Configs is
    end Get_Source_Log_Directory;
 
    --  ------------------------------
+   --  Get a working directory.
+   --  ------------------------------
+   function Get_Work_Directory (Name : in String) return String is
+      Dir : constant String := Util.Files.Compose (Get_Porion_Directory, "tmp");
+   begin
+      return Util.Files.Compose (Dir, Name);
+   end Get_Work_Directory;
+
+   --  ------------------------------
    --  Get the default path of the local database.
    --  ------------------------------
    function Get_Default_Database_Path return String is

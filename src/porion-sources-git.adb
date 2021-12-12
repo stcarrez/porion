@@ -68,6 +68,10 @@ package body Porion.Sources.Git is
       Status.Check_Date := Ada.Calendar.Clock;
       Executor.Execute (Controller.Check_Command, Controller.Config,
                         Process'Access, Strip_Crlf => True, Status => Result);
+      if Result /= 0 then
+         return;
+      end if;
+
       Executor.Execute (Controller.Show_Remote_Command, Controller.Config,
                         Process_Show'Access, Strip_Crlf => True, Status => Result);
    end Check;
@@ -142,9 +146,12 @@ package body Porion.Sources.Git is
          if not Util.Strings.Ends_With (Path, ".git") then
             return;
          end if;
+
          Result.URI := To_UString (Path);
          Result.Name := To_UString (Make_Project_Name (Path));
          Result.Kind := SRC_GIT;
+         Executor.Log (Porion.Logs.LOG_INFO, "recognized a git repository: "
+                       & To_String (Result.Name));
          return;
       end if;
       if Ada.Directories.Kind (Path) /= Ada.Directories.Directory then

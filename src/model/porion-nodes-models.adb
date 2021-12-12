@@ -444,6 +444,36 @@ package body Porion.Nodes.Models is
       return Impl.Main_Node;
    end Get_Main_Node;
 
+
+   procedure Set_Check_Rules (Object : in out Node_Ref;
+                               Value : in String) is
+      Impl : Node_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Audits.Set_Field_String (Impl.all, 17, Impl.Check_Rules, Value);
+   end Set_Check_Rules;
+
+   procedure Set_Check_Rules (Object : in out Node_Ref;
+                              Value  : in Ada.Strings.Unbounded.Unbounded_String) is
+      Impl : Node_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Audits.Set_Field_Unbounded_String (Impl.all, 17, Impl.Check_Rules, Value);
+   end Set_Check_Rules;
+
+   function Get_Check_Rules (Object : in Node_Ref)
+                 return String is
+   begin
+      return Ada.Strings.Unbounded.To_String (Object.Get_Check_Rules);
+   end Get_Check_Rules;
+   function Get_Check_Rules (Object : in Node_Ref)
+                  return Ada.Strings.Unbounded.Unbounded_String is
+      Impl : constant Node_Access
+         := Node_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Check_Rules;
+   end Get_Check_Rules;
+
    --  Copy of the object.
    procedure Copy (Object : in Node_Ref;
                    Into   : in out Node_Ref) is
@@ -473,6 +503,7 @@ package body Porion.Nodes.Models is
             Copy.Info_Date := Impl.Info_Date;
             Copy.Cpu_Type := Impl.Cpu_Type;
             Copy.Main_Node := Impl.Main_Node;
+            Copy.Check_Rules := Impl.Check_Rules;
          end;
       end if;
       Into := Result;
@@ -677,6 +708,11 @@ package body Porion.Nodes.Models is
                           Value => Object.Main_Node);
          Object.Clear_Modified (16);
       end if;
+      if Object.Is_Modified (17) then
+         Stmt.Save_Field (Name  => COL_16_1_NAME, --  check_rules
+                          Value => Object.Check_Rules);
+         Object.Clear_Modified (17);
+      end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
          Stmt.Save_Field (Name  => "version",
@@ -740,6 +776,8 @@ package body Porion.Nodes.Models is
                         Value => Object.Cpu_Type);
       Query.Save_Field (Name  => COL_15_1_NAME, --  main_node
                         Value => Object.Main_Node);
+      Query.Save_Field (Name  => COL_16_1_NAME, --  check_rules
+                        Value => Object.Check_Rules);
       Query.Execute (Result);
       if Result /= 1 then
          raise ADO.Objects.INSERT_ERROR;
@@ -810,6 +848,8 @@ package body Porion.Nodes.Models is
          return Util.Beans.Objects.To_Object (Impl.Cpu_Type);
       elsif Name = "main_node" then
          return Util.Beans.Objects.To_Object (Impl.Main_Node);
+      elsif Name = "check_rules" then
+         return Util.Beans.Objects.To_Object (Impl.Check_Rules);
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -839,6 +879,7 @@ package body Porion.Nodes.Models is
       Object.Info_Date := Stmt.Get_Nullable_Time (13);
       Object.Cpu_Type := Stmt.Get_Unbounded_String (14);
       Object.Main_Node := Stmt.Get_Boolean (15);
+      Object.Check_Rules := Stmt.Get_Unbounded_String (16);
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);
    end Load;

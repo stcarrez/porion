@@ -77,7 +77,8 @@ package body Porion.Resources.Schema is
        & "LL, `update_date` DATETIME , `kind` TINYINT NOT NULL, `deleted` TINYINT "
        & "NOT NULL, `status` TINYINT NOT NULL, `os_name` VARCHAR(255) NOT NULL, `o"
        & "s_version` VARCHAR(255) NOT NULL, `info_date` DATETIME , `cpu_type` VARC"
-       & "HAR(255) NOT NULL, `main_node` TINYINT NOT NULL, PRIMARY KEY (`id`))";
+       & "HAR(255) NOT NULL, `main_node` TINYINT NOT NULL, `check_rules` VARCHAR(2"
+       & "55) NOT NULL, PRIMARY KEY (`id`))";
    L_19  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_branch "
        & "( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `name` VARCHAR(255) "
        & "NOT NULL, `tag` VARCHAR(255) NOT NULL, `last_date` DATETIME , `create_da"
@@ -203,29 +204,32 @@ package body Porion.Resources.Schema is
        & "on_node""), ""main_node"")";
    L_58  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""pori"
-       & "on_branch""), ""tag"")";
+       & "on_node""), ""check_rules"")";
    L_59  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""pori"
-       & "on_branch""), ""last_date"")";
+       & "on_branch""), ""tag"")";
    L_60  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""pori"
-       & "on_branch""), ""main_branch"")";
+       & "on_branch""), ""last_date"")";
    L_61  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""pori"
-       & "on_project""), ""name"")";
+       & "on_branch""), ""main_branch"")";
    L_62  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""pori"
-       & "on_project""), ""description"")";
+       & "on_project""), ""name"")";
    L_63  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""pori"
-       & "on_project""), ""status"")";
+       & "on_project""), ""description"")";
    L_64  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""pori"
-       & "on_project""), ""scm"")";
+       & "on_project""), ""status"")";
    L_65  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""pori"
-       & "on_project""), ""scm_url"")";
+       & "on_project""), ""scm"")";
    L_66  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
+       & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""pori"
+       & "on_project""), ""scm_url"")";
+   L_67  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""pori"
        & "on_project""), ""check_delay"")";
    C_0 : aliased constant Content_Array :=
@@ -294,7 +298,8 @@ package body Porion.Resources.Schema is
       L_63'Access,
       L_64'Access,
       L_65'Access,
-      L_66'Access);
+      L_66'Access,
+      L_67'Access);
 
 
    type Content_List_Array is array (Natural range <>) of Content_Access;

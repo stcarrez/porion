@@ -71,7 +71,7 @@ package Porion.Projects.Services is
    procedure Check_Sources (Service  : in out Context_Type;
                             Status   : in out Porion.Sources.Status_Type;
                             Executor : in out Porion.Executors.Executor_Type'Class) with
-      Pre => Service.Has_Project;
+      Pre => Service.Has_Project and Executor.Is_Configured;
 
    --  Export some information about the project in the output stream.
    procedure Export (Service : in out Context_Type;

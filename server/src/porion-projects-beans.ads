@@ -20,14 +20,27 @@ with Ada.Strings.Unbounded;
 
 with Util.Beans.Basic;
 with Util.Beans.Objects;
-with Util.Beans.Methods;
+with Porion.Dashboards.Models;
 with Porion.Projects.Modules;
+with Porion.Projects.Models;
+with Porion.Nodes.Models;
+with Porion.Dashboards.Beans.Stats;
 package Porion.Projects.Beans is
 
-   type Project_Bean is new Util.Beans.Basic.Bean
-     and Util.Beans.Methods.Method_Bean with record
-      Module : Porion.Projects.Modules.Project_Module_Access := null;
-      Count  : Natural := 0;
+   package UBB renames Util.Beans.Basic;
+   package UBO renames Util.Beans.Objects;
+
+   type Project_Bean is new Porion.Dashboards.Models.Project_List_Bean with record
+      Ident        : Porion.Projects.Ident_Type;
+      Module       : Porion.Projects.Modules.Project_Module_Access := null;
+      Branch       : aliased Porion.Projects.Models.Branch_Ref;
+      Branch_Bean  : UBB.Readonly_Bean_Access;
+      Project      : aliased Porion.Projects.Models.Project_Ref;
+      Project_Bean : UBB.Readonly_Bean_Access;
+      Node         : aliased Porion.Nodes.Models.Node_Ref;
+      Node_Bean    : UBB.Readonly_Bean_Access;
+      Metric       : aliased Porion.Dashboards.Beans.Stats.Metrics_Bean;
+      Metric_Bean  : UBB.Readonly_Bean_Access;
    end record;
    type Project_Bean_Access is access all Project_Bean'Class;
 
@@ -42,14 +55,9 @@ package Porion.Projects.Beans is
                         Name  : in String;
                         Value : in Util.Beans.Objects.Object);
 
-   --  This bean provides some methods that can be used in a Method_Expression
-   overriding
-   function Get_Method_Bindings (From : in Project_Bean)
-                                 return Util.Beans.Methods.Method_Binding_Array_Access;
-
-   --  Example of action method.
-   procedure Action (Bean    : in out Project_Bean;
-                     Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
+   --  Load the project.
+   procedure Load (Bean    : in out Project_Bean;
+                   Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
 
    --  Create the Projects_Bean bean instance.
    function Create_Project_Bean (Module : in Porion.Projects.Modules.Project_Module_Access)

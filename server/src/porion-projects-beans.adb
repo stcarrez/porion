@@ -15,26 +15,15 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-
-with ASF.Events.Faces.Actions;
+with ADO.Sessions;
+with ADO.Queries;
+with AWA.Services.Contexts;
+with Porion.Queries;
+with Porion.Projects.Services;
+with Porion.Services;
 package body Porion.Projects.Beans is
 
-   --  ------------------------------
-   --  Example of action method.
-   --  ------------------------------
-   procedure Action (Bean    : in out Project_Bean;
-                     Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
-   begin
-      null;
-   end Action;
-
-   package Action_Binding is
-     new ASF.Events.Faces.Actions.Action_Method.Bind (Bean   => Project_Bean,
-                                                      Method => Action,
-                                                      Name   => "action");
-
-   Project_Bean_Binding : aliased constant Util.Beans.Methods.Method_Binding_Array
-     := (Action_Binding.Proxy'Access, null);
+   package ASC renames AWA.Services.Contexts;
 
    --  ------------------------------
    --  Get the value identified by the name.
@@ -43,10 +32,19 @@ package body Porion.Projects.Beans is
    function Get_Value (From : in Project_Bean;
                        Name : in String) return Util.Beans.Objects.Object is
    begin
-      if Name = "count" then
-         return Util.Beans.Objects.To_Object (From.Count);
+      if Name = "project" then
+         return Util.Beans.Objects.To_Object (Value   => From.Project_Bean,
+                                              Storage => Util.Beans.Objects.STATIC);
+      elsif Name = "branch" then
+         return Util.Beans.Objects.To_Object (Value   => From.Branch_Bean,
+                                              Storage => Util.Beans.Objects.STATIC);
+      elsif Name = "metrics" then
+         return Util.Beans.Objects.To_Object (Value   => From.Metric_Bean,
+                                              Storage => Util.Beans.Objects.STATIC);
+      elsif Name = "ident" then
+         return UBO.To_Object (Porion.Projects.To_String (From.Ident));
       else
-         return Util.Beans.Objects.Null_Object;
+         return From.Project.Get_Value (Name);
       end if;
    end Get_Value;
 
@@ -58,30 +56,49 @@ package body Porion.Projects.Beans is
                         Name  : in String;
                         Value : in Util.Beans.Objects.Object) is
    begin
-      if Name = "count" then
-         From.Count := Util.Beans.Objects.To_Integer (Value);
+      if Name = "ident" then
+         From.Ident := Porion.Projects.Parse (UBO.To_String (Value));
       end if;
    end Set_Value;
 
    --  ------------------------------
-   --  This bean provides some methods that can be used in a Method_Expression
+   --  Load the stats.
    --  ------------------------------
-   overriding
-   function Get_Method_Bindings (From : in Project_Bean)
-                                 return Util.Beans.Methods.Method_Binding_Array_Access is
-      pragma Unreferenced (From);
+   procedure Load (Bean    : in out Project_Bean;
+                   Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
+      Ctx     : constant ASC.Service_Context_Access := ASC.Current;
+      Session : ADO.Sessions.Session := ASC.Get_Session (Ctx);
+      Query   : ADO.Queries.Context;
+      Context : Porion.Services.Context_Type;
+      List    : Porion.Queries.Metric_Stat_List_Bean;
    begin
-      return Project_Bean_Binding'Access;
-   end Get_Method_Bindings;
+      Context.DB := ASC.Get_Master_Session (Ctx);
+
+      Context.Load (Bean.Ident);
+      Bean.Project := Context.Project;
+      Bean.Branch := Context.Branch;
+      Bean.Metric.Project := Context.Project.Get_Id;
+      Bean.Metric.Cloc_Max_Count := 4;
+      Bean.Metric.Load (Outcome);
+
+   exception
+      when Porion.Services.Not_Found =>
+         Outcome := To_UString ("not-found");
+
+   end Load;
 
    --  ------------------------------
    --  Create the Project_Bean bean instance.
    --  ------------------------------
    function Create_Project_Bean (Module : in Porion.Projects.Modules.Project_Module_Access)
       return Util.Beans.Basic.Readonly_Bean_Access is
-      Object : constant Project_Bean_Access := new Project_Bean;
+      Object  : constant Project_Bean_Access := new Project_Bean;
+      Metrics : constant Porion.Dashboards.Beans.Stats.Metrics_Bean_Access := Object.Metric'Access;
    begin
       Object.Module := Module;
+      Object.Project_Bean := Object.Project'Access;
+      Object.Metric_Bean := Object.Metric'Access;
+      Porion.Dashboards.Beans.Stats.Initialize (Metrics);
       return Object.all'Access;
    end Create_Project_Bean;
 

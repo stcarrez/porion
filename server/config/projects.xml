@@ -6,30 +6,68 @@
   </application>
 
   <managed-bean>
-    <description>An example of a bean (change description and bean name)</description>
+    <description>The project description and information</description>
     <managed-bean-name>project</managed-bean-name>
     <managed-bean-class>Porion.Projects.Beans.Projects_Bean</managed-bean-class>
     <managed-bean-scope>request</managed-bean-scope>
   </managed-bean>
 
+  <managed-bean>
+    <description>Metrics about a project</description>
+    <managed-bean-name>projectMetrics</managed-bean-name>
+    <managed-bean-class>Porion.Dashboards.Beans.Stats.Metrics_Bean</managed-bean-class>
+    <managed-bean-scope>request</managed-bean-scope>
+  </managed-bean>
+
+  <navigation-rule>
+    <from-view-id>/projects/view.xhtml</from-view-id>
+    <navigation-case>
+      <from-outcome>loaded</from-outcome>
+      <to-view-id>/projects/view.xhtml</to-view-id>
+    </navigation-case>
+    <navigation-case>
+      <from-outcome>not-visible</from-outcome>
+      <to-view-id>/projects/no-project.xhtml</to-view-id>
+      <status>403</status>      
+    </navigation-case>
+    <navigation-case>
+      <from-outcome>not-found</from-outcome>
+      <to-view-id>/projects/no-project.xhtml</to-view-id>
+      <redirect/>
+    </navigation-case>
+    <navigation-case>
+      <from-outcome>ado.objects.not_found</from-outcome>
+      <to-view-id>/projects/no-project.xhtml</to-view-id>
+      <redirect/>
+    </navigation-case>
+  </navigation-rule>
+
   <filter-mapping>
     <filter-name>service</filter-name>
     <url-pattern>/projects/*.html</url-pattern>
+    <url-pattern>/projects/view/#{project.ident}</url-pattern>
   </filter-mapping>
 
   <filter-mapping>
     <filter-name>auth-filter</filter-name>
     <url-pattern>/projects/*.html</url-pattern>
+    <url-pattern>/projects/view/#{project.ident}</url-pattern>
   </filter-mapping>
 
   <url-policy>
     <permission>anonymous</permission>
     <url-pattern>/projects/.*\.html</url-pattern>
+    <url-pattern>/projects/view/.*</url-pattern>
   </url-policy>
 
   <url-policy>
     <permission>logged-user</permission>
     <url-pattern>/projects/admin/.*</url-pattern>
   </url-policy>
+
+  <url-mapping>
+    <pattern>/projects/view/#{project.ident}</pattern>
+    <view-id>/projects/view.html</view-id>
+  </url-mapping>
 
 </module>

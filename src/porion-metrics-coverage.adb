@@ -16,22 +16,23 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with GNAT.Regpat;
-with EL.Contexts.Default;
 with PT.Colors;
 with Porion.Logs;
+with Porion.Configs.Rules;
 with Porion.Reports;
 package body Porion.Metrics.Coverage is
 
    function Create (Session : in ADO.Sessions.Master_Session;
                     Params  : in UString) return Controller_Access is
-      Result  : constant Coverage_Controller_Access := new Controller_Type;
-      Command : constant String := Configs.Get ("command_lcov", LCOV_SUMMARY_COMMAND);
-      Ctx     : EL.Contexts.Default.Default_Context;
+      package PCR renames Porion.Configs.Rules;
+
+      Lcov_Rule : constant PCR.Rule_Type := PCR.Get_Definition ("lcov");
+      Result    : constant Coverage_Controller_Access := new Controller_Type;
    begin
       Result.Kind := METRIC_COVERAGE;
       Result.Session := Session;
       Result.Path := Params;
-      Result.Command := EL.Expressions.Create_Expression (Command, Ctx);
+      Result.Command := PCR.Get_Command (Lcov_Rule, "command", LCOV_SUMMARY_COMMAND);
       return Result.all'Access;
    end Create;
 

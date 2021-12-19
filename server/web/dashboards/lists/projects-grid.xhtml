@@ -42,7 +42,9 @@
                     Build
                   </div>
                   <div class='project-build-info-value'>
-                    #{project.build_number}
+                    <a href="#{contextPath}/builds/view/#{project.name}:#{project.build_number}" title="Build #{project.build_number}">
+                      #{project.build_number}
+                    </a>
                   </div>
                 </li>
                 <li>

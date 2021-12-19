@@ -74,4 +74,23 @@
         </sql>
     </query> 
 
+    <query name='stat-project-all-builds'>
+        <comment>Stats about all project builds</comment>
+        <sql>
+          SELECT
+          build.status AS status,
+          COUNT(build.id) AS cnt,
+          SUM(build.pass_count) AS pass_count,
+          SUM(build.fail_count) AS fail_count,
+          SUM(build.timeout_count) AS timeout_count,
+          SUM(build.test_duration) AS test_duration,
+          SUM(build.build_duration) AS build_duration,
+          SUM(build.sys_time) AS sys_time,
+          SUM(build.user_time) AS user_time
+          FROM porion_build AS build
+          WHERE build.project_id = :project_id
+          GROUP BY build.status
+        </sql>
+    </query> 
+
 </query-mapping>

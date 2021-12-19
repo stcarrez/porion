@@ -3,7 +3,7 @@
         List of builds
     </description>
  
-    <class name="Porion.Queries.Build_Info" bean="no">
+    <class name="Porion.Queries.Build_Info" bean="yes">
         <comment>Information about a build.</comment>
         <property type='String' name="name">
             <comment>the project name.</comment>

@@ -20,9 +20,9 @@ with Util.Log.Loggers;
 with Util.Beans.Objects;
 with Util.Serialize.Mappers.Record_Mapper;
 with Util.Serialize.IO.XML;
-with EL.Contexts.Default;
 with PT.Colors;
 with Porion.Logs;
+with Porion.Configs.Rules;
 package body Porion.Metrics.Cloc is
 
    package UBO renames Util.Beans.Objects;
@@ -160,14 +160,14 @@ package body Porion.Metrics.Cloc is
    function Create (Session : in ADO.Sessions.Master_Session;
                     Params  : in UString) return Controller_Access is
       pragma Unreferenced (Params);
+      package PCR renames Porion.Configs.Rules;
 
+      Cloc_Rule : constant PCR.Rule_Type := PCR.Get_Definition ("cloc");
       Result  : constant Cloc_Controller_Access := new Controller_Type;
-      Command : constant String := Configs.Get ("command_cloc", CLOC_COMMAND);
-      Ctx     : EL.Contexts.Default.Default_Context;
    begin
       Result.Kind := METRIC_CLOC;
       Result.Session := Session;
-      Result.Command := EL.Expressions.Create_Expression (Command, Ctx);
+      Result.Command := PCR.Get_Command (Cloc_Rule, "command", CLOC_COMMAND);
       return Result.all'Access;
    end Create;
 

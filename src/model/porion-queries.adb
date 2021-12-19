@@ -63,6 +63,120 @@ package body Porion.Queries is
       end loop;
    end List;
 
+
+
+   --  ------------------------------
+   --  Get the bean attribute identified by the name.
+   --  ------------------------------
+   overriding
+   function Get_Value (From : in Build_Info;
+                       Name : in String) return Util.Beans.Objects.Object is
+   begin
+      if Name = "name" then
+         return Util.Beans.Objects.To_Object (From.Name);
+      elsif Name = "project_status" then
+         return Porion.Projects.Models.Project_Status_Type_Objects.To_Object (From.Project_Status);
+      elsif Name = "branch_name" then
+         return Util.Beans.Objects.To_Object (From.Branch_Name);
+      elsif Name = "branch_status" then
+         return Porion.Projects.Models.Branch_Status_Type_Objects.To_Object (From.Branch_Status);
+      elsif Name = "node_name" then
+         return Util.Beans.Objects.To_Object (From.Node_Name);
+      elsif Name = "recipe_name" then
+         return Util.Beans.Objects.To_Object (From.Recipe_Name);
+      elsif Name = "build_id" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Build_Id));
+      elsif Name = "build_number" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Build_Number));
+      elsif Name = "build_tag" then
+         return Util.Beans.Objects.To_Object (From.Build_Tag);
+      elsif Name = "build_status" then
+         return Porion.Builds.Models.Build_Status_Type_Objects.To_Object (From.Build_Status);
+      elsif Name = "build_date" then
+         if From.Build_Date.Is_Null then
+            return Util.Beans.Objects.Null_Object;
+         else
+            return Util.Beans.Objects.Time.To_Object (From.Build_Date.Value);
+         end if;
+      elsif Name = "finish_date" then
+         if From.Finish_Date.Is_Null then
+            return Util.Beans.Objects.Null_Object;
+         else
+            return Util.Beans.Objects.Time.To_Object (From.Finish_Date.Value);
+         end if;
+      elsif Name = "build_duration" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Build_Duration));
+      elsif Name = "pass_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Pass_Count));
+      elsif Name = "fail_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Fail_Count));
+      elsif Name = "timeout_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Timeout_Count));
+      end if;
+      return Util.Beans.Objects.Null_Object;
+   end Get_Value;
+
+
+   --  ------------------------------
+   --  Set the value identified by the name
+   --  ------------------------------
+   overriding
+   procedure Set_Value (Item  : in out Build_Info;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object) is
+   begin
+      if Name = "name" then
+         Item.Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "project_status" then
+         Item.Project_Status := Porion.Projects.Models.Project_Status_Type_Objects.To_Value (Value);
+      elsif Name = "branch_name" then
+         Item.Branch_Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "branch_status" then
+         Item.Branch_Status := Porion.Projects.Models.Branch_Status_Type_Objects.To_Value (Value);
+      elsif Name = "node_name" then
+         Item.Node_Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "recipe_name" then
+         Item.Recipe_Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "build_id" then
+         Item.Build_Id := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "build_number" then
+         Item.Build_Number := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "build_tag" then
+         Item.Build_Tag := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "build_status" then
+         Item.Build_Status := Porion.Builds.Models.Build_Status_Type_Objects.To_Value (Value);
+      elsif Name = "build_date" then
+         Item.Build_Date.Is_Null := Util.Beans.Objects.Is_Null (Value);
+         if not Item.Build_Date.Is_Null then
+            Item.Build_Date.Value := Util.Beans.Objects.Time.To_Time (Value);
+         end if;
+      elsif Name = "finish_date" then
+         Item.Finish_Date.Is_Null := Util.Beans.Objects.Is_Null (Value);
+         if not Item.Finish_Date.Is_Null then
+            Item.Finish_Date.Value := Util.Beans.Objects.Time.To_Time (Value);
+         end if;
+      elsif Name = "build_duration" then
+         Item.Build_Duration := Porion.Millisecond_Type (Util.Beans.Objects.To_Integer (Value));
+      elsif Name = "pass_count" then
+         Item.Pass_Count := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "fail_count" then
+         Item.Fail_Count := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "timeout_count" then
+         Item.Timeout_Count := Util.Beans.Objects.To_Integer (Value);
+      end if;
+   end Set_Value;
+
+
+   --  --------------------
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   --  --------------------
+   procedure List (Object  : in out Build_Info_List_Bean'Class;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+   begin
+      List (Object.List, Session, Context);
+   end List;
+
    --  --------------------
    --  Information about a build.
    --  --------------------
@@ -202,6 +316,129 @@ package body Porion.Queries is
    begin
       Stmt.Execute;
       Build_Stat_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         Object.Insert_Space (Before => Pos);
+         Object.Update_Element (Index => Pos, Process => Read'Access);
+         Pos := Pos + 1;
+         Stmt.Next;
+      end loop;
+   end List;
+
+
+
+   --  ------------------------------
+   --  Get the bean attribute identified by the name.
+   --  ------------------------------
+   overriding
+   function Get_Value (From : in Build_Step_Info;
+                       Name : in String) return Util.Beans.Objects.Object is
+   begin
+      if Name = "step_id" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Step_Id));
+      elsif Name = "number" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Number));
+      elsif Name = "builder" then
+         return Porion.Builds.Models.Builder_Type_Objects.To_Object (From.Builder);
+      elsif Name = "kind" then
+         return Porion.Builds.Step_Type_Objects.To_Object (From.Kind);
+      elsif Name = "execution" then
+         return Porion.Builds.Models.Execution_Type_Objects.To_Object (From.Execution);
+      elsif Name = "start_date" then
+         return Util.Beans.Objects.Time.To_Object (From.Start_Date);
+      elsif Name = "end_date" then
+         if From.End_Date.Is_Null then
+            return Util.Beans.Objects.Null_Object;
+         else
+            return Util.Beans.Objects.Time.To_Object (From.End_Date.Value);
+         end if;
+      elsif Name = "status" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Status));
+      elsif Name = "user_time" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.User_Time));
+      elsif Name = "sys_time" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Sys_Time));
+      elsif Name = "step_duration" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Step_Duration));
+      end if;
+      return Util.Beans.Objects.Null_Object;
+   end Get_Value;
+
+
+   --  ------------------------------
+   --  Set the value identified by the name
+   --  ------------------------------
+   overriding
+   procedure Set_Value (Item  : in out Build_Step_Info;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object) is
+   begin
+      if Name = "step_id" then
+         Item.Step_Id := ADO.Identifier (Util.Beans.Objects.To_Long_Long_Integer (Value));
+      elsif Name = "number" then
+         Item.Number := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "builder" then
+         Item.Builder := Porion.Builds.Models.Builder_Type_Objects.To_Value (Value);
+      elsif Name = "kind" then
+         Item.Kind := Porion.Builds.Step_Type_Objects.To_Value (Value);
+      elsif Name = "execution" then
+         Item.Execution := Porion.Builds.Models.Execution_Type_Objects.To_Value (Value);
+      elsif Name = "start_date" then
+         Item.Start_Date := Util.Beans.Objects.Time.To_Time (Value);
+      elsif Name = "end_date" then
+         Item.End_Date.Is_Null := Util.Beans.Objects.Is_Null (Value);
+         if not Item.End_Date.Is_Null then
+            Item.End_Date.Value := Util.Beans.Objects.Time.To_Time (Value);
+         end if;
+      elsif Name = "status" then
+         Item.Status := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "user_time" then
+         Item.User_Time := Porion.Millisecond_Type (Util.Beans.Objects.To_Integer (Value));
+      elsif Name = "sys_time" then
+         Item.Sys_Time := Porion.Millisecond_Type (Util.Beans.Objects.To_Integer (Value));
+      elsif Name = "step_duration" then
+         Item.Step_Duration := Porion.Millisecond_Type (Util.Beans.Objects.To_Integer (Value));
+      end if;
+   end Set_Value;
+
+
+   --  --------------------
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   --  --------------------
+   procedure List (Object  : in out Build_Step_Info_List_Bean'Class;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+   begin
+      List (Object.List, Session, Context);
+   end List;
+
+   --  --------------------
+   --  Information about a build.
+   --  --------------------
+   procedure List (Object  : in out Build_Step_Info_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+      procedure Read (Into : in out Build_Step_Info);
+
+      Stmt : ADO.Statements.Query_Statement
+          := Session.Create_Statement (Context);
+      Pos  : Positive := 1;
+      procedure Read (Into : in out Build_Step_Info) is
+      begin
+         Into.Step_Id := Stmt.Get_Identifier (0);
+         Into.Number := Stmt.Get_Integer (1);
+         Into.Builder := Porion.Builds.Models.Builder_Type'Enum_Val (Stmt.Get_Integer (2));
+         Into.Kind := Porion.Builds.Step_Type'Enum_Val (Stmt.Get_Integer (3));
+         Into.Execution := Porion.Builds.Models.Execution_Type'Enum_Val (Stmt.Get_Integer (4));
+         Into.Start_Date := Stmt.Get_Time (5);
+         Into.End_Date := Stmt.Get_Nullable_Time (6);
+         Into.Status := Stmt.Get_Integer (7);
+         Into.User_Time := Porion.Millisecond_Type (Stmt.Get_Integer (8));
+         Into.Sys_Time := Porion.Millisecond_Type (Stmt.Get_Integer (9));
+         Into.Step_Duration := Porion.Millisecond_Type (Stmt.Get_Integer (10));
+      end Read;
+   begin
+      Stmt.Execute;
+      Build_Step_Info_Vectors.Clear (Object);
       while Stmt.Has_Elements loop
          Object.Insert_Space (Before => Pos);
          Object.Update_Element (Index => Pos, Process => Read'Access);

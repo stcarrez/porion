@@ -1,0 +1,108 @@
+<ui:composition xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:util="http://code.google.com/p/ada-asf/util"
+                xmlns:c="http://java.sun.com/jstl/core"
+                template="/WEB-INF/layouts/layout.xhtml">
+  <ui:param name="title" value="#{layoutMsg.homePageTitle}" />
+  <ui:param name="pageStyle" value="page-build"/>
+  <!-- Main page body -->
+  <ui:define name="pageBody">
+    <f:metadata>
+      <f:viewAction action='#{project.load}'/>
+    </f:metadata>
+    <div id='awa-content'>
+      <ui:include src="views/info.xhtml"/>
+      <div class='project-graph'>
+        <div id='graph-month'/>
+        <div id='graph-total'/>
+        <div id='graph-total-legen'/>
+      </div>
+     </div>
+    <util:script>
+    $(function() {
+        var series = [];
+        var total_series = [];
+    var pos = 1;
+    var ticks = [];
+    <h:list var="lang" value="#{project.metrics.cloc}">
+      series.push({label: "#{lang.label}", data: [[#{lang.sum_value}, pos]] });
+      ticks.push([pos, "#{lang.label}"]);
+      pos++;
+      total_series.push({label: "#{lang.label}", data: #{lang.sum_value} });
+    </h:list>
+
+        var legendContainer = document.getElementById("graph-legend");
+        $.plot("#graph-month", series, {
+            series: {
+                stack: true,
+                bars: {
+    show: true,
+    horizontal: true,
+                    align: "center"
+                }
+            },
+            legend: {
+        show: false,
+        backgroundOpacity: 0.5
+
+            },
+            /* colors: [
+                "#66FF99",
+                "#47B26B",
+                "#A3FFC2",
+                "#66FFFF",
+                "#3D9999",
+                "#94FFFF",
+                "#FFFF66",
+                "#99993D",
+                // "#FFFFA3",
+                // "#FF6600",
+                "#993D00",
+                "#FF99FF",
+                "#99CCFF"
+            ],*/
+            xaxis: {
+    ticks: [],
+    color: "#993D00"
+    },
+    yaxis: {
+    ticks: ticks,
+    show: true,
+    color: "white",
+    tickColor: "#red"
+    }
+        });
+        legendContainer = document.getElementById("graph-total-legend");
+        $.plot("#graph-total", total_series, {
+            series: {
+                pie: {
+                   show: true,
+                   startAngle: 1.0, radius: 1.0, innerRadius: 0.5, tilt: 1.0, offset: { top: 0, left: 0 },
+                   label: { show: true }
+                }
+            },
+            legend: {
+                show: false, container: legendContainer
+            }
+        });
+    });
+    </util:script>
+  </ui:define>
+
+  <ui:define name="pageScript">
+    <script type="text/javascript" src="#{contextPath}/js/jquery.canvaswrapper.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/jquery.colorhelpers.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.saturated.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.browser.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.drawSeries.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.uiConstants.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.symbol.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.legend.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.time.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.stack.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.pie.js"></script>
+  </ui:define>
+
+</ui:composition>

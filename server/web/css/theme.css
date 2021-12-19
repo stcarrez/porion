@@ -1,0 +1,202 @@
+/**
+ * Dark mode support
+ */
+@media (prefers-color-scheme: dark) {
+  body, #awa-page, div.blog-post, .wiki-page-container, #blog-post-list, #blog-comment-list,
+  #wiki-page-list, #document-list-editor, #wiki-page-create {
+    background-color: #2b2b2b;
+    color: #ccc;
+  }
+  div.comment-COMMENT_PUBLISHED,  div.blog-post-info h2 {
+    color: #ccc;
+  }
+  .build-info-line, .project-dashboard {
+      background-color: #3b3b3b;
+      border-color: #2b2b2b;
+  }
+
+  div.post-text a, .blog-post a,
+  dl.vacs-version a, div.vacs-demo a,
+  a.feed,
+  div.awa-project a,
+  ul.vacs-list li a,
+  ul.blog-pagination li a,
+  .awa-post-more a,
+  .blog-post-add-comment a,
+  .tagedit-list li.tagedit-listelement a,
+  div.blog-post div.post-title h2 a, div.post-text a, ul.tag-cloud a {
+    color: #55A6FF;
+  }
+  div.post-text a, ul.tag-cloud a {
+    color: #55A6FF;
+    text-decoration: none;
+  }
+  div.blog-post-tag-info {
+      border-color: #6b6b6b;
+  }
+  div.blog-post-tag-info h2 {
+      background-color: #4b4b4b;
+  }
+  dl.vacs-version a:hover, div.vacs-demo a:hover,
+  a.feed:hover,
+  div.awa-project a:hover,
+  .tagedit-list li.tagedit-listelement a:hover,
+  ul.vacs-list li a:hover,
+  ul.blog-pagination li a:hover,
+  div.blog-post div.post-title h2 a:hover, div.post-text a:hover, ul.tag-cloud a:hover,
+  div.post-text a:hover, .blog-post a:hover {
+    color: #58A6FF;
+  }
+  div.post-text a:hover, ul.tag-cloud a:hover {
+    color: #58A6FF;
+  }
+  div.awa-comment-list h3,
+  a, div.post-text h2, div.post-text h3, div.post-text h4, div.post-text h5,
+  .wiki-text h2, .wiki-text h3, .wiki-text h4, .wiki-text h5, .wiki-text h6 {
+    color: #ccc;
+  }
+  .awa-comment div.comment-author {
+    color: #bbb;
+  }
+  .wiki-text pre, div.post-text pre {
+    background-color: #3b3b3b;
+    border-color: #4b4b4b;
+  }
+  .wiki-toc,
+  .wiki-img-thumb,
+  .wiki-img-caption {
+    border-color: #4b4b4b;
+  }
+  .wiki-image-grid span {
+    background-color: #3b3b3b;      
+  }
+  .tagedit-list li.tagedit-listelement-old {
+      background-color: #3b3b3b;
+      border-color: #bfbfb0;
+  }
+  .tagedit-list li.tagedit-listelement-old:hover {
+      background-color: #4b4b4b;
+  }
+  .page-tools #awa-top-nav #nav-tools a,
+  .page-tutorials #awa-top-nav #nav-tutorials a,
+  .page-wiki #awa-top-nav #nav-wiki a,
+  .page-download #awa-top-nav #nav-download a,
+  .page-news #awa-top-nav #nav-news a {
+      background: #4b4b4b;
+      color: #ccc;
+      border-color: #eee;
+   }
+   div.shape, .ui-widget-content {
+      background: #3b3b3b;
+      border-color: #4b4b4b;
+      color: #ccc;
+   }
+   #awa-page #storage-folder-left-panel {
+      background: #3b3b3b;
+   }
+   #awa-page div.ui-list div.asf-active {
+      background-color: #5b5b5b;
+   }
+   #awa-page div.storage-folder-list div.asf-active {
+      background: #5b5b5b;
+   }
+   #awa-page div.storage-folder-list div.asf-selected {
+      background: #6b6b6b;
+   }
+   .dropzone {
+       background: #3b3b3b;
+   }
+   div.awa-login, div.awa-project a {
+      background: #3b3b3b;
+   }
+   div.awa-login h2, div.awa-project a:hover, .awa-button:hover {
+      background: #4b4b4b;
+      color: #ccc;
+   }
+   dl.awa-optional label, dl.awa-required label {
+      color: #ccc;
+   }
+   input, textarea, #storage-reupload-button {
+      background: #3b3b3b;
+      color: #ddd;
+   }
+   .vacs-about .vacs-openhub {
+      background: #ccc;
+   }
+   .vacs-about .vacs-github {
+      background-image: url(../images/GitHub-Mark-Light-32px.png);
+   }
+}
+@media (prefers-color-scheme: light) {
+  .day.light-scheme   { background: white; color:  #555; }
+  .night.light-scheme { background:  #eee; color: black; }
+}
+@media screen and (max-width: 768px) {
+    #awa-top-nav li a {
+        font-size: 100%;
+        padding-left: 5px;
+        padding: 5px;
+    }
+    #vacs-top, #awa-footer, body {
+        background-image: none;
+        font-size: 100%;
+    }
+    #awa-top-nav {
+        width: 99%;
+    }
+    #awa-hdr ul {
+        padding-right: 0;
+    }
+    #awa-hdr li {
+        line-height: 0.9em;
+    }
+    .wiki-page-container .grid_2, .wiki-page-container .grid_10,
+    .tagedit-list, .container_12 .grid_9, .container_12 .grid_3 {
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+    }
+    .tagedit-list li.tagedit-listelement {
+        float: right;
+    }
+    h3 {
+        overflow: hidden;
+        width: 100%;
+    }
+    div.post-text div {
+        max-width: 95%;
+        overflow: hidden;
+    }
+    div.awa-project a {
+        font-size: 70%;
+    }
+    div.container_12 div.vacs-demo {
+        width: 100%;
+    }
+    div.awa-side1, div.awa-side2 {
+        width: 100%;
+        padding: 0;
+    }
+}
+@media screen and (min-width: 960px) {
+    #awa-top-nav li {
+        width: 20%;
+    }
+}
+@media screen and (max-width: 960px) {
+    div.container_12 div.vacs-demo {
+        width: 100%;
+    }
+}
+@media screen and (max-width: 600px) {
+    body{
+        font-size:100%;
+    }
+    div.awa-modal {
+	    top: 5%;
+    	left: 5%;
+    	width: 90%;
+    	max-width: 530px;
+    	min-width: 320px;
+    }
+}

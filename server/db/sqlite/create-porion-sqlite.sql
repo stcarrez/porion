@@ -434,9 +434,13 @@ CREATE TABLE IF NOT EXISTS porion_environment (
   /* the environment variable value. */
   `value` VARCHAR(4096) NOT NULL,
   /*  */
+  `branch_id` BIGINT ,
+  /*  */
   `node_id` BIGINT ,
   /*  */
   `recipe_id` BIGINT ,
+  /*  */
+  `project_id` BIGINT ,
   PRIMARY KEY (`id`)
 );
 /*  */
@@ -447,6 +451,8 @@ CREATE TABLE IF NOT EXISTS porion_last_build (
   `status` TINYINT NOT NULL,
   /* the optimistic lock version. */
   `version` INTEGER NOT NULL,
+  /* indicates the last build */
+  `last_build` TINYINT NOT NULL,
   /*  */
   `build_id` BIGINT NOT NULL,
   /*  */
@@ -576,6 +582,8 @@ CREATE TABLE IF NOT EXISTS porion_node (
   `cpu_type` VARCHAR(255) NOT NULL,
   /*  */
   `main_node` TINYINT NOT NULL,
+  /*  */
+  `check_rules` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`)
 );
 /*  */
@@ -813,6 +821,8 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "deleted");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "main_node");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "check_rules");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "tag");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)

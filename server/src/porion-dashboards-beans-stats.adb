@@ -19,6 +19,8 @@ with ADO.Sessions;
 with ADO.Queries;
 with AWA.Services.Contexts;
 with Porion.Metrics;
+with Porion.Projects.Services;
+with Porion.Services;
 with Porion.Builds.Models;
 package body Porion.Dashboards.Beans.Stats is
 
@@ -117,12 +119,22 @@ package body Porion.Dashboards.Beans.Stats is
    --  ------------------------------
    procedure Load (Bean    : in out Metrics_Bean;
                    Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
+      use type ADO.Identifier;
+
       Ctx     : constant ASC.Service_Context_Access := ASC.Current;
       Session : ADO.Sessions.Session := ASC.Get_Session (Ctx);
       Query   : ADO.Queries.Context;
       List    : Porion.Queries.Metric_Stat_List_Bean;
+      Context : Porion.Services.Context_Type;
    begin
-      Query.Set_Query (Porion.Queries.Query_Stat_Metrics);
+      if Bean.Project /= ADO.NO_IDENTIFIER then
+         Context.DB := ASC.Get_Master_Session (Ctx);
+
+         Query.Set_Query (Porion.Queries.Query_Stat_Project_Metrics);
+         Query.Bind_Param ("project_id", Bean.Project);
+      else
+         Query.Set_Query (Porion.Queries.Query_Stat_Metrics);
+      end if;
       Porion.Queries.List (List, Session, Query);
       for Stat of List.List loop
          case Stat.Kind is
@@ -153,6 +165,31 @@ package body Porion.Dashboards.Beans.Stats is
          end case;
       end loop;
       Sort.Sort (Bean.Cloc.List);
+      if Natural (Bean.Cloc.List.Length) > Bean.Cloc_Max_Count then
+         declare
+            Stat : Porion.Queries.Metric_Stat;
+         begin
+            Stat.Kind := Porion.Metrics.METRIC_CLOC;
+            Stat.Name := To_UString ("others");
+            Stat.Label := To_UString ("Others");
+            Stat.Sum_Value := 0;
+            Stat.Max_Value := 0;
+            Stat.Count := 0;
+            for I in Bean.Cloc_Max_Count .. Natural (Bean.Cloc.List.Length) loop
+               declare
+                  Item : constant Porion.Queries.Metric_Stat
+                     := Bean.Cloc.List.Element (I);
+               begin
+                  Stat.Sum_Value := Stat.Sum_Value + Item.Sum_Value;
+                  Stat.Count := Stat.Count + Item.Count;
+               end;
+            end loop;
+            while Natural (Bean.Cloc.List.Length) >= Bean.Cloc_Max_Count loop
+               Bean.Cloc.List.Delete_Last;
+            end loop;
+            Bean.Cloc.List.Append (Stat);
+         end;
+      end if;
    end Load;
 
    --  ------------------------------
@@ -188,11 +225,8 @@ package body Porion.Dashboards.Beans.Stats is
    --  ------------------------------
    --  Create the stats build bean instance.
    --  ------------------------------
-   function Create_Metrics_Bean (Module : in Modules.Dashboard_Module_Access)
-      return Util.Beans.Basic.Readonly_Bean_Access is
-      Object : constant Metrics_Bean_Access := new Metrics_Bean;
+   procedure Initialize (Object : in Metrics_Bean_Access) is
    begin
-      Object.Module := Module;
       Object.Func_Coverage_Bean := Object.Func_Coverage'Access;
       Object.Func_Coverage := Empty_Metric;
       Object.Line_Coverage_Bean := Object.Line_Coverage'Access;
@@ -204,6 +238,16 @@ package body Porion.Dashboards.Beans.Stats is
       Object.Cloc_Bean := Object.Cloc'Access;
       Object.Cloc_Total_Bean := Object.Cloc_Total'Access;
       Object.Cloc_Total := Empty_Metric;
+   end Initialize;
+
+   --  ------------------------------
+   --  Create the stats build bean instance.
+   --  ------------------------------
+   function Create_Metrics_Bean (Module : in Modules.Dashboard_Module_Access)
+      return Util.Beans.Basic.Readonly_Bean_Access is
+      Object : constant Metrics_Bean_Access := new Metrics_Bean;
+   begin
+      Initialize (Object);
       return Object.all'Access;
    end Create_Metrics_Bean;
 

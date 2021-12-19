@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module version="1.0">
+
+  <application>
+    <message-bundle var='buildsMsg'>builds</message-bundle>
+  </application>
+
+  <managed-bean>
+    <description>Information about a project build</description>
+    <managed-bean-name>build</managed-bean-name>
+    <managed-bean-class>Porion.Builds.Beans.Builds_Bean</managed-bean-class>
+    <managed-bean-scope>request</managed-bean-scope>
+  </managed-bean>
+
+  <navigation-rule>
+    <from-view-id>/builds/view.xhtml</from-view-id>
+    <navigation-case>
+      <from-outcome>loaded</from-outcome>
+      <to-view-id>/builds/view.xhtml</to-view-id>
+    </navigation-case>
+    <navigation-case>
+      <from-outcome>not-visible</from-outcome>
+      <to-view-id>/builds/no-build.xhtml</to-view-id>
+      <status>403</status>      
+    </navigation-case>
+    <navigation-case>
+      <from-outcome>not-found</from-outcome>
+      <to-view-id>/builds/no-build.xhtml</to-view-id>
+      <redirect/>
+    </navigation-case>
+    <navigation-case>
+      <from-outcome>ado.objects.not_found</from-outcome>
+      <to-view-id>/builds/no-build.xhtml</to-view-id>
+      <redirect/>
+    </navigation-case>
+  </navigation-rule>
+
+  <filter-mapping>
+    <filter-name>service</filter-name>
+    <url-pattern>/builds/*.html</url-pattern>
+    <url-pattern>/builds/view/#{build.ident}</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>auth-filter</filter-name>
+    <url-pattern>/builds/*.html</url-pattern>
+    <url-pattern>/builds/view/#{build.ident}</url-pattern>
+  </filter-mapping>
+
+  <url-policy>
+    <permission>anonymous</permission>
+    <url-pattern>/builds/.*\.html</url-pattern>
+    <url-pattern>/builds/view/.*</url-pattern>
+  </url-policy>
+
+  <url-policy>
+    <permission>logged-user</permission>
+    <url-pattern>/builds/admin/.*</url-pattern>
+  </url-policy>
+
+  <url-mapping>
+    <pattern>/builds/view/#{build.ident}</pattern>
+    <view-id>/builds/view.html</view-id>
+  </url-mapping>
+
+</module>

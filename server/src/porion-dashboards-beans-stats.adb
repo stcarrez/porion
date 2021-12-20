@@ -125,13 +125,13 @@ package body Porion.Dashboards.Beans.Stats is
       Session : ADO.Sessions.Session := ASC.Get_Session (Ctx);
       Query   : ADO.Queries.Context;
       List    : Porion.Queries.Metric_Stat_List_Bean;
-      Context : Porion.Services.Context_Type;
    begin
       if Bean.Project /= ADO.NO_IDENTIFIER then
-         Context.DB := ASC.Get_Master_Session (Ctx);
-
          Query.Set_Query (Porion.Queries.Query_Stat_Project_Metrics);
          Query.Bind_Param ("project_id", Bean.Project);
+      elsif Bean.Build /= ADO.NO_IDENTIFIER then
+         Query.Set_Query (Porion.Queries.Query_Stat_Build_Metrics);
+         Query.Bind_Param ("build_id", Bean.Build);
       else
          Query.Set_Query (Porion.Queries.Query_Stat_Metrics);
       end if;

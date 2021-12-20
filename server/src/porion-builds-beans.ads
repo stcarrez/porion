@@ -25,6 +25,7 @@ with Porion.Builds.Modules;
 with Porion.Projects.Models;
 with Porion.Builds.Models;
 with Porion.Nodes.Models;
+with Porion.Dashboards.Beans.Stats;
 package Porion.Builds.Beans is
 
    package UBB renames Util.Beans.Basic;
@@ -43,6 +44,8 @@ package Porion.Builds.Beans is
       Project_Bean : UBB.Readonly_Bean_Access;
       Node         : aliased Porion.Nodes.Models.Node_Ref;
       Node_Bean    : UBB.Readonly_Bean_Access;
+      Metrics      : aliased Porion.Dashboards.Beans.Stats.Metrics_Bean;
+      Metrics_Bean : UBB.Readonly_Bean_Access;
    end record;
    type Build_Bean_Access is access all Build_Bean'Class;
 

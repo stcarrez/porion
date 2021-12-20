@@ -60,6 +60,7 @@ package Porion.Dashboards.Beans.Stats is
 
    type Metrics_Bean is new Porion.Dashboards.Models.Project_List_Bean with record
       Project            : ADO.Identifier := ADO.NO_IDENTIFIER;
+      Build              : ADO.Identifier := ADO.NO_IDENTIFIER;
       Func_Coverage      : aliased Porion.Queries.Metric_Stat;
       Func_Coverage_Bean : Metrics_Stat_Bean_Access;
       Line_Coverage      : aliased Porion.Queries.Metric_Stat;

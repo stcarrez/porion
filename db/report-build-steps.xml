@@ -1,0 +1,71 @@
+<query-mapping package='Porion.Queries'>
+    <description>
+        List of build steps with the execution time
+    </description>
+ 
+    <class name="Porion.Queries.Build_Step_Info" bean="yes">
+        <comment>Information about a build.</comment>
+        <property type='ADO.Identifier' name="step_id">
+            <comment>the recipe step id.</comment>
+        </property>
+        <property type='Integer' name="number">
+            <comment>the recipe step number.</comment>
+        </property>
+        <property type='Porion.Builds.Models.Builder_Type' name="builder">
+            <comment>the recipe builder.</comment>
+        </property>
+        <property type='Porion.Builds.Step_Type' name="kind">
+            <comment>the recipe step type.</comment>
+        </property>
+        <property type='Porion.Builds.Models.Execution_Type' name="execution">
+            <comment>the recipe execution mode.</comment>
+        </property>
+        <property type='Date' name="start_date">
+            <comment>the start date.</comment>
+        </property>
+        <property type='Nullable_Date' name="end_date" not-null="no">
+            <comment>the finish date.</comment>
+        </property>
+        <property type='Integer' name="status">
+            <comment>the execution status.</comment>
+        </property>
+        <property type='Porion.Millisecond_Type' name="user_time">
+            <comment>the user time.</comment>
+        </property>
+        <property type='Porion.Millisecond_Type' name="sys_time">
+            <comment>the sys time.</comment>
+        </property>
+        <property type='Porion.Millisecond_Type' name="step_duration">
+            <comment>the execution step duration.</comment>
+        </property>
+    </class>
+
+   <query name='build-recipe-list'>
+        <comment>Get the list of build execution recipes</comment>
+        <sql>
+            SELECT
+            recipe_step.id,
+            recipe_step.number,
+            recipe_step.builder,
+            recipe_step.step,
+            recipe_step.execution,
+            build_step.start_date,
+            build_step.end_date,
+            build_step.exit_status,
+            build_step.user_time,
+            build_step.sys_time,
+            build_step.step_duration
+            FROM porion_build_step AS build_step
+            INNER JOIN porion_recipe_step as recipe_step ON build_step.recipe_step_id = recipe_step.id
+            WHERE build_step.build_id = :build_id
+            ORDER BY build_step.id ASC
+        </sql>
+        <sql-count>
+            SELECT
+            count(build_step.id)
+            FROM porion_build_step AS build_step
+            WHERE build_step.build_id = :build_id
+        </sql-count>
+    </query>
+
+</query-mapping>

@@ -472,7 +472,8 @@ package Porion.Queries is
    --  --------------------
    --    Information about a build node.
    --  --------------------
-   type Node_Info is record
+   type Node_Info is
+     new Util.Beans.Basic.Bean with  record
 
       --  the node name.
       Name : Ada.Strings.Unbounded.Unbounded_String;
@@ -505,10 +506,29 @@ package Porion.Queries is
       Build_Count : Integer;
    end record;
 
-   package Node_Info_Vectors is
-      new Ada.Containers.Vectors (Index_Type   => Positive,
-                                  Element_Type => Node_Info,
-                                  "="          => "=");
+   --  Get the bean attribute identified by the name.
+   overriding
+   function Get_Value (From : in Node_Info;
+                       Name : in String) return Util.Beans.Objects.Object;
+
+   --  Set the bean attribute identified by the name.
+   overriding
+   procedure Set_Value (Item  : in out Node_Info;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object);
+
+
+   package Node_Info_Beans is
+      new Util.Beans.Basic.Lists (Element_Type => Node_Info);
+   package Node_Info_Vectors renames Node_Info_Beans.Vectors;
+   subtype Node_Info_List_Bean is Node_Info_Beans.List_Bean;
+
+   type Node_Info_List_Bean_Access is access all Node_Info_List_Bean;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Node_Info_List_Bean'Class;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
 
    subtype Node_Info_Vector is Node_Info_Vectors.Vector;
 
@@ -875,7 +895,7 @@ private
    := Def_Metricstat_Stat_Project_Metrics.Query'Access;
 
    package File_8 is
-      new ADO.Queries.Loaders.File (Path => "command-nodes.xml",
+      new ADO.Queries.Loaders.File (Path => "report-nodes.xml",
                                     Sha1 => "C415C6088AFE424A4C27990F658A1FA3111DA129");
 
    package Def_Nodeinfo_Node_List is

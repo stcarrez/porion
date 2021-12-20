@@ -660,6 +660,82 @@ package body Porion.Queries is
       end loop;
    end List;
 
+
+
+   --  ------------------------------
+   --  Get the bean attribute identified by the name.
+   --  ------------------------------
+   overriding
+   function Get_Value (From : in Node_Info;
+                       Name : in String) return Util.Beans.Objects.Object is
+   begin
+      if Name = "name" then
+         return Util.Beans.Objects.To_Object (From.Name);
+      elsif Name = "login" then
+         return Util.Beans.Objects.To_Object (From.Login);
+      elsif Name = "os_name" then
+         return Util.Beans.Objects.To_Object (From.Os_Name);
+      elsif Name = "os_version" then
+         return Util.Beans.Objects.To_Object (From.Os_Version);
+      elsif Name = "cpu_type" then
+         return Util.Beans.Objects.To_Object (From.Cpu_Type);
+      elsif Name = "repository_dir" then
+         return Util.Beans.Objects.To_Object (From.Repository_Dir);
+      elsif Name = "kind" then
+         return Porion.Nodes.Node_Type_Objects.To_Object (From.Kind);
+      elsif Name = "status" then
+         return Porion.Nodes.Node_Status_Type_Objects.To_Object (From.Status);
+      elsif Name = "recipe_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Recipe_Count));
+      elsif Name = "build_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Build_Count));
+      end if;
+      return Util.Beans.Objects.Null_Object;
+   end Get_Value;
+
+
+   --  ------------------------------
+   --  Set the value identified by the name
+   --  ------------------------------
+   overriding
+   procedure Set_Value (Item  : in out Node_Info;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object) is
+   begin
+      if Name = "name" then
+         Item.Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "login" then
+         Item.Login := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "os_name" then
+         Item.Os_Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "os_version" then
+         Item.Os_Version := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "cpu_type" then
+         Item.Cpu_Type := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "repository_dir" then
+         Item.Repository_Dir := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "kind" then
+         Item.Kind := Porion.Nodes.Node_Type_Objects.To_Value (Value);
+      elsif Name = "status" then
+         Item.Status := Porion.Nodes.Node_Status_Type_Objects.To_Value (Value);
+      elsif Name = "recipe_count" then
+         Item.Recipe_Count := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "build_count" then
+         Item.Build_Count := Util.Beans.Objects.To_Integer (Value);
+      end if;
+   end Set_Value;
+
+
+   --  --------------------
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   --  --------------------
+   procedure List (Object  : in out Node_Info_List_Bean'Class;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+   begin
+      List (Object.List, Session, Context);
+   end List;
+
    --  --------------------
    --  Information about a build node.
    --  --------------------

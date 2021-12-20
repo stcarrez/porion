@@ -24,6 +24,7 @@ with Servlet.Security.Servlets;
 with ASF.Servlets.Faces;
 with ASF.Servlets.Ajax;
 with ASF.Converters.Sizes;
+with ASF.Converters.Durations;
 
 with AWA.Users.Servlets;
 with AWA.Users.Modules;
@@ -81,6 +82,8 @@ private
       --  Converters shared by web requests.
       Rel_Date_Converter : aliased AWA.Converters.Dates.Relative_Date_Converter;
       Size_Converter     : aliased ASF.Converters.Sizes.Size_Converter;
+      Microsec_Converter : aliased ASF.Converters.Durations.Duration_Converter;
+      Millisec_Converter : aliased ASF.Converters.Durations.Duration_Converter;
 
       --  The application modules.
       User_Module        : aliased AWA.Users.Modules.User_Module;

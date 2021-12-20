@@ -76,6 +76,13 @@ package body Porion.Applications is
                          Converter => App.Self.Rel_Date_Converter'Access);
       App.Add_Converter (Name      => "sizeConverter",
                          Converter => App.Self.Size_Converter'Access);
+      App.Add_Converter (Name      => "microsecondConverter",
+                         Converter => App.Self.Microsec_Converter'Access);
+      App.Add_Converter (Name      => "millisecondConverter",
+                         Converter => App.Self.Millisec_Converter'Access);
+
+      App.Self.Microsec_Converter.Unit := ASF.Converters.Durations.MICROSECOND;
+      App.Self.Millisec_Converter.Unit := ASF.Converters.Durations.MILLISECOND;
 
       Register (App    => App.Self.all'Access,
                 Name   => AWA.Users.Modules.NAME,

@@ -58,48 +58,62 @@
           </h:outputText>
         </span>
       </div>
+
+      <div class='build-info'>
+        <span>
+          Tag #{build.tag}
+        </span>
+      </div>
     </div>
   </div>
 
-  <div class='build-info'>
-    <ul class='build-info-line'>
-      <li>
-        <div class='porion-label'>
-          Tag #{build.tag}
-        </div>
-        <div class='porion-value'>
-        </div>
-      </li>
-    </ul>
-  </div>
 
   <div class='build-info'>
-    <ul class='build-execution-time'>
-      <li style='width: 20%'>
-        Git
+    <ul class='build-info-line'>
+
+      <li>
+        <div class='dashboard-title'>
+          Tests
+        </div>
+        <div class='dashboard-value'>
+          #{build.pass_count}
+        </div>
+        <div class='dashboard-value'>
+          <div class="progress-bar">
+            <span class="progress-status" style="width: #{build.pass_count == 0 ? 0 : ((100 * build.pass_count) / (build.pass_count + build.fail_count + build_timeout_count))}%"/>
+          </div>
+        </div>
       </li>
-      <li style='width: 30%'>
-        Configure
+
+      <li>
+        <div class='dashboard-title'>
+          Line coverage
+        </div>
+        <div class='dashboard-value'>
+          <h:outputText value="#{(build.metrics.lines.sum_value) / (build.metrics.lines.count * 10)}">
+            <f:converter converterId="percentConverter"/>
+          </h:outputText> %
+        </div>
+        <div class='dashboard-value'>
+          <div class="progress-bar">
+            <span class="progress-status" style="width: #{build.metrics.lines.count == 0 ? 0 : build.metrics.lines.sum_value / (10 * build.metrics.lines.count)}%"/>
+          </div>
+        </div>
       </li>
-      <li style='width: 40%'>
-        Build
-      </li>
-      <li style='width: 10%'>
-        Test
-      </li>
-    </ul>
-    <ul class='build-execution-time'>
-      <li style='width: 20%'>
-        4.5
-      </li>
-      <li style='width: 30%'>
-        6.5
-      </li>
-      <li style='width: 40%'>
-        13.4
-      </li>
-      <li style='width: 10%'>
-        2.2
+    <li>
+        <div class='dashboard-title'>
+          Function coverage
+        </div>
+        <div class='dashboard-value'>
+          <h:outputText value="#{(build.metrics.functions.sum_value) / (build.metrics.functions.count * 10)}">
+            <f:converter converterId="percentConverter"/>
+          </h:outputText> %
+        </div>
+        <div class='dashboard-value'>
+          <div class="progress-bar">
+            <span class="progress-status" style="width: #{build.metrics.functions.count == 0 ? 0 : build.metrics.functions.sum_value / (10 * build.metrics.functions.count)}%"/>
+          </div>
+        </div>
       </li>
     </ul>
   </div>

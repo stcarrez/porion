@@ -61,6 +61,10 @@ div.awa-title dd {
 .project-page-grid a {
     text-decoration: none;
 }
+.project-page-grid .project-build-info a {
+    width: 100%;
+    display: inline-block;    
+}
 .project-page-grid a span {
     display: inline-block;
     line-height: 32px;

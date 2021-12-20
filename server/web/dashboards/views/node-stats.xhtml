@@ -1,0 +1,51 @@
+<!-- Statistics about tests for all projects
+  -  Copyright (C) 2021 Stephane Carrez
+  -  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
+  -
+  -  Licensed under the Apache License, Version 2.0 (the "License");
+  -  you may not use this file except in compliance with the License.
+  -  You may obtain a copy of the License at
+  -
+  -      http://www.apache.org/licenses/LICENSE-2.0
+  -
+  -  Unless required by applicable law or agreed to in writing, software
+  -  distributed under the License is distributed on an "AS IS" BASIS,
+  -  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  -  See the License for the specific language governing permissions and
+  -  limitations under the License.
+  -->
+<ui:composition
+        xmlns:awa="http://code.google.com/p/ada-awa/jsf"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:c="http://java.sun.com/jstl/core"
+        xmlns:u="http://code.google.com/p/ada-asf/util"
+        xmlns:h="http://java.sun.com/jsf/html">
+  <div class='dashboard-stats'>
+    <ul class='project-dashboard'>
+      <li>
+        <div class='dashboard-title'>
+          Nodes
+        </div>
+        <div class='dashboard-value'>
+          <h:list var="node" value="#{nodeList.nodes}">
+            <div>
+              <div>
+                #{node.name}
+              </div>
+              <div>
+                #{node.recipe_count}
+              </div>
+            </div>
+          </h:list>
+        </div>
+        <div class='dashboard-value'>
+          <div class="progress-bar">
+            <span class="progress-status" style="width: #{statLastBuilds.count == 0 ? 0 : (statLastBuilds.pass.count * 100) / statLastBuilds.count}%"/>
+          </div>
+        </div>
+      </li>
+
+    </ul>
+  </div>
+</ui:composition>

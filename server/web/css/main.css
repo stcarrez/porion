@@ -11,10 +11,6 @@ body.awa {
   padding-left: 20px;
   padding-bottom: 20px;
   font-size: 24px;
-  background-color: #C2EFDD;
-  border-color: #FFFFFF #4CAF91 #4CAF91 #FFFFFF;
-  border-style: solid;
-  border-width: 1px;
 }
 .awa-title dl {
   float: left;
@@ -97,9 +93,13 @@ div.awa-title dd {
 .project-page-grid .project-build-info-title {
     border-bottom: 1px solid #ccc;
     text-align: center;
+    padding-top: 0.2em;
+    padding-bottom: 0.2em;
 }
 .project-page-grid .project-build-info-value {
     text-align: center;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
 }
 
 /* Dashboard */
@@ -125,7 +125,7 @@ div.awa-title dd {
     width: 20%;
     padding-left: 1em;
     padding-right: 1em;
-    border-left: 1px solid #ccc;
+    border: 1px solid #ccc;
 }
 .project-dashboard .dashboard-title {
     float: left;
@@ -149,7 +149,7 @@ div.awa-title dd {
 }
 .progress-status {
     display: inline-block;
-    height: 1em;
+    height: 19px;
     background: green;
 }
 .progress-bar {
@@ -157,7 +157,7 @@ div.awa-title dd {
     position: relative;
     display: block;
     width: 100%;
-    height: 1em;
+    height: 21px;
     border: 1px solid #ccc;
     margin-top: 0.2em;
     margin-bottom: 0.5em;
@@ -172,10 +172,14 @@ div.awa-title dd {
     padding-right: 1%;
 }
 .build-top-title {
-    font-size: 2em;
     float: left;
     padding-left: 1%;
     padding-right: 1%;
+    padding-bottom: 1em;
+}
+.build-top-title .build-project-name {
+    font-size: 2em;
+    padding-bottom: 1em;
 }
 .build-top-info {
     width: 90%;

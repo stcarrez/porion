@@ -24,7 +24,7 @@
   <div class='build-top-title build-#{build.status}'>
     <div class="build-status"/>
     <div class='build-top-info'>
-      <div class='build-info'>
+      <div class='build-info build-project-name'>
         <span>
           Build ##{build.number}
         </span>
@@ -39,8 +39,11 @@
         <span>
           Started on #{build.create_date}
         </span>
+      </div>
+
+      <div class='build-info'>
         <span>
-          on
+          Build node
           <a href="#{contextPath}/nodes/view/#{build.node.name}" title="#{build.node.name}">
             #{build.node.name}
           </a>
@@ -49,7 +52,10 @@
 
       <div class='build-info'>
         <span>
-          Completed in #{build.build_duration}
+          Completed in 
+          <h:outputText value="#{build.build_duration}">
+            <f:converter converterId="millisecondConverter"/>
+          </h:outputText>
         </span>
       </div>
     </div>

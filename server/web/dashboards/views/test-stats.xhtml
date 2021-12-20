@@ -75,7 +75,9 @@
           Duration
         </div>
         <div class='dashboard-value'>
-          #{statLastBuilds.build_duration}
+          <h:outputText value="#{statLastBuilds.build_duration}">
+            <f:converter converterId="millisecondConverter"/>
+          </h:outputText>
         </div>
         <div class='dashboard-value'>
           <div class="progress-bar">

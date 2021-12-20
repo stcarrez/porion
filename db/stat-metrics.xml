@@ -63,4 +63,22 @@
         </sql>
     </query> 
 
+    <query name='stat-build-metrics'>
+        <comment>Statistics about the build metrics (specific build)</comment>
+        <sql>
+          SELECT
+          metric.metric,
+          metric.name,
+          metric.label,
+          SUM(mb.value) AS value,
+          MAX(mb.value) AS max_value,
+          COUNT(mb.id) AS CNT
+          FROM porion_build AS build
+          INNER JOIN porion_build_metric AS mb ON mb.build_id = build.id
+          INNER JOIN porion_metric AS metric ON mb.metric_id = metric.id
+          WHERE build.id = :build_id
+          GROUP BY metric.name
+        </sql>
+    </query> 
+
 </query-mapping>

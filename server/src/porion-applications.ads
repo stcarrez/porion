@@ -35,6 +35,7 @@ with AWA.Converters.Dates;
 with Porion.Dashboards.Modules;
 with Porion.Projects.Modules;
 with Porion.Builds.Modules;
+with Porion.Nodes.Modules;
 package Porion.Applications is
 
    CONFIG_PATH  : constant String := "porion-server";
@@ -93,6 +94,7 @@ private
       Dashboard_Module  : aliased Porion.Dashboards.Modules.Dashboard_Module;
       Project_Module    : aliased Porion.Projects.Modules.Project_Module;
       Build_Module      : aliased Porion.Builds.Modules.Build_Module;
+      Node_Module       : aliased Porion.Nodes.Modules.Node_Module;
    end record;
 
 end Porion.Applications;

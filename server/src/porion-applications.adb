@@ -106,6 +106,10 @@ package body Porion.Applications is
                 Name   => Porion.Builds.Modules.NAME,
                 URI    => "builds",
                 Module => App.Build_Module'Access);
+      Register (App    => App.Self.all'Access,
+                Name   => Porion.Nodes.Modules.NAME,
+                URI    => "nodes",
+                Module => App.Node_Module'Access);
    end Initialize_Modules;
 
 end Porion.Applications;

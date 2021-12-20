@@ -60,3 +60,6 @@ package:
 	cd server && rm -rf $(DIST_DIR)
 	cd server && dynamo dist $(DIST_DIR) package.xml
 	cd server && tar czf ../$(DIST_FILE) $(DIST_DIR)
+
+build-ts:
+	tsc server/web/js/projects.ts

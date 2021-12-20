@@ -1011,7 +1011,18 @@ package body Porion.Resources.Queries is
        & "atus = 2 AND last_build.last_build = 1" & ASCII.LF & "          AND buil"
        & "d.project_id = :project_id" & ASCII.LF & "          GROUP BY metric.name"
        & ASCII.LF & "        </sql>" & ASCII.LF & "    </query> " & ASCII.LF & ASCII.LF
-       & "</query-mapping>" & ASCII.LF;
+       & "    <query name='stat-build-metrics'>" & ASCII.LF & "        <comment>St"
+       & "atistics about the build metrics (specific build)</comment>" & ASCII.LF
+       & "        <sql>" & ASCII.LF & "          SELECT" & ASCII.LF & "          m"
+       & "etric.metric," & ASCII.LF & "          metric.name," & ASCII.LF & "     "
+       & "     metric.label," & ASCII.LF & "          SUM(mb.value) AS value," & ASCII.LF
+       & "          MAX(mb.value) AS max_value," & ASCII.LF & "          COUNT(mb."
+       & "id) AS CNT" & ASCII.LF & "          FROM porion_build AS build" & ASCII.LF
+       & "          INNER JOIN porion_build_metric AS mb ON mb.build_id = build.id"
+       & ASCII.LF & "          INNER JOIN porion_metric AS metric ON mb.metric_id"
+       & " = metric.id" & ASCII.LF & "          WHERE build.id = :build_id" & ASCII.LF
+       & "          GROUP BY metric.name" & ASCII.LF & "        </sql>" & ASCII.LF
+       & "    </query> " & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
 
    type Content_List_Array is array (Natural range <>) of access constant String;

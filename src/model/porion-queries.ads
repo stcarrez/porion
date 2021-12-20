@@ -469,6 +469,8 @@ package Porion.Queries is
 
    Query_Stat_Project_Metrics : constant ADO.Queries.Query_Definition_Access;
 
+   Query_Stat_Build_Metrics : constant ADO.Queries.Query_Definition_Access;
+
    --  --------------------
    --    Information about a build node.
    --  --------------------
@@ -893,6 +895,12 @@ private
                                      File => File_7.File'Access);
    Query_Stat_Project_Metrics : constant ADO.Queries.Query_Definition_Access
    := Def_Metricstat_Stat_Project_Metrics.Query'Access;
+
+   package Def_Metricstat_Stat_Build_Metrics is
+      new ADO.Queries.Loaders.Query (Name => "stat-build-metrics",
+                                     File => File_7.File'Access);
+   Query_Stat_Build_Metrics : constant ADO.Queries.Query_Definition_Access
+   := Def_Metricstat_Stat_Build_Metrics.Query'Access;
 
    package File_8 is
       new ADO.Queries.Loaders.File (Path => "report-nodes.xml",

@@ -39,10 +39,16 @@ package body Porion.Configs is
    --  Get the default configuration path.
    --  ------------------------------
    function Get_Default_Path return String is
-      Home     : constant String := Ada.Environment_Variables.Value ("HOME");
-      Def_Path : constant String := Util.Files.Compose (Home, ".config/porion/porion.properties");
    begin
-      return Def_Path;
+      if not Ada.Environment_Variables.Exists ("HOME") then
+         return "porion.properties";
+      else
+         declare
+            Home     : constant String := Ada.Environment_Variables.Value ("HOME");
+         begin
+            return Util.Files.Compose (Home, ".config/porion/porion.properties");
+         end;
+      end if;
    end Get_Default_Path;
 
    --  ------------------------------

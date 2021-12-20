@@ -1,0 +1,101 @@
+<!-- Information about the build
+  -  Copyright (C) 2021 Stephane Carrez
+  -  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
+  -
+  -  Licensed under the Apache License, Version 2.0 (the "License");
+  -  you may not use this file except in compliance with the License.
+  -  You may obtain a copy of the License at
+  -
+  -      http://www.apache.org/licenses/LICENSE-2.0
+  -
+  -  Unless required by applicable law or agreed to in writing, software
+  -  distributed under the License is distributed on an "AS IS" BASIS,
+  -  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  -  See the License for the specific language governing permissions and
+  -  limitations under the License.
+  -->
+<ui:composition
+        xmlns:awa="http://code.google.com/p/ada-awa/jsf"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:c="http://java.sun.com/jstl/core"
+        xmlns:u="http://code.google.com/p/ada-asf/util"
+        xmlns:h="http://java.sun.com/jsf/html">
+  <div class='build-top-title build-#{build.status}'>
+    <div class="build-status"/>
+    <div class='build-top-info'>
+      <div class='build-info'>
+        <span>
+          Build ##{build.number}
+        </span>
+        <span>
+          <a href="#{contextPath}/projects/view/#{build.project.name}" title="#{build.project.name}">
+            #{build.project.name}
+          </a>
+        </span>
+      </div>
+
+      <div class='build-info'>
+        <span>
+          Started on #{build.create_date}
+        </span>
+        <span>
+          on
+          <a href="#{contextPath}/nodes/view/#{build.node.name}" title="#{build.node.name}">
+            #{build.node.name}
+          </a>
+        </span>
+      </div>
+
+      <div class='build-info'>
+        <span>
+          Completed in #{build.build_duration}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class='build-info'>
+    <ul class='build-info-line'>
+      <li>
+        <div class='porion-label'>
+          Tag #{build.tag}
+        </div>
+        <div class='porion-value'>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div class='build-info'>
+    <ul class='build-execution-time'>
+      <li style='width: 20%'>
+        Git
+      </li>
+      <li style='width: 30%'>
+        Configure
+      </li>
+      <li style='width: 40%'>
+        Build
+      </li>
+      <li style='width: 10%'>
+        Test
+      </li>
+    </ul>
+    <ul class='build-execution-time'>
+      <li style='width: 20%'>
+        4.5
+      </li>
+      <li style='width: 30%'>
+        6.5
+      </li>
+      <li style='width: 40%'>
+        13.4
+      </li>
+      <li style='width: 10%'>
+        2.2
+      </li>
+    </ul>
+  </div>
+
+</ui:composition>

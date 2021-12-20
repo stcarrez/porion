@@ -135,6 +135,11 @@ package body Porion.Commands is
                         Long_Switch => "--no-color",
                         Help   => -("Disable colors in output"));
       GC.Define_Switch (Config => Context.Command_Config,
+                        Output => Context.Quiet'Access,
+                        Switch => "-q",
+                        Long_Switch => "--quiet",
+                        Help => -("quiet execution mode"));
+      GC.Define_Switch (Config => Context.Command_Config,
                         Output => Context.Config_File'Access,
                         Switch => "-c:",
                         Long_Switch => "--config=",
@@ -365,7 +370,9 @@ package body Porion.Commands is
    procedure Notice (Context : in out Context_Type;
                      Message : in String) is
    begin
-      Ada.Text_IO.Put_Line (Message);
+      if not Context.Quiet then
+         Ada.Text_IO.Put_Line (Message);
+      end if;
    end Notice;
 
    procedure Notice (Context : in out Context_Type;
@@ -374,7 +381,9 @@ package body Porion.Commands is
                      Arg2    : in String := "";
                      Arg3    : in String := "") is
    begin
-      Ada.Text_IO.Put_Line (Format (Message, Arg1, Arg2, Arg3));
+      if not Context.Quiet then
+         Ada.Text_IO.Put_Line (Format (Message, Arg1, Arg2, Arg3));
+      end if;
    end Notice;
 
    --  Open the database.

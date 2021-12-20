@@ -73,6 +73,7 @@ private
       Dump              : aliased Boolean := False;
       Zero              : aliased Boolean := False;
       No_Colors         : aliased Boolean := False;
+      Quiet             : aliased Boolean := False;
       Config_File       : aliased GNAT.Strings.String_Access;
       Wallet_File       : aliased GNAT.Strings.String_Access;
       Wallet_Key_File   : aliased GNAT.Strings.String_Access;

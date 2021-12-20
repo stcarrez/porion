@@ -45,6 +45,22 @@
       </div>
     </div>
   </div>
+  <div id="project-lang-graph" class='porion-graph'>
+    <u:script>
+    $(function() {
+    var series = [];
+    var pos = 1;
+    var ticks = [];
+    <h:list var="lang" value="#{project.metrics.cloc}">
+      series.push({label: "#{lang.label}", data: [[#{lang.sum_value}, pos]] });
+      ticks.push([pos, "#{lang.label}"]);
+      pos++;
+    </h:list>
+
+    new Porion.BarGraph('project-lang-graph', '', series, ticks);
+    });
+    </u:script>
+  </div>
 
   <div class='build-info'>
     <ul class='build-info-line'>

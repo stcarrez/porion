@@ -88,7 +88,6 @@ div.awa-title dd {
 .project-page-grid .project-build-info {
     float: left;
     width: 100%;
-    background: #eee;
 }
 .project-page-grid .project-build-info li {
     float: left;
@@ -165,3 +164,100 @@ div.awa-title dd {
     text-align: left;
 }
 
+/* Build info */
+.build-info {
+    float: left;
+    width: 100%;
+    padding-left: 1%;
+    padding-right: 1%;
+}
+.build-top-title {
+    font-size: 2em;
+    float: left;
+    padding-left: 1%;
+    padding-right: 1%;
+}
+.build-top-info {
+    width: 90%;
+    float: left;
+}
+.build-top-title span {
+    padding-right: 2em;
+}
+.build-BUILD_PASS .build-status {
+    float: left;
+    padding-right: 0;
+    width: 32px;
+    height: 32px;
+    background-color: #00C000;
+}
+.build-info-line {
+    float: left;
+    width: 100%;
+    list-style-type: none;
+    border-size: 1px;
+}
+.build-info-line li {
+    float: left;
+    width: 20%;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+.porion-label {
+    text-align: center;
+    font-size: 1.2em;
+}
+.build-info .porion-label {
+    float: left;
+    width: 100%;
+    text-align: center;
+    border-bottom-size: 3px;
+}
+.project-dashboard .dashboard-value {
+    float: left;
+    width: 100%;
+    text-align: center;
+}
+.dashboard-cloc {
+    overflow: hidden;
+    text-align: left;
+    height: 1em;
+}
+.project-dashboard .value {
+    float: left;
+    width: 10%;
+}
+.build-execution-time {
+    float: left;
+    width: 100%;
+}
+.build-execution-time li {
+    list-style-type: none;
+    float: left;
+    text-align: center;
+    border-left: 1px solid red;
+}
+.project-graph {
+    float: left;
+    width: 100%;
+    padding-left: 1%;
+    padding-right: 1%;
+    background: #424342;
+}
+#project-lang-graph, #graph-month, #graph-total {
+    float: left;
+    width: 350px;
+    height: 150px;
+}
+
+#project-lang-graph {
+    float: left;
+    width: 350px;
+    height: 150px;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+.flot-y-axis {
+  fill: white;
+}

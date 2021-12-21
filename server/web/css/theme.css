@@ -212,4 +212,11 @@
     	max-width: 530px;
     	min-width: 320px;
     }
+    .project-dashboard li {
+        width: 100%;
+    }
+    .build-info-line li,
+    .project-page-grid {
+        width: 96%;
+    }
 }

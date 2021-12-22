@@ -9,6 +9,7 @@ with "@ADO_DIR@ado_sqlite";
 with "@AWA_DIR@awa";
 with "@AWA_DIR@awa_mail";
 with "@AWA_DIR@awa_setup";
+with "openapi_server";
 
 with "../porion_lib";
 project Porion_Server is

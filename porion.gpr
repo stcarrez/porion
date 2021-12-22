@@ -21,6 +21,8 @@ aggregate project Porion is
                          "awa/ada-asf",
                          "awa/ada-wiki/.alire",
                          "awa/ada-wiki",
+                         "awa/ada-wiki/.alire",
+                         "awa/openapi-ada/.alire",
                          "awa/.alire",
                          "awa/awa");
 

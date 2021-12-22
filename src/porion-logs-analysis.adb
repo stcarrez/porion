@@ -37,8 +37,15 @@ package body Porion.Logs.Analysis is
             return;
          end if;
       end loop;
-      Result.Level := LOG_UNKNOWN;
       Result.Drop := False;
+      if Line'Length = 0 then
+         Result.Level := LOG_DEBUG;
+         if not Context.Levels (LOG_DEBUG) then
+            Result.Drop := True;
+         end if;
+      else
+         Result.Level := LOG_UNKNOWN;
+      end if;
    end Analyse;
 
    --  ------------------------------

@@ -74,6 +74,11 @@ package body Porion.Configs is
       end if;
    end Initialize;
 
+   procedure Initialize (Config : in Config_Type) is
+   begin
+      Cfg := Config;
+   end Initialize;
+
    --  ------------------------------
    --  Save the configuration.
    --  ------------------------------

@@ -35,6 +35,7 @@ package Porion.Configs is
 
    --  Initialize the configuration.
    procedure Initialize (Path : in String);
+   procedure Initialize (Config : in Config_Type);
 
    --  Get the configuration parameter.
    function Get (Name : in String) return String;

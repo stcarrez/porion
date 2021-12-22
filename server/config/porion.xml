@@ -25,4 +25,9 @@
     <url-pattern>/index.html</url-pattern>
   </url-policy>
 
+  <filter-mapping>
+    <filter-name>service</filter-name>
+    <url-pattern>/api/v1/*</url-pattern>
+  </filter-mapping>
+
 </module>

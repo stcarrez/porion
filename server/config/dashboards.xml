@@ -26,6 +26,11 @@
     <managed-bean-scope>request</managed-bean-scope>
   </managed-bean>
 
+  <servlet-mapping>
+    <servlet-name>api</servlet-name>
+    <url-pattern>/api/*</url-pattern>
+  </servlet-mapping>
+
   <filter-mapping>
     <filter-name>service</filter-name>
     <url-pattern>/dashboards/*.html</url-pattern>

@@ -16,10 +16,14 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
+with AWA.Applications;
 with AWA.Modules.Beans;
 with AWA.Modules.Get;
 with Util.Log.Loggers;
+with Servlet.Rest;
+with Servlet.Core;
 with Porion.Builds.Beans;
+with Porion.Builds.Rest;
 package body Porion.Builds.Modules is
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Builds.Module");
@@ -44,7 +48,7 @@ package body Porion.Builds.Modules is
 
       AWA.Modules.Module (Plugin).Initialize (App, Props);
 
-      --  Add here the creation of manager instances.
+      Servlet.Rest.Register (App.all, Porion.Builds.Rest.API_Get_Build_Log.Definition);
    end Initialize;
 
    --  ------------------------------

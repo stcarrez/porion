@@ -54,7 +54,7 @@ div.awa-title dd {
 
 .project-page-grid {
     float: left;
-    width: 24%;
+    width: 32%;
     border: 1px solid #ccc;
     margin: 5px;
 }
@@ -162,6 +162,12 @@ div.awa-title dd {
     height: 19px;
     background: green;
 }
+.progress-status-vertical {
+    display: inline-block;
+    background: green;
+    width: 100%;
+    vertical-align: bottom;
+}
 .progress-bar {
     float: left;
     position: relative;
@@ -226,6 +232,65 @@ div.awa-title dd {
     width: 100%;
     text-align: center;
     border-bottom-size: 3px;
+}
+/* Build logs */
+.build-log {
+    float: left;
+    width: 98%;
+    padding-left: 1%;
+    padding-right: 1%;
+    margin-left: 1%;
+    margin-right: 1%;
+    border: 2px solid black;
+}
+.build-log-header {
+    float: left;
+    width: 100%;
+    border-bottom: 2px solid black;
+    padding-bottom: 0.5em;
+    margin-bottom: 0.5em;
+    margin-top: 0.5em;
+}
+.build-log-header li {
+    list-style-type: none;
+    float: left;
+    padding-left: 1em;
+    padding-right: 1em;
+    border-radius: 0.5em;
+}
+.log-line, .log-line-number, .log-content {
+    float: left;
+}
+.log-line {
+    width: 100%;
+}
+.log-line-number {
+    width: 3em;
+}
+.log-level-porion {
+    color: yellow;
+}
+.log-level-info {
+    color: grey;
+}
+.log-level-error {
+    color: red;
+}
+.log-level-warning {
+    color: lightblue;
+}
+.build-show-warning .log-level-debug,
+.build-show-warning .log-level-unknown,
+.build-show-warning .log-level-info,
+.build-show-info .log-level-unkown,
+.build-show-info .log-level-debug {
+    display: none;
+}
+.build-show-info #build-log-show-info,
+.build-show-warning #build-log-show-warning,
+.build-show-all #build-log-show-all {
+    font-weight: bold;
+    background: #888;
 }
 .project-dashboard .dashboard-value {
     float: left;

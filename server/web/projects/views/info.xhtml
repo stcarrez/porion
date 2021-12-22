@@ -15,12 +15,13 @@
   -  limitations under the License.
   -->
 <ui:composition
-        xmlns:awa="http://code.google.com/p/ada-awa/jsf"
-        xmlns:ui="http://java.sun.com/jsf/facelets"
-        xmlns:f="http://java.sun.com/jsf/core"
-        xmlns:c="http://java.sun.com/jstl/core"
-        xmlns:u="http://code.google.com/p/ada-asf/util"
-        xmlns:h="http://java.sun.com/jsf/html">
+  xmlns:awa="http://code.google.com/p/ada-awa/jsf"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:c="http://java.sun.com/jstl/core"
+  xmlns:u="http://code.google.com/p/ada-asf/util"
+  xmlns:w="http://code.google.com/p/ada-asf/widget"
+  xmlns:h="http://java.sun.com/jsf/html">
   <div class='build-top-title build-#{build.status}'>
     <div class="build-status"/>
     <div class='build-top-info'>
@@ -74,9 +75,7 @@
           </h:outputText> %
         </div>
         <div class='dashboard-value'>
-          <div class="progress-bar">
-            <span class="progress-status" style="width: #{project.project.build_progress / 10}%"/>
-          </div>
+          <w:progress value="#{project.project.build_progress}" maxValue="1000" />
         </div>
       </li>
 
@@ -90,9 +89,7 @@
           </h:outputText> %
         </div>
         <div class='dashboard-value'>
-          <div class="progress-bar">
-            <span class="progress-status" style="width: #{project.project.build_rate / 10}%"/>
-          </div>
+          <w:progress value="#{project.project.build_rate}" maxValue="1000" />
         </div>
       </li>
 
@@ -106,9 +103,7 @@
           </h:outputText> %
         </div>
         <div class='dashboard-value'>
-          <div class="progress-bar">
-            <span class="progress-status" style="width: #{project.project.build_rate / 10}%"/>
-          </div>
+          <w:progress value="#{project.project.build_rate}" maxValue="1000" />
         </div>
       </li>
 
@@ -122,9 +117,7 @@
           </h:outputText> %
         </div>
         <div class='dashboard-value'>
-          <div class="progress-bar">
-            <span class="progress-status" style="width: #{project.metrics.lines.count == 0 ? 0 : project.metrics.lines.sum_value / (10 * project.metrics.lines.count)}%"/>
-          </div>
+          <w:progress value="#{project.metrics.lines.sum_value}" maxValue="#{project.metrics.lines.count * 1000}" />
         </div>
       </li>
     <li>
@@ -137,9 +130,7 @@
           </h:outputText> %
         </div>
         <div class='dashboard-value'>
-          <div class="progress-bar">
-            <span class="progress-status" style="width: #{project.metrics.functions.count == 0 ? 0 : project.metrics.functions.sum_value / (10 * project.metrics.functions.count)}%"/>
-          </div>
+          <w:progress value="#{project.metrics.functions.sum_value}" direction='vertical' maxValue="#{project.metrics.functions.count * 1000}" />
         </div>
       </li>
     </ul>

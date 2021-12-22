@@ -1,8 +1,10 @@
-<ui:composition xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:c="http://java.sun.com/jstl/core"
-                template="/WEB-INF/layouts/layout.xhtml">
+<ui:composition
+  xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:u="http://code.google.com/p/ada-asf/util"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:c="http://java.sun.com/jstl/core"
+  template="/WEB-INF/layouts/layout.xhtml">
   <ui:param name="title" value="#{layoutMsg.homePageTitle}" />
   <ui:param name="pageStyle" value="page-build"/>
   <!-- Main page body -->
@@ -11,7 +13,31 @@
       <f:viewAction action='#{build.load}'/>
     </f:metadata>
     <div id='awa-content'>
-        <ui:include src="views/info.xhtml"/>
-     </div>
+      <ui:include src="views/info.xhtml"/>
+      <ui:include src="lists/build-steps.xhtml"/>
+      <div id='build-log' class='build-log build-show-warning'>
+        <div class='build-log-header'>
+          <ul>
+            <li id='build-log-show-all'>
+              Show all
+            </li>
+            <li id='build-log-show-info'>
+              Info
+            </li>
+            <li id='build-log-show-warning'>
+              Warnings
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <u:script>
+    $(function() {
+    new Porion.BuildLog({container: 'build-log', btnShowAll: 'build-log-show-all', btnShowInfo: 'build-log-show-info', btnShowWarning: 'build-log-show-warning'}, '#{build.ident}');
+});
+    </u:script>
+  </ui:define>
+  <ui:define name="pageScript">
+    <script type="text/javascript" src="#{contextPath}/js/builds.js"></script>
   </ui:define>
 </ui:composition>

@@ -15,12 +15,13 @@
   -  limitations under the License.
   -->
 <ui:composition
-        xmlns:awa="http://code.google.com/p/ada-awa/jsf"
-        xmlns:ui="http://java.sun.com/jsf/facelets"
-        xmlns:f="http://java.sun.com/jsf/core"
-        xmlns:c="http://java.sun.com/jstl/core"
-        xmlns:u="http://code.google.com/p/ada-asf/util"
-        xmlns:h="http://java.sun.com/jsf/html">
+  xmlns:awa="http://code.google.com/p/ada-awa/jsf"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:c="http://java.sun.com/jstl/core"
+  xmlns:u="http://code.google.com/p/ada-asf/util"
+  xmlns:w="http://code.google.com/p/ada-asf/widget"
+  xmlns:h="http://java.sun.com/jsf/html">
   <div class='dashboard-list'>
     <h:panelGroup rendered="#{projectList.count == 0}">
         #{porionMsg.porion_no_project_message}

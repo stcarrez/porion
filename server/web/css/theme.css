@@ -2,12 +2,9 @@
  * Dark mode support
  */
 @media (prefers-color-scheme: dark) {
-  body, #awa-page, div.blog-post, .wiki-page-container, #blog-post-list, #blog-comment-list,
+  body, #awa-page, .wiki-page-container,
   #wiki-page-list, #document-list-editor, #wiki-page-create {
     background-color: #2b2b2b;
-    color: #ccc;
-  }
-  div.comment-COMMENT_PUBLISHED,  div.blog-post-info h2 {
     color: #ccc;
   }
   .build-info-line, .project-dashboard {
@@ -27,36 +24,26 @@
       border-bottom-width: 3px;
       border-right-width: 3px;      
   }
+  .build-log {
+      background-color: #4b4b4b;
+  }
 
-  div.post-text a, .blog-post a,
-  dl.vacs-version a, div.vacs-demo a,
+  div.post-text a,
   a.feed,
   div.awa-project a,
-  ul.vacs-list li a,
-  ul.blog-pagination li a,
   .awa-post-more a,
-  .blog-post-add-comment a,
   .tagedit-list li.tagedit-listelement a,
-  div.blog-post div.post-title h2 a, div.post-text a, ul.tag-cloud a {
+  ul.tag-cloud a {
     color: #55A6FF;
   }
   div.post-text a, ul.tag-cloud a {
     color: #55A6FF;
     text-decoration: none;
   }
-  div.blog-post-tag-info {
-      border-color: #6b6b6b;
-  }
-  div.blog-post-tag-info h2 {
-      background-color: #4b4b4b;
-  }
-  dl.vacs-version a:hover, div.vacs-demo a:hover,
   a.feed:hover,
   div.awa-project a:hover,
   .tagedit-list li.tagedit-listelement a:hover,
-  ul.vacs-list li a:hover,
-  ul.blog-pagination li a:hover,
-  div.blog-post div.post-title h2 a:hover, div.post-text a:hover, ul.tag-cloud a:hover,
+  ul.tag-cloud a:hover,
   div.post-text a:hover, .blog-post a:hover {
     color: #58A6FF;
   }
@@ -133,12 +120,6 @@
       background: #3b3b3b;
       color: #ddd;
    }
-   .vacs-about .vacs-openhub {
-      background: #ccc;
-   }
-   .vacs-about .vacs-github {
-      background-image: url(../images/GitHub-Mark-Light-32px.png);
-   }
 }
 @media (prefers-color-scheme: light) {
   .day.light-scheme   { background: white; color:  #555; }
@@ -150,7 +131,7 @@
         padding-left: 5px;
         padding: 5px;
     }
-    #vacs-top, #awa-footer, body {
+    #awa-footer, body {
         background-image: none;
         font-size: 100%;
     }
@@ -183,9 +164,6 @@
     div.awa-project a {
         font-size: 70%;
     }
-    div.container_12 div.vacs-demo {
-        width: 100%;
-    }
     div.awa-side1, div.awa-side2 {
         width: 100%;
         padding: 0;
@@ -194,11 +172,6 @@
 @media screen and (min-width: 960px) {
     #awa-top-nav li {
         width: 20%;
-    }
-}
-@media screen and (max-width: 960px) {
-    div.container_12 div.vacs-demo {
-        width: 100%;
     }
 }
 @media screen and (max-width: 600px) {

@@ -15,12 +15,13 @@
   -  limitations under the License.
   -->
 <ui:composition
-        xmlns:awa="http://code.google.com/p/ada-awa/jsf"
-        xmlns:ui="http://java.sun.com/jsf/facelets"
-        xmlns:f="http://java.sun.com/jsf/core"
-        xmlns:c="http://java.sun.com/jstl/core"
-        xmlns:u="http://code.google.com/p/ada-asf/util"
-        xmlns:h="http://java.sun.com/jsf/html">
+  xmlns:awa="http://code.google.com/p/ada-awa/jsf"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:c="http://java.sun.com/jstl/core"
+  xmlns:u="http://code.google.com/p/ada-asf/util"
+  xmlns:w="http://code.google.com/p/ada-asf/widget"
+  xmlns:h="http://java.sun.com/jsf/html">
   <div class='dashboard-stats'>
     <ul class='project-dashboard'>
       <li>
@@ -34,9 +35,7 @@
           </h:outputText> % OK)
         </div>
         <div class='dashboard-value'>
-          <div class="progress-bar">
-            <span class="progress-status" style="width: #{statLastBuilds.count == 0 ? 0 : (statLastBuilds.pass.count * 100) / statLastBuilds.count}%"/>
-          </div>
+          <w:progress value="#{statLastBuilds.pass.count}" maxValue="#{statLastBuilds.count}" />
         </div>
       </li>
 
@@ -48,9 +47,7 @@
           #{statLastBuilds.pass_count}
         </div>
         <div class='dashboard-value'>
-          <div class="progress-bar">
-            <span class="progress-status" style="width: #{(statLastBuilds.pass_count + statLastBuilds.fail_count) == 0 ? 0 : (statLastBuilds.pass.pass_count * 100) / (statLastBuilds.pass_count + statLastBuilds.fail_count + statLastBuilds.timeout_count)}%"/>
-          </div>
+          <w:progress value="#{statLastBuilds.pass.pass_count}" maxValue="#{(statLastBuilds.pass_count + statLastBuilds.fail_count + statLastBuilds.timeout_count)}" />
         </div>
       </li>
 
@@ -64,9 +61,7 @@
           </h:outputText> %
         </div>
         <div class='dashboard-value'>
-          <div class="progress-bar">
-            <span class="progress-status" style="width: #{metricLastBuilds.lines.count == 0 ? 0 : metricLastBuilds.lines.sum_value / (10 * metricLastBuilds.lines.count)}%"/>
-          </div>
+          <w:progress value="#{metricLastBuilds.lines.sum_value}" maxValue="#{1000 * metricLastBuilds.lines.count}" />
         </div>
       </li>
 
@@ -80,9 +75,7 @@
           </h:outputText>
         </div>
         <div class='dashboard-value'>
-          <div class="progress-bar">
-            <span class="progress-status" style="width: #{metricLastBuilds.lines.count == 0 ? 0 : metricLastBuilds.lines.sum_value / (10 * metricLastBuilds.lines.count)}%"/>
-          </div>
+          <w:progress value="#{metricLastBuilds.lines.sum_value}" maxValue="#{1000 * metricLastBuilds.lines.count}" />
         </div>
       </li>
 

@@ -17,6 +17,7 @@ gprbuild
 
 [log-warning]
 .*[0-9]+: warning:
+.*[0-9]+: \(style\)
 
 [log-error]
 .*[0-9]+: error:

@@ -18,6 +18,7 @@
 with Servlet.Filters.Dump;
 with Servlet.Filters.Cache_Control;
 with Servlet.Core.Files;
+with Servlet.Core.Rest;
 with Servlet.Core.Measures;
 with Servlet.Security.Servlets;
 
@@ -25,6 +26,7 @@ with ASF.Servlets.Faces;
 with ASF.Servlets.Ajax;
 with ASF.Converters.Sizes;
 with ASF.Converters.Durations;
+with ASF.Applications;
 
 with AWA.Users.Servlets;
 with AWA.Users.Modules;
@@ -43,6 +45,13 @@ package Porion.Applications is
 
    type Application is new AWA.Applications.Application with private;
    type Application_Access is access all Application'Class;
+
+   --  Initialize the application configuration properties.
+   --  Properties defined in `Conf` are expanded by using the EL
+   --  expression resolver.
+   overriding
+   procedure Initialize_Config (App  : in out Application;
+                                Conf : in out ASF.Applications.Config);
 
    --  Initialize the servlets provided by the application.
    --  This procedure is called by <b>Initialize</b>.
@@ -75,10 +84,12 @@ private
       Service_Filter     : aliased AWA.Services.Filters.Service_Filter;
       Measures           : aliased Servlet.Core.Measures.Measure_Servlet;
       No_Cache           : aliased Servlet.Filters.Cache_Control.Cache_Control_Filter;
+      API_Servlet        : aliased Servlet.Core.Rest.Rest_Servlet;
 
       --  Authentication servlet and filter.
       Auth               : aliased Servlet.Security.Servlets.Request_Auth_Servlet;
       Verify_Auth        : aliased AWA.Users.Servlets.Verify_Auth_Servlet;
+      --  API_Filter         : aliased AWA.Sysadmin.Filters.Auth_Filter;
 
       --  Converters shared by web requests.
       Rel_Date_Converter : aliased AWA.Converters.Dates.Relative_Date_Converter;

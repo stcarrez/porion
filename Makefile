@@ -63,3 +63,4 @@ package:
 
 build-ts:
 	tsc server/web/js/projects.ts
+	tsc server/web/js/builds.ts

@@ -15,7 +15,7 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-
+with ADO.Queries;
 with AWA.Services.Contexts;
 with Porion.Services;
 package body Porion.Builds.Beans is
@@ -44,6 +44,9 @@ package body Porion.Builds.Beans is
       elsif Name = "metrics" then
          return Util.Beans.Objects.To_Object (Value   => From.Metrics_Bean,
                                               Storage => Util.Beans.Objects.STATIC);
+      elsif Name = "build_steps" then
+         return Util.Beans.Objects.To_Object (Value   => From.Build_Steps_Bean,
+                                              Storage => Util.Beans.Objects.STATIC);
       elsif Name = "ident" then
          return UBO.To_Object (Porion.Projects.To_String (From.Ident));
       else
@@ -71,6 +74,7 @@ package body Porion.Builds.Beans is
                    Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
       Ctx     : constant ASC.Service_Context_Access := ASC.Current;
       Context : Porion.Services.Context_Type;
+      Query   : ADO.Queries.Context;
    begin
       Context.DB := ASC.Get_Master_Session (Ctx);
 
@@ -88,6 +92,10 @@ package body Porion.Builds.Beans is
       Bean.Metrics.Build := Context.Build.Get_Id;
       Bean.Metrics.Load (Outcome);
 
+      Query.Set_Query (Porion.Queries.Query_Build_Recipe_List);
+      Query.Bind_Param ("build_id", Context.Build.Get_Id);
+      Porion.Queries.List (Bean.Build_Steps, Context.DB, Query);
+
       --  Query.Set_Query (Porion.Queries.Query_Stat_Metrics);
       --  Porion.Queries.List (List, Session, Query);
    exception
@@ -102,7 +110,8 @@ package body Porion.Builds.Beans is
    function Create_Build_Bean (Module : in Porion.Builds.Modules.Build_Module_Access)
       return Util.Beans.Basic.Readonly_Bean_Access is
       Object  : constant Build_Bean_Access := new Build_Bean;
-      Metrics : constant Porion.Dashboards.Beans.Stats.Metrics_Bean_Access := Object.Metrics'Access;
+      Metrics : constant Porion.Dashboards.Beans.Stats.Metrics_Bean_Access
+         := Object.Metrics'Access;
    begin
       Object.Module := Module;
       Object.Build_Bean := Object.Build'Access;
@@ -111,6 +120,7 @@ package body Porion.Builds.Beans is
       Object.Branch_Bean := Object.Branch'Access;
       Object.Node_Bean := Object.Node'Access;
       Object.Metrics_Bean := Metrics.all'Access;
+      Object.Build_Steps_Bean := Object.Build_Steps'Access;
       Porion.Dashboards.Beans.Stats.Initialize (Metrics);
       return Object.all'Access;
    end Create_Build_Bean;

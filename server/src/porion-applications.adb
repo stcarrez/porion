@@ -17,12 +17,25 @@
 -----------------------------------------------------------------------
 
 with Util.Log.Loggers;
-
+with Porion.Configs;
 package body Porion.Applications is
 
    use AWA.Applications;
 
    Log     : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion");
+
+   --  ------------------------------
+   --  Initialize the application configuration properties.
+   --  Properties defined in `Conf` are expanded by using the EL
+   --  expression resolver.
+   --  ------------------------------
+   overriding
+   procedure Initialize_Config (App  : in out Application;
+                                Conf : in out ASF.Applications.Config) is
+   begin
+      AWA.Applications.Application (App).Initialize_Config (Conf);
+      Porion.Configs.Initialize (Porion.Configs.Config_Type (Conf));
+   end Initialize_Config;
 
    --  ------------------------------
    --  Initialize the servlets provided by the application.
@@ -42,6 +55,7 @@ package body Porion.Applications is
       App.Add_Servlet (Name => "measures", Server => App.Self.Measures'Access);
       App.Add_Servlet (Name => "auth", Server => App.Self.Auth'Access);
       App.Add_Servlet (Name => "verify-auth", Server => App.Self.Verify_Auth'Access);
+      App.Add_Servlet (Name => "api", Server => App.Self.API_Servlet'Access);
    end Initialize_Servlets;
 
    --  ------------------------------

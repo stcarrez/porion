@@ -62,6 +62,9 @@ package Porion.Projects is
    function To_String (Ident : in Ident_Type) return String with
       Pre => Is_Valid (Ident);
 
+   --  Returns true if the name can be used for a recipe name.
+   function Is_Valid_Recipe (Name : in String) return Boolean;
+
    type Project_Type is record
       Name    : UString;
       Path    : UString;

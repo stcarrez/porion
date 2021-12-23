@@ -20,9 +20,13 @@ with Ada.Directories;
 with Util.Log.Loggers;
 with Util.Files;
 with Util.Strings;
+with Ada.Strings.Maps;
 package body Porion.Projects is
 
    Log     : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Projects");
+
+   Name_Forbidden_Set : constant Ada.Strings.Maps.Character_Set
+      := Ada.Strings.Maps.To_Set ("@~#");
 
    --  ------------------------------
    --  Parse an identification string with the format:
@@ -128,6 +132,14 @@ package body Porion.Projects is
 
       return To_String (Result);
    end To_String;
+
+   --  ------------------------------
+   --  Returns true if the name can be used for a recipe name.
+   --  ------------------------------
+   function Is_Valid_Recipe (Name : in String) return Boolean is
+   begin
+      return (for all C of Name => not Ada.Strings.Maps.Is_In (C, Name_Forbidden_Set));
+   end Is_Valid_Recipe;
 
    --  Load the project description.
    procedure Load_Project (Name    : in String;

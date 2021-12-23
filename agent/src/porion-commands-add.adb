@@ -91,6 +91,11 @@ package body Porion.Commands.Add is
       Ident   : Porion.Projects.Ident_Type;
       Recipes : Porion.Builds.Models.Recipe_Vector;
    begin
+      if not Porion.Projects.Is_Valid_Recipe (Command.Recipe.all) then
+         Commands.Error (-("invalid recipe name '{0}'"), Command.Recipe.all);
+         return;
+      end if;
+
       if Source'Length > 0 then
          begin
             Ident := Porion.Projects.Parse (Source);

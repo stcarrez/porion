@@ -17,18 +17,30 @@
 -----------------------------------------------------------------------
 
 with Swagger.Servers;
-with Swagger.Servers.Operation;
+with Porion.Services;
+with Porion.Projects.Operation;
 package Porion.Builds.Rest is
 
    procedure Get_Build_Log
      (Req     : in out Swagger.Servers.Request'Class;
       Reply   : in out Swagger.Servers.Response'Class;
       Stream  : in out Swagger.Servers.Output_Stream'Class;
-      Context : in out Swagger.Servers.Context_Type);
+      Context : in out Porion.Services.Context_Type);
+
+   procedure Jenkins_Get_Last_Completed_Build
+     (Req     : in out Swagger.Servers.Request'Class;
+      Reply   : in out Swagger.Servers.Response'Class;
+      Stream  : in out Swagger.Servers.Output_Stream'Class;
+      Context : in out Porion.Services.Context_Type);
 
    package API_Get_Build_Log is
-     new Swagger.Servers.Operation (Handler => Get_Build_Log,
+     new Porion.Projects.Operation (Handler => Get_Build_Log,
                                     Method  => Swagger.Servers.GET,
                                     URI     => "/api/v1/builds/{buildId}/logs");
+
+   package API_Jenkins_Get_Last_Completed_Build is
+     new Porion.Projects.Operation (Handler => Jenkins_Get_Last_Completed_Build,
+                                    Method  => Swagger.Servers.GET,
+                                    URI     => "/api/v1/jenkins/{project}/lastCompletedBuild/api/json");
 
 end Porion.Builds.Rest;

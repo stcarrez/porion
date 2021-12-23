@@ -30,67 +30,61 @@ package body Porion.Builds.Rest is
      (Req     : in out Swagger.Servers.Request'Class;
       Reply   : in out Swagger.Servers.Response'Class;
       Stream  : in out Swagger.Servers.Output_Stream'Class;
-      Context : in out Swagger.Servers.Context_Type) is
-      Module   : constant Builds.Modules.Build_Module_Access := Modules.Get_Build_Module;
-      Prj_Ctx  : Porion.Services.Context_Type;
-      Ident    : Porion.Projects.Ident_Type;
-      Build_Id : constant String := Req.Get_Path_Parameter (1);
+      Context : in out Porion.Services.Context_Type) is
+      use Porion.Logs.Analysis;
+
+      Rules  : constant String := Context.Recipe.Get_Filter_Rules;
+      Ctx    : Porion.Logs.Analysis.Analyser_Type;
+      Levels : Porion.Logs.Analysis.Level_Map;
+      List   : Porion.Logs.Analysis.Line_Vector;
+      Dir    : constant String := Builds.Services.Get_Log_Directory (Context);
+      Path   : constant String := Ada.Directories.Compose (Dir, "build.log");
    begin
-      Ident := Porion.Projects.Parse (Build_Id);
-      Prj_Ctx.DB := Module.Get_Master_Session;
-      Prj_Ctx.Load (Ident);
-      declare
-         use Porion.Logs.Analysis;
+      if not Porion.Projects.Has_Build (Context.Ident) then
+         raise Porion.Services.Not_Found;
+      end if;
 
-         Rules  : constant String := Prj_Ctx.Recipe.Get_Filter_Rules;
-         Ctx    : Porion.Logs.Analysis.Analyser_Type;
-         Levels : Porion.Logs.Analysis.Level_Map;
-         List   : Porion.Logs.Analysis.Line_Vector;
-         Dir    : constant String := Builds.Services.Get_Log_Directory (Prj_Ctx);
-         Path   : constant String := Ada.Directories.Compose (Dir, "build.log");
-      begin
-         Levels := (others => True);
-         Porion.Logs.Analysis.Set_Rules (Ctx, Rules);
-         Porion.Logs.Analysis.Set_Filter (Ctx, Levels);
-         Porion.Logs.Analysis.Read (Ctx, Path, List);
-         Stream.Start_Array ("");
-         for Line of List loop
-            Stream.Start_Entity ("log");
-            Stream.Write_Attribute ("number", Line.Number);
-            case Line.Level is
-               when LOG_UNKNOWN =>
-                  Stream.Write_Attribute ("level", "unkown");
+      Levels := (others => True);
+      Porion.Logs.Analysis.Set_Rules (Ctx, Rules);
+      Porion.Logs.Analysis.Set_Filter (Ctx, Levels);
+      Porion.Logs.Analysis.Read (Ctx, Path, List);
+      Stream.Start_Array ("");
+      for Line of List loop
+         Stream.Start_Entity ("log");
+         Stream.Write_Attribute ("number", Line.Number);
+         case Line.Level is
+            when LOG_UNKNOWN =>
+               Stream.Write_Attribute ("level", "unkown");
 
-               when LOG_PORION =>
-                  Stream.Write_Attribute ("level", "porion");
+            when LOG_PORION =>
+               Stream.Write_Attribute ("level", "porion");
 
-               when LOG_FATAL =>
-                  Stream.Write_Attribute ("level", "fatal");
+            when LOG_FATAL =>
+               Stream.Write_Attribute ("level", "fatal");
 
-               when LOG_ERROR =>
-                  Stream.Write_Attribute ("level", "error");
+            when LOG_ERROR =>
+               Stream.Write_Attribute ("level", "error");
 
-               when LOG_WARNING =>
-                  Stream.Write_Attribute ("level", "warning");
+            when LOG_WARNING =>
+               Stream.Write_Attribute ("level", "warning");
 
-               when LOG_CONTEXT =>
-                  Stream.Write_Attribute ("level", "context");
+            when LOG_CONTEXT =>
+               Stream.Write_Attribute ("level", "context");
 
-               when LOG_INFO =>
-                  Stream.Write_Attribute ("level", "info");
+            when LOG_INFO =>
+               Stream.Write_Attribute ("level", "info");
 
-               when LOG_TRACE =>
-                  Stream.Write_Attribute ("level", "trace");
+            when LOG_TRACE =>
+               Stream.Write_Attribute ("level", "trace");
 
-               when LOG_DEBUG =>
-                  Stream.Write_Attribute ("level", "debug");
+            when LOG_DEBUG =>
+               Stream.Write_Attribute ("level", "debug");
 
-            end case;
-            Stream.Write_Entity ("content", Line.Content);
-            Stream.End_Entity ("log");
-         end loop;
-         Stream.End_Array ("");
-      end;
+         end case;
+         Stream.Write_Entity ("content", Line.Content);
+         Stream.End_Entity ("log");
+      end loop;
+      Stream.End_Array ("");
 
    exception
       when E : others =>
@@ -98,5 +92,18 @@ package body Porion.Builds.Rest is
          raise;
 
    end Get_Build_Log;
+
+   procedure Jenkins_Get_Last_Completed_Build
+     (Req     : in out Swagger.Servers.Request'Class;
+      Reply   : in out Swagger.Servers.Response'Class;
+      Stream  : in out Swagger.Servers.Output_Stream'Class;
+      Context : in out Porion.Services.Context_Type) is
+   begin
+      Stream.Start_Document;
+      Stream.Start_Entity ("");
+      Stream.Write_Entity ("color", "blue");
+      Stream.End_Entity ("");
+      Stream.End_Document;
+   end Jenkins_Get_Last_Completed_Build;
 
 end Porion.Builds.Rest;

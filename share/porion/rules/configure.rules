@@ -1,6 +1,9 @@
 [command]
 ./configure --prefix=#{install}
 
+[log-error]
+^configure: error:.*
+
 [log-ignore]
 ^config.status: creating .*
 ^configure: creating .*

@@ -62,11 +62,11 @@ package body Porion.Commands.Drivers is
       Pos : constant Natural := Util.Strings.Index (Locale, '_');
    begin
       if Pos > 0 then
-         return Dir & Locale (Locale'First .. Pos - 1) & "/" & Name & ".txt";
+         return Util.Files.Compose (Dir, Locale (Locale'First .. Pos - 1) & "/" & Name & ".txt");
       elsif Locale'Length > 0 then
-         return Dir & Locale & "/" & Name & ".txt";
+         return Util.Files.Compose (Dir, Locale & "/" & Name & ".txt");
       else
-         return Dir & "en/" & Name & ".txt";
+         return Util.Files.Compose (Dir, "en/" & Name & ".txt");
       end if;
    end Get_Help;
 

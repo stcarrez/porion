@@ -183,5 +183,8 @@ make install
 
 # Documents
 
-* [Porion User Guide](https://porion.readthedocs.io/en/latest/) [PDF](https://gitlab.com/stcarrez/porion/blob/master/docs/porion-book.pdf)
 * Man page: [porion (1)](https://gitlab.com/stcarrez/porion/blob/master/docs/porion.md)
+
+# Sites Using Porion
+
+* [Porion Build Manager](https://porion.vacs.fr/porion/index.html)

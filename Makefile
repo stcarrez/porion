@@ -64,3 +64,11 @@ package:
 build-ts:
 	tsc server/web/js/projects.ts
 	tsc server/web/js/builds.ts
+
+install::
+	mkdir -p $(DESTDIR)$(prefix)/bin
+	$(INSTALL) bin/porion $(DESTDIR)$(prefix)/bin/porion
+	mkdir -p $(DESTDIR)$(prefix)/share/man/man1
+	$(INSTALL) docs/porion.1 $(DESTDIR)$(prefix)/share/man/man1/porion.1
+	(cd share && tar --exclude='*~' -cf - .) \
+       | (cd $(DESTDIR)$(prefix)/share/ && tar xf -)

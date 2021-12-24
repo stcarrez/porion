@@ -18,11 +18,8 @@
 with Util.Properties;
 package Porion.Configs is
 
-   VERSION   : constant String := "0.1.0";
-   RELEASE   : constant String := "Porion " & "0.1.0";
-   PREFIX    : constant String := "/build/local-gnat-2021";
    SHARE_DIR : constant String := "/share/porion/";
-   RESOURCES : constant String := "/share/porion/resources";
+   RESOURCES : constant String := "resources";
 
    WORKSPACE_DIR_NAME     : constant String := "workspace_dir";
    PROJECT_DIR_NAME       : constant String := "project_dir";

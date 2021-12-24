@@ -78,14 +78,15 @@ package body Porion.Testsuite is
       Schema : constant Porion.Resources.Content_Access
         := Porion.Resources.Schema.Get_Content ("create-porion_agent-sqlite");
    begin
+      Porion.Configs.Set (Porion.Configs.WORKSPACE_DIR_NAME, Path);
       if Ada.Directories.Exists (Path) and Remove then
          Ada.Directories.Delete_Tree (Path);
       end if;
 
       if not Ada.Directories.Exists (Path) then
          Ada.Directories.Create_Path (Path);
+         Ada.Directories.Create_Path (Porion.Configs.Get_Config_Directory);
       end if;
-      Porion.Configs.Set (Porion.Configs.WORKSPACE_DIR_NAME, Path);
       Service.Open (Porion.Resources.Queries.Get_Content'Access, Schema);
    end Create;
 

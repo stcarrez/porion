@@ -25,6 +25,7 @@ with Util.Strings;
 with Util.Log.Loggers;
 with Util.Systems.Os;
 with Util.Properties.Basic;
+with Porion.Configs.Setup;
 package body Porion.Configs is
 
    --  The logger
@@ -159,18 +160,20 @@ package body Porion.Configs is
    --  Get the share directory path which contains other porion installation files.
    --  ------------------------------
    function Get_Share_Directory return String is
-      Path : constant String := Porion.Configs.PREFIX & Porion.Configs.SHARE_DIR;
+      Name    : constant String := Ada.Command_Line.Command_Name;
+      Bin_Dir : constant String := Ada.Directories.Containing_Directory (Name);
    begin
-      if Ada.Directories.Exists (Path) then
-         return Path;
+      if Bin_Dir /= "." then
+         declare
+            Dir  : constant String := Ada.Directories.Containing_Directory (Bin_Dir);
+            Path : constant String := Util.Files.Compose (Dir, Configs.SHARE_DIR);
+         begin
+            if Ada.Directories.Exists (Path) then
+               return Path;
+            end if;
+         end;
       end if;
-      declare
-         Name : constant String := Ada.Command_Line.Command_Name;
-         Path : constant String := Ada.Directories.Containing_Directory (Name);
-         Dir  : constant String := Ada.Directories.Containing_Directory (Path);
-      begin
-         return Dir & Porion.Configs.SHARE_DIR;
-      end;
+      return Porion.Configs.Setup.PREFIX & Porion.Configs.SHARE_DIR;
    end Get_Share_Directory;
 
    --  ------------------------------
@@ -181,7 +184,7 @@ package body Porion.Configs is
       if Exists (WORKSPACE_DIR_NAME) then
          return Get (WORKSPACE_DIR_NAME);
       else
-         return PREFIX;
+         return Porion.Configs.Setup.PREFIX;
       end if;
    end Get_Porion_Directory;
 

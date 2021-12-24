@@ -99,23 +99,6 @@ The steps to use Porion are the following:
 * `step`:     control the build steps
 
 
-# Porion Debian Binaries
-
-Ubuntu 20.04 packages are available to help you install the `porion` command
-more easily.  You can configure your Ubuntu system as follows:
-
-```
-wget -O - https://apt.vacs.fr/apt.vacs.fr.gpg.key | sudo apt-key add -
-sudo add-apt-repository "deb https://apt.vacs.fr/ubuntu-focal focal main"
-```
-
-And then install the `porion` package:
-
-```
-sudo apt-get install porion
-```
-
-
 # Building Porion
 
 To build `porion` you will need the GNAT Ada compiler, either
@@ -128,7 +111,7 @@ AdaCore GNAT Community 2021 edition.
 
 Install the following packages:
 ```
-sudo apt-get install -y make gnat-7 gprbuild git gnupg2
+sudo apt-get install -y make gnat gprbuild git libsqlite3-dev
 ```
 
 ### FreeBSD 12
@@ -136,20 +119,8 @@ sudo apt-get install -y make gnat-7 gprbuild git gnupg2
 Install the following packages:
 
 ```
-pkg install gmake gcc6-aux-20180516_1,1 gprbuild-20160609_1 git gnupg-2.2.17_2
-```
-
-### Windows
-
-Get the Ada compiler from [AdaCore Download](https://www.adacore.com/download)
-site and install.
-
-Install the following packages:
-
-```
-pacman -S git
-pacman -S make
-pacman -S base-devel --needed
+pkg install gmake gcc6-aux-20180516_1,1 gprbuild-20160609_1 git
+pkg install lzma-18.05 curl-7.66.0 xmlada-17.0.0_1 aws-17.1_2 sqlite3-3.29.0
 ```
 
 ## Getting the sources
@@ -158,7 +129,7 @@ The project uses a sub-module to help you in the integration and build
 process.  You should checkout the project with the following commands:
 
 ```
-git clone --recursive git@gitlab.com:stcarrez/porion.git
+git clone --recursive https://gitlab.com/stcarrez/porion.git
 cd porion
 ```
 

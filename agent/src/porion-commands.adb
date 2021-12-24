@@ -24,7 +24,7 @@ with Util.Commands.Parsers.GNAT_Parser;
 with PT.Drivers.Texts;
 with PT.Colors;
 with PT.Texts;
-with Porion.Configs;
+with Porion.Configs.Setup;
 with Porion.Executors;
 with Porion.Builds.Models;
 with Porion.Builds.Services;
@@ -103,7 +103,7 @@ package body Porion.Commands is
    overriding
    procedure Initialize (Context : in out Context_Type) is
    begin
-      Intl.Initialize ("porion", Porion.Configs.PREFIX & "/share/locale");
+      Intl.Initialize ("porion", Porion.Configs.Setup.PREFIX & "/share/locale");
 
       Context.Worker_Count := Positive (System.Multiprocessors.Number_Of_CPUs);
 
@@ -313,7 +313,7 @@ package body Porion.Commands is
       Porion.Configs.Initialize (Context.Config_File.all);
 
       if Context.Version then
-         Ada.Text_IO.Put_Line (Porion.Configs.RELEASE);
+         Ada.Text_IO.Put_Line (Porion.Configs.Setup.RELEASE);
          return;
       end if;
 

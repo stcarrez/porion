@@ -17,7 +17,6 @@
 -----------------------------------------------------------------------
 with Ada.Text_IO;
 with Ada.Directories;
-with Ada.Command_Line;
 with Util.Files;
 with Util.Strings;
 with Porion.Configs;
@@ -43,17 +42,9 @@ package body Porion.Commands.Drivers is
    end Setup;
 
    function Get_Resources_Directory return String is
+      Path : constant String := Porion.Configs.Get_Share_Directory;
    begin
-      if Ada.Directories.Exists (Porion.Configs.PREFIX & Porion.Configs.RESOURCES) then
-         return Porion.Configs.PREFIX & Porion.Configs.RESOURCES;
-      end if;
-      declare
-         Name : constant String := Ada.Command_Line.Command_Name;
-         Path : constant String := Ada.Directories.Containing_Directory (Name);
-         Dir  : constant String := Ada.Directories.Containing_Directory (Path);
-      begin
-         return Dir & Porion.Configs.RESOURCES;
-      end;
+      return Util.Files.Compose (Path, Porion.Configs.RESOURCES);
    end Get_Resources_Directory;
 
    function Get_Help (Dir    : in String;

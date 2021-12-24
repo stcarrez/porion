@@ -39,7 +39,7 @@ ROOTDIR=.
 # Build executables for all mains defined by the project.
 build-test::
 
-build::
+build:: src/porion-configs-setup.ads
 	$(GNATMAKE) $(GPRFLAGS) -p -P "$(GPRPATH)" $(MAKE_ARGS)
 
 server build-server::
@@ -64,6 +64,10 @@ package:
 build-ts:
 	tsc server/web/js/projects.ts
 	tsc server/web/js/builds.ts
+
+src/porion-configs-setup.ads:   Makefile.conf src/porion-configs-setup.gpb
+	gnatprep -DPREFIX='"${prefix}"' -DVERSION='"$(VERSION)"' \
+		  src/porion-configs-setup.gpb src/porion-configs-setup.ads
 
 install::
 	mkdir -p $(DESTDIR)$(prefix)/bin

@@ -1,3 +1,4 @@
+with "porion_config";
 aggregate project Porion is
 
    for Project_Path use ("awa/ada-util/.alire",
@@ -9,8 +10,11 @@ aggregate project Porion is
                          "awa/ada-el",
                          "awa/ada-keystore/.alire",
                          "awa/ada-keystore",
-                         "awa/ada-ado/.alire",
                          "awa/ada-ado/.alire/sqlite",
+                         "awa/ada-ado/.alire/mysql",
+                         "awa/ada-ado/.alire/postgresql",
+                         "awa/ada-ado/.alire/all",
+                         "awa/ada-ado/.alire",
                          "awa/ada-ado",
                          "awa/ada-security/.alire",
                          "awa/ada-security",
@@ -23,11 +27,34 @@ aggregate project Porion is
                          "awa/ada-wiki",
                          "awa/ada-wiki/.alire",
                          "awa/openapi-ada/.alire",
+                         "awa/dynamo/.alire",
                          "awa/.alire",
-                         "awa/awa");
+                         "awa/awa",
+                         "resource-embedder");
 
    for Create_Missing_Dirs use "True";
 
+   Build_Are    : Porion_Config.Yes_No := external ("BUILD_ARE", "yes");
+   Build_Dynamo : Porion_Config.Yes_No := external ("BUILD_DYNAMO", "yes");
+
    for Project_Files use ("porion_lib.gpr", "agent/porion_agent.gpr", "porion_tests.gpr", "server/porion_server.gpr");
+
+   case Build_Are is
+      when "yes" =>
+         for Project_Files use Project'Project_Files & ("resource-embedder/are_tool.gpr");
+
+      when others =>
+         null;
+
+   end case;
+
+   case Build_Dynamo is
+      when "yes" =>
+         for Project_Files use Project'Project_Files & ("awa/dynamo/.alire/dynamo.gpr");
+
+      when others =>
+         null;
+
+   end case;
 
 end Porion;

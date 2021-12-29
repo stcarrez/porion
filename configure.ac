@@ -78,6 +78,20 @@ AC_SUBST(SERVLET_DIR)
 AC_SUBST(ASF_DIR)
 AC_SUBST(KEYSTOREADA_DIR)
 
+ROOT_DIR=`pwd`
+GNAT_PROJECT_PATHS="$ROOT_DIR/awa/ada-util/.alire:$ROOT_DIR/awa/ada-util/.alire/xml:$ROOT_DIR/awa/ada-util/.alire/aws:$ROOT_DIR/awa/ada-util/.alire/unit"
+GNAT_PROJECT_PATHS="$GNAT_PROJECT_PATHS:$ROOT_DIR/awa/ada-util:$ROOT_DIR/awa/ada-el/.alire:$ROOT_DIR/awa/ada-el:$ROOT_DIR/awa/ada-keystore/.alire"
+GNAT_PROJECT_PATHS="$GNAT_PROJECT_PATHS:$ROOT_DIR/awa/ada-keystore:$ROOT_DIR/awa/ada-ado/.alire/sqlite:$ROOT_DIR/awa/ada-ado/.alire/mysql"
+GNAT_PROJECT_PATHS="$GNAT_PROJECT_PATHS:$ROOT_DIR/awa/ada-ado/.alire/postgresql:$ROOT_DIR/awa/ada-ado/.alire/all:$ROOT_DIR/awa/ada-ado/.alire"
+GNAT_PROJECT_PATHS="$GNAT_PROJECT_PATHS:$ROOT_DIR/awa/ada-ado:$ROOT_DIR/awa/ada-security/.alire:$ROOT_DIR/awa/ada-security:$ROOT_DIR/awa/ada-servlet/.alire"
+GNAT_PROJECT_PATHS="$GNAT_PROJECT_PATHS:$ROOT_DIR/awa/ada-servlet/.alire/aws:$ROOT_DIR/awa/ada-servlet:$ROOT_DIR/awa/ada-asf/.alire:$ROOT_DIR/awa/ada-asf"
+GNAT_PROJECT_PATHS="$GNAT_PROJECT_PATHS:$ROOT_DIR/awa/ada-wiki/.alire:$ROOT_DIR/awa/ada-wiki:$ROOT_DIR/awa/ada-wiki/.alire:$ROOT_DIR/awa/openapi-ada/.alire"
+GNAT_PROJECT_PATHS="$GNAT_PROJECT_PATHS:$ROOT_DIR/awa/dynamo/.alire:$ROOT_DIR/awa/.alire:$ROOT_DIR/awa/awa"
+GNAT_PROJECT_PATHS="$GNAT_PROJECT_PATHS:/usr/share/gpr"
+
+AC_SUBST(GNAT_PROJECT_PATHS)
+
 AC_OUTPUT(
 Makefile.conf agent/porion_agent.gpr server/porion_server.gpr porion_lib.gpr porion_tests.gpr
+awa/dynamo/config/generator.properties
 )

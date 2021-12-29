@@ -10,7 +10,19 @@ include Makefile.defaults
 DIST_DIR=porion-$(VERSION)
 DIST_FILE=porion-$(VERSION).tar.gz
 
-GPRFLAGS += -j$(PROCESSORS)
+GPRFLAGS += -j$(PROCESSORS) -XROOT_DIR=`pwd`
+
+ifeq (${HAVE_DYNAMO},yes)
+GPRFLAGS += -XBUILD_DYNAMO=no
+else
+GPRFLAGS += -XBUILD_DYNAMO=yes
+endif
+
+ifeq (${HAVE_ARE},yes)
+GPRFLAGS += -XBUILD_ARE=no
+else
+GPRFLAGS += -XBUILD_ARE=yes
+endif
 
 LIBNAME=lib${NAME}
 

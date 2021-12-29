@@ -89,6 +89,14 @@ setup:: awa/dynamo/src/gen-configs.ads
 awa/dynamo/src/gen-configs.ads:   Makefile.conf awa/dynamo/src/gen-configs.gpb
 	gnatprep -DCONFIG_DIR='"$(ROOT_DIR)/awa/dynamo/config"' -DVERSION='"1.2.3"' \
 		  awa/dynamo/src/gen-configs.gpb awa/dynamo/src/gen-configs.ads
+
+setup:: awa/ada-ado/src/drivers/ado-drivers-initialize.adb
+awa/ada-ado/src/drivers/ado-drivers-initialize.adb: awa/ada-ado/src/drivers/ado-drivers-initialize.gpb Makefile.conf
+	gnatprep -DHAVE_MYSQL=False \
+	          -DHAVE_SQLITE=True \
+	          -DHAVE_POSTGRESQL=False \
+		  awa/ada-ado/src/drivers/ado-drivers-initialize.gpb $@
+
 endif
 
 install::

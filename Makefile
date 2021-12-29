@@ -87,7 +87,7 @@ src/porion-configs-setup.ads:   Makefile.conf src/porion-configs-setup.gpb
 ifneq (${HAVE_DYNAMO},yes)
 setup:: awa/dynamo/src/gen-configs.ads
 awa/dynamo/src/gen-configs.ads:   Makefile.conf awa/dynamo/src/gen-configs.gpb
-	gnatprep -DCONFIG_DIR='"$(ROOT_DIR)/awa/dynamo/config"' -DVERSION='"1.2.0"' \
+	gnatprep -DCONFIG_DIR='"$(ROOT_DIR)/awa/dynamo/config"' -DVERSION='"1.2.3"' \
 		  awa/dynamo/src/gen-configs.gpb awa/dynamo/src/gen-configs.ads
 endif
 

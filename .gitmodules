@@ -4,3 +4,6 @@
 [submodule "ada-awa"]
 	path = awa
 	url = https://github.com/stcarrez/ada-awa.git
+[submodule "resource-embedder"]
+	path = resource-embedder
+	url = https://github.com/stcarrez/resource-embedder.git

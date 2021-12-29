@@ -9,24 +9,26 @@ include Makefile.defaults
 
 DIST_DIR=porion-$(VERSION)
 DIST_FILE=porion-$(VERSION).tar.gz
+ROOT_DIR=$(shell pwd)
 
-GPRFLAGS += -j$(PROCESSORS) -XROOT_DIR=`pwd`
+GPRFLAGS += -j$(PROCESSORS) -XROOT_DIR=$(ROOT_DIR)
 
 ifeq (${HAVE_DYNAMO},yes)
 GPRFLAGS += -XBUILD_DYNAMO=no
 else
 GPRFLAGS += -XBUILD_DYNAMO=yes
+DYNAMO=$(ROOT_DIR)/bin/dynamo
 endif
 
 ifeq (${HAVE_ARE},yes)
 GPRFLAGS += -XBUILD_ARE=no
+ARE=are
 else
 GPRFLAGS += -XBUILD_ARE=yes
+ARE=$(ROOT_DIR)/bin/are
 endif
 
 LIBNAME=lib${NAME}
-
-ARE=are
 
 # Model generation arguments with Dynamo
 # --package XXX.XXX.Models db uml/xxx.zargo
@@ -51,7 +53,7 @@ ROOTDIR=.
 # Build executables for all mains defined by the project.
 build-test::
 
-build:: src/porion-configs-setup.ads
+build:: setup
 	$(GNATMAKE) $(GPRFLAGS) -p -P "$(GPRPATH)" $(MAKE_ARGS)
 
 server build-server::
@@ -77,9 +79,17 @@ build-ts:
 	tsc server/web/js/projects.ts
 	tsc server/web/js/builds.ts
 
+setup:: src/porion-configs-setup.ads
 src/porion-configs-setup.ads:   Makefile.conf src/porion-configs-setup.gpb
 	gnatprep -DPREFIX='"${prefix}"' -DVERSION='"$(VERSION)"' \
 		  src/porion-configs-setup.gpb src/porion-configs-setup.ads
+
+ifneq (${HAVE_DYNAMO},yes)
+setup:: awa/dynamo/src/gen-configs.ads
+awa/dynamo/src/gen-configs.ads:   Makefile.conf awa/dynamo/src/gen-configs.gpb
+	gnatprep -DCONFIG_DIR='"$(ROOT_DIR)/awa/dynamo/config"' -DVERSION='"1.2.0"' \
+		  awa/dynamo/src/gen-configs.gpb awa/dynamo/src/gen-configs.ads
+endif
 
 install::
 	mkdir -p $(DESTDIR)$(prefix)/bin

@@ -50,6 +50,7 @@ package body Porion.Builds.Modules is
 
       Servlet.Rest.Register (App.all, Porion.Builds.Rest.API_Get_Build_Log.Definition);
       Servlet.Rest.Register (App.all, Porion.Builds.Rest.API_Jenkins_Get_Last_Completed_Build.Definition);
+      Servlet.Rest.Register (App.all, Porion.Builds.Rest.API_Get_Project_Schields_Status.Definition);
    end Initialize;
 
    --  ------------------------------

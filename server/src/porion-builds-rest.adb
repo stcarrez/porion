@@ -106,4 +106,20 @@ package body Porion.Builds.Rest is
       Stream.End_Document;
    end Jenkins_Get_Last_Completed_Build;
 
+   procedure Get_Project_Schields_Status
+     (Req     : in out Swagger.Servers.Request'Class;
+      Reply   : in out Swagger.Servers.Response'Class;
+      Stream  : in out Swagger.Servers.Output_Stream'Class;
+      Context : in out Porion.Services.Context_Type) is
+   begin
+      Stream.Start_Document;
+      Stream.Start_Entity ("");
+      Stream.Write_Entity ("schemaVersion", 1);
+      Stream.Write_Entity ("label", "build");
+      Stream.Write_Entity ("message", "passing");
+      Stream.Write_Entity ("color", "green");
+      Stream.End_Entity ("");
+      Stream.End_Document;
+   end Get_Project_Schields_Status;
+
 end Porion.Builds.Rest;

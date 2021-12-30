@@ -106,3 +106,6 @@ install::
 	$(INSTALL) docs/porion.1 $(DESTDIR)$(prefix)/share/man/man1/porion.1
 	(cd share && tar --exclude='*~' -cf - .) \
        | (cd $(DESTDIR)$(prefix)/share/ && tar xf -)
+
+clean::
+	rm -rf server/$(DIST_DIR)

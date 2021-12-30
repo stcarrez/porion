@@ -576,7 +576,7 @@ package Porion.Projects.Models is
 
 
 
-   Query_Project_Branches : constant ADO.Queries.Query_Definition_Access;
+   Query_Project_Last_Build : constant ADO.Queries.Query_Definition_Access;
 
 
    Query_Cleanup_Project_Build_Step : constant ADO.Queries.Query_Definition_Access;
@@ -610,10 +610,7 @@ package Porion.Projects.Models is
    Query_Cleanup_Project_Dependency : constant ADO.Queries.Query_Definition_Access;
 
 
-   Query_Command_Build_List : constant ADO.Queries.Query_Definition_Access;
-
-
-   Query_Project_Last_Build : constant ADO.Queries.Query_Definition_Access;
+   Query_Project_Branches : constant ADO.Queries.Query_Definition_Access;
 
 
 
@@ -912,14 +909,14 @@ private
                         Impl   : out Dependency_Access);
 
    package File_1 is
-      new ADO.Queries.Loaders.File (Path => "project-branches.xml",
+      new ADO.Queries.Loaders.File (Path => "project-builds.xml",
                                     Sha1 => "9B2B599473F75F92CB5AB5045675E4CCEF926543");
 
-   package Def_Project_Branches is
-      new ADO.Queries.Loaders.Query (Name => "project-branches",
+   package Def_Project_Last_Build is
+      new ADO.Queries.Loaders.Query (Name => "project-last-build",
                                      File => File_1.File'Access);
-   Query_Project_Branches : constant ADO.Queries.Query_Definition_Access
-   := Def_Project_Branches.Query'Access;
+   Query_Project_Last_Build : constant ADO.Queries.Query_Definition_Access
+   := Def_Project_Last_Build.Query'Access;
 
    package File_2 is
       new ADO.Queries.Loaders.File (Path => "cleanup-project.xml",
@@ -1016,22 +1013,12 @@ private
    := Def_Cleanup_Project_Dependency.Query'Access;
 
    package File_3 is
-      new ADO.Queries.Loaders.File (Path => "command-info.xml",
+      new ADO.Queries.Loaders.File (Path => "project-branches.xml",
                                     Sha1 => "9B2B599473F75F92CB5AB5045675E4CCEF926543");
 
-   package Def_Command_Build_List is
-      new ADO.Queries.Loaders.Query (Name => "command-build-list",
+   package Def_Project_Branches is
+      new ADO.Queries.Loaders.Query (Name => "project-branches",
                                      File => File_3.File'Access);
-   Query_Command_Build_List : constant ADO.Queries.Query_Definition_Access
-   := Def_Command_Build_List.Query'Access;
-
-   package File_4 is
-      new ADO.Queries.Loaders.File (Path => "project-builds.xml",
-                                    Sha1 => "9B2B599473F75F92CB5AB5045675E4CCEF926543");
-
-   package Def_Project_Last_Build is
-      new ADO.Queries.Loaders.Query (Name => "project-last-build",
-                                     File => File_4.File'Access);
-   Query_Project_Last_Build : constant ADO.Queries.Query_Definition_Access
-   := Def_Project_Last_Build.Query'Access;
+   Query_Project_Branches : constant ADO.Queries.Query_Definition_Access
+   := Def_Project_Branches.Query'Access;
 end Porion.Projects.Models;

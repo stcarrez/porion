@@ -584,6 +584,7 @@ PACKAGE_URL=
 ac_unique_file="src/porion.ads"
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+DYNAMO_SEARCH_DIR
 BUNDLE_DIR
 GNAT_PROJECT_PATHS
 KEYSTOREADA_DIR
@@ -3708,6 +3709,9 @@ GNAT_PROJECT_PATHS="$GNAT_PROJECT_PATHS:/usr/share/gpr"
 
 
 BUNDLE_DIR="$ROOT_DIR/awa/ada-asf/bundles"
+
+
+DYNAMO_SEARCH_DIR="$ROOT_DIR/awa/awa/plugins"
 
 
 ac_config_files="$ac_config_files Makefile.conf agent/porion_agent.gpr server/porion_server.gpr porion_lib.gpr porion_tests.gpr awa/dynamo/config/generator.properties"

@@ -33,6 +33,12 @@ package Porion.Builds.Rest is
       Stream  : in out Swagger.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type);
 
+   procedure Get_Project_Schields_Status
+     (Req     : in out Swagger.Servers.Request'Class;
+      Reply   : in out Swagger.Servers.Response'Class;
+      Stream  : in out Swagger.Servers.Output_Stream'Class;
+      Context : in out Porion.Services.Context_Type);
+
    package API_Get_Build_Log is
      new Porion.Projects.Operation (Handler => Get_Build_Log,
                                     Method  => Swagger.Servers.GET,
@@ -42,5 +48,10 @@ package Porion.Builds.Rest is
      new Porion.Projects.Operation (Handler => Jenkins_Get_Last_Completed_Build,
                                     Method  => Swagger.Servers.GET,
                                     URI     => "/api/v1/jenkins/{project}/lastCompletedBuild/api/json");
+
+   package API_Get_Project_Schields_Status is
+     new Porion.Projects.Operation (Handler => Get_Project_Schields_Status,
+                                    Method  => Swagger.Servers.GET,
+                                    URI     => "/api/v1/projects/{project}/schields-status.json");
 
 end Porion.Builds.Rest;

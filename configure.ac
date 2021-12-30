@@ -94,6 +94,9 @@ AC_SUBST(GNAT_PROJECT_PATHS)
 BUNDLE_DIR="$ROOT_DIR/awa/ada-asf/bundles"
 AC_SUBST(BUNDLE_DIR)
 
+DYNAMO_SEARCH_DIR="$ROOT_DIR/awa/awa/plugins"
+AC_SUBST(DYNAMO_SEARCH_DIR)
+
 AC_OUTPUT(
 Makefile.conf agent/porion_agent.gpr server/porion_server.gpr porion_lib.gpr porion_tests.gpr
 awa/dynamo/config/generator.properties

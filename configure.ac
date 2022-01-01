@@ -21,6 +21,77 @@ AC_SUBST(PORION_MICRO_VERSION)
 PORION_LIBDIR="lib"
 AC_SUBST(PORION_LIBDIR)
 
+os_base='unix'
+os_version='none'
+AC_MSG_CHECKING([operating system])
+case "${target_os}" in
+     linux|linux-*|solaris*|sysv-*)
+        os_version='linux'
+        ;;
+
+     netbsd*|dragonfly*)
+        os_version='netbsd'
+        ;;
+
+     openbsd*|freebsd*)
+        # Let OpenBSD people cry 
+        os_version='freebsd'
+        ;;
+
+     macos*|darwin*)
+        os_version='macos'
+        ;;
+
+     mingw32*|cygwin*|mingw64*|msys)
+        os_version='win'
+        os_base='windows'
+        ;;
+
+     mingw32*|cygwin*|mingw64*|msys)
+        os_version='win'
+        os_base='windows'
+        ;;
+
+     *)
+        # Be authoritative
+        os_version='linux'
+        ;;
+esac
+
+AC_MSG_RESULT($os_version)
+
+AC_MSG_CHECKING([hardware platform])
+case "${target_cpu}" in
+     x86_64)
+        os_version="${os_version}64"
+        HARDWARE_PLATFORM=${target_cpu}
+        ;;
+
+     i386|i486|i586|i686)
+        os_version="${os_version}32"
+        HARDWARE_PLATFORM='x86'
+        ;;
+
+     armv7*)
+        os_version="${os_version}32"
+        HARDWARE_PLATFORM=${target_cpu}
+        ;;
+
+     armv8*)
+        os_version="${os_version}64"
+        HARDWARE_PLATFORM=${target_cpu}
+        ;;
+
+     *)
+        HARDWARE_PLATFORM=${target_cpu}
+        ;;
+esac
+AC_MSG_RESULT($HARDWARE_PLATFORM)
+AC_SUBST(HARDWARE_PLATFORM)
+
+UTIL_OS=${os_version}
+AC_SUBST(UTIL_OS)
+
 case "${target_os}" in
   mingw32*|cygwin*|mingw64*|msys)
     HAVE_GETTEXT=False

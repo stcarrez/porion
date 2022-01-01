@@ -1,6 +1,7 @@
 NAME=porion
 GPRPATH=${NAME}.gpr
 VERSION=x.x.x
+UTIL_OS=linux64
 #GPRPATH_AGENT=porion_agent.gpr
 
 -include Makefile.conf
@@ -11,7 +12,7 @@ DIST_DIR=porion-$(VERSION)
 DIST_FILE=porion-$(VERSION).tar.gz
 ROOT_DIR=$(shell pwd)
 
-GPRFLAGS += -j$(PROCESSORS) -XROOT_DIR=$(ROOT_DIR)
+GPRFLAGS += -j$(PROCESSORS) -XROOT_DIR=$(ROOT_DIR) -XUTIL_OS=$(UTIL_OS)
 
 ifeq (${HAVE_DYNAMO},yes)
 GPRFLAGS += -XBUILD_DYNAMO=no

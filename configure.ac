@@ -98,6 +98,11 @@ case "${target_os}" in
     GETTEXT_INTL=False
     ;;
 
+  netbsd*|dragonfly*|openbsd*|freebsd*)
+    HAVE_GETTEXT=False
+    GETTEXT_INTL=False
+    ;;
+  
   *)
     AM_GNU_GETTEXT([external])
     ;;

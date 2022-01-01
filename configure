@@ -609,6 +609,8 @@ LDFLAGS
 CFLAGS
 CC
 USE_NLS
+UTIL_OS
+HARDWARE_PLATFORM
 PORION_LIBDIR
 PORION_MICRO_VERSION
 PORION_MINOR_VERSION
@@ -2581,6 +2583,81 @@ PORION_VERSION=$PORION_MAJOR_VERSION.$PORION_MINOR_VERSION.$PORION_MICRO_VERSION
 
 
 PORION_LIBDIR="lib"
+
+
+os_base='unix'
+os_version='none'
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking operating system" >&5
+$as_echo_n "checking operating system... " >&6; }
+case "${target_os}" in
+     linux|linux-*|solaris*|sysv-*)
+        os_version='linux'
+        ;;
+
+     netbsd*|dragonfly*)
+        os_version='netbsd'
+        ;;
+
+     openbsd*|freebsd*)
+        # Let OpenBSD people cry
+        os_version='freebsd'
+        ;;
+
+     macos*|darwin*)
+        os_version='macos'
+        ;;
+
+     mingw32*|cygwin*|mingw64*|msys)
+        os_version='win'
+        os_base='windows'
+        ;;
+
+     mingw32*|cygwin*|mingw64*|msys)
+        os_version='win'
+        os_base='windows'
+        ;;
+
+     *)
+        # Be authoritative
+        os_version='linux'
+        ;;
+esac
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $os_version" >&5
+$as_echo "$os_version" >&6; }
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking hardware platform" >&5
+$as_echo_n "checking hardware platform... " >&6; }
+case "${target_cpu}" in
+     x86_64)
+        os_version="${os_version}64"
+        HARDWARE_PLATFORM=${target_cpu}
+        ;;
+
+     i386|i486|i586|i686)
+        os_version="${os_version}32"
+        HARDWARE_PLATFORM='x86'
+        ;;
+
+     armv7*)
+        os_version="${os_version}32"
+        HARDWARE_PLATFORM=${target_cpu}
+        ;;
+
+     armv8*)
+        os_version="${os_version}64"
+        HARDWARE_PLATFORM=${target_cpu}
+        ;;
+
+     *)
+        HARDWARE_PLATFORM=${target_cpu}
+        ;;
+esac
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $HARDWARE_PLATFORM" >&5
+$as_echo "$HARDWARE_PLATFORM" >&6; }
+
+
+UTIL_OS=${os_version}
 
 
 case "${target_os}" in

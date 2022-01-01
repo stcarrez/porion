@@ -12,6 +12,7 @@ DIST_FILE=porion-@PORION_VERSION@.tar.gz
 LN_S=@LN_S@
 VPATH = @srcdir@
 prefix = @prefix@
+UTIL_OS=@UTIL_OS@
 exec_prefix = @exec_prefix@
 PROCESSORS=@NR_CPUS@
 HAVE_SERVER=@PORION_SERVER@

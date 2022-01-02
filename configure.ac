@@ -139,6 +139,50 @@ AC_CHECK_PROG(HAVE_PANDOC,pandoc,yes)
 AC_CHECK_PROG(HAVE_DYNAMO,dynamo,yes)
 AC_CHECK_PROG(HAVE_ARE,are,yes)
 
+##########################################
+# Check for Ada Web Server
+##########################################
+AM_GNAT_CHECK_AWS(
+  [
+    HAVE_AWS=no
+    WITH_SERVER="";
+    WITH_UTIL_AWS="";
+    UTIL_AWS_VERSION="none"
+  ], [
+    UTIL_HAVE_AWS=yes
+    WITH_SERVER=$ac_cv_gnat_project_with_aws
+
+    AM_GNAT_AWS_VERSION
+
+    AC_MSG_CHECKING([which AWS implementation to use])
+    UTIL_AWS_VERSION=1
+case $AWS_VERSION in
+  22.0)
+     UTIL_AWS_VERSION=3
+     ;;
+
+  *2017*|*2018*|*2019*|*202*|20.0)
+     UTIL_AWS_VERSION=2
+     ;;
+
+  3.3.2)
+     UTIL_AWS_VERSION=2
+     ;;
+
+  3.*|2.*)
+     UTIL_AWS_VERSION=1
+     ;;
+
+  *)
+     UTIL_AWS_VERSION=3
+     ;;
+esac
+    AC_MSG_RESULT(${UTIL_AWS_VERSION})
+
+  ])
+
+AC_SUBST(UTIL_AWS_VERSION)
+
 AWA_DIR=""
 ADO_DIR=""
 EL_DIR=""

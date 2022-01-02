@@ -1,9 +1,9 @@
 # Porion
 
 [![License](http://img.shields.io/badge/license-APACHE2-blue.svg)](LICENSE)
-[![Build Status](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/porion/badges/build.json)](https://porion.vacs.fr/porion/projects/view//porion)
-[![Test Status](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/porion/badges/tests.json)](https://porion.vacs.fr/porion/projects/view//porion)
-![semver](https://img.shields.io/badge/semver-2.0.0-blue.svg?cacheSeconds=2592000)
+[![Build Status](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/porion/badges/build.json)](https://porion.vacs.fr/porion/projects/view/porion)
+[![Test Status](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/porion/badges/tests.json)](https://porion.vacs.fr/porion/projects/view/porion)
+[![semver](https://img.shields.io/badge/semver-2.0.0-blue.svg?cacheSeconds=2592000)]()
 
 # TL;DR
 

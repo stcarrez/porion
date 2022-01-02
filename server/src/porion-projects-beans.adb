@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-projects-beans -- Beans for module projects
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,11 +15,7 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with ADO.Sessions;
-with ADO.Queries;
 with AWA.Services.Contexts;
-with Porion.Queries;
-with Porion.Projects.Services;
 with Porion.Services;
 package body Porion.Projects.Beans is
 
@@ -67,10 +63,7 @@ package body Porion.Projects.Beans is
    procedure Load (Bean    : in out Project_Bean;
                    Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
       Ctx     : constant ASC.Service_Context_Access := ASC.Current;
-      Session : ADO.Sessions.Session := ASC.Get_Session (Ctx);
-      Query   : ADO.Queries.Context;
       Context : Porion.Services.Context_Type;
-      List    : Porion.Queries.Metric_Stat_List_Bean;
    begin
       Context.DB := ASC.Get_Master_Session (Ctx);
 

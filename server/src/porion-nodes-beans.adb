@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-nodes-beans -- Beans for module nodes
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -66,6 +66,8 @@ package body Porion.Nodes.Beans is
    --  ------------------------------
    function Create_Node_List_Bean (Module : in Modules.Node_Module_Access)
       return Util.Beans.Basic.Readonly_Bean_Access is
+      pragma Unreferenced (Module);
+
       Object : constant Node_List_Bean_Access := new Node_List_Bean;
    begin
       Object.Nodes_Bean := Object.Nodes'Access;

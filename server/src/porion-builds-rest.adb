@@ -16,15 +16,21 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Directories;
+with ADO.Queries;
+with Util.Strings;
 with Util.Log.Loggers;
 with Porion.Builds.Modules;
 with Porion.Logs.Analysis;
 with Porion.Projects;
 with Porion.Services;
+with Porion.Queries;
+with Porion.Builds.Models;
 with Porion.Builds.Services;
 package body Porion.Builds.Rest is
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Builds.Rest");
+
+   use type Porion.Builds.Models.Build_Status_Type;
 
    procedure Get_Build_Log
      (Req     : in out Swagger.Servers.Request'Class;
@@ -106,18 +112,96 @@ package body Porion.Builds.Rest is
       Stream.End_Document;
    end Jenkins_Get_Last_Completed_Build;
 
+   type Badge_Info is record
+      Label   : UString;
+      Message : UString;
+      Color   : UString;
+   end record;
+
+   procedure Get_Build_Badge (Context : in out Porion.Services.Context_Type;
+                              Badge   : in out Badge_Info) is
+      Query   : ADO.Queries.Context;
+      List    : Porion.Queries.Build_Stat_List_Bean;
+   begin
+      Badge.Label := To_UString ("build");
+      Query.Set_Query (Porion.Queries.Query_Stat_Project_Builds);
+      Query.Bind_Param ("project_id", Context.Project.Get_Id);
+      Porion.Queries.List (List, Context.DB, Query);
+      for Stat of List.List loop
+         if Stat.Build_Status = Porion.Builds.Models.BUILD_RUNNING then
+            Badge.Message := To_UString ("building");
+            Badge.Color := To_UString ("yellow");
+            return;
+         end if;
+      end loop;
+
+      
+   end Get_Build_Badge;
+
+   procedure Get_Tests_Badge (Context : in out Porion.Services.Context_Type;
+                              Badge   : in out Badge_Info) is
+      Query       : ADO.Queries.Context;
+      List        : Porion.Queries.Build_Stat_List_Bean;
+      Total_Count : Natural := 0;
+      Pass_Count  : Natural := 0;
+      Fail_Count  : Natural := 0;
+   begin
+      Badge.Label := To_UString ("build");
+      Query.Set_Query (Porion.Queries.Query_Stat_Project_Builds);
+      Query.Bind_Param ("project_id", Context.Project.Get_Id);
+      Porion.Queries.List (List, Context.DB, Query);
+      for Stat of List.List loop
+         Total_Count := Total_Count + Stat.Count;
+         Pass_Count := Pass_Count + Stat.Pass_Count;
+         Fail_Count := Fail_Count + Stat.Fail_Count;
+         Fail_Count := Fail_Count + Stat.Timeout_Count;
+      end loop;
+      Badge.Label := To_UString ("tests");
+      if Pass_Count > 0 and Fail_Count = 0 then
+         Badge.Message := To_UString (Util.Strings.Image (Pass_Count) & " passed");
+         Badge.Color := To_UString ("green");
+      elsif Pass_Count > 0 and Fail_Count > 0 then
+         Badge.Message := To_UString (Util.Strings.Image (Pass_Count) & " passed, "
+                                      & Util.Strings.Image (Fail_Count) & " failed");
+         Badge.Color := To_UString ("orange");
+      elsif Fail_Count > 0 then
+         Badge.Message := To_UString (Util.Strings.Image (Fail_Count) & " failed");
+         Badge.Color := To_UString ("red");
+      else
+         Badge.Message := To_UString ("no test");
+         Badge.Color := To_UString ("red");
+      end if;
+   end Get_Tests_Badge;
+
    procedure Get_Project_Schields_Status
      (Req     : in out Swagger.Servers.Request'Class;
       Reply   : in out Swagger.Servers.Response'Class;
       Stream  : in out Swagger.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type) is
+      Mode : constant String := Req.Get_Path_Parameter (2);
+
+      Badge : Badge_Info;
    begin
+      if Mode = "build.json" then
+         Get_Build_Badge (Context, Badge);
+      elsif Mode = "tests.json" then
+         Get_Tests_Badge (Context, Badge);
+      elsif Mode = "coverage.json" then
+         Get_Tests_Badge (Context, Badge);
+      else
+         raise Porion.Services.Not_Found;
+      end if;
+
+      if Length (Badge.Label) = 0 or Length (Badge.Message) = 0 then
+         raise Porion.Services.Not_Found;
+      end if;
+
       Stream.Start_Document;
       Stream.Start_Entity ("");
       Stream.Write_Entity ("schemaVersion", 1);
-      Stream.Write_Entity ("label", "build");
-      Stream.Write_Entity ("message", "passing");
-      Stream.Write_Entity ("color", "green");
+      Stream.Write_Entity ("label", Badge.Label);
+      Stream.Write_Entity ("message", Badge.Message);
+      Stream.Write_Entity ("color", Badge.Color);
       Stream.End_Entity ("");
       Stream.End_Document;
    end Get_Project_Schields_Status;

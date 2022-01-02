@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
---  asf-converters-durations -- Duration converter
---  Copyright (C) 2021 Stephane Carrez
+--  porion-converters-durations -- Duration converter
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,25 +16,14 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Exceptions;
-with Ada.Strings.Unbounded;
 
 with Util.Locales;
-with Util.Strings;
 with Util.Properties.Bundles;
 
 with ASF.Locales;
-with ASF.Utils;
 with ASF.Applications.Main;
 with Porion.Reports;
-package body ASF.Converters.Durations is
-
-   ONE_KB  : constant Long_Long_Integer := 1_024;
-   ONE_MB  : constant Long_Long_Integer := ONE_KB * 1_024;
-   ONE_GB  : constant Long_Long_Integer := ONE_MB * 1_024;
-
-   UNIT_NS : aliased constant String := "duration_ns_unit";
-   UNIT_US : aliased constant String := "duration_us_unit";
-   UNIT_MS : aliased constant String := "duration_ms_unit";
+package body Porion.Converters.Durations is
 
    --  ------------------------------
    --  Convert the object value into a string.  The object value is associated
@@ -45,8 +34,6 @@ package body ASF.Converters.Durations is
                        Context   : in ASF.Contexts.Faces.Faces_Context'Class;
                        Component : in ASF.Components.Base.UIComponent'Class;
                        Value     : in Util.Beans.Objects.Object) return String is
-      pragma Unreferenced (Convert);
-
       Bundle  : ASF.Locales.Bundle;
       Locale  : constant Util.Locales.Locale := Context.Get_Locale;
    begin
@@ -65,10 +52,8 @@ package body ASF.Converters.Durations is
       --  Convert the value as an integer here so that we can raise
       --  the Invalid_Conversion exception.
       declare
-         Long_Value : constant Long_Long_Integer := Util.Beans.Objects.To_Long_Long_Integer (Value);
-         Val        : Integer;
-         Result     : Ada.Strings.Unbounded.Unbounded_String;
-         Unit       : Util.Strings.Name_Access;
+         Long_Value : constant Long_Long_Integer
+            := Util.Beans.Objects.To_Long_Long_Integer (Value);
       begin
          if Convert.Unit = MICROSECOND then
             return Porion.Reports.Format (Porion.Microsecond_Type (Long_Value));
@@ -99,4 +84,4 @@ package body ASF.Converters.Durations is
       return Util.Beans.Objects.Null_Object;
    end To_Object;
 
-end ASF.Converters.Durations;
+end Porion.Converters.Durations;

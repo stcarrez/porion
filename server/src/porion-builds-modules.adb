@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-builds-modules -- Module builds
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,6 @@ with AWA.Modules.Beans;
 with AWA.Modules.Get;
 with Util.Log.Loggers;
 with Servlet.Rest;
-with Servlet.Core;
 with Porion.Builds.Beans;
 with Porion.Builds.Rest;
 package body Porion.Builds.Modules is
@@ -48,9 +47,9 @@ package body Porion.Builds.Modules is
 
       AWA.Modules.Module (Plugin).Initialize (App, Props);
 
-      Servlet.Rest.Register (App.all, Porion.Builds.Rest.API_Get_Build_Log.Definition);
-      Servlet.Rest.Register (App.all, Porion.Builds.Rest.API_Jenkins_Get_Last_Completed_Build.Definition);
-      Servlet.Rest.Register (App.all, Porion.Builds.Rest.API_Get_Project_Schields_Status.Definition);
+      Servlet.Rest.Register (App.all, Rest.API_Get_Build_Log.Definition);
+      Servlet.Rest.Register (App.all, Rest.API_Jenkins_Get_Last_Completed_Build.Definition);
+      Servlet.Rest.Register (App.all, Rest.API_Get_Project_Schields_Status.Definition);
    end Initialize;
 
    --  ------------------------------

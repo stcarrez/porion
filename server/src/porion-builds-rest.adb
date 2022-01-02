@@ -120,8 +120,11 @@ package body Porion.Builds.Rest is
 
    procedure Get_Build_Badge (Context : in out Porion.Services.Context_Type;
                               Badge   : in out Badge_Info) is
-      Query   : ADO.Queries.Context;
-      List    : Porion.Queries.Build_Stat_List_Bean;
+      Query     : ADO.Queries.Context;
+      List      : Porion.Queries.Build_Stat_List_Bean;
+      Has_Fail  : Boolean := False;
+      Has_Pass  : Boolean := False;
+      Has_Error : Boolean := False;
    begin
       Badge.Label := To_UString ("build");
       Query.Set_Query (Porion.Queries.Query_Stat_Project_Builds);
@@ -133,9 +136,29 @@ package body Porion.Builds.Rest is
             Badge.Color := To_UString ("yellow");
             return;
          end if;
+         if Stat.Build_Status = Porion.Builds.Models.BUILD_FAIL then
+            Has_Fail := True;
+         else
+            Has_Pass := True;
+         end if;
+         if Stat.Fail_Count > 0 or Stat.Timeout_Count > 0 then
+            Has_Error := True;
+         end if;
       end loop;
-
       
+      if Has_Pass and not Has_Fail and not Has_Error then
+         Badge.Message := To_UString ("passing");
+         Badge.Color := To_UString ("green");
+      elsif Has_Pass and Has_Error then
+         Badge.Message := To_UString ("unstable");
+         Badge.Color := To_UString ("orange");
+      elsif Has_Fail then
+         Badge.Message := To_UString ("failed");
+         Badge.Color := To_UString ("red");
+      else
+         Badge.Message := To_UString ("none");
+         Badge.Color := To_UString ("blue");
+      end if;
    end Get_Build_Badge;
 
    procedure Get_Tests_Badge (Context : in out Porion.Services.Context_Type;

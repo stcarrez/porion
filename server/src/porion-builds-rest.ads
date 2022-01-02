@@ -52,6 +52,6 @@ package Porion.Builds.Rest is
    package API_Get_Project_Schields_Status is
      new Porion.Projects.Operation (Handler => Get_Project_Schields_Status,
                                     Method  => Swagger.Servers.GET,
-                                    URI     => "/api/v1/projects/{project}/schields-status.json");
+                                    URI     => "/api/v1/projects/{project}/badges/{mode}");
 
 end Porion.Builds.Rest;

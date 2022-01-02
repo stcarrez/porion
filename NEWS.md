@@ -1,3 +1,7 @@
+Version 0.6.0   -
+  - REST API to get a schields badge using https://shields.io/endpoint
+  - Build dynamo and are if they are not installed
+
 Version 0.5.0   - Dec 2021
   - Server with Web responsive UI listing the projects and builds
   - REST API to get the build logs

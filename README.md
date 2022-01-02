@@ -1,6 +1,8 @@
 # Porion
 
 [![License](http://img.shields.io/badge/license-APACHE2-blue.svg)](LICENSE)
+[![Build Status](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/porion/badges/build.json)](https://porion.vacs.fr/porion/projects/view//porion)
+[![Test Status](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/porion/badges/tests.json)](https://porion.vacs.fr/porion/projects/view//porion)
 ![semver](https://img.shields.io/badge/semver-2.0.0-blue.svg?cacheSeconds=2592000)
 
 # TL;DR
@@ -46,6 +48,10 @@ Get information about a project or a build number:
    porion info ada-util
    porion info ada-util:2
 ```
+
+## Version 0.6.0   - Under development
+  - REST API to get a schields badge using https://shields.io/endpoint
+  - Build dynamo and are if they are not installed
 
 ## Version 0.5.0   - Dec 2021
   - Server with Web responsive UI listing the projects and builds

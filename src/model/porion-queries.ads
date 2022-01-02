@@ -5,7 +5,7 @@
 --  Template used: templates/model/package-spec.xhtml
 --  Ada Generator: https://github.com/stcarrez/dynamo Version 1.2.3
 -----------------------------------------------------------------------
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -469,6 +469,8 @@ package Porion.Queries is
 
    Query_Stat_Project_Metrics : constant ADO.Queries.Query_Definition_Access;
 
+   Query_Stat_Project_With_Metric : constant ADO.Queries.Query_Definition_Access;
+
    Query_Stat_Build_Metrics : constant ADO.Queries.Query_Definition_Access;
 
    --  --------------------
@@ -895,6 +897,12 @@ private
                                      File => File_7.File'Access);
    Query_Stat_Project_Metrics : constant ADO.Queries.Query_Definition_Access
    := Def_Metricstat_Stat_Project_Metrics.Query'Access;
+
+   package Def_Metricstat_Stat_Project_With_Metric is
+      new ADO.Queries.Loaders.Query (Name => "stat-project-with-metric",
+                                     File => File_7.File'Access);
+   Query_Stat_Project_With_Metric : constant ADO.Queries.Query_Definition_Access
+   := Def_Metricstat_Stat_Project_With_Metric.Query'Access;
 
    package Def_Metricstat_Stat_Build_Metrics is
       new ADO.Queries.Loaders.Query (Name => "stat-build-metrics",

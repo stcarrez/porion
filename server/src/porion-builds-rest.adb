@@ -22,6 +22,7 @@ with Util.Log.Loggers;
 with Porion.Logs.Analysis;
 with Porion.Projects;
 with Porion.Queries;
+with Porion.Metrics;
 with Porion.Builds.Models;
 with Porion.Builds.Services;
 package body Porion.Builds.Rest is
@@ -29,6 +30,21 @@ package body Porion.Builds.Rest is
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Builds.Rest");
 
    use type Porion.Builds.Models.Build_Status_Type;
+
+   type Badge_Info is record
+      Label   : UString;
+      Message : UString;
+      Color   : UString;
+   end record;
+
+   procedure Get_Build_Badge (Context : in out Porion.Services.Context_Type;
+                              Badge   : in out Badge_Info);
+
+   procedure Get_Tests_Badge (Context : in out Porion.Services.Context_Type;
+                              Badge   : in out Badge_Info);
+
+   procedure Get_Coverage_Badge (Context : in out Porion.Services.Context_Type;
+                                 Badge   : in out Badge_Info);
 
    procedure Get_Build_Log
      (Req     : in out Swagger.Servers.Request'Class;
@@ -113,12 +129,6 @@ package body Porion.Builds.Rest is
       Stream.End_Document;
    end Jenkins_Get_Last_Completed_Build;
 
-   type Badge_Info is record
-      Label   : UString;
-      Message : UString;
-      Color   : UString;
-   end record;
-
    procedure Get_Build_Badge (Context : in out Porion.Services.Context_Type;
                               Badge   : in out Badge_Info) is
       Query     : ADO.Queries.Context;
@@ -197,6 +207,50 @@ package body Porion.Builds.Rest is
       end if;
    end Get_Tests_Badge;
 
+   procedure Get_Coverage_Badge (Context : in out Porion.Services.Context_Type;
+                                 Badge   : in out Badge_Info) is
+      Query       : ADO.Queries.Context;
+      List        : Porion.Queries.Metric_Stat_List_Bean;
+      Coverage    : Natural := 0;
+      Metric      : constant Natural
+         := Porion.Metrics.Metric_Type'Enum_Rep (Porion.Metrics.METRIC_COVERAGE);
+   begin
+      Badge.Label := To_UString ("coverage");
+      Query.Set_Query (Porion.Queries.Query_Stat_Project_With_Metric);
+      Query.Bind_Param ("project_id", Context.Project.Get_Id);
+      Query.Bind_Param ("metric", Metric);
+      Porion.Queries.List (List, Context.DB, Query);
+      for Stat of List.List loop
+         case Stat.Kind is
+            when Porion.Metrics.METRIC_COVERAGE =>
+               if Stat.Name = "lines" then
+                  if Stat.Count > 0 then
+                     Coverage := Natural (Stat.Sum_Value / Stat.Count);
+                  end if;
+               end if;
+
+            when others =>
+               null;
+
+         end case;
+      end loop;
+      if Coverage > 0 then
+         Badge.Message := To_UString (Util.Strings.Image (Coverage / 10));
+         if Coverage > 900 then
+            Badge.Color := To_UString ("green");
+         elsif Coverage > 800 then
+            Badge.Color := To_UString ("yellow");
+         elsif Coverage > 700 then
+            Badge.Color := To_UString ("orange");
+         else
+            Badge.Color := To_UString ("red");
+         end if;
+      else
+         Badge.Message := To_UString ("none");
+         Badge.Color := To_UString ("blue");
+      end if;
+   end Get_Coverage_Badge;
+
    procedure Get_Project_Schields_Status
      (Req     : in out Swagger.Servers.Request'Class;
       Reply   : in out Swagger.Servers.Response'Class;
@@ -212,7 +266,7 @@ package body Porion.Builds.Rest is
       elsif Mode = "tests.json" then
          Get_Tests_Badge (Context, Badge);
       elsif Mode = "coverage.json" then
-         Get_Tests_Badge (Context, Badge);
+         Get_Coverage_Badge (Context, Badge);
       else
          raise Porion.Services.Not_Found;
       end if;

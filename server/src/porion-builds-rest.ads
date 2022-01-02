@@ -40,18 +40,21 @@ package Porion.Builds.Rest is
       Context : in out Porion.Services.Context_Type);
 
    package API_Get_Build_Log is
-     new Porion.Projects.Operation (Handler => Get_Build_Log,
-                                    Method  => Swagger.Servers.GET,
-                                    URI     => "/api/v1/builds/{buildId}/logs");
+     new Porion.Projects.Operation
+        (Handler => Get_Build_Log,
+         Method  => Swagger.Servers.GET,
+         URI     => "/api/v1/builds/{buildId}/logs");
 
    package API_Jenkins_Get_Last_Completed_Build is
-     new Porion.Projects.Operation (Handler => Jenkins_Get_Last_Completed_Build,
-                                    Method  => Swagger.Servers.GET,
-                                    URI     => "/api/v1/jenkins/{project}/lastCompletedBuild/api/json");
+     new Porion.Projects.Operation
+        (Handler => Jenkins_Get_Last_Completed_Build,
+         Method  => Swagger.Servers.GET,
+         URI     => "/api/v1/jenkins/{project}/lastCompletedBuild/api/json");
 
    package API_Get_Project_Schields_Status is
-     new Porion.Projects.Operation (Handler => Get_Project_Schields_Status,
-                                    Method  => Swagger.Servers.GET,
-                                    URI     => "/api/v1/projects/{project}/badges/{mode}");
+     new Porion.Projects.Operation
+        (Handler => Get_Project_Schields_Status,
+         Method  => Swagger.Servers.GET,
+         URI     => "/api/v1/projects/{project}/badges/{mode}");
 
 end Porion.Builds.Rest;

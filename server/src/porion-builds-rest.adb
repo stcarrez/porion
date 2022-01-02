@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-builds-beans -- Beans for module builds
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,10 +19,8 @@ with Ada.Directories;
 with ADO.Queries;
 with Util.Strings;
 with Util.Log.Loggers;
-with Porion.Builds.Modules;
 with Porion.Logs.Analysis;
 with Porion.Projects;
-with Porion.Services;
 with Porion.Queries;
 with Porion.Builds.Models;
 with Porion.Builds.Services;
@@ -37,6 +35,8 @@ package body Porion.Builds.Rest is
       Reply   : in out Swagger.Servers.Response'Class;
       Stream  : in out Swagger.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type) is
+      pragma Unreferenced (Req, Reply);
+
       use Porion.Logs.Analysis;
 
       Rules  : constant String := Context.Recipe.Get_Filter_Rules;
@@ -104,6 +104,7 @@ package body Porion.Builds.Rest is
       Reply   : in out Swagger.Servers.Response'Class;
       Stream  : in out Swagger.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type) is
+      pragma Unreferenced (Req, Reply, Context);
    begin
       Stream.Start_Document;
       Stream.Start_Entity ("");
@@ -145,7 +146,7 @@ package body Porion.Builds.Rest is
             Has_Error := True;
          end if;
       end loop;
-      
+
       if Has_Pass and not Has_Fail and not Has_Error then
          Badge.Message := To_UString ("passing");
          Badge.Color := To_UString ("green");
@@ -201,8 +202,9 @@ package body Porion.Builds.Rest is
       Reply   : in out Swagger.Servers.Response'Class;
       Stream  : in out Swagger.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type) is
-      Mode : constant String := Req.Get_Path_Parameter (2);
+      pragma Unreferenced (Reply);
 
+      Mode  : constant String := Req.Get_Path_Parameter (2);
       Badge : Badge_Info;
    begin
       if Mode = "build.json" then

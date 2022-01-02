@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-dashboards-beans-stats -- Statistics about projects and builds
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,6 @@ with ADO;
 with Util.Beans.Basic;
 with Util.Beans.Objects;
 with Porion.Queries;
-with Porion.Projects;
 with Porion.Dashboards.Modules;
 with Porion.Dashboards.Models;
 package Porion.Dashboards.Beans.Stats is

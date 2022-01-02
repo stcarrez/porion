@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-dashboards-beans-stats -- Statistics about projects and builds
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,8 +19,6 @@ with ADO.Sessions;
 with ADO.Queries;
 with AWA.Services.Contexts;
 with Porion.Metrics;
-with Porion.Projects.Services;
-with Porion.Services;
 with Porion.Builds.Models;
 package body Porion.Dashboards.Beans.Stats is
 
@@ -245,6 +243,8 @@ package body Porion.Dashboards.Beans.Stats is
    --  ------------------------------
    function Create_Metrics_Bean (Module : in Modules.Dashboard_Module_Access)
       return Util.Beans.Basic.Readonly_Bean_Access is
+      pragma Unreferenced (Module);
+
       Object : constant Metrics_Bean_Access := new Metrics_Bean;
    begin
       Initialize (Object);

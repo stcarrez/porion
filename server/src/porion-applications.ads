@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion -- porion applications
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,6 @@ with Servlet.Security.Servlets;
 with ASF.Servlets.Faces;
 with ASF.Servlets.Ajax;
 with ASF.Converters.Sizes;
-with ASF.Converters.Durations;
 with ASF.Applications;
 
 with AWA.Users.Servlets;
@@ -38,6 +37,7 @@ with Porion.Dashboards.Modules;
 with Porion.Projects.Modules;
 with Porion.Builds.Modules;
 with Porion.Nodes.Modules;
+with Porion.Converters.Durations;
 package Porion.Applications is
 
    CONFIG_PATH  : constant String := "porion-server";
@@ -94,8 +94,8 @@ private
       --  Converters shared by web requests.
       Rel_Date_Converter : aliased AWA.Converters.Dates.Relative_Date_Converter;
       Size_Converter     : aliased ASF.Converters.Sizes.Size_Converter;
-      Microsec_Converter : aliased ASF.Converters.Durations.Duration_Converter;
-      Millisec_Converter : aliased ASF.Converters.Durations.Duration_Converter;
+      Microsec_Converter : aliased Porion.Converters.Durations.Duration_Converter;
+      Millisec_Converter : aliased Porion.Converters.Durations.Duration_Converter;
 
       --  The application modules.
       User_Module        : aliased AWA.Users.Modules.User_Module;

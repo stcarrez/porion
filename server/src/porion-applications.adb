@@ -95,8 +95,8 @@ package body Porion.Applications is
       App.Add_Converter (Name      => "millisecondConverter",
                          Converter => App.Self.Millisec_Converter'Access);
 
-      App.Self.Microsec_Converter.Unit := ASF.Converters.Durations.MICROSECOND;
-      App.Self.Millisec_Converter.Unit := ASF.Converters.Durations.MILLISECOND;
+      App.Self.Microsec_Converter.Unit := Porion.Converters.Durations.MICROSECOND;
+      App.Self.Millisec_Converter.Unit := Porion.Converters.Durations.MILLISECOND;
 
       Register (App    => App.Self.all'Access,
                 Name   => AWA.Users.Modules.NAME,

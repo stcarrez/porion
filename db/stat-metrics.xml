@@ -63,6 +63,26 @@
         </sql>
     </query> 
 
+    <query name='stat-project-with-metric'>
+        <comment>Statistics about the last project build with a specific metric</comment>
+        <sql>
+          SELECT
+          metric.metric,
+          metric.name,
+          metric.label,
+          SUM(mb.value) AS value,
+          MAX(mb.value) AS max_value,
+          COUNT(mb.id) AS CNT
+          FROM porion_last_build AS last_build
+          INNER JOIN porion_build AS build ON last_build.build_id = build.id
+          INNER JOIN porion_build_metric AS mb ON mb.build_id = last_build.build_id
+          INNER JOIN porion_metric AS metric ON mb.metric_id = metric.id
+          WHERE last_build.status = 2 AND last_build.last_build = 1
+          AND build.project_id = :project_id AND metric.metric = :metric
+          GROUP BY metric.name
+        </sql>
+    </query> 
+
     <query name='stat-build-metrics'>
         <comment>Statistics about the build metrics (specific build)</comment>
         <sql>

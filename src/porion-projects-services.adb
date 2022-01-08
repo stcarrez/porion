@@ -647,20 +647,13 @@ package body Porion.Projects.Services is
       Service.DB.Commit;
    end Set_Rate_Factor;
 
-   --  Replace several special characters by ' ' which is the separator
-   --  used to split filtering rules.
-   Rule_Translate_Map : constant Ada.Strings.Maps.Character_Mapping
-     := Ada.Strings.Maps.To_Mapping
-       (From => ",;/\",
-        To   => "    ");
-
    --  ------------------------------
    --  Set the recipe filter rules.
    --  ------------------------------
    procedure Set_Filter_Rules (Service  : in out Context_Type;
                                Rules    : in String;
                                Modified : out Boolean) is
-      Value : constant String := Ada.Strings.Fixed.Translate (Rules, Rule_Translate_Map);
+      Value : constant String := To_Filter_Rules (Rules);
    begin
       Log.Info ("Set filter rules to '{0}'' on recipe {1}", Value, Service.Get_Recipe_Name);
 

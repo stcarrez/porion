@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion -- Continuous integration controller
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,8 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
+with Ada.Strings.Maps;
+with Ada.Strings.Fixed;
 with Util.Log.Loggers;
 with Util.Properties;
 package body Porion is
@@ -65,5 +67,17 @@ package body Porion is
       Util.Log.Loggers.Initialize (Log_Config);
 
    end Configure_Logs;
+
+   --  Replace several special characters by ' ' which is the separator
+   --  used to split filtering rules.
+   Rule_Translate_Map : constant Ada.Strings.Maps.Character_Mapping
+     := Ada.Strings.Maps.To_Mapping
+       (From => ",;/\",
+        To   => "    ");
+
+   function To_Filter_Rules (List : in String) return String is
+   begin
+      return Ada.Strings.Fixed.Translate (List, Rule_Translate_Map);
+   end To_Filter_Rules;
 
 end Porion;

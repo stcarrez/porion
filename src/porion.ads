@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion -- Continuous integration controller
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,4 +51,7 @@ private
    procedure Configure_Logs (Debug   : in Boolean;
                              Dump    : in Boolean;
                              Verbose : in Boolean);
+
+   function To_Filter_Rules (List : in String) return String;
+
 end Porion;

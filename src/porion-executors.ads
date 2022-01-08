@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-executors -- Execute commands for builders or source controllers
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,6 +46,9 @@ package Porion.Executors is
 
    --  Returns true if this executor is configured and can be used.
    function Is_Configured (Executor : in Executor_Type) return Boolean;
+
+   --  Returns true if this executor runs locally.
+   function Is_Local (Executor : in Executor_Type) return Boolean;
 
    --  Enable the dry run execution mode.
    procedure Enable_Dry_Run (Executor : in out Executor_Type);

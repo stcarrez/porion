@@ -187,7 +187,8 @@ package body Porion.Services is
       Service.Recipe.Find (Service.DB, Query, Found);
       if not Found then
          Log.Error ("Recipe not found");
-         raise Not_Found;
+         --  raise Not_Found;
+         return;
       end if;
       if Service.Branch.Is_Null then
          Service.Branch := Porion.Projects.Models.Branch_Ref (Service.Recipe.Get_Branch);

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-nodes -- Build node information and management
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -78,6 +78,9 @@ package Porion.Nodes is
 
    type Controller_Type is abstract limited new Ada.Finalization.Limited_Controlled with private;
    type Controller_Access is access all Controller_Type'Class;
+
+   --  Returns true if this executor runs locally.
+   function Is_Local (Controller : in Controller_Type) return Boolean is (True);
 
    --  Return the usage identified when running commands on this build node.
    function Get_Usage (Controller : in Controller_Type'Class) return Usage_Type;

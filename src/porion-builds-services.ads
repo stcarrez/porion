@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-builds-services -- build service to manage builds
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -143,8 +143,8 @@ package Porion.Builds.Services is
    --  Copy the recipe to another recipe with the given name.
    procedure Copy_Recipe (Service  : in out Context_Type;
                           Name     : in String;
-                          Recipe   : in out Models.Recipe_Ref) with
-      Pre => Service.Is_Open and Service.Has_Recipe;
+                          From     : in out Models.Recipe_Ref) with
+      Pre => Service.Is_Open and not From.Is_Null;
 
    procedure Guess (Service  : in out Context_Type;
                     Path     : in String;

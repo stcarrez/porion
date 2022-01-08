@@ -64,6 +64,9 @@ package Porion.Services is
    --  Get the identification of the current recipe in the form <project>#<branc>~<recipe>.
    function Get_Recipe_Name (Service : in Context_Type) return String with
       Pre => Service.Has_Recipe;
+   function Get_Recipe_Name (Service : in Context_Type;
+                             Recipe  : in Porion.Builds.Models.Recipe_Ref'Class) return String with
+      Pre => Service.Has_Project and not Recipe.Is_Null;
 
    procedure Load_Project (Service : in out Context_Type;
                            Name    : in String);

@@ -33,6 +33,13 @@ package body Porion.Nodes.Beans is
    begin
       Query.Set_Query (Porion.Queries.Query_Node_List);
       Porion.Queries.List (Bean.Nodes, Session, Query);
+      Bean.Queue_Count := 0;
+      for Node of Bean.Nodes.List loop
+         if Node.Queue_Count > 0 then
+            Bean.Queue_Count := Bean.Queue_Count + Node.Queue_Count;
+            Bean.Queue_Nodes := Bean.Queue_Nodes + 1;
+         end if;
+      end loop;
    end Load;
 
    --  ------------------------------
@@ -40,13 +47,19 @@ package body Porion.Nodes.Beans is
    --  ------------------------------
    overriding
    function Get_Value (From : in Node_List_Bean;
-                       Name : in String) return Util.Beans.Objects.Object is
+                       Name : in String) return UBO.Object is
    begin
       if Name = "nodes" then
-         return Util.Beans.Objects.To_Object (Value   => From.Nodes_Bean,
-                                              Storage => Util.Beans.Objects.STATIC);
+         return UBO.To_Object (Value   => From.Nodes_Bean,
+                               Storage => UBO.STATIC);
+      elsif Name = "queue_count" then
+         return UBO.To_Object (From.Queue_Count);
+      elsif Name = "queue_nodes" then
+         return UBO.To_Object (From.Queue_Nodes);
+      elsif Name = "count" then
+         return UBO.To_Object (Natural (From.Nodes.List.Length));
       else
-         return Util.Beans.Objects.Null_Object;
+         return UBO.Null_Object;
       end if;
    end Get_Value;
 
@@ -56,7 +69,7 @@ package body Porion.Nodes.Beans is
    overriding
    procedure Set_Value (From  : in out Node_List_Bean;
                         Name  : in String;
-                        Value : in Util.Beans.Objects.Object) is
+                        Value : in UBO.Object) is
    begin
       null;
    end Set_Value;

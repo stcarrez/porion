@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-nodes-beans -- Beans for module nodes
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,22 +26,26 @@ with Porion.Queries;
 with Porion.Dashboards.Models;
 package Porion.Nodes.Beans is
 
+   package UBO renames Util.Beans.Objects;
+
    type Node_List_Bean is new Porion.Dashboards.Models.Project_List_Bean with record
-      Nodes      : aliased Porion.Queries.Node_Info_List_Bean;
-      Nodes_Bean : Porion.Queries.Node_Info_List_Bean_Access;
+      Nodes       : aliased Porion.Queries.Node_Info_List_Bean;
+      Nodes_Bean  : Porion.Queries.Node_Info_List_Bean_Access;
+      Queue_Count : Natural := 0;
+      Queue_Nodes : Natural := 0;
    end record;
    type Node_List_Bean_Access is access all Node_List_Bean'Class;
 
    --  Get the value identified by the name.
    overriding
    function Get_Value (From : in Node_List_Bean;
-                       Name : in String) return Util.Beans.Objects.Object;
+                       Name : in String) return UBO.Object;
 
    --  Set the value identified by the name.
    overriding
    procedure Set_Value (From  : in out Node_List_Bean;
                         Name  : in String;
-                        Value : in Util.Beans.Objects.Object);
+                        Value : in UBO.Object);
 
    --  Load the list of projects.
    procedure Load (Bean    : in out Node_List_Bean;

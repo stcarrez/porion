@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-nodes-services -- Build node management operations
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -59,8 +59,9 @@ package Porion.Nodes.Services is
      Post => Service.Build_Node.Is_Loaded;
 
    --  Probe the current node to check and update its status.
-   procedure Probe_Node (Service : in out Context_Type;
-                         Rules   : in out Rule_Status_Vector) with
+   procedure Probe_Node (Service     : in out Context_Type;
+                         Check_Rules : in String;
+                         Rules       : in out Rule_Status_Vector) with
      Pre => Service.Is_Open and Service.Build_Node.Is_Loaded;
 
    --  Add a default build node.

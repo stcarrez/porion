@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-nodes-services -- Build node management operations
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -97,8 +97,9 @@ package body Porion.Nodes.Services is
    --  ------------------------------
    --  Probe the current node to check and update its status.
    --  ------------------------------
-   procedure Probe_Node (Service : in out Context_Type;
-                         Rules   : in out Rule_Status_Vector) is
+   procedure Probe_Node (Service     : in out Context_Type;
+                         Check_Rules : in String;
+                         Rules       : in out Rule_Status_Vector) is
       procedure Probe_Uname (Controller : in Controller_Access);
       procedure Probe_Os_Release (Controller : in Controller_Access);
       procedure Probe_Rule (Controller : in Controller_Access;
@@ -325,6 +326,11 @@ package body Porion.Nodes.Services is
       end if;
 
       Probe_Uname (Controller);
+
+      --  When some check rules are specified, update the build node to check these rules.
+      if Check_Rules'Length > 0 then
+         Service.Build_Node.Set_Check_Rules (To_Filter_Rules (Check_Rules));
+      end if;
 
       if Service.Build_Node.Get_Status /= NODE_ERROR then
          Probe_Os_Release (Controller);

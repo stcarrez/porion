@@ -61,7 +61,9 @@ package body Porion.Commands.Init is
             Nodes.Services.Add_Default_Node (Context.Project_Service,
                                              Hostname => "localhost",
                                              Login    => "");
-            Nodes.Services.Probe_Node (Context.Project_Service, Rules);
+            Nodes.Services.Probe_Node (Context.Project_Service,
+                                       "git mvn make cloc lcov gprbuild",
+                                       Rules);
             Context.Notice (-("Default build node 'localhost' is registered"));
             Context.Notice (-("Use 'porion add' to register a first project"));
          end;

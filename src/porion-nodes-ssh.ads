@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-nodes-ssh -- SSH build node management
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,6 +32,10 @@ private package Porion.Nodes.SSH is
    --  Create the controller for the management of the given build node.
    function Create (Listener : in Listener_Access;
                     Node     : in Models.Node_Ref) return Nodes.Controller_Access;
+
+   --  Returns true if this executor runs locally.
+   overriding
+   function Is_Local (Controller : in Controller_Type) return Boolean is (False);
 
    --  Execute the command in the working directory on the remote host through
    --  ssh and for each output line produced by the command call Process.

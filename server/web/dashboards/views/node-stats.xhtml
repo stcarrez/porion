@@ -15,29 +15,24 @@
   -  limitations under the License.
   -->
 <ui:composition
-        xmlns:awa="http://code.google.com/p/ada-awa/jsf"
-        xmlns:ui="http://java.sun.com/jsf/facelets"
-        xmlns:f="http://java.sun.com/jsf/core"
-        xmlns:c="http://java.sun.com/jstl/core"
-        xmlns:u="http://code.google.com/p/ada-asf/util"
-        xmlns:h="http://java.sun.com/jsf/html">
+  xmlns:awa="http://code.google.com/p/ada-awa/jsf"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:c="http://java.sun.com/jstl/core"
+  xmlns:w="http://code.google.com/p/ada-asf/widget"
+  xmlns:u="http://code.google.com/p/ada-asf/util"
+  xmlns:h="http://java.sun.com/jsf/html">
   <div class='dashboard-stats'>
     <ul class='project-dashboard'>
       <li>
         <div class='dashboard-title'>
-          Nodes
+          Build Queue
         </div>
         <div class='dashboard-value'>
-          <h:list var="node" value="#{nodeList.nodes}">
-            <div>
-              <div>
-                #{node.name}
-              </div>
-              <div>
-                #{node.recipe_count}
-              </div>
-            </div>
-          </h:list>
+          #{nodeList.queue_count} on #{nodeList.queue_nodes} build nodes
+        </div>
+        <div class='dashboard-value'>
+          <w:progress value="#{nodeList.queue_nodes}" maxValue="#{nodeList.count}"/>
         </div>
       </li>
 

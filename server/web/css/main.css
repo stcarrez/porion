@@ -70,18 +70,22 @@ div.awa-title dd {
     line-height: 32px;
     vertical-align: top;
 }
-.project-page-grid .project-build-status {
+.project-page-grid .project-build-status, .project-page-grid .project-progress-status {
     display: inline-block;
     width: 16px;
     height: 40px;
+    float: left;
 }
-.build-status-BUILD_FAIL .project-build-status {
+.project-page-grid .project-progress-status {
+    float: right;
+}
+.build-status-BUILD_FAIL .project-build-status, .build-status-BUILD_FAIL .project-progress-status {
     background: red;
 }
-.build-status-BUILD_PASS .project-build-status {
+.build-status-BUILD_PASS .project-build-status, .build-status-BUILD_PASS .project-progress-status {
     background: green;
 }
-.build-status-BUILD_RUNNING .project-build-status {
+.build-status-BUILD_RUNNING .project-build-status, .build-status-BUILD_RUNNING .project-progress-status {
     background: orange;
 }
 .project-page-grid .project-title {
@@ -268,7 +272,7 @@ div.awa-title dd {
     width: 3em;
 }
 .log-level-porion {
-    color: yellow;
+    color: brown;
 }
 .log-level-info {
     color: grey;
@@ -277,7 +281,7 @@ div.awa-title dd {
     color: red;
 }
 .log-level-warning {
-    color: lightblue;
+    color: blue;
 }
 .build-show-warning .log-level-debug,
 .build-show-warning .log-level-unknown,

@@ -7,6 +7,12 @@
     background-color: #2b2b2b;
     color: #ccc;
   }
+  .log-level-porion {
+    color: yellow;
+  }
+  .log-level-warning {
+    color: lightblue;
+  }
   .build-info-line, .project-dashboard {
       background-color: #3b3b3b;
       border-color: #2b2b2b;

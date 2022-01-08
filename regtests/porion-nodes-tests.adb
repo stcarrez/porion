@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-nodes-tests -- Tests for build node management
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -53,7 +53,7 @@ package body Porion.Nodes.Tests is
                        "Invalid node name");
       T.Assert (Service.Build_Node.Get_Main_Node, "not the main node");
 
-      Nodes.Services.Probe_Node (Service, Rules);
+      Nodes.Services.Probe_Node (Service, "configure,make", Rules);
       Assert_Equals (T, Nodes.NODE_ONLINE, Service.Build_Node.Get_Status,
                      "invalid localhost node state");
 

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-commands-add -- Add command
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -47,7 +47,7 @@ private
                          Context : in out Context_Type);
 
    type Command_Type is new Porion.Commands.Drivers.Command_Type with record
-      Recipe : aliased GNAT.Strings.String_Access;
+      Recipe : aliased Boolean := False;
       Quiet  : aliased Boolean := False;
    end record;
 

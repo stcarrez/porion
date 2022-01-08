@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-commands-add -- Add command
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -88,13 +88,19 @@ package body Porion.Commands.Add is
                          Target  : in String;
                          Source  : in String;
                          Context : in out Context_Type) is
-      Ident   : Porion.Projects.Ident_Type;
-      Recipes : Porion.Builds.Models.Recipe_Vector;
+      Ident        : Porion.Projects.Ident_Type;
+      Target_Ident : Porion.Projects.Ident_Type;
+      Recipes      : Porion.Builds.Models.Recipe_Vector;
+      Recipe       : Porion.Builds.Models.Recipe_Ref;
    begin
-      if not Porion.Projects.Is_Valid_Recipe (Command.Recipe.all) then
-         Commands.Error (-("invalid recipe name '{0}'"), Command.Recipe.all);
-         return;
-      end if;
+      begin
+         Target_Ident := Porion.Projects.Parse (Target);
+
+      exception
+         when Porion.Projects.Invalid_Ident =>
+            Commands.Error (-("invalid recipe name '{0}"), Target);
+            return;
+      end;
 
       if Source'Length > 0 then
          begin
@@ -120,16 +126,33 @@ package body Porion.Commands.Add is
             Commands.Error (-("no recipe found for source '{0}'"), Source);
             return;
          end if;
+         for Existing_Recipe of Recipes loop
+            if Existing_Recipe.Get_Main_Recipe then
+               Recipe := Existing_Recipe;
+               exit;
+            end if;
+         end loop;
+         if Recipe.Is_Null then
+            Recipe := Recipes.First_Element;
+         end if;
       end if;
 
-      Ident := Porion.Projects.Parse (Target);
-
       begin
-         Context.Project_Service.Load (Ident);
-         if not Context.Project_Service.Has_Recipe then
-            Commands.Error (-("missing source recipe identification to copy"));
-            return;
+         Ident := Target_Ident;
+         Ident.Recipe := To_UString ("");
+         if Recipe.Is_Null then
+            Ident.Node := To_UString ("");
+            Porion.Builds.Services.Load_Recipes (Context.Project_Service, Ident, Recipes);
+            for Existing_Recipe of Recipes loop
+               if Existing_Recipe.Get_Main_Recipe then
+                  Recipe := Existing_Recipe;
+                  exit;
+               end if;
+            end loop;
          end if;
+
+         Ident.Node := Target_Ident.Node;
+         Context.Project_Service.Load (Ident);
 
       exception
          when Porion.Services.Not_Found =>
@@ -138,9 +161,18 @@ package body Porion.Commands.Add is
             return;
       end;
 
+      if Recipe.Is_Null then
+         Commands.Error (-("missing source recipe identification to copy"));
+         return;
+      end if;
+
+      if not Porion.Projects.Has_Recipe (Target_Ident) then
+         Target_Ident.Recipe := Target_Ident.Node;
+      end if;
+
       Builds.Services.Copy_Recipe (Context.Project_Service,
-                                   Command.Recipe.all,
-                                   Context.Project_Service.Recipe);
+                                   To_String (Target_Ident.Recipe),
+                                   Recipe);
 
       if Context.Project_Service.Branch.Is_Null then
          Commands.Error (-("branch '{0}' not found for project '{1}'"),
@@ -179,7 +211,7 @@ package body Porion.Commands.Add is
       end if;
       Context.Open;
 
-      if Command.Recipe'Length > 0 then
+      if Command.Recipe then
          if Args.Get_Count = 2 then
             Command.Add_Recipe (Args.Get_Argument (1), Args.Get_Argument (2), Context);
          else
@@ -200,8 +232,7 @@ package body Porion.Commands.Add is
    begin
       Drivers.Command_Type (Command).Setup (Config, Context);
       GC.Define_Switch (Config, Command.Recipe'Access,
-                        "-r=", "--recipe=",
-                        Argument => "IDENT",
+                        "-r", "--recipe",
                         Help     =>  -("Add a build recipe to a project"));
       GC.Define_Switch (Config, Command.Quiet'Access,
                         "-q", "--quiet", -("Quiet execution don't print the build steps"));

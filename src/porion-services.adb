@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-services -- Project information
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -69,6 +69,12 @@ package body Porion.Services is
       Branch_Name : constant String := Service.Get_Branch_Name;
    begin
       return Branch_Name & "~" & Service.Recipe.Get_Name;
+   end Get_Recipe_Name;
+
+   function Get_Recipe_Name (Service : in Context_Type;
+                             Recipe  : in Porion.Builds.Models.Recipe_Ref'Class) return String is
+   begin
+      return "~" & Recipe.Get_Name;
    end Get_Recipe_Name;
 
    procedure Load_Project (Service : in out Context_Type;

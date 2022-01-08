@@ -35,6 +35,9 @@
         <property type='Integer' name="build_count">
             <comment>the number of builds for this node.</comment>
         </property>
+        <property type='Integer' name="queue_count">
+            <comment>the number of recipes in the build queue for this node.</comment>
+        </property>
     </class>
 
    <query name='node-list'>
@@ -50,7 +53,8 @@
             node.kind AS kind,
             node.status AS status,
             (SELECT COUNT(recipe.id) FROM porion_recipe AS recipe WHERE recipe.node_id = node.id) AS recipe_count,
-            (SELECT COUNT(build.id) FROM porion_build AS build WHERE build.node_id = node.id) AS bld_count
+            (SELECT COUNT(build.id) FROM porion_build AS build WHERE build.node_id = node.id) AS bld_count,
+            (SELECT COUNT(queue.id) FROM porion_build_queue AS queue WHERE queue.node_id = node.id) AS queue_count
             FROM porion_node AS node
             WHERE node.deleted = 0
             ORDER BY node.name
@@ -70,7 +74,8 @@
             node.kind AS kind,
             node.status AS status,
             COUNT(distinct recipe.id) AS recipe_count,
-            (SELECT COUNT(build.id) FROM porion_build AS build WHERE build.node_id = node.id AND build.project_id = :project_id) AS bld_count
+            (SELECT COUNT(build.id) FROM porion_build AS build WHERE build.node_id = node.id AND build.project_id = :project_id) AS bld_count,
+            (SELECT COUNT(queue.id) FROM porion_build_queue AS queue WHERE queue.node_id = node.id) AS queue_count
             FROM porion_node AS node
             INNER JOIN porion_recipe AS recipe ON recipe.node_id = node.id
             WHERE node.deleted = 0 AND recipe.project_id = :project_id

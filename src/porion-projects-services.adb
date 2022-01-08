@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-projects -- Project information
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,8 +16,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Directories;
-with Ada.Strings.Maps;
-with Ada.Strings.Fixed;
 with Util.Log.Loggers;
 with Util.Properties;
 with Util.Strings;

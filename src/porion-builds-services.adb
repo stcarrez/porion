@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-builds-services -- build service to manage builds
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -1470,16 +1470,16 @@ package body Porion.Builds.Services is
    --  ------------------------------
    procedure Copy_Recipe (Service  : in out Context_Type;
                           Name     : in String;
-                          Recipe   : in out Models.Recipe_Ref) is
+                          From     : in out Models.Recipe_Ref) is
       use type Porion.Projects.Models.Branch_Status_Type;
 
-      Ident   : constant String := Service.Get_Recipe_Name;
+      Ident   : constant String := Service.Get_Recipe_Name (From);
       Steps   : Build_Step_Vector;
    begin
       Log.Info ("Copy build recipe {0} to {1}", Ident, Name);
 
       --  Load the recipe steps.
-      Load_Recipe (Service, Service.Recipe, Steps);
+      Load_Recipe (Service, From, Steps);
 
       --  Create the new recipe and copy the build steps.
       Service.DB.Begin_Transaction;
@@ -1488,13 +1488,13 @@ package body Porion.Builds.Services is
          Added      : Boolean;
       begin
          New_Recipe.Set_Name (Name);
-         New_Recipe.Set_Description (String '(Recipe.Get_Description));
-         New_Recipe.Set_Rate_Factor (Recipe.Get_Rate_Factor);
+         New_Recipe.Set_Description (String '(From.Get_Description));
+         New_Recipe.Set_Rate_Factor (From.Get_Rate_Factor);
          New_Recipe.Set_Status (Builds.Models.CONFIG_BUILD_REQUIRED);
          New_Recipe.Set_Node (Service.Build_Node);
          New_Recipe.Set_Project (Service.Project);
          New_Recipe.Set_Branch (Service.Branch);
-         New_Recipe.Set_Filter_Rules (String '(Recipe.Get_Filter_Rules));
+         New_Recipe.Set_Filter_Rules (String '(From.Get_Filter_Rules));
          New_Recipe.Save (Service.DB);
 
          if Service.Branch.Get_Status = Porion.Projects.Models.BUILD_DISABLED then
@@ -1518,11 +1518,11 @@ package body Porion.Builds.Services is
             end;
          end loop;
 
+         Service.Recipe := New_Recipe;
          Add_Build_Queue (Service, Models.REASON_CONFIG, Added);
          if Added then
             Update_Build_Queue (Service, Trigger_Builds => False);
          end if;
-         Recipe := New_Recipe;
       end;
       Service.DB.Commit;
    end Copy_Recipe;

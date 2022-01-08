@@ -688,21 +688,26 @@ package body Porion.Resources.Queries is
        & "s that use this node.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
        & "        <property type='Integer' name=""build_count"">" & ASCII.LF & "  "
        & "          <comment>the number of builds for this node.</comment>" & ASCII.LF
-       & "        </property>" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF
-       & "   <query name='node-list'>" & ASCII.LF & "        <comment>Get the list"
-       & " of build nodes</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & "  "
-       & "          SELECT" & ASCII.LF & "            node.name AS name," & ASCII.LF
-       & "            node.login AS login," & ASCII.LF & "            node.os_name"
-       & " AS os_name," & ASCII.LF & "            node.os_version AS os_version," & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Integer' name"
+       & "=""queue_count"">" & ASCII.LF & "            <comment>the number of reci"
+       & "pes in the build queue for this node.</comment>" & ASCII.LF & "        <"
+       & "/property>" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF & "   <qu"
+       & "ery name='node-list'>" & ASCII.LF & "        <comment>Get the list of bu"
+       & "ild nodes</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & "        "
+       & "    SELECT" & ASCII.LF & "            node.name AS name," & ASCII.LF & " "
+       & "           node.login AS login," & ASCII.LF & "            node.os_name "
+       & "AS os_name," & ASCII.LF & "            node.os_version AS os_version," & ASCII.LF
        & "            node.cpu_type AS cpu_type," & ASCII.LF & "            node.r"
        & "epository_dir AS repository_dir," & ASCII.LF & "            node.kind AS"
        & " kind," & ASCII.LF & "            node.status AS status," & ASCII.LF & " "
        & "           (SELECT COUNT(recipe.id) FROM porion_recipe AS recipe WHERE r"
        & "ecipe.node_id = node.id) AS recipe_count," & ASCII.LF & "            (SE"
        & "LECT COUNT(build.id) FROM porion_build AS build WHERE build.node_id = no"
-       & "de.id) AS bld_count" & ASCII.LF & "            FROM porion_node AS node" & ASCII.LF
-       & "            WHERE node.deleted = 0" & ASCII.LF & "            ORDER BY n"
-       & "ode.name" & ASCII.LF & "        </sql>" & ASCII.LF & "   </query>" & ASCII.LF
+       & "de.id) AS bld_count," & ASCII.LF & "            (SELECT COUNT(queue.id) "
+       & "FROM porion_build_queue AS queue WHERE queue.node_id = node.id) AS queue"
+       & "_count" & ASCII.LF & "            FROM porion_node AS node" & ASCII.LF & " "
+       & "           WHERE node.deleted = 0" & ASCII.LF & "            ORDER BY no"
+       & "de.name" & ASCII.LF & "        </sql>" & ASCII.LF & "   </query>" & ASCII.LF
        & ASCII.LF & "   <query name='project-node-list'>" & ASCII.LF & "        <"
        & "comment>Get the list of build nodes for a project</comment>" & ASCII.LF
        & "        <sql>" & ASCII.LF & "            SELECT" & ASCII.LF & "         "
@@ -714,10 +719,12 @@ package body Porion.Resources.Queries is
        & " status," & ASCII.LF & "            COUNT(distinct recipe.id) AS recipe_"
        & "count," & ASCII.LF & "            (SELECT COUNT(build.id) FROM porion_bu"
        & "ild AS build WHERE build.node_id = node.id AND build.project_id = :proje"
-       & "ct_id) AS bld_count" & ASCII.LF & "            FROM porion_node AS node" & ASCII.LF
-       & "            INNER JOIN porion_recipe AS recipe ON recipe.node_id = node."
-       & "id" & ASCII.LF & "            WHERE node.deleted = 0 AND recipe.project_"
-       & "id = :project_id" & ASCII.LF & "            GROUP BY node.id" & ASCII.LF
+       & "ct_id) AS bld_count," & ASCII.LF & "            (SELECT COUNT(queue.id) "
+       & "FROM porion_build_queue AS queue WHERE queue.node_id = node.id) AS queue"
+       & "_count" & ASCII.LF & "            FROM porion_node AS node" & ASCII.LF & " "
+       & "           INNER JOIN porion_recipe AS recipe ON recipe.node_id = node.i"
+       & "d" & ASCII.LF & "            WHERE node.deleted = 0 AND recipe.project_i"
+       & "d = :project_id" & ASCII.LF & "            GROUP BY node.id" & ASCII.LF
        & "            ORDER BY node.name" & ASCII.LF & "        </sql>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 

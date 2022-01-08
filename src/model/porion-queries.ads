@@ -508,6 +508,9 @@ package Porion.Queries is
 
       --  the number of builds for this node.
       Build_Count : Integer;
+
+      --  the number of recipes in the build queue for this node.
+      Queue_Count : Integer;
    end record;
 
    --  Get the bean attribute identified by the name.
@@ -912,7 +915,7 @@ private
 
    package File_8 is
       new ADO.Queries.Loaders.File (Path => "report-nodes.xml",
-                                    Sha1 => "C415C6088AFE424A4C27990F658A1FA3111DA129");
+                                    Sha1 => "5FFD9A89CA06C96A624A2EF6283F13D015A2A9DC");
 
    package Def_Nodeinfo_Node_List is
       new ADO.Queries.Loaders.Query (Name => "node-list",

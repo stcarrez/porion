@@ -689,6 +689,8 @@ package body Porion.Queries is
          return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Recipe_Count));
       elsif Name = "build_count" then
          return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Build_Count));
+      elsif Name = "queue_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Queue_Count));
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -722,6 +724,8 @@ package body Porion.Queries is
          Item.Recipe_Count := Util.Beans.Objects.To_Integer (Value);
       elsif Name = "build_count" then
          Item.Build_Count := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "queue_count" then
+         Item.Queue_Count := Util.Beans.Objects.To_Integer (Value);
       end if;
    end Set_Value;
 
@@ -759,6 +763,7 @@ package body Porion.Queries is
          Into.Status := Porion.Nodes.Node_Status_Type'Enum_Val (Stmt.Get_Integer (7));
          Into.Recipe_Count := Stmt.Get_Integer (8);
          Into.Build_Count := Stmt.Get_Integer (9);
+         Into.Queue_Count := Stmt.Get_Integer (10);
       end Read;
    begin
       Stmt.Execute;

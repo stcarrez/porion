@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-metrics-spaces -- Get metrics for the file system space used by the build
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,6 +44,10 @@ package body Porion.Metrics.DiskUsage is
       Stats  : Porion.Tools.Tree_Stat_Type;
       Prefix : constant String := To_String (Controller.Prefix);
    begin
+      if not Executor.Is_Local then
+         return;
+      end if;
+
       Porion.Tools.Find_Stats (Path, Stats);
       Controller.Save_Metric (Prefix & "total_size", "Total size (Kb)",
                               Natural (Stats.Total_Size / 1024));

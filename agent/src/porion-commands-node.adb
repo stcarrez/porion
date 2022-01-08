@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-commands-node -- Node command to add/remove/update build nodes
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,10 @@ with Porion.Configs.Rules;
 with Porion.Nodes.Services;
 with Porion.Reports;
 package body Porion.Commands.Node is
+
+   procedure List_Rules (Rules   : in Porion.Nodes.Services.Rule_Status_Vector;
+                         Printer : in out PT.Printer_Type'Class;
+                         Styles  : in Porion.Reports.Style_Configuration);
 
    procedure List_Rules (Rules   : in Porion.Nodes.Services.Rule_Status_Vector;
                          Printer : in out PT.Printer_Type'Class;
@@ -177,7 +181,7 @@ package body Porion.Commands.Node is
                Rules : Porion.Nodes.Services.Rule_Status_Vector;
             begin
                Nodes.Services.Load_Node (Context.Project_Service, Name);
-               Nodes.Services.Probe_Node (Context.Project_Service, Rules);
+               Nodes.Services.Probe_Node (Context.Project_Service, Command.Rules.all, Rules);
                Context.Notice (-("Node {0} is {1}"), Name, Get_Node_Status);
                List_Rules (Rules, Context.Printer.all, Context.Styles);
 
@@ -201,7 +205,7 @@ package body Porion.Commands.Node is
                                      Login      => Login,
                                      Repository => Directory);
 
-            Nodes.Services.Probe_Node (Context.Project_Service, Rules);
+            Nodes.Services.Probe_Node (Context.Project_Service, Command.Rules.all, Rules);
             Context.Notice (-("Node {0} is {1}"), Hostname, Get_Node_Status);
             List_Rules (Rules, Context.Printer.all, Context.Styles);
 
@@ -226,6 +230,10 @@ package body Porion.Commands.Node is
                         "-r", "--remove", -("remove the build node"));
       GC.Define_Switch (Config, Command.Probe'Access,
                         "-P", "--probe", -("probe the build node"));
+      GC.Define_Switch (Config, Command.Rules'Access,
+                        "-R=", "--rules=",
+                        Argument => "RULES",
+                        Help     =>  -("Use the specific rules when probing the build node"));
    end Setup;
 
 end Porion.Commands.Node;

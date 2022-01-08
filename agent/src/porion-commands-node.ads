@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-commands-node -- Node command to add/remove/update build nodes
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,6 +36,7 @@ private package Porion.Commands.Node is
 private
 
    type Command_Type is new Porion.Commands.Drivers.Command_Type with record
+      Rules  : aliased GNAT.Strings.String_Access;
       Remove : aliased Boolean := False;
       Probe  : aliased Boolean := False;
    end record;

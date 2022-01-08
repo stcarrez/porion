@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-nodes-ssh -- SSH build node management
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,12 +16,15 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Characters.Handling;
+with Ada.Environment_Variables;
 with Util.Strings.Vectors;
+with Util.Files;
 with Porion.Configs;
 with EL.Contexts.Default;
 package body Porion.Nodes.SSH is
 
    package UBO renames Util.Beans.Objects;
+   function Find_Command_Path (Command : in String) return String;
 
    --  ------------------------------
    --  Create the controller for the management of the given build node.
@@ -38,6 +41,24 @@ package body Porion.Nodes.SSH is
       Controller.Command := EL.Expressions.Create_Expression (Cmd, Ctx);
       return Controller.all'Access;
    end Create;
+
+   function Find_Command_Path (Command : in String) return String is
+   begin
+      if not Ada.Environment_Variables.Exists ("PATH") then
+         return Command;
+      end if;
+
+      declare
+         Path : String := Ada.Environment_Variables.Value ("PATH");
+      begin
+         for C of Path loop
+            if C = ':' then
+               C := ';';
+            end if;
+         end loop;
+         return Util.Files.Find_File_Path (Command, Path);
+      end;
+   end Find_Command_Path;
 
    --  ------------------------------
    --  Execute the command in the working directory on the remote host through
@@ -80,6 +101,13 @@ package body Porion.Nodes.SSH is
             Args.Append (Ssh (First .. Pos - 1));
             First := Pos;
          end loop;
+
+         if Args.Is_Empty then
+            Status := 1;
+            return;
+         end if;
+         Args.Replace_Element (1, Find_Command_Path (Args.First_Element));
+
          --  cd <working_dir> && <command>
          if Working_Dir'Length > 0 then
             Args.Append ("cd " & Working_Dir & " && " & Command);

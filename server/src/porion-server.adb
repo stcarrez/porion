@@ -102,7 +102,9 @@ procedure Porion.Server is
             Nodes.Services.Add_Default_Node (Project_Service,
                                              Hostname => "localhost",
                                              Login    => "");
-            Nodes.Services.Probe_Node (Project_Service, Rules);
+            Nodes.Services.Probe_Node (Project_Service,
+                                       "git make mvn cloc lcov gprbuild",
+                                       Rules);
             Log.Info (-("Default build node 'localhost' is registered"));
             Log.Info (-("Use 'porion add' to register a first project"));
          end;

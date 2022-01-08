@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-executors -- Execute commands for builders or source controllers
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,6 +42,14 @@ package body Porion.Executors is
    begin
       return Executor.Dry_Run or Executor.Logger.Is_Opened;
    end Is_Configured;
+
+   --  ------------------------------
+   --  Returns true if this executor runs locally.
+   --  ------------------------------
+   function Is_Local (Executor : in Executor_Type) return Boolean is
+   begin
+      return Executor.Controller = null or else Executor.Controller.Is_Local;
+   end Is_Local;
 
    --  ------------------------------
    --  Enable the dry run execution mode.

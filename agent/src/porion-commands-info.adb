@@ -182,32 +182,31 @@ package body Porion.Commands.Info is
       function Count_Active_Branches return Natural;
       use type Porion.Projects.Models.Branch_Status_Type;
 
-      Printer : PT.Texts.Printer_Type := PT.Texts.Create (Context.Printer.all);
-      Fields  : PT.Texts.Field_Array (1 .. 10);
-      Last_Builds : Porion.Builds.Models.Last_Build_Vector;
+      Printer     : PT.Texts.Printer_Type := PT.Texts.Create (Context.Printer.all);
+      Fields      : PT.Texts.Field_Array (1 .. 10);
+      Last_Builds : Porion.Queries.Build_Info_Vector;
       Executor    : Porion.Executors.Executor_Type;
       Recipes     : Porion.Builds.Models.Recipe_Vector;
+      Branches    : Porion.Queries.Branch_Info_Vector;
+      Query       : ADO.Queries.Context;
+      Branch_Name : UString;
 
-      Branches     : Porion.Queries.Branch_Info_Vector;
-      Query        : ADO.Queries.Context;
-      Branch_Name  : UString;
-
-            function Count_Active_Branches return Natural is
-               Result : Natural := 0;
-            begin
-               for Branch of Branches loop
-                  if Branch.Branch_Status /= Porion.Projects.Models.BUILD_DISABLED then
-                     Result := Result + 1;
-                     if Result > 1 then
-                        Ada.Strings.Unbounded.Append (Branch_Name, ", ");
-                     else
-                        Ada.Strings.Unbounded.Append (Branch_Name, "(");
-                     end if;
-                     Ada.Strings.Unbounded.Append (Branch_Name, Branch.Name);
-                  end if;
-               end loop;
-               return Result;
-            end Count_Active_Branches;
+      function Count_Active_Branches return Natural is
+         Result : Natural := 0;
+      begin
+         for Branch of Branches loop
+            if Branch.Branch_Status /= Porion.Projects.Models.BUILD_DISABLED then
+               Result := Result + 1;
+               if Result > 1 then
+                  Ada.Strings.Unbounded.Append (Branch_Name, ", ");
+               else
+                  Ada.Strings.Unbounded.Append (Branch_Name, "(");
+               end if;
+               Ada.Strings.Unbounded.Append (Branch_Name, Branch.Name);
+            end if;
+         end loop;
+         return Result;
+      end Count_Active_Branches;
 
       Name : constant String := To_String (Ident.Name);
    begin
@@ -261,10 +260,9 @@ package body Porion.Commands.Info is
       Printer.New_Line;
 
       Query.Clear;
-      Query.Set_Join ("INNER JOIN porion_branch AS b ON o.branch_id = b.id");
-      Query.Set_Filter ("b.project_id = :project_id");
+      Query.Set_Query (Porion.Queries.Query_Project_Last_Build_List);
       Query.Bind_Param ("project_id", Context.Project_Service.Project.Get_Id);
-      Porion.Builds.Models.List (Last_Builds, Context.Project_Service.DB, Query);
+      Porion.Queries.List (Last_Builds, Context.Project_Service.DB, Query);
 
             --  Printer.Set_Max_Dimension (Fields (2), (3, 1));
             --  Printer.Set_Max_Dimension (Fields (4), (3, 1));
@@ -290,24 +288,32 @@ package body Porion.Commands.Info is
 
          Printer.Put (Fields (3), -("Last builds"));
          Printer.New_Line;
+         Printer.Set_Bottom_Right_Padding (Fields (3), (2, 0));
+         Printer.Set_Bottom_Right_Padding (Fields (4), (2, 0));
          Printer.Layout_Fields (Fields (3 .. 5));
          for Build of Last_Builds loop
             declare
-               Branch_Name  : constant String := Build.Get_Branch.Get_Name;
-               Build_Number : constant Integer := Build.Get_Build.Get_Number;
+               Branch_Name  : constant String := To_String (Build.Branch_Name);
+               Build_Number : constant Integer := Build.Build_Number;
                Log_Dir      : constant String
                   := Configs.Get_Build_Log_Directory (Name,
                                                       Branch_Name,
                                                       Build_Number);
+               Ident        : Porion.Projects.Ident_Type;
             begin
-               if Build.Get_Status = Builds.Models.BUILD_FAIL then
+               Ident.Name := To_UString (Name);
+               Ident.Branch := Build.Branch_Name;
+               Ident.Recipe := Build.Recipe_Name;
+               Ident.Node := Build.Node_Name;
+               Ident.Build := Build_Number;
+               if Build.Build_Status = Builds.Models.BUILD_FAIL then
                   Printer.Set_Style (Fields (4), Context.Styles.Error);
                   Printer.Set_Style (Fields (5), Context.Styles.Error);
-                  Printer.Put (Fields (3), Branch_Name & (-(" (KO)")));
+                  Printer.Put (Fields (3), Porion.Projects.To_String (Ident) & (-(" (KO)")));
                else
                   Printer.Set_Style (Fields (4), Context.Styles.Success);
                   Printer.Set_Style (Fields (5), Context.Styles.Success);
-                  Printer.Put (Fields (3), Branch_Name);
+                  Printer.Put (Fields (3), Porion.Projects.To_String (Ident));
                end if;
                Printer.Put_Int (Fields (4), Build_Number);
                Printer.Put (Fields (5), Log_Dir);
@@ -346,23 +352,12 @@ package body Porion.Commands.Info is
          end;
       end if;
 
-      if Command.List_Builds then
-         declare
-            List   : Porion.Queries.Build_Info_Vector;
-            Query  : ADO.Queries.Context;
-         begin
-            Query.Set_Query (Porion.Queries.Query_Project_Last_Build_List);
-            Query.Bind_Param ("project_id", Context.Project_Service.Project.Get_Id);
-            Porion.Queries.List (List, Context.Project_Service.DB, Query);
-
-            if not List.Is_Empty then
-               Printer.New_Line;
-               Porion.Reports.List_Builds (List    => List,
-                                           Printer => Printer,
-                                           Styles  => Context.Styles,
-                                           Label   => -("Builds"));
-            end if;
-         end;
+      if Command.List_Builds and not Last_Builds.Is_Empty then
+         Printer.New_Line;
+         Porion.Reports.List_Builds (List    => Last_Builds,
+                                     Printer => Printer,
+                                     Styles  => Context.Styles,
+                                     Label   => -("Builds"));
       end if;
 
       declare

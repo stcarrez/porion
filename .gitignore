@@ -37,3 +37,13 @@ server/model.yaml
 agent/porion_agent.properties
 *-aunit.xml
 *.prj
+debian/.debhelper/
+debian/autoreconf.after
+debian/autoreconf.before
+debian/debhelper-build-stamp
+debian/porion-server.substvars
+debian/porion.substvars
+debian/porion/
+debian/porion-server/
+debian/files
+debian/tmp/

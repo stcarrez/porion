@@ -1,0 +1,42 @@
+Source: porion
+Priority: optional
+Section: devel
+Maintainer: Stephane Carrez <Stephane.Carrez@gmail.com>
+Build-Depends: debhelper (>= 10), autotools-dev,
+ dh-ada-library,
+ gnat, gnat-9,
+# This line is parsed by debian/rules.
+ gprbuild (>= 2015-2),
+ pkg-config,
+# 2015-2 is compatible with gnat-7
+# dh-ada-library (>= 6.7)
+# pandoc requires texlive-fonts-extra for PDF
+ pandoc, clojure, texlive-fonts-extra
+Standards-Version: 4.1.4
+Homepage: https://gitlab.com/stcarrez/porion/
+Vcs-Git: https://gitlab.com/stcarrez/porion.git -b debian-gnat-9
+Vcs-Browser: https://gitlab.com/stcarrez/porion/tree/debian-gnat-9
+
+Package: porion
+Section: devel
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: continuous integration and build manager
+ Porion is an automation system that helps automate the building,
+ testing and deployment of software development projects.
+ Porion is a continuous integration agent that helps
+ automate the building, testing and deployment of software
+ development projects written in any language.  Porion maintains
+ a list of projects with build recipes to build these projects.
+ It periodically checks for changes in projects and schedule
+ a build when a project is modified.
+
+Package: porion-server
+Section: utils
+Architecture: any
+Depends: porion, ${shlibs:Depends}, ${misc:Depends}
+Description: continuous integration and build manager server
+ Porion is an automation system that helps automate the building,
+ testing and deployment of software development projects.
+ Porion server is the web server associated with the Porion
+ agent.

@@ -2,6 +2,7 @@ NAME=porion
 GPRPATH=${NAME}.gpr
 VERSION=x.x.x
 UTIL_OS=linux64
+PACKAGE_XML=package.xml
 #GPRPATH_AGENT=porion_agent.gpr
 
 -include Makefile.conf
@@ -71,10 +72,12 @@ generate::
 	cd server && $(DYNAMO) generate $(SERVER_DYNAMO_ARGS)
 	cd server && $(ARE) -o src/model --rule=are-package.xml --no-type-declaration --list-access --content-only --name-access .. .
 
-package:
-	cd server && rm -rf $(DIST_DIR)
-	cd server && $(DYNAMO) dist $(DIST_DIR) package.xml
-	cd server && tar czf ../$(DIST_FILE) $(DIST_DIR)
+package: server-package
+	cd server && tar czf ../$(DIST_FILE) $(DESTDIR)$(DIST_DIR)
+
+server-package:
+	cd server && rm -rf $(DESTDIR)$(DIST_DIR)
+	cd server && $(DYNAMO) dist $(DESTDIR)$(DIST_DIR) $(PACKAGE_XML)
 
 build-ts:
 	tsc server/web/js/projects.ts

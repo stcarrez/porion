@@ -21,7 +21,7 @@ include /usr/share/ada/debian_packaging-$(GNAT_VERSION).mk
 ADAFLAGS += -gnatafno -gnatVa -gnatwa
 
 %:
-	dh $@
+	dh $@ --with=sysuser
 
 override_dh_auto_configure:
 	dh_auto_configure --
@@ -38,6 +38,7 @@ override_dh_auto_install:
 	dh_install debian/tmp/usr/bin/porion /usr/bin
 	dh_install -pporion-server bin/porion-server /usr/bin
 	dh_installman debian/tmp/usr/share/man/man1/porion.1
+	dh_installsystemd --package=porion-server
 	dh_strip
 	files=`cd $(CURDIR)/debian/tmp/usr/share/porion/resources && find . -type f`; \
         for i in $$files; do \

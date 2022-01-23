@@ -4,7 +4,6 @@ Section: devel
 Maintainer: Stephane Carrez <Stephane.Carrez@gmail.com>
 Build-Depends: debhelper (>= 10), autotools-dev,
  dh-ada-library,
- dh-sysuser,
  gnat, gnat-9,
 # This line is parsed by debian/rules.
  gprbuild (>= 2015-2),
@@ -35,7 +34,11 @@ Description: continuous integration and build manager
 Package: porion-server
 Section: utils
 Architecture: any
-Depends: porion, daemon, ${shlibs:Depends}, ${misc:Depends}
+Depends: adduser,
+ porion,
+ daemon,
+ ${shlibs:Depends},
+ ${misc:Depends}
 Description: continuous integration and build manager server
  Porion is an automation system that helps automate the building,
  testing and deployment of software development projects.

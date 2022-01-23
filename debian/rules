@@ -21,7 +21,7 @@ include /usr/share/ada/debian_packaging-$(GNAT_VERSION).mk
 ADAFLAGS += -gnatafno -gnatVa -gnatwa
 
 %:
-	dh $@ --with=sysuser
+	dh $@
 
 override_dh_auto_configure:
 	dh_auto_configure --
@@ -33,8 +33,6 @@ override_dh_auto_test::
 
 override_dh_auto_install:
 	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp prefix=/usr install
-	dh_installdirs usr/bin
-	dh_installdirs --package=porion-server usr/bin
 	dh_install debian/tmp/usr/bin/porion /usr/bin
 	dh_install -pporion-server bin/porion-server /usr/bin
 	dh_installman debian/tmp/usr/share/man/man1/porion.1

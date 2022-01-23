@@ -1,0 +1,21 @@
+[Unit]
+Description=Porion Build Engine
+ConditionPathExists=/etc/default/porion
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+Environment="PORION_BIN_DIR=/usr/bin"
+Environment="PORION_DIR=/home/porion"
+Environment="PORION_USER=porion"
+Environment="PORION_CONFIG=/home/porion/porion_server.properties"
+EnvironmentFile=/etc/default/porion
+WorkingDirectory=/
+ExecStart=daemon --name porion --respawn --delay=60 \
+      --inherit --user ${PORION_USER} --chdir ${PORION_DIR} \
+      -- ${PORION_BIN_DIR}/porion-server -c ${PORION_CONFIG} start
+ExecReload=/bin/true
+ExecStop=daemon --name porion --stop
+
+[Install]
+WantedBy=multi-user.target

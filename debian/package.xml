@@ -68,6 +68,7 @@
        <command>yui-compressor --type css --charset UTF-8 -o #{dst} #{src}</command>
        <fileset dir="web">
          <include name="**/*.css"/>
+         <exclude name="**/jquery-chosen-1.4.2/**"/>
        </fileset>
      </install>
      <install mode='merge' dir='web' log='info'>
@@ -92,6 +93,7 @@
        <command>pngcrush -q #{src} #{dst}</command>
        <fileset dir="web">
          <include name="**/*.png"/>
+         <exclude name="**/jquery-chosen-1.4.2/**"/>
        </fileset>
      </install>
      <install mode='copy' dir='web' >

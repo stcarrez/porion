@@ -7,7 +7,6 @@
     <property name="use_postgresql">false</property>
     <property name="use_mysql">false</property>
     <property name="is_lib">FALSE</property>
-    <property name="build">9</property>
     <property name="author">Stephane Carrez</property>
     <property name="is_web">FALSE</property>
     <property name="gnat_project">porion_server.gpr</property>
@@ -19,5 +18,6 @@
     <depend name="awa"></depend>
     <depend name="awa-mail"></depend>
     <depend name="awa-flotcharts"></depend>
+    <depend name="awa_flotcharts"></depend>
     <depend name="awa-setup"></depend>
 </project>

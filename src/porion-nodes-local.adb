@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-nodes-local -- Local build node management
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -205,6 +205,7 @@ package body Porion.Nodes.Local is
                                Clean      : in Boolean;
                                Process    : not null access
                                  procedure (Line : in String)) is
+      pragma Unreferenced (Controller, Process);
    begin
       if Clean and then Ada.Directories.Exists (Path) then
          Ada.Directories.Delete_Tree (Path);

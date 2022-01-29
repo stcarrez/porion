@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-configs -- Configuration
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +27,9 @@ package Porion.Configs is
    RULES_SEARCH_PATH_NAME : constant String := "rules_search_path";
    DATABASE_NAME          : constant String := "database";
    DEFAUL_LOG_DIR_NAME    : constant String := "log_dir";
+   KEYSTORE_PATH          : constant String := "keystore-path";
+   WALLEY_KEY_PATH        : constant String := "keystore-master-keypath";
+   PASSWORD_FILE_PATH     : constant String := "keystore-password-path";
 
    subtype Config_Type is Util.Properties.Manager;
 

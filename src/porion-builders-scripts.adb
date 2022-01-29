@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-builders-scripts -- Run a configurable script for a build step
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +24,8 @@ package body Porion.Builders.Scripts is
                     Build      : in out Porion.Builds.Models.Build_Ref;
                     Path       : in String;
                     Executor   : in out Porion.Executors.Executor_Type'Class) is
+      pragma Unreferenced (Build);
+
       Status : Integer;
    begin
       Executor.Execute (Command     => Controller.Command,

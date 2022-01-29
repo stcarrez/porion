@@ -35,6 +35,8 @@ package body Porion.Dashboards.Beans.Stats is
    --  ------------------------------
    procedure Load (Bean    : in out Last_Builds_Bean;
                    Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
+      pragma Unreferenced (Outcome);
+
       Ctx     : constant ASC.Service_Context_Access := ASC.Current;
       Session : ADO.Sessions.Session := ASC.Get_Session (Ctx);
       Query   : ADO.Queries.Context;
@@ -117,6 +119,7 @@ package body Porion.Dashboards.Beans.Stats is
    --  ------------------------------
    procedure Load (Bean    : in out Metrics_Bean;
                    Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
+      pragma Unreferenced (Outcome);
       use type ADO.Identifier;
 
       Ctx     : constant ASC.Service_Context_Access := ASC.Current;

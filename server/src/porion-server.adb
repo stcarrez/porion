@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  Porion-server -- Application server
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -67,6 +67,7 @@ procedure Porion.Server is
                       Name    : in String;
                       Args    : in Util.Commands.Argument_List'Class;
                       Context : in out AWA.Commands.Context_Type) is
+      pragma Unreferenced (Command, Name);
 
       Config_Path : constant String := Server_Commands.Get_Configuration_Path (Context);
       Schema      : constant Porion.Resources.Content_Access

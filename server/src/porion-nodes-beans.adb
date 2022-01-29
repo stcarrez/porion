@@ -27,6 +27,8 @@ package body Porion.Nodes.Beans is
    --  ------------------------------
    procedure Load (Bean    : in out Node_List_Bean;
                    Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
+      pragma Unreferenced (Outcome);
+
       Ctx     : constant ASC.Service_Context_Access := ASC.Current;
       Session : ADO.Sessions.Session := ASC.Get_Session (Ctx);
       Query   : ADO.Queries.Context;

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-commands-status -- Status command
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,6 +30,7 @@ package body Porion.Commands.Status is
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Context   : in out Context_Type) is
+      pragma Unreferenced (Name);
    begin
       if Args.Get_Count = 0 then
          Ada.Text_IO.Put ("Porion directory : ");
@@ -73,6 +74,8 @@ package body Porion.Commands.Status is
    procedure Stats (Command : in out Command_Type;
                     Stream  : in out Util.Serialize.IO.Output_Stream'Class;
                     Context : in out Context_Type) is
+      pragma Unreferenced (Command);
+
       procedure Process (Stream : in out Util.Serialize.IO.Output_Stream'Class);
 
       procedure Process (Stream : in out Util.Serialize.IO.Output_Stream'Class) is

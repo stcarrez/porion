@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-commands-env -- Env command to configure environment variables
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,7 +31,7 @@ package body Porion.Commands.Env is
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Context   : in out Context_Type) is
-      pragma Unreferenced (Name);
+      pragma Unreferenced (Command, Name);
 
       Count : constant Natural := Args.Get_Count;
    begin

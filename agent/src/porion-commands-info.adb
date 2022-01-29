@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-commands-info -- Info command
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -47,6 +47,8 @@ package body Porion.Commands.Info is
    procedure Print_Build (Command : in out Command_Type;
                           Ident   : in Porion.Projects.Ident_Type;
                           Context : in out Context_Type) is
+      pragma Unreferenced (Command);
+
       Printer : PT.Texts.Printer_Type := PT.Texts.Create (Context.Printer.all);
       Chart   : PT.Charts.Printer_Type := PT.Charts.Create (Context.Printer.all);
       Fields  : PT.Texts.Field_Array (1 .. 10);

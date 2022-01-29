@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-commands-set -- Set command to configure a project, branch or recipe
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -68,6 +68,8 @@ package body Porion.Commands.Set is
    procedure Set_Project (Command : in out Command_Type;
                           Args    : in Argument_List'Class;
                           Context : in out Context_Type) is
+      pragma Unreferenced (Command);
+
       Name     : constant String := Get_Name (Args, 2);
       Value    : constant String := Get_Value (Args, 2);
       Modified : Boolean;

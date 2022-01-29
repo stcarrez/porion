@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-services -- Project information
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +17,8 @@
 -----------------------------------------------------------------------
 with ADO.Sessions;
 with ADO.Sessions.Factory;
+
+with Keystore.Files;
 
 with Porion.Nodes.Models;
 with Porion.Projects.Models;
@@ -37,6 +39,7 @@ package Porion.Services is
       Queue             : Porion.Builds.Models.Build_Queue_Ref;
       Ident             : Porion.Projects.Ident_Type;
       Dry_Run           : Boolean := False;
+      Wallet            : Keystore.Files.Wallet_File;
    end record;
 
    --  Returns True if the service is opened.
@@ -90,5 +93,12 @@ package Porion.Services is
 
    procedure Import (Service : in out Context_Type;
                      Path    : in String);
+
+   --  Setup the directory to hold the database, configuration files
+   --  and project space to checkout and build projects.
+   procedure Setup (Service  : in out Context_Type;
+                    Path     : in String;
+                    Resource : in Resources.Get_Resource_Access;
+                    Schema   : in Resources.Content_Access);
 
 end Porion.Services;

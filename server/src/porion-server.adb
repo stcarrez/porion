@@ -15,7 +15,6 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Directories;
 
 with Util.Log.Loggers;
 with Util.Commands;
@@ -32,7 +31,6 @@ with ADO.Sqlite;
 
 with Porion.Configs;
 with Porion.Projects.Services;
-with Porion.Nodes.Services;
 with Porion.Resources.Server_Schema;
 with Porion.Resources.Queries;
 with Porion.Applications;
@@ -80,32 +78,13 @@ procedure Porion.Server is
       elsif Args.Get_Count /= 1 then
          Log.Error (-("too many arguments for the command"));
       else
+         Porion.Configs.Initialize (Config_Path);
          declare
             Path  : constant String := Args.Get_Argument (1);
-            Rules : Porion.Nodes.Services.Rule_Status_Vector;
          begin
-            if Ada.Directories.Exists (Path) then
-               Log.Error (-("directory {0} exists"), Path);
-               return;
-            end if;
+            Project_Service.Setup (Path, Resources.Queries.Get_Content'Access, Schema);
 
-            Ada.Directories.Create_Path (Path);
-            Porion.Configs.Initialize (Config_Path);
-            Porion.Configs.Set (Porion.Configs.WORKSPACE_DIR_NAME, Path);
-            Porion.Configs.Set (Porion.Configs.DATABASE_NAME,
-                                Porion.Configs.Get_Default_Database_Path);
-            Ada.Directories.Create_Path (Porion.Configs.Get_Config_Directory);
-            Ada.Directories.Create_Path (Porion.Configs.Get_Project_Directory);
-            Ada.Directories.Create_Path (Porion.Configs.Get_Rules_Directory);
-            Porion.Configs.Save;
-            Project_Service.Open (Resources.Queries.Get_Content'Access, Schema);
             Log.Info (-("Porion workspace created in {0}"), Path);
-            Nodes.Services.Add_Default_Node (Project_Service,
-                                             Hostname => "localhost",
-                                             Login    => "");
-            Nodes.Services.Probe_Node (Project_Service,
-                                       "git make mvn cloc lcov gprbuild",
-                                       Rules);
             Log.Info (-("Default build node 'localhost' is registered"));
             Log.Info (-("Use 'porion add' to register a first project"));
          end;
@@ -116,8 +95,6 @@ procedure Porion.Server is
 begin
    --  Initialize the database drivers (all of them or specific ones).
    ADO.Sqlite.Initialize;
-   Log.Info ("Connect you browser to: http://localhost:8080{0}/index.html",
-             Porion.Applications.CONTEXT_PATH);
 
    Server_Commands.Driver.Add_Command ("init", -("setup the build server"),
                                        Init_Command'Access);

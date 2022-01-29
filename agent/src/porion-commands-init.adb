@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-commands-init -- Setup command
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,9 +15,6 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Directories;
-with Porion.Configs;
-with Porion.Nodes.Services;
 with Porion.Resources.Queries;
 with Porion.Resources.Schema;
 package body Porion.Commands.Init is
@@ -43,27 +40,10 @@ package body Porion.Commands.Init is
       else
          declare
             Path  : constant String := Args.Get_Argument (1);
-            Rules : Porion.Nodes.Services.Rule_Status_Vector;
          begin
-            if Ada.Directories.Exists (Path) then
-               Porion.Commands.Error (-("directory {0} exists"), Path);
-               return;
-            end if;
+            Context.Project_Service.Setup (Path, Resources.Queries.Get_Content'Access, Schema);
 
-            Ada.Directories.Create_Path (Path);
-            Porion.Configs.Set (Porion.Configs.WORKSPACE_DIR_NAME, Path);
-            Ada.Directories.Create_Path (Porion.Configs.Get_Config_Directory);
-            Ada.Directories.Create_Path (Porion.Configs.Get_Project_Directory);
-            Ada.Directories.Create_Path (Porion.Configs.Get_Rules_Directory);
-            Porion.Configs.Save;
-            Context.Project_Service.Open (Resources.Queries.Get_Content'Access, Schema);
             Context.Notice (-("Porion workspace created in {0}"), Path);
-            Nodes.Services.Add_Default_Node (Context.Project_Service,
-                                             Hostname => "localhost",
-                                             Login    => "");
-            Nodes.Services.Probe_Node (Context.Project_Service,
-                                       "git mvn make cloc lcov gprbuild",
-                                       Rules);
             Context.Notice (-("Default build node 'localhost' is registered"));
             Context.Notice (-("Use 'porion add' to register a first project"));
          end;

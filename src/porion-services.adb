@@ -25,6 +25,8 @@ with Util.Properties;
 with Keystore.Passwords.Keys;
 with Keystore.Passwords.Files;
 
+with Security.Random;
+
 with ADO.Configs;
 with ADO.Sqlite;
 with ADO.SQL;
@@ -296,6 +298,7 @@ package body Porion.Services is
          Key1_Provider : Keystore.Passwords.Keys.Key_Provider_Access;
          Key2_Provider : Keystore.Passwords.Keys.Key_Provider_Access;
          Pass_Provider : Keystore.Passwords.Provider_Access;
+         Sec_Gen       : Security.Random.Generator;
       begin
          Ada.Directories.Create_Path (Config_Dir);
          Key1_Provider := Keystore.Passwords.Files.Generate (Key1_Path);
@@ -308,6 +311,7 @@ package body Porion.Services is
          Keystore.Files.Create (Container => Service.Wallet,
                                 Password  => Pass_Provider.all,
                                 Path      => KS_Path);
+         Service.Wallet.Set ("porion.users.auth_key", Sec_Gen.Generate (Bits => 256));
       end;
       Ada.Directories.Create_Path (Porion.Configs.Get_Project_Directory);
       Ada.Directories.Create_Path (Porion.Configs.Get_Rules_Directory);

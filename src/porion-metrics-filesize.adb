@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-metrics-filesize -- Metric to track the size of a file
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,6 +44,8 @@ package body Porion.Metrics.Filesize is
    procedure Collect (Controller : in out Controller_Type;
                       Path       : in String;
                       Executor   : in out Porion.Executors.Executor_Type'Class) is
+      pragma Unreferenced (Executor);
+
       Local_Path : constant String := To_String (Controller.Path);
       File_Path  : constant String := Util.Files.Compose (Path, Local_Path);
       Size       : Ada.Directories.File_Size;

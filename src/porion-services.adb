@@ -15,10 +15,15 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Ada.Directories;
 
 with Util.Strings;
+with Util.Files;
 with Util.Log.Loggers;
 with Util.Properties;
+
+with Keystore.Passwords.Keys;
+with Keystore.Passwords.Files;
 
 with ADO.Configs;
 with ADO.Sqlite;
@@ -26,7 +31,7 @@ with ADO.SQL;
 with ADO.Queries;
 with ADO.Statements;
 
-with Porion.Configs;
+with Porion.Configs.Rules;
 with Porion.Services.Parsers;
 with Porion.Builds.Services;
 with Porion.Nodes.Services;
@@ -252,5 +257,70 @@ package body Porion.Services is
 
       Builds.Services.Update (Service, Content.Build_Configs);
    end Import;
+
+   --  ------------------------------
+   --  Setup the directory to hold the database, configuration files
+   --  and project space to checkout and build projects.
+   --  ------------------------------
+   procedure Setup (Service  : in out Context_Type;
+                    Path     : in String;
+                    Resource : in Resources.Get_Resource_Access;
+                    Schema   : in Resources.Content_Access) is
+      procedure Check_Empty (Ent : in Ada.Directories.Directory_Entry_Type);
+
+      procedure Check_Empty (Ent : in Ada.Directories.Directory_Entry_Type) is
+         Name : constant String := Ada.Directories.Simple_Name (Ent);
+      begin
+         if Name /= "." and Name /= ".." then
+            raise Constraint_Error;
+         end if;
+      end Check_Empty;
+
+      Rules : Porion.Nodes.Services.Rule_Status_Vector;
+   begin
+      Log.Info ("Setup workspace in {0}", Path);
+
+      if Ada.Directories.Exists (Path) then
+         Ada.Directories.Search (Path, "", Process => Check_Empty'Access);
+      end if;
+
+      Ada.Directories.Create_Path (Path);
+      Porion.Configs.Set (Porion.Configs.WORKSPACE_DIR_NAME, Path);
+      Porion.Configs.Set (Porion.Configs.DATABASE_NAME,
+                          Porion.Configs.Get_Default_Database_Path);
+      declare
+         Config_Dir    : constant String := Porion.Configs.Get_Config_Directory;
+         Key1_Path     : constant String := Util.Files.Compose (Config_Dir, "wallet.key");
+         Key2_Path     : constant String := Util.Files.Compose (Config_Dir, "master.key");
+         KS_Path       : constant String := Util.Files.Compose (Config_Dir, "porion.akt");
+         Key1_Provider : Keystore.Passwords.Keys.Key_Provider_Access;
+         Key2_Provider : Keystore.Passwords.Keys.Key_Provider_Access;
+         Pass_Provider : Keystore.Passwords.Provider_Access;
+      begin
+         Ada.Directories.Create_Path (Config_Dir);
+         Key1_Provider := Keystore.Passwords.Files.Generate (Key1_Path);
+         Key2_Provider := Keystore.Passwords.Files.Generate (Key2_Path);
+         Pass_Provider := Keystore.Passwords.Files.Create (Key2_Path);
+         Porion.Configs.Set (Porion.Configs.WALLEY_KEY_PATH, Key1_Path);
+         Porion.Configs.Set (Porion.Configs.PASSWORD_FILE_PATH, Key2_Path);
+         Porion.Configs.Set (Porion.Configs.KEYSTORE_PATH, KS_Path);
+         Service.Wallet.Set_Master_Key (Key1_Provider.all);
+         Keystore.Files.Create (Container => Service.Wallet,
+                                Password  => Pass_Provider.all,
+                                Path      => KS_Path);
+      end;
+      Ada.Directories.Create_Path (Porion.Configs.Get_Project_Directory);
+      Ada.Directories.Create_Path (Porion.Configs.Get_Rules_Directory);
+      Porion.Configs.Save;
+      Service.Open (Resource, Schema);
+
+      Log.Info (-("Porion workspace created in {0}"), Path);
+      Nodes.Services.Add_Default_Node (Service,
+                                       Hostname => "localhost",
+                                       Login    => "");
+      Nodes.Services.Probe_Node (Service,
+                                 "git mvn make cloc lcov gprbuild",
+                                 Rules);
+   end Setup;
 
 end Porion.Services;

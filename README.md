@@ -166,6 +166,7 @@ make install
 # Documents
 
 * Man page: [porion (1)](https://gitlab.com/stcarrez/porion/blob/master/docs/porion.md)
+* Man page: [porion-server (8)](https://gitlab.com/stcarrez/porion/blob/master/docs/porion-server.md)
 
 # Sites Using Porion
 

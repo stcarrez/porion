@@ -84,8 +84,7 @@ package body Porion.Configs is
    --  Save the configuration.
    --  ------------------------------
    procedure Save is
-      Path : constant String
-        := (if Length (Cfg_Path) = 0 then Get_Default_Path else To_String (Cfg_Path));
+      Path : constant String := Get_Config_Path;
       Dir  : constant String := Ada.Directories.Containing_Directory (Path);
       P    : Interfaces.C.Strings.chars_ptr;
    begin
@@ -195,6 +194,18 @@ package body Porion.Configs is
    begin
       return Util.Files.Compose (Get_Porion_Directory, "config");
    end Get_Config_Directory;
+
+   --  ------------------------------
+   --  Get the porion configuration path (setup with Initialize).
+   --  ------------------------------
+   function Get_Config_Path return String is
+   begin
+      if Length (Cfg_Path) = 0 then
+         return Get_Default_Path;
+      else
+         return To_String (Cfg_Path);
+      end if;
+   end Get_Config_Path;
 
    --  ------------------------------
    --  Get the directory holding filtering rules.

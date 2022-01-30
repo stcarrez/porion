@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-commands-steps -- Command to add, update remove build steps
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -140,6 +140,7 @@ package body Porion.Commands.Steps is
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Context   : in out Context_Type) is
+      pragma Unreferenced (Name);
    begin
       if Args.Get_Count = 0 then
          Porion.Commands.Error (-("missing project name"));

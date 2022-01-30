@@ -1,3 +1,5 @@
 usr/bin
 usr/share/porion
 var/lib/porion
+etc/porion
+

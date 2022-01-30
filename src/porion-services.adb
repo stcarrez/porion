@@ -281,7 +281,8 @@ package body Porion.Services is
          Name : constant String := Ada.Directories.Simple_Name (Ent);
       begin
          if Name /= "." and Name /= ".." then
-            raise Constraint_Error;
+            Log.Warn ("Workspace directory '{0}' is not empty: found '{1}'", Path, Name);
+            raise Invalid_Workspace;
          end if;
       end Check_Empty;
 

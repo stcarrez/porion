@@ -36,6 +36,7 @@ override_dh_auto_install:
 	dh_install debian/tmp/usr/bin/porion /usr/bin
 	dh_install -pporion-server bin/porion-server /usr/bin
 	dh_installman debian/tmp/usr/share/man/man1/porion.1
+	dh_installman --package=porion-server debian/tmp/usr/share/man/man8/porion-server.8
 	dh_installsystemd --package=porion-server
 	dh_strip
 	files=`cd $(CURDIR)/debian/tmp/usr/share/porion/resources && find . -type f`; \

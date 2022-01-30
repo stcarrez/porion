@@ -4,6 +4,8 @@ with "@EL_DIR@elada";
 with "@ADO_DIR@ado";
 --  with "yaml";
 with "@ADO_DIR@ado_sqlite";
+with "@SECURITY_DIR@security";
+with "@KEYSTOREADA_DIR@keystoreada";
 
 with "printer-toolkit/ansi-ada/ansi";
 with "printer-toolkit/printer_toolkitada";
@@ -13,7 +15,7 @@ library project Porion_Lib is
    Use_NLS     : Porion_Config.Yes_No := "@USE_NLS@";
    Use_Libintl : Porion_Config.Yes_No := "@USE_LIBINTL@";
    Library_Dir := "lib";
-   Version     := "1.0.0";
+   Version     := "@PORION_VERSION@";
 
    for Languages use ("Ada", "C");
 

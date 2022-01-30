@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-sources-files -- Source management with plain files
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -127,6 +127,8 @@ package body Porion.Sources.Files is
    procedure Check (Controller : in out Controller_Type;
                     Status     : out Status_Type;
                     Executor   : in out Porion.Executors.Executor_Type'Class) is
+      pragma Unreferenced (Executor);
+
       Info   : Branch_Type;
       Path   : constant String := Controller.Config.Get ("repository_url");
    begin

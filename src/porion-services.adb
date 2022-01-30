@@ -300,6 +300,8 @@ package body Porion.Services is
                           Porion.Configs.Get_Default_Database_Path);
       declare
          Config_Dir    : constant String := Porion.Configs.Get_Config_Directory;
+         Config_Path   : constant String := Porion.Configs.Get_Config_Path;
+         Sys_Config    : constant String := Porion.Configs.Get_Sys_Config_Path;
          Key1_Path     : constant String := Util.Files.Compose (Config_Dir, "wallet.key");
          Key2_Path     : constant String := Util.Files.Compose (Config_Dir, "master.key");
          KS_Path       : constant String := Util.Files.Compose (Config_Dir, "porion.akt");
@@ -320,8 +322,12 @@ package body Porion.Services is
                                 Password  => Pass_Provider.all,
                                 Path      => KS_Path);
 
-         --  Server setup configuration.
-         Porion.Configs.Set ("porion.config", Porion.Configs.Get_Config_Path);
+         --  Server setup configuration: load the system wide configuration first.
+         if Sys_Config'Length > 0 then
+            Porion.Configs.Set ("porion.config", Sys_Config & "," & Config_Path);
+         else
+            Porion.Configs.Set ("porion.config", Config_Path);
+         end if;
          Service.Wallet.Set ("porion.users.auth_key", Sec_Gen.Generate (Bits => 256));
          Free (Key1_Provider);
          Free (Key2_Provider);

@@ -12,7 +12,7 @@ _command_  [args]
 
 ## DESCRIPTION
 
-_porion_ is a continuous integration server and agent that helps automate the building,
+_porion_ is a continuous integration agent that helps automate the building,
 testing and deployment of software development projects written in any language.
 _porion_ maintains a list of projects with build recipes to build these projects.
 It periodically checks for changes in projects and schedules a build when a project
@@ -23,6 +23,11 @@ _porion_ uses a workspace directory to maintain the list of projects, their buil
 and build area.  The workspace directory contains a SQLite database which is used
 to maintain the list of projects, build nodes, build recipes, build queue and build
 results.
+
+The _porion_ agent has a server companion that is dedicated to providing web access.
+The
+_porion-server_(8) is the server that handles the HTTP requests.  It is not strictly necessary to run
+it to build and manage the projects.
 
 The steps to use _porion_ are the following:
 
@@ -156,6 +161,19 @@ _--all_ option allows to force a check for every active project.
 porion config keystore.akt -- name
 ```
 
+
+
+### The env command
+```
+porion env [--unset name] {ident} [NAME=VALUE]
+```
+
+Configure the environment variables used to build a project, a branch
+a specific recipe or on a build node.  The environment variable is
+associated with
+_ident_. 
+The
+_--unset name_ option allows to remove a past definition.
 
 
 ### The depend command
@@ -299,7 +317,8 @@ description of filtering rules that can be configured in a project recipe.
 
 _editor(1)_, _update-alternative(1)_, _make(1)_,
 _mvn(1)_,
-_cron(8)_
+_cron(8)_,
+_porion-server(8)_
 
 ## AUTHOR
 

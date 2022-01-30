@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 with Porion.Resources.Queries;
 with Porion.Resources.Schema;
+with Porion.Services;
 package body Porion.Commands.Init is
 
    --  ------------------------------
@@ -46,6 +47,11 @@ package body Porion.Commands.Init is
             Context.Notice (-("Porion workspace created in {0}"), Path);
             Context.Notice (-("Default build node 'localhost' is registered"));
             Context.Notice (-("Use 'porion add' to register a first project"));
+
+         exception
+            when Porion.Services.Invalid_Workspace =>
+               Porion.Commands.Error (-("workspace directory '{0}' is not empty"), Path);
+
          end;
 
       end if;

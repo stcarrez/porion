@@ -30,6 +30,7 @@ with AWA.Commands.Info;
 with ADO.Sqlite;
 
 with Porion.Configs;
+with Porion.Services;
 with Porion.Projects.Services;
 with Porion.Resources.Server_Schema;
 with Porion.Resources.Queries;
@@ -87,6 +88,11 @@ procedure Porion.Server is
             Log.Info (-("Porion workspace created in {0}"), Path);
             Log.Info (-("Default build node 'localhost' is registered"));
             Log.Info (-("Use 'porion add' to register a first project"));
+
+         exception
+            when Porion.Services.Invalid_Workspace =>
+               Log.Error (-("workspace directory '{0}' is not empty"), Path);
+
          end;
       end if;
    end Execute;

@@ -64,6 +64,9 @@ package Porion.Configs is
    --  Get the porion configuration path (setup with Initialize).
    function Get_Config_Path return String;
 
+   --  Get the system wide configuration path or empty string if no installation found.
+   function Get_Sys_Config_Path return String;
+
    --  Get the porion installation directory.
    function Get_Porion_Directory return String;
 

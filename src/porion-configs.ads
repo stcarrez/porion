@@ -28,7 +28,7 @@ package Porion.Configs is
    DATABASE_NAME          : constant String := "database";
    DEFAUL_LOG_DIR_NAME    : constant String := "log_dir";
    KEYSTORE_PATH          : constant String := "keystore-path";
-   WALLEY_KEY_PATH        : constant String := "keystore-master-keypath";
+   WALLET_KEY_PATH        : constant String := "keystore-masterkey-path";
    PASSWORD_FILE_PATH     : constant String := "keystore-password-path";
 
    subtype Config_Type is Util.Properties.Manager;
@@ -60,6 +60,9 @@ package Porion.Configs is
 
    --  Get the porion configuration directory.
    function Get_Config_Directory return String;
+
+   --  Get the porion configuration path (setup with Initialize).
+   function Get_Config_Path return String;
 
    --  Get the porion installation directory.
    function Get_Porion_Directory return String;

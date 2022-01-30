@@ -1,11 +1,6 @@
 pragma synchronous=OFF;
 /* Copied from porion-drop-sqlite.sql*/
 /* File generated automatically by dynamo */
-/* Copied from awa_counters-drop-sqlite.sql*/
-/* File generated automatically by dynamo */
-DROP TABLE IF EXISTS `awa_visit`;
-DROP TABLE IF EXISTS `awa_counter_definition`;
-DROP TABLE IF EXISTS `awa_counter`;
 /* Copied from porion_lib-drop-sqlite.sql*/
 /* File generated automatically by dynamo */
 DROP TABLE IF EXISTS `porion_test_run_group`;

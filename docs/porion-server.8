@@ -1,0 +1,265 @@
+.\"
+.\"
+.TH PORION-SERVER 8 "Jan 30, 2022" "Continuous build system"
+.SH NAME
+porion-server - Continuous build system
+.SH SYNOPSIS
+.B porion-server
+[ -v ] [-vv] [-vvv] [-V] [ -c
+.I config-file
+]
+.I command
+ [args]
+.br
+.SH DESCRIPTION
+\fIporion-server\fR is a continuous integration server that helps automate the building,
+testing and deployment of software development projects written in any language.
+\fIporion-server\fR maintains a list of projects with build recipes to build these projects.
+It periodically checks for changes in projects and schedules a build when a project
+is modified.  \fIporion-server\fR uses a build node to build a project and the build node can
+be the current host or a specific remote host registered for that purpose.
+.\"
+.PP
+\fIporion\fR uses a workspace directory to maintain the list of projects, their build status
+and build area.  The workspace directory contains a SQLite database which is used
+to maintain the list of projects, build nodes, build recipes, build queue and build
+results.
+.\"
+.PP
+.SH OPTIONS
+The following options are recognized by \fIporion-server\fR:
+.TP 5
+-V
+Prints the
+.I porion-server
+version.
+.TP 5
+-v
+Enable the verbose mode.
+.TP 5
+-vv
+Enable debugging output.
+.TP 5
+-vvv
+Enable full debugging output.
+.TP 5
+-c
+.I config-file
+Defines the path of the global
+.I porion
+configuration file.
+.\"
+.SH COMMANDS
+.\"
+.SS The init command
+.RS 0
+porion-server \fBinit\fR \fIdirectory\fR
+.RE
+.PP
+Setup the build workspace directory used by the porion server and porion build agent.
+This directory is created by the command and is used for:
+.IP \(bu 4
+the SQLite database that describes projects, builds, tests
+.IP \(bu 4
+the project directories where projects are built
+.\"
+.\"
+.SS The start command
+.RS 0
+porion-server \fBstart\fR [--management-port \fIPORT\fR] [--port \fIPORT\fR]
+    [--connection \fICOUNT\fR] [--upload \fIDIR\fR] [--tcp-no-delay]
+    [--daemon] [--keystore \fIPATH\fR]
+.RE
+.PP
+The
+.I start
+command allows to start the server and all applications that are
+registered to the web container.  When a keystore is specified, it is first
+unlocked by using one of the unlock mechanism (password, GPG, ...).
+Then, each application is configured by using its own configuration file
+and a subset of the keystore secured configuration.
+Once each application is configured, the web server container is started
+to listen to the TCP/IP port defined by the
+.BI --port= PORT
+option.
+Applications are then started and they can serve HTTP requests through
+the web server container.
+.PP
+At the same time, a management port is created and used exclusively by
+the
+.I stop
+command to stop the web server container.  The
+.I start
+command
+will wait on that management port for the
+.I stop
+command to be executed.
+The management port is configured by the
+.BI --management= PORT
+option.
+The management port is local to the host and cannot be accessed remotely.
+.PP
+When the
+.B --daemon
+option is used, the server will first put itself in
+the background.  This option is supported only under some Unix systems
+like
+.I GNU/Linux
+and
+.I FreeBSD
+and more generally every system where
+the
+.IR daemon (3)
+C-library call is supported.  On other systems, this option
+has no effect.
+.PP
+The
+.B --tcp-no-delay
+option is supported for recent version of
+Ada Web Server and configure the web server to use the
+.I TCP_NO_DELAY
+option of the TCP/IP stack (strongly recommended).
+.PP
+The
+.BI --upload= DIR
+option indicates to the web server container
+the directory that can be used to store temporarily the uploaded files
+that the server receives.
+.PP
+The
+.BI --connection= COUNT
+option controls the maximum number of active
+HTTP requests that the server can handle.
+.\"
+.SS The setup command
+.RS 0
+porion-server \fBsetup\fP [--management-port \fIPORT\fR] [--port \fIPORT\fR]
+   [--connection \fICOUNT\fR] [--upload \fIDIR\fR] [--tcp-no-delay]
+   [--daemon] [--keystore \fIPATH\f] \fINAME\fR
+.RE
+.PP
+The
+.I setup
+command is very close to the
+.I start
+command but it starts
+the
+.B Setup Application
+to configure the application by using a web browser.
+.\"
+.SS The stop command
+.RS 0
+porion-server \fBstop\fP [--management-port \fIPORT\fR] [--keystore \fIPATH\fR]
+.RE
+.PP
+The
+.I stop
+command is used to inform a running web server container to stop.
+The management port is used to connect to the web server container and stop it.
+The management port is local to the host and cannot be accessed remotely.
+.PP
+The management port is configured with the
+.BI --management-port= PORT
+option.
+.\"
+.SS The list command
+.RS 0
+porion-server \fBlist\fP [--application \fINAME\fR] [--keystore \fIPATH\fR]
+     [--users] [--jobs] [--sessions] [--tables]
+.RE
+.PP
+The
+.I list
+command is intended to help in looking at the application
+database and see some important information.  Because the database is
+specific to each application, it may be necessary to indicate the
+application name by using the
+.BI --application= NAME
+option.
+.PP
+The
+.B --tables
+option triggers the list of database tables with the
+number of entries they contain.
+.PP
+The
+.B --users
+option triggers the list of users that are registered in
+the application.
+.PP
+The
+.B --sessions
+option triggers the list of user connection sessions.
+.PP
+The
+.B --jobs
+option triggers the list of jobs that have been created
+and scheduled.
+.\"
+.SS The info command
+.RS 0
+porion-server \fBinfo\fP [--application \fINAME\fR] [--keystore \fIPATH\fR]
+   [--long-lines]
+.RE
+.PP
+The
+.I info
+command reports the current configuration used by the
+application.  The configuration is extracted from the AWA default
+XML configuration files and can be overriden by the application
+specific configuration.  The command allows to see what is the
+actual configuration.  The configuration is printed with the
+configuration name and its associated value.
+.PP
+The list of configuration parameters are grouped in several categories:
+.IP \(bu 4
+.I Database configuration
+gives the configuration properties for the
+database configuration.
+.IP \(bu 4
+.I Server faces configuration
+lists the configuration use by the Ada Servlets and Ada Server Faces.
+.IP \(bu 4
+.I AWA Application
+lists the core AWA configuration properties.
+.PP
+Depending on whether a module is used by the application, a number
+of modules are listed with their configuration.
+.PP
+The
+.B --long-lines
+option triggers the list of database tables with the
+number of entries they contain.
+.\"
+.SH CONFIGURATION
+The
+.I porion
+global configuration file contains several configuration properties
+which are used to customize several commands.  These properties can
+be modified with the
+.B config
+command.
+.\"
+.SS workspace_dir
+This property defines the absolute path of the
+.I porion
+workspace directory.
+.\"
+.SS project_dir
+This property defines the absolute path where project directories
+are stored.  The default is
+.IR workspace_dir /projects.
+.\"
+.SS rules_dir
+This property defines the path of the rules directory which contains
+description of filtering rules that can be configured in a project recipe.
+.\"
+.SH SEE ALSO
+\fIporion(1)\fR,
+\fIcron(8)\fR
+.\"
+.\"
+.SH AUTHOR
+Written by Stephane Carrez.
+.\"
+

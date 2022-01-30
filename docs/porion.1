@@ -1,6 +1,6 @@
 .\"
 .\"
-.TH PORION 1 "Nov 28, 2021" "Continuous build system"
+.TH PORION 1 "Jan 30, 2022" "Continuous build system"
 .SH NAME
 porion - Continuous build system
 .SH SYNOPSIS
@@ -12,7 +12,7 @@ porion - Continuous build system
  [args]
 .br
 .SH DESCRIPTION
-\fIporion\fR is a continuous integration server and agent that helps automate the building,
+\fIporion\fR is a continuous integration agent that helps automate the building,
 testing and deployment of software development projects written in any language.
 \fIporion\fR maintains a list of projects with build recipes to build these projects.
 It periodically checks for changes in projects and schedules a build when a project
@@ -24,6 +24,12 @@ be the current host or a specific remote host registered for that purpose.
 and build area.  The workspace directory contains a SQLite database which is used
 to maintain the list of projects, build nodes, build recipes, build queue and build
 results.
+.PP
+The \fIporion\fR agent has a server companion that is dedicated to providing web access.
+The
+.IR porion-server (8)
+is the server that handles the HTTP requests.  It is not strictly necessary to run
+it to build and manage the projects.
 .\"
 .PP
 The steps to use \fIporion\fR are the following:
@@ -330,7 +336,8 @@ description of filtering rules that can be configured in a project recipe.
 .SH SEE ALSO
 \fIeditor(1)\fR, \fIupdate-alternative(1)\fR, \fImake(1)\fR,
 \fImvn(1)\fR,
-\fIcron(8)\fR
+\fIcron(8)\fR,
+\fIporion-server(8)\fR
 .\"
 .\"
 .SH AUTHOR

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-configs -- Default configuration setup
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@
 package Porion.Configs.Setup is
 
    VERSION   : constant String := $VERSION;
-   RELEASE   : constant String := "Porion" & $VERSION;
+   RELEASE   : constant String := "Porion " & $VERSION;
    PREFIX    : constant String := $PREFIX;
 
 end Porion.Configs.Setup;

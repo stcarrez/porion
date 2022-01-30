@@ -28,6 +28,8 @@ package Porion.Services is
 
    Not_Found : exception;
 
+   Invalid_Workspace : exception;
+
    type Context_Type is tagged limited record
       Factory           : ADO.Sessions.Factory.Session_Factory;
       DB                : ADO.Sessions.Master_Session;

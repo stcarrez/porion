@@ -208,6 +208,24 @@ package body Porion.Configs is
    end Get_Config_Path;
 
    --  ------------------------------
+   --  Get the system wide configuration path or empty string if no installation found.
+   --  ------------------------------
+   function Get_Sys_Config_Path return String is
+      use type Ada.Directories.File_Kind;
+
+      Share_Dir   : constant String := Get_Share_Directory;
+      Config_Path : constant String := Util.Files.Compose (Share_Dir, "config/porion.properties");
+   begin
+      if not Ada.Directories.Exists (Config_Path) then
+         return "";
+      end if;
+      if Ada.Directories.Kind (Config_Path) /= Ada.Directories.Ordinary_File then
+         return "";
+      end if;
+      return Config_Path;
+   end Get_Sys_Config_Path;
+
+   --  ------------------------------
    --  Get the directory holding filtering rules.
    --  ------------------------------
    function Get_Rules_Directory return String is

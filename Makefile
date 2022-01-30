@@ -70,7 +70,8 @@ generate::
 	cd agent && $(DYNAMO) generate $(AGENT_DYNAMO_ARGS)
 	cd agent && $(ARE) -o src/model --rule=are-package.xml --no-type-declaration --list-access --content-only --name-access .. .
 	cd server && $(DYNAMO) generate $(SERVER_DYNAMO_ARGS)
-	cd server && $(ARE) -o src/model --rule=are-package.xml --no-type-declaration --list-access --content-only --name-access .. .
+	cd server && $(ARE) -o src/model --rule=are-package.xml --no-type-declaration \
+          --list-access --content-only --name-access ../awa/awa .. .
 
 package: server-package
 	cd server && tar czf ../$(DIST_FILE) $(DESTDIR)$(DIST_DIR)

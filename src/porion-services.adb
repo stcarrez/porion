@@ -16,6 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Directories;
+with Ada.Unchecked_Deallocation;
 
 with Util.Strings;
 with Util.Files;
@@ -33,7 +34,7 @@ with ADO.SQL;
 with ADO.Queries;
 with ADO.Statements;
 
-with Porion.Configs.Rules;
+with Porion.Configs;
 with Porion.Services.Parsers;
 with Porion.Builds.Services;
 with Porion.Nodes.Services;
@@ -269,6 +270,12 @@ package body Porion.Services is
                     Resource : in Resources.Get_Resource_Access;
                     Schema   : in Resources.Content_Access) is
       procedure Check_Empty (Ent : in Ada.Directories.Directory_Entry_Type);
+      procedure Free is
+        new Ada.Unchecked_Deallocation (Object => Keystore.Passwords.Provider'Class,
+                                        Name   => Keystore.Passwords.Provider_Access);
+      procedure Free is
+        new Ada.Unchecked_Deallocation (Object => Keystore.Passwords.Keys.Key_Provider'Class,
+                                        Name   => Keystore.Passwords.Keys.Key_Provider_Access);
 
       procedure Check_Empty (Ent : in Ada.Directories.Directory_Entry_Type) is
          Name : constant String := Ada.Directories.Simple_Name (Ent);
@@ -304,14 +311,20 @@ package body Porion.Services is
          Key1_Provider := Keystore.Passwords.Files.Generate (Key1_Path);
          Key2_Provider := Keystore.Passwords.Files.Generate (Key2_Path);
          Pass_Provider := Keystore.Passwords.Files.Create (Key2_Path);
-         Porion.Configs.Set (Porion.Configs.WALLEY_KEY_PATH, Key1_Path);
+         Porion.Configs.Set (Porion.Configs.WALLET_KEY_PATH, Key1_Path);
          Porion.Configs.Set (Porion.Configs.PASSWORD_FILE_PATH, Key2_Path);
          Porion.Configs.Set (Porion.Configs.KEYSTORE_PATH, KS_Path);
          Service.Wallet.Set_Master_Key (Key1_Provider.all);
          Keystore.Files.Create (Container => Service.Wallet,
                                 Password  => Pass_Provider.all,
                                 Path      => KS_Path);
+
+         --  Server setup configuration.
+         Porion.Configs.Set ("porion.config", Porion.Configs.Get_Config_Path);
          Service.Wallet.Set ("porion.users.auth_key", Sec_Gen.Generate (Bits => 256));
+         Free (Key1_Provider);
+         Free (Key2_Provider);
+         Free (Pass_Provider);
       end;
       Ada.Directories.Create_Path (Porion.Configs.Get_Project_Directory);
       Ada.Directories.Create_Path (Porion.Configs.Get_Rules_Directory);

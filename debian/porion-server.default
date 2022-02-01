@@ -1,0 +1,2 @@
+PORION_DIR=/var/lib/porion
+PORION_CONFIG=/var/lib/porion/config/porion.properties

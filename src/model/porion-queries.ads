@@ -639,6 +639,8 @@ package Porion.Queries is
 
    Query_Project_List : constant ADO.Queries.Query_Definition_Access;
 
+   Query_Project_Summary_List : constant ADO.Queries.Query_Definition_Access;
+
    Query_Project_Dependency_List : constant ADO.Queries.Query_Definition_Access;
 
    --  --------------------
@@ -729,6 +731,100 @@ package Porion.Queries is
    Query_Project_Build_Queue_List : constant ADO.Queries.Query_Definition_Access;
 
    Query_Node_Build_Queue_List : constant ADO.Queries.Query_Definition_Access;
+
+   --  --------------------
+   --    Information about a recipe.
+   --  --------------------
+   type Recipe_Info is
+     new Util.Beans.Basic.Bean with  record
+
+      --  the recipe id.
+      Id : ADO.Identifier;
+
+      --  the recipe name.
+      Name : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the recipe status.
+      Recipe_Status : Porion.Builds.Models.Config_Status_Type;
+
+      --  the build node name.
+      Node_Name : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the branch id.
+      Branch_Id : ADO.Identifier;
+
+      --  the branch name.
+      Branch_Name : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the branch tag.
+      Branch_Tag : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the branch status.
+      Branch_Status : Porion.Projects.Models.Branch_Status_Type;
+
+      --  the last successful build number.
+      Last_Success_Build : Integer;
+
+      --  the last failed build number.
+      Last_Fail_Build : Integer;
+
+      --  the max build duration.
+      Max_Build_Duration : Integer;
+
+      --  the sum of build duration.
+      Sum_Build_Duration : Integer;
+
+      --  the number of tests that succeeded.
+      Max_Pass_Count : Integer;
+
+      --  the number of tests that succeeded.
+      Sum_Pass_Count : Integer;
+
+      --  the number of tests that failed.
+      Max_Fail_Count : Integer;
+
+      --  the number of tests that failed.
+      Sum_Fail_Count : Integer;
+
+      --  the number of builds that succeeded.
+      Build_Pass_Count : Integer;
+
+      --  the number of builds that failed.
+      Build_Fail_Count : Integer;
+   end record;
+
+   --  Get the bean attribute identified by the name.
+   overriding
+   function Get_Value (From : in Recipe_Info;
+                       Name : in String) return Util.Beans.Objects.Object;
+
+   --  Set the bean attribute identified by the name.
+   overriding
+   procedure Set_Value (Item  : in out Recipe_Info;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object);
+
+
+   package Recipe_Info_Beans is
+      new Util.Beans.Basic.Lists (Element_Type => Recipe_Info);
+   package Recipe_Info_Vectors renames Recipe_Info_Beans.Vectors;
+   subtype Recipe_Info_List_Bean is Recipe_Info_Beans.List_Bean;
+
+   type Recipe_Info_List_Bean_Access is access all Recipe_Info_List_Bean;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Recipe_Info_List_Bean'Class;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
+
+   subtype Recipe_Info_Vector is Recipe_Info_Vectors.Vector;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Recipe_Info_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
+
+   Query_Recipe_List : constant ADO.Queries.Query_Definition_Access;
 
    --  --------------------
    --    Information about a test.
@@ -939,6 +1035,12 @@ private
    Query_Project_List : constant ADO.Queries.Query_Definition_Access
    := Def_Projectinfo_Project_List.Query'Access;
 
+   package Def_Projectinfo_Project_Summary_List is
+      new ADO.Queries.Loaders.Query (Name => "project-summary-list",
+                                     File => File_9.File'Access);
+   Query_Project_Summary_List : constant ADO.Queries.Query_Definition_Access
+   := Def_Projectinfo_Project_Summary_List.Query'Access;
+
    package Def_Projectinfo_Project_Dependency_List is
       new ADO.Queries.Loaders.Query (Name => "project-dependency-list",
                                      File => File_9.File'Access);
@@ -968,12 +1070,22 @@ private
    := Def_Queueinfo_Node_Build_Queue_List.Query'Access;
 
    package File_11 is
+      new ADO.Queries.Loaders.File (Path => "report-recipes.xml",
+                                    Sha1 => "3116DEDCF858DB61A9818C8A6EA3B93CAF83A5E8");
+
+   package Def_Recipeinfo_Recipe_List is
+      new ADO.Queries.Loaders.Query (Name => "recipe-list",
+                                     File => File_11.File'Access);
+   Query_Recipe_List : constant ADO.Queries.Query_Definition_Access
+   := Def_Recipeinfo_Recipe_List.Query'Access;
+
+   package File_12 is
       new ADO.Queries.Loaders.File (Path => "report-tests.xml",
                                     Sha1 => "156DC07FA310576EE59560D133C5C3BF4C945A83");
 
    package Def_Testinfo_Build_Test_List is
       new ADO.Queries.Loaders.Query (Name => "build-test-list",
-                                     File => File_11.File'Access);
+                                     File => File_12.File'Access);
    Query_Build_Test_List : constant ADO.Queries.Query_Definition_Access
    := Def_Testinfo_Build_Test_List.Query'Access;
 end Porion.Queries;

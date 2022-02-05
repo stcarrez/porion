@@ -1071,6 +1071,157 @@ package body Porion.Queries is
    --  Get the bean attribute identified by the name.
    --  ------------------------------
    overriding
+   function Get_Value (From : in Recipe_Info;
+                       Name : in String) return Util.Beans.Objects.Object is
+   begin
+      if Name = "id" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Id));
+      elsif Name = "name" then
+         return Util.Beans.Objects.To_Object (From.Name);
+      elsif Name = "recipe_status" then
+         return Porion.Builds.Models.Config_Status_Type_Objects.To_Object (From.Recipe_Status);
+      elsif Name = "node_name" then
+         return Util.Beans.Objects.To_Object (From.Node_Name);
+      elsif Name = "branch_id" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Branch_Id));
+      elsif Name = "branch_name" then
+         return Util.Beans.Objects.To_Object (From.Branch_Name);
+      elsif Name = "branch_tag" then
+         return Util.Beans.Objects.To_Object (From.Branch_Tag);
+      elsif Name = "branch_status" then
+         return Porion.Projects.Models.Branch_Status_Type_Objects.To_Object (From.Branch_Status);
+      elsif Name = "last_success_build" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Last_Success_Build));
+      elsif Name = "last_fail_build" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Last_Fail_Build));
+      elsif Name = "max_build_duration" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Max_Build_Duration));
+      elsif Name = "sum_build_duration" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Sum_Build_Duration));
+      elsif Name = "max_pass_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Max_Pass_Count));
+      elsif Name = "sum_pass_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Sum_Pass_Count));
+      elsif Name = "max_fail_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Max_Fail_Count));
+      elsif Name = "sum_fail_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Sum_Fail_Count));
+      elsif Name = "build_pass_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Build_Pass_Count));
+      elsif Name = "build_fail_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Build_Fail_Count));
+      end if;
+      return Util.Beans.Objects.Null_Object;
+   end Get_Value;
+
+
+   --  ------------------------------
+   --  Set the value identified by the name
+   --  ------------------------------
+   overriding
+   procedure Set_Value (Item  : in out Recipe_Info;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object) is
+   begin
+      if Name = "id" then
+         Item.Id := ADO.Identifier (Util.Beans.Objects.To_Long_Long_Integer (Value));
+      elsif Name = "name" then
+         Item.Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "recipe_status" then
+         Item.Recipe_Status := Porion.Builds.Models.Config_Status_Type_Objects.To_Value (Value);
+      elsif Name = "node_name" then
+         Item.Node_Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "branch_id" then
+         Item.Branch_Id := ADO.Identifier (Util.Beans.Objects.To_Long_Long_Integer (Value));
+      elsif Name = "branch_name" then
+         Item.Branch_Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "branch_tag" then
+         Item.Branch_Tag := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "branch_status" then
+         Item.Branch_Status := Porion.Projects.Models.Branch_Status_Type_Objects.To_Value (Value);
+      elsif Name = "last_success_build" then
+         Item.Last_Success_Build := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "last_fail_build" then
+         Item.Last_Fail_Build := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "max_build_duration" then
+         Item.Max_Build_Duration := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "sum_build_duration" then
+         Item.Sum_Build_Duration := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "max_pass_count" then
+         Item.Max_Pass_Count := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "sum_pass_count" then
+         Item.Sum_Pass_Count := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "max_fail_count" then
+         Item.Max_Fail_Count := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "sum_fail_count" then
+         Item.Sum_Fail_Count := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "build_pass_count" then
+         Item.Build_Pass_Count := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "build_fail_count" then
+         Item.Build_Fail_Count := Util.Beans.Objects.To_Integer (Value);
+      end if;
+   end Set_Value;
+
+
+   --  --------------------
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   --  --------------------
+   procedure List (Object  : in out Recipe_Info_List_Bean'Class;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+   begin
+      List (Object.List, Session, Context);
+   end List;
+
+   --  --------------------
+   --  Information about a recipe.
+   --  --------------------
+   procedure List (Object  : in out Recipe_Info_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+      procedure Read (Into : in out Recipe_Info);
+
+      Stmt : ADO.Statements.Query_Statement
+          := Session.Create_Statement (Context);
+      Pos  : Positive := 1;
+      procedure Read (Into : in out Recipe_Info) is
+      begin
+         Into.Id := Stmt.Get_Identifier (0);
+         Into.Name := Stmt.Get_Unbounded_String (1);
+         Into.Recipe_Status := Porion.Builds.Models.Config_Status_Type'Enum_Val (Stmt.Get_Integer (2));
+         Into.Node_Name := Stmt.Get_Unbounded_String (3);
+         Into.Branch_Id := Stmt.Get_Identifier (4);
+         Into.Branch_Name := Stmt.Get_Unbounded_String (5);
+         Into.Branch_Tag := Stmt.Get_Unbounded_String (6);
+         Into.Branch_Status := Porion.Projects.Models.Branch_Status_Type'Enum_Val (Stmt.Get_Integer (7));
+         Into.Last_Success_Build := Stmt.Get_Integer (8);
+         Into.Last_Fail_Build := Stmt.Get_Integer (9);
+         Into.Max_Build_Duration := Stmt.Get_Integer (10);
+         Into.Sum_Build_Duration := Stmt.Get_Integer (11);
+         Into.Max_Pass_Count := Stmt.Get_Integer (12);
+         Into.Sum_Pass_Count := Stmt.Get_Integer (13);
+         Into.Max_Fail_Count := Stmt.Get_Integer (14);
+         Into.Sum_Fail_Count := Stmt.Get_Integer (15);
+         Into.Build_Pass_Count := Stmt.Get_Integer (16);
+         Into.Build_Fail_Count := Stmt.Get_Integer (17);
+      end Read;
+   begin
+      Stmt.Execute;
+      Recipe_Info_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         Object.Insert_Space (Before => Pos);
+         Object.Update_Element (Index => Pos, Process => Read'Access);
+         Pos := Pos + 1;
+         Stmt.Next;
+      end loop;
+   end List;
+
+
+
+   --  ------------------------------
+   --  Get the bean attribute identified by the name.
+   --  ------------------------------
+   overriding
    function Get_Value (From : in Test_Info;
                        Name : in String) return Util.Beans.Objects.Object is
    begin

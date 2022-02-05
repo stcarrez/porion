@@ -4,18 +4,18 @@ with Interfaces; use Interfaces;
 package body Porion.Resources.Queries is
    function Hash (S : String) return Natural;
 
-   P : constant array (0 .. 2) of Natural :=
-     (1, 11, 14);
+   P : constant array (0 .. 3) of Natural :=
+     (1, 8, 12, 14);
 
-   T1 : constant array (0 .. 2) of Unsigned_8 :=
-     (7, 13, 30);
+   T1 : constant array (0 .. 3) of Unsigned_8 :=
+     (28, 7, 23, 35);
 
-   T2 : constant array (0 .. 2) of Unsigned_8 :=
-     (26, 6, 25);
+   T2 : constant array (0 .. 3) of Unsigned_8 :=
+     (30, 20, 25, 17);
 
-   G : constant array (0 .. 34) of Unsigned_8 :=
-     (12, 0, 8, 0, 0, 3, 1, 0, 0, 0, 0, 0, 2, 0, 1, 0, 0, 7, 0, 0, 5, 2, 16,
-      0, 0, 11, 14, 0, 0, 0, 0, 2, 8, 0, 4);
+   G : constant array (0 .. 36) of Unsigned_8 :=
+     (0, 5, 0, 0, 7, 17, 0, 3, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 12, 0, 14,
+      16, 0, 0, 0, 1, 12, 0, 16, 9, 0, 0, 8, 0, 3, 1);
 
    function Hash (S : String) return Natural is
       F : constant Natural := S'First - 1;
@@ -26,10 +26,10 @@ package body Porion.Resources.Queries is
       for K in P'Range loop
          exit when L < P (K);
          J  := Character'Pos (S (P (K) + F));
-         F1 := (F1 + Natural (T1 (K)) * J) mod 35;
-         F2 := (F2 + Natural (T2 (K)) * J) mod 35;
+         F1 := (F1 + Natural (T1 (K)) * J) mod 37;
+         F2 := (F2 + Natural (T2 (K)) * J) mod 37;
       end loop;
-      return (Natural (G (F1)) + Natural (G (F2))) mod 17;
+      return (Natural (G (F1)) + Natural (G (F2))) mod 18;
    end Hash;
 
    C_0 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
@@ -805,42 +805,152 @@ package body Porion.Resources.Queries is
        & "    <sql-count>" & ASCII.LF & "            SELECT" & ASCII.LF & "       "
        & "     count(project.id)" & ASCII.LF & "            FROM porion_project AS"
        & " project" & ASCII.LF & "        </sql-count>" & ASCII.LF & "    </query>"
-       & ASCII.LF & ASCII.LF & "    <query name='project-dependency-list'>" & ASCII.LF
-       & "        <comment>Get the list of projects that another project depend on"
-       & "</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & "            SELEC"
-       & "T" & ASCII.LF & "            project.name AS name," & ASCII.LF & "      "
-       & "      project.status AS status," & ASCII.LF & "            project.build"
-       & "_progress AS build_progress," & ASCII.LF & "            project.build_ra"
-       & "te AS build_rate," & ASCII.LF & "            project.pass_rate AS pass_r"
-       & "ate," & ASCII.LF & "            project.fail_rate AS fail_rate," & ASCII.LF
-       & "            project.timeout_rate AS timeout_rate," & ASCII.LF & "       "
-       & "     COALESCE(branch.name, '') AS branch_name," & ASCII.LF & "          "
-       & "  COALESCE(branch.tag, '') AS branch_tag," & ASCII.LF & "            COA"
-       & "LESCE(branch.status, 0) AS branch_status," & ASCII.LF & "            bui"
-       & "ld.finish_date AS build_date," & ASCII.LF & "            COALESCE(build."
-       & "status, 0) AS build_status," & ASCII.LF & "            COALESCE(build.ta"
-       & "g, '') AS build_tag," & ASCII.LF & "            COALESCE(build.number, 0"
-       & ") AS build_number," & ASCII.LF & "            COALESCE(build.pass_count,"
-       & " 0) AS pass_count," & ASCII.LF & "            COALESCE(build.fail_count,"
-       & " 0) AS fail_count," & ASCII.LF & "            COALESCE(build.timeout_cou"
-       & "nt, 0) AS timeout_count" & ASCII.LF & "            FROM porion_dependenc"
-       & "y AS dependency" & ASCII.LF & "            INNER JOIN porion_project AS "
-       & "project ON dependency.project_id = project.id" & ASCII.LF & "           "
-       & " LEFT JOIN porion_branch AS branch ON project.id = branch.project_id AND"
-       & " branch.status != 0" & ASCII.LF & "            LEFT JOIN porion_last_bui"
-       & "ld AS last_build ON last_build.branch_id = branch.id AND last_build.last"
-       & "_build = 1" & ASCII.LF & "            LEFT JOIN porion_build AS build ON"
-       & " last_build.build_id = build.id" & ASCII.LF & "            WHERE depende"
-       & "ncy.owner_id = :project_id AND" & ASCII.LF & "            (build.id IS N"
-       & "ULL OR build.id IN (SELECT MAX(sb.build_id) FROM porion_last_build AS sb"
-       & ASCII.LF & "                INNER JOIN porion_branch AS br ON sb.branch_"
-       & "id = br.id WHERE br.project_id = project.id))" & ASCII.LF & "        </s"
-       & "ql>" & ASCII.LF & "        <sql-count>" & ASCII.LF & "            SELECT"
-       & ASCII.LF & "            count(project.id)" & ASCII.LF & "            FRO"
-       & "M porion_project AS project" & ASCII.LF & "        </sql-count>" & ASCII.LF
-       & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+       & ASCII.LF & ASCII.LF & "    <query name='project-summary-list'>" & ASCII.LF
+       & "        <comment>Get the list of projects (summary)</comment>" & ASCII.LF
+       & "        <sql>" & ASCII.LF & "            SELECT" & ASCII.LF & "         "
+       & "   project.name AS name," & ASCII.LF & "            project.status AS st"
+       & "atus," & ASCII.LF & "            project.build_progress AS build_progres"
+       & "s," & ASCII.LF & "            project.build_rate AS build_rate," & ASCII.LF
+       & "            project.pass_rate AS pass_rate," & ASCII.LF & "            p"
+       & "roject.fail_rate AS fail_rate," & ASCII.LF & "            project.timeou"
+       & "t_rate AS timeout_rate," & ASCII.LF & "            COALESCE(branch.name,"
+       & " '') AS branch_name," & ASCII.LF & "            COALESCE(branch.tag, '')"
+       & " AS branch_tag," & ASCII.LF & "            COALESCE(branch.status, 0) AS"
+       & " branch_status," & ASCII.LF & "            build.finish_date AS build_da"
+       & "te," & ASCII.LF & "            COALESCE(build.status, 0) AS build_status"
+       & "," & ASCII.LF & "            COALESCE(build.tag, '') AS build_tag," & ASCII.LF
+       & "            MAX(COALESCE(build.number, 0)) AS build_number," & ASCII.LF
+       & "            MAX(COALESCE(build.pass_count, 0)) AS pass_count," & ASCII.LF
+       & "            MAX(COALESCE(build.fail_count, 0)) AS fail_count," & ASCII.LF
+       & "            MAX(COALESCE(build.timeout_count, 0)) AS timeout_count" & ASCII.LF
+       & "            FROM porion_project AS project" & ASCII.LF & "            LE"
+       & "FT JOIN porion_branch AS branch ON project.id = branch.project_id AND br"
+       & "anch.status != 0" & ASCII.LF & "            LEFT JOIN porion_last_build "
+       & "AS last_build ON last_build.branch_id = branch.id AND last_build.last_bu"
+       & "ild = 1" & ASCII.LF & "            LEFT JOIN porion_build AS build ON la"
+       & "st_build.build_id = build.id" & ASCII.LF & "            GROUP BY project"
+       & ".name" & ASCII.LF & "        </sql>" & ASCII.LF & "        <sql-count>" & ASCII.LF
+       & "            SELECT" & ASCII.LF & "            count(project.id)" & ASCII.LF
+       & "            FROM porion_project AS project" & ASCII.LF & "        </sql-"
+       & "count>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "    <query"
+       & " name='project-dependency-list'>" & ASCII.LF & "        <comment>Get the"
+       & " list of projects that another project depend on</comment>" & ASCII.LF & " "
+       & "       <sql>" & ASCII.LF & "            SELECT" & ASCII.LF & "          "
+       & "  project.name AS name," & ASCII.LF & "            project.status AS sta"
+       & "tus," & ASCII.LF & "            project.build_progress AS build_progress"
+       & "," & ASCII.LF & "            project.build_rate AS build_rate," & ASCII.LF
+       & "            project.pass_rate AS pass_rate," & ASCII.LF & "            p"
+       & "roject.fail_rate AS fail_rate," & ASCII.LF & "            project.timeou"
+       & "t_rate AS timeout_rate," & ASCII.LF & "            COALESCE(branch.name,"
+       & " '') AS branch_name," & ASCII.LF & "            COALESCE(branch.tag, '')"
+       & " AS branch_tag," & ASCII.LF & "            COALESCE(branch.status, 0) AS"
+       & " branch_status," & ASCII.LF & "            build.finish_date AS build_da"
+       & "te," & ASCII.LF & "            COALESCE(build.status, 0) AS build_status"
+       & "," & ASCII.LF & "            COALESCE(build.tag, '') AS build_tag," & ASCII.LF
+       & "            COALESCE(build.number, 0) AS build_number," & ASCII.LF & "  "
+       & "          COALESCE(build.pass_count, 0) AS pass_count," & ASCII.LF & "  "
+       & "          COALESCE(build.fail_count, 0) AS fail_count," & ASCII.LF & "  "
+       & "          COALESCE(build.timeout_count, 0) AS timeout_count" & ASCII.LF
+       & "            FROM porion_dependency AS dependency" & ASCII.LF & "        "
+       & "    INNER JOIN porion_project AS project ON dependency.project_id = proj"
+       & "ect.id" & ASCII.LF & "            LEFT JOIN porion_branch AS branch ON p"
+       & "roject.id = branch.project_id AND branch.status != 0" & ASCII.LF & "    "
+       & "        LEFT JOIN porion_last_build AS last_build ON last_build.branch_i"
+       & "d = branch.id AND last_build.last_build = 1" & ASCII.LF & "            L"
+       & "EFT JOIN porion_build AS build ON last_build.build_id = build.id" & ASCII.LF
+       & "            WHERE dependency.owner_id = :project_id AND" & ASCII.LF & " "
+       & "           (build.id IS NULL OR build.id IN (SELECT MAX(sb.build_id) FRO"
+       & "M porion_last_build AS sb" & ASCII.LF & "                INNER JOIN pori"
+       & "on_branch AS br ON sb.branch_id = br.id WHERE br.project_id = project.id"
+       & "))" & ASCII.LF & "        </sql>" & ASCII.LF & "        <sql-count>" & ASCII.LF
+       & "            SELECT" & ASCII.LF & "            count(project.id)" & ASCII.LF
+       & "            FROM porion_project AS project" & ASCII.LF & "        </sql-"
+       & "count>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</query-ma"
+       & "pping>" & ASCII.LF;
 
    C_14 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+       & "    <description>" & ASCII.LF & "        List of recipes for a project" & ASCII.LF
+       & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
+       & "ueries.Recipe_Info"" bean=""yes"">" & ASCII.LF & "        <comment>Infor"
+       & "mation about a recipe.</comment>" & ASCII.LF & "        <property type='"
+       & "ADO.Identifier' name=""id"">" & ASCII.LF & "            <comment>the rec"
+       & "ipe id.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "    "
+       & "    <property type='String' name=""name"">" & ASCII.LF & "            <c"
+       & "omment>the recipe name.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Porion.Builds.Models.Config_Status_Type' name="""
+       & "recipe_status"">" & ASCII.LF & "            <comment>the recipe status.<"
+       & "/comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <pro"
+       & "perty type='String' name=""node_name"">" & ASCII.LF & "            <comm"
+       & "ent>the build node name.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='ADO.Identifier' name=""branch_id"">" & ASCII.LF
+       & "            <comment>the branch id.</comment>" & ASCII.LF & "        </p"
+       & "roperty>" & ASCII.LF & "        <property type='String' name=""branch_na"
+       & "me"">" & ASCII.LF & "            <comment>the branch name.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='String' name="
+       & """branch_tag"">" & ASCII.LF & "            <comment>the branch tag.</com"
+       & "ment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <propert"
+       & "y type='Porion.Projects.Models.Branch_Status_Type' name=""branch_status"""
+       & ">" & ASCII.LF & "            <comment>the branch status.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Integer' name"
+       & "=""last_success_build"">" & ASCII.LF & "            <comment>the last su"
+       & "ccessful build number.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Integer' name=""last_fail_build"">" & ASCII.LF & " "
+       & "           <comment>the last failed build number.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Integer' name"
+       & "=""max_build_duration"">" & ASCII.LF & "            <comment>the max bui"
+       & "ld duration.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & " "
+       & "       <property type='Integer' name=""sum_build_duration"">" & ASCII.LF
+       & "            <comment>the sum of build duration.</comment>" & ASCII.LF & " "
+       & "       </property>" & ASCII.LF & "        <property type='Integer' name="
+       & """max_pass_count"">" & ASCII.LF & "            <comment>the number of te"
+       & "sts that succeeded.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Integer' name=""sum_pass_count"">" & ASCII.LF & " "
+       & "           <comment>the number of tests that succeeded.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Integer' name"
+       & "=""max_fail_count"">" & ASCII.LF & "            <comment>the number of t"
+       & "ests that failed.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Integer' name=""sum_fail_count"">" & ASCII.LF & " "
+       & "           <comment>the number of tests that failed.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Integer' name"
+       & "=""build_pass_count"">" & ASCII.LF & "            <comment>the number of"
+       & " builds that succeeded.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Integer' name=""build_fail_count"">" & ASCII.LF
+       & "            <comment>the number of builds that failed.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF
+       & "    <query name='recipe-list'>" & ASCII.LF & "        <comment>Get the l"
+       & "ist of recipes</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & "   "
+       & "       SELECT" & ASCII.LF & "            recipe.id AS id," & ASCII.LF & " "
+       & "           recipe.name AS name," & ASCII.LF & "            recipe.status"
+       & " AS status," & ASCII.LF & "            node.name AS node_name," & ASCII.LF
+       & "            recipe.branch_id AS branch_id," & ASCII.LF & "            CO"
+       & "ALESCE(branch.name, '') AS branch_name," & ASCII.LF & "            COALE"
+       & "SCE(branch.tag, '') AS branch_tag," & ASCII.LF & "            COALESCE(b"
+       & "ranch.status, 0) AS branch_status," & ASCII.LF & "            COALESCE(M"
+       & "AX(build_ok.number), 0) AS last_build," & ASCII.LF & "            COALES"
+       & "CE(MAX(build_ko.number), 0) AS failed_build," & ASCII.LF & "            "
+       & "COALESCE(MAX(build_ok.build_duration), 0) AS max_duration," & ASCII.LF & " "
+       & "           COALESCE(SUM(build_ok.build_duration), 0) AS sum_duration," & ASCII.LF
+       & "            COALESCE(MAX(build_ok.pass_count), 0) AS pass_count," & ASCII.LF
+       & "            COALESCE(SUM(build_ok.pass_count), 0) AS sum_pass," & ASCII.LF
+       & "            COALESCE(MAX(build_ok.fail_count), 0) AS fail_count," & ASCII.LF
+       & "            COALESCE(SUM(build_ok.fail_count), 0) AS sum_fail," & ASCII.LF
+       & "            COUNT(distinct build_ok.id) AS ok_count," & ASCII.LF & "    "
+       & "        COUNT(distinct build_ko.id) AS ko_count" & ASCII.LF & "         "
+       & "   FROM porion_recipe AS recipe" & ASCII.LF & "            INNER JOIN po"
+       & "rion_branch AS branch ON recipe.branch_id = branch.id" & ASCII.LF & "   "
+       & "         INNER JOIN porion_node AS node ON recipe.node_id = node.id" & ASCII.LF
+       & "            LEFT JOIN porion_build AS build_ok ON recipe.id = build_ok.r"
+       & "ecipe_id AND build_ok.status = 2" & ASCII.LF & "            LEFT JOIN po"
+       & "rion_build AS build_ko ON recipe.id = build_ko.recipe_id AND build_ko.st"
+       & "atus != 2" & ASCII.LF & "            WHERE recipe.project_id = :project_"
+       & "id" & ASCII.LF & "            GROUP BY recipe.id, recipe.branch_id" & ASCII.LF
+       & "        </sql>" & ASCII.LF & "        <sql-count>" & ASCII.LF & "       "
+       & "     SELECT" & ASCII.LF & "            count(recipe.id)" & ASCII.LF & " "
+       & "           FROM porion_recipe AS recipe" & ASCII.LF & "            WHERE"
+       & " recipe.project_id = :project_id" & ASCII.LF & "        </sql-count>" & ASCII.LF
+       & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+
+   C_15 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List the tests" & ASCII.LF & " "
        & "   </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Qu"
        & "eries.Test_Info"" bean=""yes"">" & ASCII.LF & "        <comment>Informat"
@@ -884,7 +994,7 @@ package body Porion.Resources.Queries is
        & "id = :build_id" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>"
        & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_15 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_16 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        Stats for the builds" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
        & "ueries.Build_Stat"" bean=""yes"">" & ASCII.LF & "        <comment>Statis"
@@ -956,7 +1066,7 @@ package body Porion.Resources.Queries is
        & "        </sql>" & ASCII.LF & "    </query> " & ASCII.LF & ASCII.LF & "<"
        & "/query-mapping>" & ASCII.LF;
 
-   C_16 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_17 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        Stats with the build metrics" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
        & "ueries.Metric_Stat"" bean=""yes"">" & ASCII.LF & "        <comment>Stati"
@@ -1035,7 +1145,7 @@ package body Porion.Resources.Queries is
    Contents : constant Content_List_Array := (
       C_0'Access, C_1'Access, C_2'Access, C_3'Access, C_4'Access, C_5'Access,
       C_6'Access, C_7'Access, C_8'Access, C_9'Access, C_10'Access, C_11'Access,
-      C_12'Access, C_13'Access, C_14'Access, C_15'Access, C_16'Access);
+      C_12'Access, C_13'Access, C_14'Access, C_15'Access, C_16'Access, C_17'Access);
 
    function Get_Content (Name : String) return access constant String is
       H : constant Natural := Hash (Name);

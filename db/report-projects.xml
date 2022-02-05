@@ -91,6 +91,40 @@
         </sql-count>
     </query>
 
+    <query name='project-summary-list'>
+        <comment>Get the list of projects (summary)</comment>
+        <sql>
+            SELECT
+            project.name AS name,
+            project.status AS status,
+            project.build_progress AS build_progress,
+            project.build_rate AS build_rate,
+            project.pass_rate AS pass_rate,
+            project.fail_rate AS fail_rate,
+            project.timeout_rate AS timeout_rate,
+            COALESCE(branch.name, '') AS branch_name,
+            COALESCE(branch.tag, '') AS branch_tag,
+            COALESCE(branch.status, 0) AS branch_status,
+            build.finish_date AS build_date,
+            COALESCE(build.status, 0) AS build_status,
+            COALESCE(build.tag, '') AS build_tag,
+            MAX(COALESCE(build.number, 0)) AS build_number,
+            MAX(COALESCE(build.pass_count, 0)) AS pass_count,
+            MAX(COALESCE(build.fail_count, 0)) AS fail_count,
+            MAX(COALESCE(build.timeout_count, 0)) AS timeout_count
+            FROM porion_project AS project
+            LEFT JOIN porion_branch AS branch ON project.id = branch.project_id AND branch.status != 0
+            LEFT JOIN porion_last_build AS last_build ON last_build.branch_id = branch.id AND last_build.last_build = 1
+            LEFT JOIN porion_build AS build ON last_build.build_id = build.id
+            GROUP BY project.name
+        </sql>
+        <sql-count>
+            SELECT
+            count(project.id)
+            FROM porion_project AS project
+        </sql-count>
+    </query>
+
     <query name='project-dependency-list'>
         <comment>Get the list of projects that another project depend on</comment>
         <sql>

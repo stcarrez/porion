@@ -33,7 +33,7 @@ package body Porion.Dashboards.Beans is
       Session : ADO.Sessions.Session := ASC.Get_Session (Ctx);
       Query   : ADO.Queries.Context;
    begin
-      Query.Set_Query (Porion.Queries.Query_Project_List);
+      Query.Set_Query (Porion.Queries.Query_Project_Summary_List);
       Porion.Queries.List (Bean.Projects, Session, Query);
    end Load;
 

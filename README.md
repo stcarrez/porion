@@ -109,6 +109,21 @@ The steps to use Porion are the following:
 * `status`:   status about the workspace or a project
 * `step`:     control the build steps
 
+# Porion Debian Binaries
+
+Ubuntu 20.04 packages are available to help you install the `porion`
+and `porion-server` commands more easily.  You can configure your Ubuntu system as follows:
+
+```
+wget -O - https://apt.vacs.fr/apt.vacs.fr.gpg.key | sudo apt-key add -
+sudo add-apt-repository "deb http://apt.vacs.fr/ubuntu-focal focal main"
+```
+
+And then install the `porion-server` package:
+
+```
+sudo apt-get install porion-server
+```
 
 # Building Porion
 

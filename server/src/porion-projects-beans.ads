@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-projects-beans -- Beans for module projects
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,7 @@ with Ada.Strings.Unbounded;
 
 with Util.Beans.Basic;
 with Util.Beans.Objects;
+with Porion.Queries;
 with Porion.Dashboards.Models;
 with Porion.Projects.Modules;
 with Porion.Projects.Models;
@@ -37,6 +38,8 @@ package Porion.Projects.Beans is
       Branch_Bean  : UBB.Readonly_Bean_Access;
       Project      : aliased Porion.Projects.Models.Project_Ref;
       Project_Bean : UBB.Readonly_Bean_Access;
+      Recipes      : aliased Porion.Queries.Recipe_Info_List_Bean;
+      Recipes_Bean : UBB.Readonly_Bean_Access;
       Node         : aliased Porion.Nodes.Models.Node_Ref;
       Node_Bean    : UBB.Readonly_Bean_Access;
       Metric       : aliased Porion.Dashboards.Beans.Stats.Metrics_Bean;

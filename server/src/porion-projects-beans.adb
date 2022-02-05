@@ -15,6 +15,7 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with ADO.Queries;
 with AWA.Services.Contexts;
 with Porion.Services;
 package body Porion.Projects.Beans is
@@ -36,6 +37,9 @@ package body Porion.Projects.Beans is
                                               Storage => Util.Beans.Objects.STATIC);
       elsif Name = "metrics" then
          return Util.Beans.Objects.To_Object (Value   => From.Metric_Bean,
+                                              Storage => Util.Beans.Objects.STATIC);
+      elsif Name = "recipes" then
+         return Util.Beans.Objects.To_Object (Value   => From.Recipes_Bean,
                                               Storage => Util.Beans.Objects.STATIC);
       elsif Name = "ident" then
          return UBO.To_Object (Porion.Projects.To_String (From.Ident));
@@ -64,6 +68,7 @@ package body Porion.Projects.Beans is
                    Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
       Ctx     : constant ASC.Service_Context_Access := ASC.Current;
       Context : Porion.Services.Context_Type;
+      Query   : ADO.Queries.Context;
    begin
       Context.DB := ASC.Get_Master_Session (Ctx);
 
@@ -73,6 +78,10 @@ package body Porion.Projects.Beans is
       Bean.Metric.Project := Context.Project.Get_Id;
       Bean.Metric.Cloc_Max_Count := 4;
       Bean.Metric.Load (Outcome);
+
+      Query.Set_Query (Porion.Queries.Query_Recipe_List);
+      Query.Bind_Param ("project_id", Context.Project.Get_Id);
+      Porion.Queries.List (Bean.Recipes, Context.DB, Query);
 
    exception
       when Porion.Services.Not_Found =>
@@ -91,6 +100,7 @@ package body Porion.Projects.Beans is
       Object.Module := Module;
       Object.Project_Bean := Object.Project'Access;
       Object.Metric_Bean := Object.Metric'Access;
+      Object.Recipes_Bean := Object.Recipes'Access;
       Porion.Dashboards.Beans.Stats.Initialize (Metrics);
       return Object.all'Access;
    end Create_Project_Bean;

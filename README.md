@@ -116,7 +116,7 @@ and `porion-server` commands more easily.  You can configure your Ubuntu system 
 
 ```
 wget -O - https://apt.vacs.fr/apt.vacs.fr.gpg.key | sudo apt-key add -
-sudo add-apt-repository "deb http://apt.vacs.fr/ubuntu-focal focal main"
+sudo add-apt-repository "deb https://apt.vacs.fr/ubuntu-focal focal main"
 ```
 
 And then install the `porion-server` package:

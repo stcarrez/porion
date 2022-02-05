@@ -15,6 +15,7 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Util.Systems.Constants;
 with Porion.Commands.Drivers;
 private package Porion.Commands.Build is
 
@@ -45,7 +46,8 @@ private
    end record;
 
    function Sys_Daemon (No_Chdir : in Integer; No_Close : in Integer) return Integer
-     with Import => True, Convention => C, Link_Name => "daemon";
+     with Import => True, Convention => C,
+          Link_Name => Util.Systems.Constants.SYMBOL_PREFIX & "daemon";
    pragma Weak_External (Sys_Daemon);
 
 end Porion.Commands.Build;

@@ -85,6 +85,7 @@
         </div>
       </li>
 
+      <h:panelGroup rendered="#{build.metrics.lines.count ne 0}">
       <li>
         <div class='dashboard-title'>
           Line coverage
@@ -100,6 +101,8 @@
           </div>
         </div>
       </li>
+      </h:panelGroup>
+      <h:panelGroup rendered="#{build.metrics.functions.count ne 0}">
     <li>
         <div class='dashboard-title'>
           Function coverage
@@ -115,6 +118,7 @@
           </div>
         </div>
       </li>
+      </h:panelGroup>
     </ul>
   </div>
 

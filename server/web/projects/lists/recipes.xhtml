@@ -1,0 +1,100 @@
+<!-- Project recipes
+  -  Copyright (C) 2021 Stephane Carrez
+  -  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
+  -
+  -  Licensed under the Apache License, Version 2.0 (the "License");
+  -  you may not use this file except in compliance with the License.
+  -  You may obtain a copy of the License at
+  -
+  -      http://www.apache.org/licenses/LICENSE-2.0
+  -
+  -  Unless required by applicable law or agreed to in writing, software
+  -  distributed under the License is distributed on an "AS IS" BASIS,
+  -  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  -  See the License for the specific language governing permissions and
+  -  limitations under the License.
+  -->
+<ui:composition
+  xmlns:awa="http://code.google.com/p/ada-awa/jsf"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:c="http://java.sun.com/jstl/core"
+  xmlns:u="http://code.google.com/p/ada-asf/util"
+  xmlns:w="http://code.google.com/p/ada-asf/widget"
+  xmlns:h="http://java.sun.com/jsf/html">
+  <div class='project-recipe-list'>
+      <div class='project-recipe-header #{recipe.recipe_status}'>
+        <div class='recipe-name'>
+          Recipe name
+        </div>
+        <div class='recipe-node'>
+          Build node
+        </div>
+        <div class='recipe-build-count'>
+          # builds
+        </div>
+        <div class='recipe-build-number'>
+          Last build
+        </div>
+        <div class='recipe-build-number'>
+          Failed build
+        </div>
+        <div class='recipe-test-pass'>
+          Tests OK
+        </div>
+        <div class='recipe-test-fail'>
+          Tests KO
+        </div>
+        <div class='recipe-test-fail'>
+          Build duration
+        </div>
+        <div class='recipe-test-fail'>
+          Build success rate
+        </div>
+      </div>
+
+    <h:list var="recipe" value="#{project.recipes}">
+      <div class='project-recipe #{recipe.recipe_status}'>
+        <div class='recipe-name'>
+          #{recipe.name}
+        </div>
+        <div class='recipe-node'>
+          #{recipe.node_name}
+        </div>
+        <div class='recipe-build-count'>
+          #{recipe.build_pass_count + recipe.build_fail_count}
+        </div>
+        <div class='recipe-build-number'>
+          <h:panelGroup rendered="#{recipe.last_success_build gt 0}">
+            <a href="#{contextPath}/builds/view/#{project.name}:#{recipe.last_success_build}" title="Build #{recipe.last_success_build}">
+              #{recipe.last_success_build}
+            </a>
+          </h:panelGroup>
+        </div>
+        <div class='recipe-build-number'>
+          <h:panelGroup rendered="#{recipe.last_fail_build gt 0}">
+            <a href="#{contextPath}/builds/view/#{project.name}:#{recipe.last_fail_build}" title="Build #{recipe.last_fail_build}">
+              #{recipe.last_fail_build}
+            </a>
+          </h:panelGroup>
+        </div>
+        <div class='recipe-test-pass'>
+          #{recipe.max_pass_count}
+        </div>
+        <div class='recipe-test-fail'>
+          #{recipe.max_fail_count}
+        </div>
+        <div class='recipe-build-count'>
+          <h:outputText rendered="#{recipe.build_pass_count}" value="#{recipe.sum_build_duration / recipe.build_pass_count}">
+            <f:converter converterId="millisecondConverter"/>
+          </h:outputText>
+        </div>
+        <div class='recipe-build-count'>
+          <div class='dashboard-value'>
+            <w:progress value="#{recipe.build_pass_count}" maxValue="#{recipe.build_pass_count + recipe.build_fail_count}" />
+          </div>
+        </div>
+      </div>
+    </h:list>
+  </div>
+</ui:composition>

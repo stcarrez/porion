@@ -81,7 +81,7 @@
 
       <li>
         <div class='dashboard-title'>
-          Build rate
+          Build success rate
         </div>
         <div class='dashboard-value'>
           <h:outputText value="#{project.project.build_rate / 10}">
@@ -98,15 +98,16 @@
           Tests
         </div>
         <div class='dashboard-value'>
-          <h:outputText value="#{project.project.pass_count}">
+          <h:outputText value="#{project.project.pass_rate / 10}">
             <f:converter converterId="percentConverter"/>
           </h:outputText> %
         </div>
         <div class='dashboard-value'>
-          <w:progress value="#{project.project.build_rate}" maxValue="1000" />
+          <w:progress value="#{project.project.pass_rate}" maxValue="1000" />
         </div>
       </li>
 
+      <h:panelGroup rendered="#{project.metrics.lines.count ne 0}">
       <li>
         <div class='dashboard-title'>
           Line coverage
@@ -120,7 +121,9 @@
           <w:progress value="#{project.metrics.lines.sum_value}" maxValue="#{project.metrics.lines.count * 1000}" />
         </div>
       </li>
-    <li>
+      </h:panelGroup>
+      <h:panelGroup rendered="#{project.metrics.functions.count ne 0}">
+        <li>
         <div class='dashboard-title'>
           Function coverage
         </div>
@@ -133,6 +136,7 @@
           <w:progress value="#{project.metrics.functions.sum_value}" direction='vertical' maxValue="#{project.metrics.functions.count * 1000}" />
         </div>
       </li>
+      </h:panelGroup>
     </ul>
   </div>
 

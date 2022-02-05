@@ -198,4 +198,9 @@
     .project-page-grid {
         width: 96%;
     }
+
+    .recipe-name, .recipe-node, .recipe-build-count, .recipe-build-number, .recipe-test-pass, .recipe-test-fail {
+        width: 95%;
+    }
+
 }

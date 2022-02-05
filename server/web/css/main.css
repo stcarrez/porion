@@ -207,6 +207,8 @@ div.awa-title dd {
 }
 .build-top-title span {
     padding-right: 2em;
+    white-space: nowrap;
+    overflow: hidden;
 }
 .build-BUILD_PASS .build-status {
     float: left;
@@ -343,4 +345,29 @@ div.awa-title dd {
 
 .flot-y-axis {
   fill: white;
+}
+
+.project-recipe-list {
+    margin-top: 1em;
+    float: left;
+    width: 98%;
+    padding-left: 1%;
+    padding-right: 1%;
+}
+.project-recipe, .project-recipe-header {
+    float: left;
+    width: 100%;
+}
+.project-recipe-header {
+    font-weight: bold;
+    border-bottom: 2px solid #ccc;
+    margin-bottom: 0.5em;
+}
+.project-recipe-header > div, .project-recipe > div {
+    height: 2em;
+    float: left;
+}
+.recipe-name, .recipe-node, .recipe-build-count, .recipe-build-number, .recipe-test-pass, .recipe-test-fail {
+    float: left;
+    width: 10%;
 }

@@ -1,4 +1,9 @@
-Version 0.6.0   - Jan 2021
+Version 0.7.0   - Feb 2022
+  - Added Debian packages for porion and porion-server
+  - Added list of recipes in the project page
+  - Added man page for porion-server
+
+Version 0.6.0   - Jan 2022
   - REST API to get a schields badge using https://shields.io/endpoint
   - Build dynamo and are if they are not installed
   - Setup for first Debian package

@@ -67,7 +67,7 @@ Get information about a project or a build number:
 Porion is a continuous integration server and agent that helps automate the building,
 testing and deployment of software development projects written in any language.
 Porion maintains a list of projects with build recipes to build these projects.
-It periodically checks for changes in projects and schedule a build when a project
+It periodically checks for changes in projects and it schedules a build when a project
 is modified.  Porion uses a build node to build a project and the build node can
 be the current host or a specific remote host registered for that purpose.
 
@@ -84,7 +84,6 @@ The steps to use Porion are the following:
   Porion will guess a set of build recipes for the new project.
 - project build recipes and build steps are updated and configured on the project
   by using either `porion add --recipe` or `porion step` commands.
-- the 
 
 
 # Porion commands

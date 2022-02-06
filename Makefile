@@ -115,3 +115,18 @@ install::
 
 clean::
 	rm -rf server/$(DIST_DIR)
+
+PORION_DOC= \
+  title.md \
+  pagebreak.tex \
+  index.md \
+  pagebreak.tex \
+  Installation.md \
+  pagebreak.tex
+
+DOC_OPTIONS=-f markdown
+DOC_OPTIONS+= --listings --number-sections --toc
+HTML_OPTIONS=-f markdown
+HTML_OPTIONS+= --listings --number-sections --toc --css docs/pandoc.css
+
+$(eval $(call pandoc_build,porion-book,$(PORION_DOC)))

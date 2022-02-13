@@ -13,7 +13,8 @@ test -f Makefile.in
 test -f Makefile.am
 
 [log-error]
-make: \*\*\*
+^make\[[0-9]+\]: \*\*\* \[.*\] Error.*
+^make: \*\*\*
 
 [log-context]
 ^make\[[0-9]+\]: Leaving directory '.*'

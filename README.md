@@ -181,6 +181,10 @@ make install
 * Man page: [porion (1)](https://gitlab.com/stcarrez/porion/blob/master/docs/porion.md)
 * Man page: [porion-server (8)](https://gitlab.com/stcarrez/porion/blob/master/docs/porion-server.md)
 
+# Presentations
+
+* [Implementing a build manager in Ada](https://www.slideshare.net/StephaneCarrez1/implementing-a-build-manager-in-ada)
+
 # Sites Using Porion
 
 * [Porion Build Manager](https://porion.vacs.fr/porion/index.html)

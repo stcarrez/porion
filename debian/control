@@ -8,6 +8,7 @@ Build-Depends: debhelper (>= 10), autotools-dev,
 # This line is parsed by debian/rules.
  gprbuild (>= 2015-2),
  pkg-config,
+ libsqlite3-dev,
 # 2015-2 is compatible with gnat-7
 # dh-ada-library (>= 6.7)
 # pandoc requires texlive-fonts-extra for PDF

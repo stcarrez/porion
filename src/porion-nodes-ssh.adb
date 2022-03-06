@@ -51,12 +51,7 @@ package body Porion.Nodes.SSH is
       declare
          Path : String := Ada.Environment_Variables.Value ("PATH");
       begin
-         for C of Path loop
-            if C = ':' then
-               C := ';';
-            end if;
-         end loop;
-         return Util.Files.Find_File_Path (Command, Path);
+         return Util.Files.Find_File_Path (Command, Path, ':');
       end;
    end Find_Command_Path;
 

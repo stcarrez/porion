@@ -316,14 +316,7 @@ package body Porion.Builds.Services is
    --  ------------------------------
    function Contains (List   : in Porion.Builds.Models.Build_Queue_Vector;
                       Recipe : in Porion.Builds.Models.Recipe_Ref) return Boolean is
-   begin
-      for Queue of List loop
-         if Queue.Get_Recipe.Get_Id = Recipe.Get_Id then
-            return True;
-         end if;
-      end loop;
-      return False;
-   end Contains;
+      (for some Queue of List => Queue.Get_Recipe.Get_Id = Recipe.Get_Id);
 
    --  ------------------------------
    --  Update the build queue to trigger builds and/or re-order the build queue according

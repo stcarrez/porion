@@ -17,9 +17,11 @@
 -----------------------------------------------------------------------
 with Util.Strings.Builders;
 with Porion.Services;
+with Porion.Sources;
 package body Porion.Commands.Set is
 
    VAR_NAME         : constant String := "name";
+   VAR_SOURCE       : constant String := "source";
    VAR_DESCRIPTION  : constant String := "description";
    VAR_CHECK_DELAY  : constant String := "check_delay";
    VAR_STATUS       : constant String := "status";
@@ -76,6 +78,8 @@ package body Porion.Commands.Set is
    begin
       if Name = VAR_NAME then
          Porion.Projects.Services.Set_Name (Context.Project_Service, Value, Modified);
+      elsif Name = VAR_SOURCE then
+         Porion.Projects.Services.Set_Source (Context.Project_Service, Value, Porion.Sources.SRC_GIT, Modified);
       elsif Name = VAR_DESCRIPTION then
          Porion.Projects.Services.Set_Description (Context.Project_Service, Value, Modified);
       elsif Name = VAR_STATUS then
@@ -137,6 +141,7 @@ package body Porion.Commands.Set is
          Ident := Porion.Projects.Parse (Arg);
          Context.Project_Service.Load (Ident);
          if Count = 1 then
+            Print_Help (Context, VAR_SOURCE, -("the source repository of the project"));
             Print_Help (Context, VAR_NAME, -("name of the project, recipe"));
             Print_Help (Context, VAR_DESCRIPTION, -("description of the project, branch, recipe"));
             Print_Help (Context, VAR_STATUS, -("enable or disable the project, branch, recipe"));

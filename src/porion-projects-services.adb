@@ -544,6 +544,25 @@ package body Porion.Projects.Services is
    end Set_Description;
 
    --  ------------------------------
+   --  Set the source control type and parameter for this project.
+   --  ------------------------------
+   procedure Set_Source (Service  : in out Context_Type;
+                         Uri      : in String;
+                         Kind     : in Porion.Sources.Source_Control_Type;
+                         Modified : out Boolean) is
+   begin
+      Log.Info ("Set project source on {0} to {1}",
+                String '(Service.Project.Get_Name), Uri);
+
+      Service.DB.Begin_Transaction;
+      Service.Project.Set_Scm_Url (Uri);
+      Service.Project.Set_Scm (Kind);
+      Modified := Service.Project.Is_Modified;
+      Service.Project.Save (Service.DB);
+      Service.DB.Commit;
+   end Set_Source;
+
+   --  ------------------------------
    --  Set the project status to enable, disable or put the project onhold.
    --  ------------------------------
    procedure Set_Status (Service  : in out Context_Type;

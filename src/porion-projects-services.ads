@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-projects -- Project information
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -91,6 +91,13 @@ package Porion.Projects.Services is
    procedure Set_Description (Service     : in out Context_Type;
                               Description : in String;
                               Modified    : out Boolean) with
+      Pre => Service.Has_Project;
+
+   --  Set the source control type and parameter for this project.
+   procedure Set_Source (Service  : in out Context_Type;
+                         Uri      : in String;
+                         Kind     : in Porion.Sources.Source_Control_Type;
+                         Modified : out Boolean) with
       Pre => Service.Has_Project;
 
    --  Set the project status to enable, disable or put the project onhold.

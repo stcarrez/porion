@@ -64,7 +64,7 @@ server build-server::
 test:	build
 	bin/porion_harness -v -config test.properties -xml porion-aunit.xml
 
-generate::
+generate:: build-dynamo
 	mkdir -p db agent/db
 	$(DYNAMO) generate $(DYNAMO_ARGS)
 	cd agent && $(DYNAMO) generate $(AGENT_DYNAMO_ARGS)
@@ -101,6 +101,18 @@ awa/ada-ado/src/drivers/ado-drivers-initialize.adb: awa/ada-ado/src/drivers/ado-
 	          -DHAVE_SQLITE=True \
 	          -DHAVE_POSTGRESQL=False \
 		  awa/ada-ado/src/drivers/ado-drivers-initialize.gpb $@
+
+# Install the AWA UML model in Dynamo UML search path
+awa/dynamo/config/uml/AWA.xmi: awa/awa/uml/awa.zargo
+	unzip -cq awa/awa/uml/awa.zargo awa.xmi > awa/dynamo/config/uml/AWA.xmi
+
+build-dynamo: bin/dynamo awa/dynamo/config/uml/AWA.xmi
+
+bin/dynamo: setup
+	$(GNATMAKE) $(GPRFLAGS) -p -P "$(GPRPATH)" $(MAKE_ARGS)
+else
+
+build-dynamo:
 
 endif
 

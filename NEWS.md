@@ -1,3 +1,7 @@
+Version 0.8.0  -
+  - Update to latest Ada Web Application
+  - Update the set command to allow changing the source URL and source scheme
+
 Version 0.7.0   - Feb 2022
   - Added Debian packages for porion and porion-server
   - Added list of recipes in the project page

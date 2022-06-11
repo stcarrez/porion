@@ -267,8 +267,10 @@ package body Porion.Builds.Services is
 
          --  Save the resource usage in the build.
          declare
-            Usage : constant Nodes.Usage_Type := Executor.Get_Usage;
+            Usage   : constant Nodes.Usage_Type := Executor.Get_Usage;
+            Updated : Boolean;
          begin
+            Service.Build.Reload (Service.DB, Updated);
             Service.Build.Set_User_Time (Millisecond_Type (Usage.User_Time));
             Service.Build.Set_Sys_Time (Millisecond_Type (Usage.Sys_Time));
          end;

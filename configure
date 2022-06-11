@@ -1873,6 +1873,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+
 ac_aux_dir=
 for ac_dir in "$srcdir" "$srcdir/.." "$srcdir/../.."; do
   if test -f "$ac_dir/install-sh"; then
@@ -2581,7 +2582,7 @@ $as_echo "done" >&6; }
 
 # Current release settings
 PORION_MAJOR_VERSION=0
-PORION_MINOR_VERSION=7
+PORION_MINOR_VERSION=8
 PORION_MICRO_VERSION=0
 PORION_VERSION=$PORION_MAJOR_VERSION.$PORION_MINOR_VERSION.$PORION_MICRO_VERSION
 
@@ -2862,6 +2863,7 @@ EOF
        ac_cv_gnat_aws_version='none'
     fi
 
+    rm -f conftest conftest.o conftest.ali
     if test "$ac_cv_gnat_aws_version" = "20.0"; then
                         cat > conftest.adb <<EOF
 with AWS;

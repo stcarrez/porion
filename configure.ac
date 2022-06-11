@@ -2,7 +2,8 @@ dnl Autoconf configure script for porion
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(src/porion.ads)
+AC_INIT
+AC_CONFIG_SRCDIR([src/porion.ads])
 
 AM_GNAT_LIBRARY_PROJECT(porion)
 
@@ -107,7 +108,7 @@ AC_SUBST(BUNDLE_DIR)
 DYNAMO_SEARCH_DIR="$ROOT_DIR/awa/awa/plugins"
 AC_SUBST(DYNAMO_SEARCH_DIR)
 
-AC_OUTPUT(
-Makefile.conf agent/porion_agent.gpr server/porion_server.gpr porion_lib.gpr porion_tests.gpr
+AC_CONFIG_FILES([Makefile.conf agent/porion_agent.gpr server/porion_server.gpr porion_lib.gpr porion_tests.gpr
 awa/dynamo/config/generator.properties
-)
+])
+AC_OUTPUT

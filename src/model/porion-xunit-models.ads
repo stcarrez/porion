@@ -125,6 +125,13 @@ package Porion.Xunit.Models is
                    Id      : in ADO.Identifier;
                    Found   : out Boolean);
 
+   --  Reload from the database the same object if it was modified.
+   --  Returns True in `Updated` if the object was reloaded.
+   --  Raises the NOT_FOUND exception if it does not exist.
+   procedure Reload (Object  : in out Test_Group_Ref;
+                     Session : in out ADO.Sessions.Session'Class;
+                     Updated : out Boolean);
+
    --  Find and load the entity.
    overriding
    procedure Find (Object  : in out Test_Group_Ref;
@@ -325,6 +332,13 @@ package Porion.Xunit.Models is
                    Id      : in ADO.Identifier;
                    Found   : out Boolean);
 
+   --  Reload from the database the same object if it was modified.
+   --  Returns True in `Updated` if the object was reloaded.
+   --  Raises the NOT_FOUND exception if it does not exist.
+   procedure Reload (Object  : in out Test_Ref;
+                     Session : in out ADO.Sessions.Session'Class;
+                     Updated : out Boolean);
+
    --  Find and load the entity.
    overriding
    procedure Find (Object  : in out Test_Ref;
@@ -488,6 +502,13 @@ package Porion.Xunit.Models is
                    Session : in out ADO.Sessions.Session'Class;
                    Id      : in ADO.Identifier;
                    Found   : out Boolean);
+
+   --  Reload from the database the same object if it was modified.
+   --  Returns True in `Updated` if the object was reloaded.
+   --  Raises the NOT_FOUND exception if it does not exist.
+   procedure Reload (Object  : in out Test_Run_Group_Ref;
+                     Session : in out ADO.Sessions.Session'Class;
+                     Updated : out Boolean);
 
    --  Find and load the entity.
    overriding

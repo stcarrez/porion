@@ -558,6 +558,36 @@ package body Porion.Nodes.Models is
       end if;
    end Load;
 
+   procedure Reload (Object  : in out Node_Ref;
+                     Session : in out ADO.Sessions.Session'Class;
+                     Updated : out Boolean) is
+      Result : ADO.Objects.Object_Record_Access;
+      Impl   : Node_Access;
+      Query  : ADO.SQL.Query;
+      Id     : ADO.Identifier;
+   begin
+      if Object.Is_Null then
+         raise ADO.Objects.NULL_ERROR;
+      end if;
+      Object.Prepare_Modify (Result);
+      Impl := Node_Impl (Result.all)'Access;
+      Id := ADO.Objects.Get_Key_Value (Impl.all);
+      Query.Bind_Param (Position => 1, Value => Id);
+      Query.Bind_Param (Position => 2, Value => Impl.Version);
+      Query.Set_Filter ("id = ? AND version != ?");
+      declare
+         Stmt : ADO.Statements.Query_Statement
+             := Session.Create_Statement (Query, NODE_DEF'Access);
+      begin
+         if Stmt.Has_Elements then
+            Updated := True;
+            Impl.Load (Stmt, Session);
+         else
+            Updated := False;
+         end if;
+      end;
+   end Reload;
+
    procedure Save (Object  : in out Node_Ref;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;

@@ -179,6 +179,13 @@ package Porion.Builds.Models is
                    Id      : in ADO.Identifier;
                    Found   : out Boolean);
 
+   --  Reload from the database the same object if it was modified.
+   --  Returns True in `Updated` if the object was reloaded.
+   --  Raises the NOT_FOUND exception if it does not exist.
+   procedure Reload (Object  : in out Build_Executor_Ref;
+                     Session : in out ADO.Sessions.Session'Class;
+                     Updated : out Boolean);
+
    --  Find and load the entity.
    overriding
    procedure Find (Object  : in out Build_Executor_Ref;
@@ -344,6 +351,13 @@ package Porion.Builds.Models is
                    Session : in out ADO.Sessions.Session'Class;
                    Id      : in ADO.Identifier;
                    Found   : out Boolean);
+
+   --  Reload from the database the same object if it was modified.
+   --  Returns True in `Updated` if the object was reloaded.
+   --  Raises the NOT_FOUND exception if it does not exist.
+   procedure Reload (Object  : in out Recipe_Ref;
+                     Session : in out ADO.Sessions.Session'Class;
+                     Updated : out Boolean);
 
    --  Find and load the entity.
    overriding
@@ -553,6 +567,13 @@ package Porion.Builds.Models is
                    Id      : in ADO.Identifier;
                    Found   : out Boolean);
 
+   --  Reload from the database the same object if it was modified.
+   --  Returns True in `Updated` if the object was reloaded.
+   --  Raises the NOT_FOUND exception if it does not exist.
+   procedure Reload (Object  : in out Build_Ref;
+                     Session : in out ADO.Sessions.Session'Class;
+                     Updated : out Boolean);
+
    --  Find and load the entity.
    overriding
    procedure Find (Object  : in out Build_Ref;
@@ -667,6 +688,13 @@ package Porion.Builds.Models is
                    Session : in out ADO.Sessions.Session'Class;
                    Id      : in ADO.Identifier;
                    Found   : out Boolean);
+
+   --  Reload from the database the same object if it was modified.
+   --  Returns True in `Updated` if the object was reloaded.
+   --  Raises the NOT_FOUND exception if it does not exist.
+   procedure Reload (Object  : in out Build_Queue_Ref;
+                     Session : in out ADO.Sessions.Session'Class;
+                     Updated : out Boolean);
 
    --  Find and load the entity.
    overriding
@@ -783,6 +811,13 @@ package Porion.Builds.Models is
                    Session : in out ADO.Sessions.Session'Class;
                    Id      : in ADO.Identifier;
                    Found   : out Boolean);
+
+   --  Reload from the database the same object if it was modified.
+   --  Returns True in `Updated` if the object was reloaded.
+   --  Raises the NOT_FOUND exception if it does not exist.
+   procedure Reload (Object  : in out Build_Reason_Ref;
+                     Session : in out ADO.Sessions.Session'Class;
+                     Updated : out Boolean);
 
    --  Find and load the entity.
    overriding
@@ -1216,6 +1251,13 @@ package Porion.Builds.Models is
                    Id      : in ADO.Identifier;
                    Found   : out Boolean);
 
+   --  Reload from the database the same object if it was modified.
+   --  Returns True in `Updated` if the object was reloaded.
+   --  Raises the NOT_FOUND exception if it does not exist.
+   procedure Reload (Object  : in out Environment_Ref;
+                     Session : in out ADO.Sessions.Session'Class;
+                     Updated : out Boolean);
+
    --  Find and load the entity.
    overriding
    procedure Find (Object  : in out Environment_Ref;
@@ -1331,6 +1373,13 @@ package Porion.Builds.Models is
                    Session : in out ADO.Sessions.Session'Class;
                    Id      : in ADO.Identifier;
                    Found   : out Boolean);
+
+   --  Reload from the database the same object if it was modified.
+   --  Returns True in `Updated` if the object was reloaded.
+   --  Raises the NOT_FOUND exception if it does not exist.
+   procedure Reload (Object  : in out Last_Build_Ref;
+                     Session : in out ADO.Sessions.Session'Class;
+                     Updated : out Boolean);
 
    --  Find and load the entity.
    overriding

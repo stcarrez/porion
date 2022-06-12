@@ -1,6 +1,6 @@
 .\"
 .\"
-.TH PORION 1 "Jan 30, 2022" "Continuous build system"
+.TH PORION 1 "Jun 12, 2022" "Continuous build system"
 .SH NAME
 porion - Continuous build system
 .SH SYNOPSIS
@@ -34,32 +34,32 @@ it to build and manage the projects.
 .PP
 The steps to use \fIporion\fR are the following:
 .\"
-.IP \(bu 4
+.IP \(bu 2
 the \fIporion\fR workspace directory is created by using the \fIporion init\fR command,
 .\"
-.IP \(bu 4
+.IP \(bu 2
 projects are registered by using the \fIporion add\fR command with enough information to
 allow \fIporion\fR to checkout the source and detect changes.  When a project is added
 \fIporion\fR will guess a set of build recipes for the new project,
 .\"
-.IP \(bu 4
+.IP \(bu 2
 project build recipes and build steps are updated and configured on the project
 by using either \fIporion add --recipe\fR or \fIporion step\fR commands.  These build
 recipes describe the steps that must be executed to build, test and deploy the project,
 .\"
-.IP \(bu 4
+.IP \(bu 2
 source changes are detected by running the \fIporion check\fR command.  This command can
 be executed explicitly for a given project or globally from a
 .IR cron (8)
 job for example.  When it detect a change in a project, it adds the project to the
 build queue,
 .\"
-.IP \(bu 4
+.IP \(bu 2
 the build queue is processed by running the \fIporion build\fR command.
 It looks at the build queue and executes the build either on the current host or
 on the build node specified by the recipe,
 .\"
-.IP \(bu 4
+.IP \(bu 2
 when the build is finished, the user can look at the build result by
 using either the \fIporion info\fR or the \fIporion logs\fR commands.
 .\"
@@ -105,9 +105,9 @@ porion \fBinit\fR \fIdirectory\fR
 .PP
 Setup the build workspace directory used by the porion build agent.
 This directory is created by the command and is used for:
-.IP \(bu 4
+.IP \(bu 2
 the SQLite database that describes projects, builds, tests
-.IP \(bu 4
+.IP \(bu 2
 the project directories where projects are built
 .\"
 .SS The add command
@@ -280,6 +280,38 @@ option, a confirmation is asked before removal.
 The
 .I --force
 option forces the removal and ignores any error.
+.\"
+.SS The set command
+.RS 0
+porion \fBset\fP \fIident\fR {\fIname\fR} {\fIcontent...\fR}
+.RE
+.PP
+The \fIporion set\fR command changes a configuration variable for a project,
+a branch or a build recipe.  The identification string can reference a project,
+a branch or a build recipe.  Some variables are specific to a project, others
+are specific to a branch or build recipes.  The variable identification is given
+with a single pre-defined name.  The value is composed of the concatenation of
+the program arguments which remain.
+.\"
+.TP 12
+source
+Controls the URI to access the sources of the project.
+.\"
+.TP 12
+name
+controls the name of the project.
+.\"
+.TP 12
+description
+allows to define a description for the project or branch.
+.\"
+.TP 12
+status
+enable or disable the project, branch or recipe.
+.\"
+.TP 12
+check_delay
+defines the delay in seconds between source checks for changes.
 .\"
 .SS The step command
 .RS 0

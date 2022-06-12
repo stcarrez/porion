@@ -278,6 +278,25 @@ package body Porion.Builds.Services is
       end if;
    end Build;
 
+   --  ------------------------------
+   --  Cancel the building status on the build queues for the given node.
+   --  ------------------------------
+   procedure Cancel_Building (Service : in out Context_Type;
+                              Node    : in String) is
+      Query : ADO.Queries.Context;
+      List  : Porion.Builds.Models.Build_Queue_Vector;
+   begin
+      Log.Info ("Cancel building status for build node {0}", Node);
+
+      Query.Set_Filter ("o.building = 1 AND o.node_id = :node_id");
+      Query.Bind_Param ("node_id", Service.Build_Node.Get_Id);
+      Porion.Builds.Models.List (List, Service.DB, Query);
+      for Queue of List loop
+         Queue.Set_Building (False);
+         Queue.Save (Service.DB);
+      end loop;
+   end Cancel_Building;
+
    procedure Build_Queue (Service : in out Context_Type;
                           Node    : in String) is
       Build_Executor : Porion.Builds.Models.Build_Executor_Ref;
@@ -298,6 +317,10 @@ package body Porion.Builds.Services is
             return;
          end if;
       end if;
+
+      --  First, cancel the building status because we know there is no executor
+      --  running for this build node.
+      Cancel_Building (Service, Node);
 
       Build_Executor.Set_Pid (Util.Systems.Os.Sys_Getpid);
       Build_Executor.Set_Node (Service.Build_Node);

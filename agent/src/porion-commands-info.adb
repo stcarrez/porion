@@ -229,6 +229,10 @@ package body Porion.Commands.Info is
       Printer.Put_UString (Fields (2), Ident.Name);
       Printer.New_Line;
 
+      Printer.Put (Fields (1), -("Sources"));
+      Printer.Put (Fields (2), Context.Project_Service.Project.Get_Scm_Url);
+      Printer.New_Line;
+
       declare
          Description : constant String := Context.Project_Service.Project.Get_Description;
       begin

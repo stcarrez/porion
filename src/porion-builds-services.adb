@@ -587,118 +587,172 @@ package body Porion.Builds.Services is
    --  Update the ratings on the branch when a build is finished.
    --  ------------------------------
    procedure Update_Branch_Ratings (Service : in out Context_Type) is
-      List         : Porion.Builds.Models.Build_Status_Vector;
-      Query        : ADO.Queries.Context;
-      Recipe_Count : Natural := 0;
-      Total_Rate   : Natural := 0;
-      Success_Rate : Natural := 0;
-      Build_Count  : Natural := 0;
-      Pass_Rate    : Natural := 0;
-      Fail_Rate    : Natural := 0;
-      Timeout_Rate : Natural := 0;
-      Test_Rate    : Natural := 0;
-      Tag          : constant UString := Service.Branch.Get_Tag;
-   begin
-      --  Step 1: get the recipes and builds for the project branch.
-      Query.Set_Query (Porion.Builds.Models.Query_Project_Build_Status);
-      Query.Bind_Param ("project_id", Service.Project.Get_Id);
-      Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
-      Porion.Builds.Models.List (List, Service.DB, Query);
-      if List.Is_Empty then
-         Log.Warn ("No branch found for project {0}", Service.Project.Get_Name);
-         return;
-      end if;
 
-      --  Step 2: compute the pass/fail rates while applying the rate factor
-      --  defined on each recipe.  We only consider the builds that match
-      --  our current branch tag.
-      for Status of List loop
-         declare
-            Rate : constant Natural := Natural (Status.Rate_Factor);
-         begin
-            Total_Rate := Total_Rate + Rate;
-            if Status.Build_Status.Is_Null then
-               Recipe_Count := Recipe_Count + 1;
-            elsif Status.Build_Tag = Tag then
-               Build_Count := Build_Count + 1;
-               if Status.Build_Status.Value = Models.BUILD_PASS then
-                  Success_Rate := Success_Rate + Rate;
+      procedure Do_Branch_Ratings (Service : in out Context_Type);
+
+      procedure Do_Branch_Ratings (Service : in out Context_Type) is
+         List         : Porion.Builds.Models.Build_Status_Vector;
+         Query        : ADO.Queries.Context;
+         Recipe_Count : Natural := 0;
+         Total_Rate   : Natural := 0;
+         Success_Rate : Natural := 0;
+         Build_Count  : Natural := 0;
+         Pass_Rate    : Natural := 0;
+         Fail_Rate    : Natural := 0;
+         Timeout_Rate : Natural := 0;
+         Test_Rate    : Natural := 0;
+         Tag          : constant UString := Service.Branch.Get_Tag;
+      begin
+         --  Step 1: get the recipes and builds for the project branch.
+         Query.Set_Query (Porion.Builds.Models.Query_Project_Build_Status);
+         Query.Bind_Param ("project_id", Service.Project.Get_Id);
+         Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
+         Porion.Builds.Models.List (List, Service.DB, Query);
+         if List.Is_Empty then
+            Log.Warn ("No branch found for project {0}", Service.Project.Get_Name);
+            return;
+         end if;
+
+         --  Step 2: compute the pass/fail rates while applying the rate factor
+         --  defined on each recipe.  We only consider the builds that match
+         --  our current branch tag.
+         for Status of List loop
+            declare
+               Rate : constant Natural := Natural (Status.Rate_Factor);
+            begin
+               Total_Rate := Total_Rate + Rate;
+               if Status.Build_Status.Is_Null then
+                  Recipe_Count := Recipe_Count + 1;
+               elsif Status.Build_Tag = Tag then
+                  Build_Count := Build_Count + 1;
+                  if Status.Build_Status.Value = Models.BUILD_PASS then
+                     Success_Rate := Success_Rate + Rate;
+                  end if;
+                  Pass_Rate := Pass_Rate + Status.Pass_Count * Rate;
+                  Fail_Rate := Fail_Rate + Status.Fail_Count * Rate;
+                  Timeout_Rate := Timeout_Rate + Status.Timeout_Count * Rate;
+                  Test_Rate := Test_Rate
+                     + (Status.Pass_Count + Status.Fail_Count + Status.Timeout_Count) * Rate;
                end if;
-               Pass_Rate := Pass_Rate + Status.Pass_Count * Rate;
-               Fail_Rate := Fail_Rate + Status.Fail_Count * Rate;
-               Timeout_Rate := Timeout_Rate + Status.Timeout_Count * Rate;
-               Test_Rate := Test_Rate
-                  + (Status.Pass_Count + Status.Fail_Count + Status.Timeout_Count) * Rate;
-            end if;
+            end;
+         end loop;
+
+         if Total_Rate > 0 then
+            Service.Branch.Set_Build_Rate (To_Permille (Success_Rate, Total_Rate));
+         else
+            Service.Branch.Set_Build_Rate (0);
+         end if;
+         if Test_Rate > 0 then
+            Service.Branch.Set_Pass_Rate (To_Permille (Pass_Rate, Test_Rate));
+            Service.Branch.Set_Fail_Rate (To_Permille (Fail_Rate, Test_Rate));
+            Service.Branch.Set_Timeout_Rate (To_Permille (Timeout_Rate, Test_Rate));
+         else
+            Service.Branch.Set_Pass_Rate (0);
+            Service.Branch.Set_Fail_Rate (0);
+            Service.Branch.Set_Timeout_Rate (0);
+         end if;
+         Service.Branch.Set_Build_Progress (To_Permille (Build_Count, Natural (List.Length)));
+         Service.Branch.Save (Service.DB);
+      end Do_Branch_Ratings;
+
+      Retry   : Natural := 0;
+      Updated : Boolean;
+   begin
+      --  If two processes are updating the same branch ratings, one can get a
+      --  LAZY_LOCK exception.  To handle it, we can simply reload the branch
+      --  and run the branch rating calculation again.
+      loop
+         begin
+            Do_Branch_Ratings (Service);
+            return;
+
+         exception
+            when ADO.Objects.LAZY_LOCK =>
+               Retry := Retry + 1;
+               if Retry > 10 then
+                  raise;
+               end if;
+               Service.Branch.Reload (Service.DB, Updated);
+
          end;
       end loop;
-
-      if Total_Rate > 0 then
-         Service.Branch.Set_Build_Rate (To_Permille (Success_Rate, Total_Rate));
-      else
-         Service.Branch.Set_Build_Rate (0);
-      end if;
-      if Test_Rate > 0 then
-         Service.Branch.Set_Pass_Rate (To_Permille (Pass_Rate, Test_Rate));
-         Service.Branch.Set_Fail_Rate (To_Permille (Fail_Rate, Test_Rate));
-         Service.Branch.Set_Timeout_Rate (To_Permille (Timeout_Rate, Test_Rate));
-      else
-         Service.Branch.Set_Pass_Rate (0);
-         Service.Branch.Set_Fail_Rate (0);
-         Service.Branch.Set_Timeout_Rate (0);
-      end if;
-      Service.Branch.Set_Build_Progress (To_Permille (Build_Count, Natural (List.Length)));
-      Service.Branch.Save (Service.DB);
    end Update_Branch_Ratings;
 
    --  ------------------------------
    --  Update the ratings on the project by looking at the branches.
    --  ------------------------------
    procedure Update_Project_Ratings (Service : in out Context_Type) is
-      List         : Porion.Projects.Models.Branch_Vector;
-      Query        : ADO.Queries.Context;
-      Total_Rate   : Natural := 0;
-      Success_Rate : Natural := 0;
-      Pass_Rate    : Natural := 0;
-      Fail_Rate    : Natural := 0;
-      Timeout_Rate : Natural := 0;
-      Build_Progress : Natural := 0;
-   begin
-      --  Step 1: get the project branches.
-      Query.Bind_Param ("project_id", Service.Project.Get_Id);
-      Query.Set_Filter ("o.project_id = :project_id AND o.status != 0");
-      Porion.Projects.Models.List (List, Service.DB, Query);
 
-      --  Step 2: compute the pass/fail rates while applying the rate factor
-      --  defined on each recipe.  We only consider the builds that match
-      --  our current branch tag.
-      for Branch of List loop
-         declare
-            Rate : constant Natural := Natural (Branch.Get_Rate_Factor);
+      procedure Do_Project_Ratings (Service : in out Context_Type);
+
+      procedure Do_Project_Ratings (Service : in out Context_Type) is
+         List         : Porion.Projects.Models.Branch_Vector;
+         Query        : ADO.Queries.Context;
+         Total_Rate   : Natural := 0;
+         Success_Rate : Natural := 0;
+         Pass_Rate    : Natural := 0;
+         Fail_Rate    : Natural := 0;
+         Timeout_Rate : Natural := 0;
+         Build_Progress : Natural := 0;
+      begin
+         --  Step 1: get the project branches.
+         Query.Bind_Param ("project_id", Service.Project.Get_Id);
+         Query.Set_Filter ("o.project_id = :project_id AND o.status != 0");
+         Porion.Projects.Models.List (List, Service.DB, Query);
+
+         --  Step 2: compute the pass/fail rates while applying the rate factor
+         --  defined on each recipe.  We only consider the builds that match
+         --  our current branch tag.
+         for Branch of List loop
+            declare
+               Rate : constant Natural := Natural (Branch.Get_Rate_Factor);
+            begin
+               Total_Rate := Total_Rate + Rate;
+               Success_Rate := Success_Rate + Natural (Branch.Get_Build_Rate) * Rate;
+               Build_Progress := Build_Progress + Natural (Branch.Get_Build_Progress) * Rate;
+               Pass_Rate := Pass_Rate + Natural (Branch.Get_Pass_Rate) * Rate;
+               Fail_Rate := Fail_Rate + Natural (Branch.Get_Fail_Rate) * Rate;
+               Timeout_Rate := Timeout_Rate + Natural (Branch.Get_Timeout_Rate) * Rate;
+            end;
+         end loop;
+
+         if Total_Rate > 0 then
+            Service.Project.Set_Build_Rate (Permille_Type (Success_Rate / Total_Rate));
+            Service.Project.Set_Pass_Rate (Permille_Type (Pass_Rate / Total_Rate));
+            Service.Project.Set_Fail_Rate (Permille_Type (Fail_Rate / Total_Rate));
+            Service.Project.Set_Timeout_Rate (Permille_Type (Timeout_Rate / Total_Rate));
+            Service.Project.Set_Build_Progress (Permille_Type (Build_Progress / Total_Rate));
+         else
+            Service.Project.Set_Build_Rate (0);
+            Service.Project.Set_Pass_Rate (0);
+            Service.Project.Set_Fail_Rate (0);
+            Service.Project.Set_Timeout_Rate (0);
+         end if;
+
+         Service.Project.Save (Service.DB);
+      end Do_Project_Ratings;
+
+      Retry   : Natural := 0;
+      Updated : Boolean;
+   begin
+      --  If two processes are updating the same project ratings, one can get a
+      --  LAZY_LOCK exception.  To handle it, we can simply reload the project
+      --  and run the project rating calculation again.
+      loop
          begin
-            Total_Rate := Total_Rate + Rate;
-            Success_Rate := Success_Rate + Natural (Branch.Get_Build_Rate) * Rate;
-            Build_Progress := Build_Progress + Natural (Branch.Get_Build_Progress) * Rate;
-            Pass_Rate := Pass_Rate + Natural (Branch.Get_Pass_Rate) * Rate;
-            Fail_Rate := Fail_Rate + Natural (Branch.Get_Fail_Rate) * Rate;
-            Timeout_Rate := Timeout_Rate + Natural (Branch.Get_Timeout_Rate) * Rate;
+            Do_Project_Ratings (Service);
+            return;
+
+         exception
+            when ADO.Objects.LAZY_LOCK =>
+               Retry := Retry + 1;
+               if Retry > 10 then
+                  raise;
+               end if;
+               Service.Project.Reload (Service.DB, Updated);
+
          end;
       end loop;
-
-      if Total_Rate > 0 then
-         Service.Project.Set_Build_Rate (Permille_Type (Success_Rate / Total_Rate));
-         Service.Project.Set_Pass_Rate (Permille_Type (Pass_Rate / Total_Rate));
-         Service.Project.Set_Fail_Rate (Permille_Type (Fail_Rate / Total_Rate));
-         Service.Project.Set_Timeout_Rate (Permille_Type (Timeout_Rate / Total_Rate));
-         Service.Project.Set_Build_Progress (Permille_Type (Build_Progress / Total_Rate));
-      else
-         Service.Project.Set_Build_Rate (0);
-         Service.Project.Set_Pass_Rate (0);
-         Service.Project.Set_Fail_Rate (0);
-         Service.Project.Set_Timeout_Rate (0);
-      end if;
-
-      Service.Project.Save (Service.DB);
    end Update_Project_Ratings;
 
    --  ------------------------------

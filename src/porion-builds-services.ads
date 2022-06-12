@@ -211,6 +211,10 @@ private
 
    function Get_Build_Directory (Service : in Context_Type) return String;
 
+   --  Cancel the building status on the build queues for the given node.
+   procedure Cancel_Building (Service : in out Context_Type;
+                              Node    : in String);
+
    procedure Build (Service     : in out Context_Type;
                     Steps       : in Build_Step_Vector;
                     Executor    : in out Porion.Executors.Executor_Type'Class);

@@ -1,0 +1,18 @@
+porion set: change a configuration variable for a project, branch, build recipe
+
+Usage: porion set <ident> <name> [args...]
+
+  The `porion set` command changes a configuration variable for a project,
+  a branch or a build recipe.  The identification string can reference a project,
+  a branch or a build recipe.  Some variables are specific to a project, others
+  are specific to a branch or build recipes.  The variable identification is given
+  with a single pre-defined name.  The value is composed of the concatenation of
+  the program arguments which remain.  The following variables are recognized:
+
+name          the name of the project or build recipe
+source        the source repository of the project
+description   the description of the project, branch, recipe
+check_delay   the delay in seconds between source checks for changes
+status        enable or disable the project, branch, recipe
+rate_factor   the branch or recipe rate factor
+filter_rules  the recipe filtering rules for log reports

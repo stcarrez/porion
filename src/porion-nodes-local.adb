@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 with Ada.Directories;
 with Util.Log.Loggers;
+with Util.Files;
 with Util.Streams;
 with Util.Streams.Texts;
 with Util.Systems.Constants;
@@ -210,7 +211,9 @@ package body Porion.Nodes.Local is
       pragma Unreferenced (Controller, Process);
    begin
       if Clean and then Ada.Directories.Exists (Path) then
-         Ada.Directories.Delete_Tree (Path);
+         --  Don't use Ada.Directories.Delete_Tree because it fails if the directory
+         --  contains some special files such as sockets or symbolic links to missing files.
+         Util.Files.Delete_Tree (Path);
       end if;
 
       Ada.Directories.Create_Path (Path);

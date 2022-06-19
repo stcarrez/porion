@@ -16,10 +16,9 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Directories;
-with Interfaces.C.Strings;
 with Util.Log.Loggers;
 with Util.Strings;
-with Util.Systems.Constants;
+with Util.Files;
 with EL.Contexts.Default;
 with Porion.Logs;
 package body Porion.Sources.Files is
@@ -28,30 +27,8 @@ package body Porion.Sources.Files is
 
    Log   : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Sources.Files");
 
-   function Realpath (Path : in String) return String;
    function Make_Project_Name (Path : in String;
                                Kind : in File_Type) return String;
-
-   function Realpath (Path : in String) return String is
-      use Interfaces;
-
-      function Sys_Realpath (S : C.Strings.chars_ptr;
-                             R : C.Strings.chars_ptr) return C.Strings.chars_ptr with
-        Import => True, Convention => C,
-        Link_Name => Util.Systems.Constants.SYMBOL_PREFIX & "realpath";
-
-      P : C.Strings.chars_ptr := C.Strings.New_String (Path);
-      R : C.Strings.chars_ptr;
-   begin
-      R := Sys_Realpath (P, C.Strings.Null_Ptr);
-      C.Strings.Free (P);
-      declare
-         Result : constant String := C.Strings.Value (R);
-      begin
-         C.Strings.Free (R);
-         return Result;
-      end;
-   end Realpath;
 
    --  ------------------------------
    --  Guess the file type for the given file based on the file name extension.
@@ -215,7 +192,7 @@ package body Porion.Sources.Files is
       Executor.Execute (Controller.Guess_Command, Controller.Config,
                         Process'Access, Strip_Crlf => True, Status => Status);
       if Status = 0 then
-         Result.URI := To_UString (Realpath (Path));
+         Result.URI := To_UString (Util.Files.Realpath (Path));
          Result.Name := To_UString (Make_Project_Name (Path, Kind));
          Result.Kind := SRC_FILE;
       end if;

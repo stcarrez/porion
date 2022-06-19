@@ -19,6 +19,7 @@ with Ada.Directories;
 with Util.Log.Loggers;
 with Util.Properties;
 with Util.Strings;
+with Util.Files;
 with Util.Dates.ISO8601;
 with Porion.Configs;
 with Porion.Builds.Models;
@@ -169,7 +170,9 @@ package body Porion.Projects.Services is
          Dir : constant String := Porion.Configs.Get_Project_Directory (Name);
       begin
          if Ada.Directories.Exists (Dir) then
-            Ada.Directories.Delete_Tree (Dir);
+            --  Don't use Ada.Directories.Delete_Tree because it fails if the directory
+            --  contains some special files such as sockets or symbolic links to missing files.
+            Util.Files.Delete_Tree (Dir);
          end if;
       end;
 

@@ -1,3 +1,6 @@
+Version 0.9.0  -
+  - Fix cleaning of build directories when it contains socket files
+
 Version 0.8.0  - Jun 2022
   - Update to latest Ada Web Application
   - Update the set command to allow changing the source URL and source scheme

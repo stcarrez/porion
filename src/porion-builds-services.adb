@@ -52,6 +52,7 @@ package body Porion.Builds.Services is
                           Executor    : in out Porion.Executors.Executor_Type'Class) is
       Query         : ADO.Queries.Context;
       Found         : Boolean;
+      Updated       : Boolean;
       Create_Reason : Boolean := False;
    begin
       Service.Recipe := Recipe;
@@ -76,8 +77,9 @@ package body Porion.Builds.Services is
       Service.Build.Set_Tag (String '(Service.Branch.Get_Tag));
       Service.Build.Set_Create_Date (Ada.Calendar.Clock);
       if not Executor.Is_Dry_Run then
-         Service.Branch.Set_Last_Build_Number (Service.Build.Get_Number);
          Service.Build.Save (Service.DB);
+         Service.Branch.Reload (Service.Db, Updated);
+         Service.Branch.Set_Last_Build_Number (Service.Build.Get_Number);
          Service.Branch.Save (Service.DB);
 
          --  Get or create a build queue entry for the recipe.

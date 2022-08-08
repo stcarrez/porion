@@ -15,7 +15,10 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-
+with Ada.Characters.Handling;
+with Ada.Environment_Variables;
+with Util.Streams.Texts;
+with Util.Files;
 package body Porion.Nodes is
 
    --  ------------------------------
@@ -54,5 +57,89 @@ package body Porion.Nodes is
    begin
       return Controller.Usage;
    end Get_Usage;
+
+   function Find_Command_Path (Command : in String) return String is
+   begin
+      if not Ada.Environment_Variables.Exists ("PATH") then
+         return Command;
+      end if;
+
+      declare
+         Path : String := Ada.Environment_Variables.Value ("PATH");
+      begin
+         return Util.Files.Find_File_Path (Command, Path, ':');
+      end;
+   end Find_Command_Path;
+
+   --  ------------------------------
+   --  Execute the command in the working directory and for each output
+   --  line produced by the command call the Process procedure.
+   --  ------------------------------
+   procedure Execute (Controller  : in out Controller_Type'Class;
+                      Command     : in String;
+                      Working_Dir : in String := "";
+                      Process     : not null access procedure (Line : in String);
+                      Strip_Crlf  : in Boolean := False;
+                      Status      : out Integer) is
+
+      procedure Read_Input (Stream : in out Input_Buffer_Stream'Class) is
+         Reader  : Util.Streams.Texts.Reader_Stream;
+      begin
+         Reader.Initialize (Stream'Unchecked_Access);
+         while not Reader.Is_Eof loop
+            declare
+               Line : Ada.Strings.Unbounded.Unbounded_String;
+            begin
+               Reader.Read_Line (Line, Strip_Crlf);
+               Process (Ada.Strings.Unbounded.To_String (Line));
+            end;
+         end loop;
+      end Read_Input;
+
+   begin
+      Controller.Record_Command (Command);
+      if Controller.Is_Dry_Run then
+         Status := 0;
+         return;
+      end if;
+      declare
+         Args  : Util.Strings.Vectors.Vector;
+      begin
+         Controller.Expand (Command, Working_Dir, Args);
+         if Args.Is_Empty then
+            Status := 1;
+            return;
+         end if;
+
+         Controller.Execute (Args, Working_Dir, Read_Input'Access, Status);
+      end;
+   end Execute;
+
+   procedure Expand (Controller  : in out Controller_Type;
+                     Command     : in String;
+                     Working_Dir : in String;
+                     Args        : in out Util.Strings.Vectors.Vector) is
+
+      function Is_Space (C : in Character) return Boolean renames
+        Ada.Characters.Handling.Is_Space;
+
+      First : Natural := Command'First;
+      Pos   : Natural := First;
+   begin
+      loop
+         while First <= Command'Last and then Is_Space (Command (First)) loop
+            First := First + 1;
+         end loop;
+         exit when First > Command'Last;
+         Pos := First;
+         while Pos <= Command'Last and then not Is_Space (Command (Pos)) loop
+            Pos := Pos + 1;
+         end loop;
+         Args.Append (Command (First .. Pos - 1));
+         First := Pos;
+      end loop;
+
+      Args.Replace_Element (1, Find_Command_Path (Args.First_Element));
+   end Expand;
 
 end Porion.Nodes;

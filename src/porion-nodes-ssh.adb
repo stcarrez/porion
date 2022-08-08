@@ -15,16 +15,12 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Characters.Handling;
-with Ada.Environment_Variables;
 with Util.Strings.Vectors;
-with Util.Files;
 with Porion.Configs;
 with EL.Contexts.Default;
 package body Porion.Nodes.SSH is
 
    package UBO renames Util.Beans.Objects;
-   function Find_Command_Path (Command : in String) return String;
 
    --  ------------------------------
    --  Create the controller for the management of the given build node.
@@ -42,34 +38,11 @@ package body Porion.Nodes.SSH is
       return Controller.all'Access;
    end Create;
 
-   function Find_Command_Path (Command : in String) return String is
-   begin
-      if not Ada.Environment_Variables.Exists ("PATH") then
-         return Command;
-      end if;
-
-      declare
-         Path : String := Ada.Environment_Variables.Value ("PATH");
-      begin
-         return Util.Files.Find_File_Path (Command, Path, ':');
-      end;
-   end Find_Command_Path;
-
-   --  ------------------------------
-   --  Execute the command in the working directory on the remote host through
-   --  ssh and for each output line produced by the command call Process.
-   --  ------------------------------
    overriding
-   procedure Execute (Controller  : in out Controller_Type;
-                      Command     : in String;
-                      Working_Dir : in String := "";
-                      Process     : not null access procedure (Line : in String);
-                      Strip_Crlf  : in Boolean := False;
-                      Status      : out Integer) is
-
-      function Is_Space (C : in Character) return Boolean renames
-        Ada.Characters.Handling.Is_Space;
-
+   procedure Expand (Controller  : in out Controller_Type;
+                     Command     : in String;
+                     Working_Dir : in String;
+                     Args        : in out Util.Strings.Vectors.Vector) is
       Props : aliased EL.Contexts.Default.Default_ELResolver;
       Ctx   : EL.Contexts.Default.Default_Context;
    begin
@@ -80,28 +53,8 @@ package body Porion.Nodes.SSH is
       declare
          Cmd   : constant UBO.Object := Controller.Command.Get_Value (Ctx);
          Ssh   : constant String := UBO.To_String (Cmd);
-         Args  : Util.Strings.Vectors.Vector;
-         First : Natural := Ssh'First;
-         Pos   : Natural := First;
       begin
-         loop
-            while First <= Ssh'Last and then Is_Space (Ssh (First)) loop
-               First := First + 1;
-            end loop;
-            exit when First > Ssh'Last;
-            Pos := First;
-            while Pos <= Ssh'Last and then not Is_Space (Ssh (Pos)) loop
-               Pos := Pos + 1;
-            end loop;
-            Args.Append (Ssh (First .. Pos - 1));
-            First := Pos;
-         end loop;
-
-         if Args.Is_Empty then
-            Status := 1;
-            return;
-         end if;
-         Args.Replace_Element (1, Find_Command_Path (Args.First_Element));
+         Porion.Nodes.Controller_Type (Controller).Expand (Ssh, Working_Dir, Args);
 
          --  cd <working_dir> && <command>
          if Working_Dir'Length > 0 then
@@ -109,9 +62,8 @@ package body Porion.Nodes.SSH is
          else
             Args.Append (Command);
          end if;
-         Controller.Execute (Args, "", Process, Strip_Crlf, Status);
       end;
-   end Execute;
+   end Expand;
 
    --  ------------------------------
    --  Create the directory and optionally make sure it is cleaned.
@@ -138,5 +90,22 @@ package body Porion.Nodes.SSH is
                              Status => Status);
       end if;
    end Create_Directory;
+
+   --  Read the file with the controller and execute the `Process` procedure with the
+   --  input buffer stream that gives access to the file content.
+   overriding
+   procedure Read_File (Controller : in out Controller_Type;
+                        Path       : in String;
+                        Process    : not null access
+                           procedure (Stream : in out Input_Buffer_Stream'Class)) is
+      Status : Integer;
+      Args   : Util.Strings.Vectors.Vector;
+   begin
+      Controller.Expand ("cat " & Path, "", Args);
+      Controller.Execute (Args => Args,
+                          Working_Dir => "",
+                          Process => Process,
+                          Status => Status);
+   end Read_File;
 
 end Porion.Nodes.SSH;

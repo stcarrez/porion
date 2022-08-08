@@ -182,7 +182,7 @@ package body Porion.Nodes.Local is
    procedure Scan_Directory (Controller : in out Controller_Type;
                              Path       : in String;
                              Pattern    : in String;
-                             List       : in out Util.Strings.Vectors.Vector) is
+                             List       : in out Util.Strings.Sets.Set) is
       use Ada.Directories;
 
       Filter  : constant Filter_Type := (Ordinary_File => True,
@@ -198,7 +198,7 @@ package body Porion.Nodes.Local is
          declare
             Full_Path : constant String := Ada.Directories.Full_Name (Ent);
          begin
-            List.Append (Full_Path);
+            List.Include (Full_Path);
          end;
       end loop;
    end Scan_Directory;

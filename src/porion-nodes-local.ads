@@ -61,7 +61,7 @@ private package Porion.Nodes.Local is
    procedure Scan_Directory (Controller : in out Controller_Type;
                              Path       : in String;
                              Pattern    : in String;
-                             List       : in out Util.Strings.Vectors.Vector);
+                             List       : in out Util.Strings.Sets.Set);
 
 private
 

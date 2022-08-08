@@ -417,6 +417,37 @@ package body Porion.Nodes.Services is
    end Add_Node;
 
    --  ------------------------------
+   --  Update a build node
+   --  ------------------------------
+   procedure Update_Node (Service    : in out Context_Type;
+                          Kind       : in Node_Type;
+                          Hostname   : in String;
+                          Login      : in String;
+                          Repository : in String) is
+      Query : ADO.SQL.Query;
+      Found : Boolean;
+   begin
+      Log.Debug ("Update build node {0} with {1}", Hostname, Login);
+
+      Service.DB.Begin_Transaction;
+      Query.Bind_Param (1, Hostname);
+      Query.Set_Filter ("o.name = ? AND o.deleted = 0");
+      Service.Build_Node.Find (Service.DB, Query, Found);
+      if not Found then
+         Log.Warn ("Build node name {0} not found", Hostname);
+         raise Not_Found;
+      end if;
+      Service.Build_Node.Set_Login (Login);
+      Service.Build_Node.Set_Kind (Kind);
+      Service.Build_Node.Set_Status (NODE_ENABLED);
+      Service.Build_Node.Set_Repository_Dir (Repository);
+      Service.Build_Node.Save (Service.DB);
+      Service.DB.Commit;
+
+      Log.Info ("Build node {0} updated", Hostname);
+   end Update_Node;
+
+   --  ------------------------------
    --  Remove the node with the given name.
    --  ------------------------------
    procedure Remove_Node (Service : in out Context_Type;

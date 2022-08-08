@@ -16,10 +16,13 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Directories;
+with Ada.Streams.Stream_IO;
+
 with Util.Log.Loggers;
 with Util.Files;
 with Util.Streams;
 with Util.Streams.Texts;
+with Util.Streams.Files;
 with Util.Systems.Constants;
 with Porion.Tools;
 package body Porion.Nodes.Local is
@@ -163,8 +166,13 @@ package body Porion.Nodes.Local is
                         Path       : in String;
                         Process    : not null access
                            procedure (Stream : in out Input_Buffer_Stream'Class)) is
+      Stream     : aliased Util.Streams.Files.File_Stream;
+      Buffer     : Util.Streams.Buffered.Input_Buffer_Stream;
    begin
-      null;
+      Buffer.Initialize (Input  => Stream'Unchecked_Access,
+                         Size   => 1024);
+      Stream.Open (Mode => Ada.Streams.Stream_IO.In_File, Name => Path);
+      Process (Buffer);
    end Read_File;
 
 end Porion.Nodes.Local;

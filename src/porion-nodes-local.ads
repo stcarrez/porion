@@ -56,6 +56,13 @@ private package Porion.Nodes.Local is
                         Process    : not null access
                            procedure (Stream : in out Input_Buffer_Stream'Class));
 
+   --  Scan the directory for files matching the given pattern.
+   overriding
+   procedure Scan_Directory (Controller : in out Controller_Type;
+                             Path       : in String;
+                             Pattern    : in String;
+                             List       : in out Util.Strings.Vectors.Vector);
+
 private
 
    type Controller_Type is limited new Porion.Nodes.Controller_Type with record

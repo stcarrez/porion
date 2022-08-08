@@ -175,4 +175,32 @@ package body Porion.Nodes.Local is
       Process (Buffer);
    end Read_File;
 
+   --  ------------------------------
+   --  Scan the directory for files matching the given pattern.
+   --  ------------------------------
+   overriding
+   procedure Scan_Directory (Controller : in out Controller_Type;
+                             Path       : in String;
+                             Pattern    : in String;
+                             List       : in out Util.Strings.Vectors.Vector) is
+      use Ada.Directories;
+
+      Filter  : constant Filter_Type := (Ordinary_File => True,
+                                         Directory     => True,
+                                         others        => False);
+      Search  : Search_Type;
+      Ent     : Ada.Directories.Directory_Entry_Type;
+   begin
+      Start_Search (Search, Directory => Path,
+                    Pattern => Pattern, Filter => Filter);
+      while More_Entries (Search) loop
+         Get_Next_Entry (Search, Ent);
+         declare
+            Full_Path : constant String := Ada.Directories.Full_Name (Ent);
+         begin
+            List.Append (Full_Path);
+         end;
+      end loop;
+   end Scan_Directory;
+
 end Porion.Nodes.Local;

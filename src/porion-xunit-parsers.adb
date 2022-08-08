@@ -16,8 +16,10 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Directories;
+with Ada.Streams.Stream_IO;
 
 with Util.Beans.Objects;
+with Util.Streams.Files;
 with Util.Serialize.Mappers.Record_Mapper;
 with Util.Serialize.IO.XML;
 with Util.Log.Loggers;
@@ -66,7 +68,7 @@ package body Porion.XUnit.Parsers is
    function Get_Status (Config : in XUnit_Config) return Test_Status_Type;
    function To_Duration (Value : in Util.Beans.Objects.Object) return Microsecond_Type;
 
-   Log   : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.XUnit.Parsers");
+   Log   : aliased constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.XUnit.Parsers");
 
    function To_Duration (Value : in Util.Beans.Objects.Object) return Microsecond_Type is
    begin
@@ -117,6 +119,7 @@ package body Porion.XUnit.Parsers is
    end Get_Status;
 
    procedure Scan (Path    : in String;
+                   Stream  : in out Util.Streams.Buffered.Input_Buffer_Stream'Class;
                    Results : in out Analysis.Test_Results) is
       procedure Set_Member (N     : in out XUnit_Config;
                             Field : in XUnit_Fields;
@@ -222,7 +225,19 @@ package body Porion.XUnit.Parsers is
       XUnit_Mapper.Set_Context (Parser, Config'Unchecked_Access);
       Parser.Add_Mapping ("testsuite", Mapper'Unchecked_Access);
       Parser.Add_Mapping ("testsuites", Mapper'Unchecked_Access);
-      Reader.Parse (Path, Parser);
+      Reader.Set_Logger (Log'Access);
+      Reader.Parse (Stream, Parser);
+   end Scan;
+
+   procedure Scan (Path    : in String;
+                   Results : in out Analysis.Test_Results) is
+      Stream     : aliased Util.Streams.Files.File_Stream;
+      Buffer     : Util.Streams.Buffered.Input_Buffer_Stream;
+   begin
+      Buffer.Initialize (Input  => Stream'Unchecked_Access,
+                         Size   => 1024);
+      Stream.Open (Mode => Ada.Streams.Stream_IO.In_File, Name => Path);
+      Scan (Path, Buffer, Results);
    end Scan;
 
    procedure Scan (Path    : in String;

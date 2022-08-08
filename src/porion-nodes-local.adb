@@ -79,6 +79,17 @@ package body Porion.Nodes.Local is
       end if;
    end Set_Environment;
 
+   overriding
+   procedure Expand (Controller  : in out Controller_Type;
+                     Command     : in String;
+                     Working_Dir : in String;
+                     Args        : in out Util.Strings.Vectors.Vector) is
+   begin
+      Args.Append (Find_Command_Path ("sh"));
+      Args.Append ("-c");
+      Args.Append (Command);
+   end Expand;
+
    --  ------------------------------
    --  Execute the command in the working directory and for each output
    --  line produced by the command call the Process procedure.

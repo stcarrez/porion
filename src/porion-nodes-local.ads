@@ -30,6 +30,12 @@ private package Porion.Nodes.Local is
    procedure Set_Environment (Controller : in out Controller_Type;
                               Env        : in Util.Strings.Maps.Map);
 
+   overriding
+   procedure Expand (Controller  : in out Controller_Type;
+                     Command     : in String;
+                     Working_Dir : in String;
+                     Args        : in out Util.Strings.Vectors.Vector);
+
    --  Execute the command in the working directory and for each output
    --  line produced by the command call the Process procedure.
    overriding

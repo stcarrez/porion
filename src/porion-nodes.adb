@@ -104,20 +104,23 @@ package body Porion.Nodes is
       end if;
       declare
          Args  : Util.Strings.Vectors.Vector;
+         Ignore_Working_Dir : Boolean;
       begin
-         Controller.Expand (Command, Working_Dir, Args);
+         Controller.Expand (Command, Working_Dir, Ignore_Working_Dir, Args);
          if Args.Is_Empty then
             Status := 1;
             return;
          end if;
 
-         Controller.Execute (Args, Working_Dir, Read_Input'Access, Status);
+         Controller.Execute (Args, (if Ignore_Working_Dir then "" else Working_Dir),
+                             Read_Input'Access, Status);
       end;
    end Execute;
 
    procedure Expand (Controller  : in out Controller_Type;
                      Command     : in String;
                      Working_Dir : in String;
+                     Ignore_Working_Dir : out Boolean;
                      Args        : in out Util.Strings.Vectors.Vector) is
 
       function Is_Space (C : in Character) return Boolean renames
@@ -140,6 +143,7 @@ package body Porion.Nodes is
       end loop;
 
       Args.Replace_Element (1, Find_Command_Path (Args.First_Element));
+      Ignore_Working_Dir := True;
    end Expand;
 
 end Porion.Nodes;

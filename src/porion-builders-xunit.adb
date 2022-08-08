@@ -18,6 +18,7 @@
 with Util.Strings.Sets;
 with Util.Beans.Objects;
 with Util.Log.Loggers;
+with Util.Files;
 with Util.Streams.Buffered;
 with Porion.XUnit.Analysis;
 with Porion.XUnit.Parsers;
@@ -49,7 +50,16 @@ package body Porion.Builders.XUnit is
          if Executor.Is_Dry_Run then
             Executor.Record_Command ("xunit " & Include);
          else
-            Executor.Scan_Directory (Path, Include, Controller.Excludes, Files);
+            declare
+               Sep  : constant Natural := Util.Strings.Rindex (Include, '/');
+            begin
+               if Sep > 0 then
+                  Executor.Scan_Directory (Util.Files.Compose (Path, Include (Include'First .. Sep - 1)),
+                                           Include (Sep + 1 .. Include'Last), Controller.Excludes, Files);
+               else
+                  Executor.Scan_Directory (Path, Include, Controller.Excludes, Files);
+               end if;
+            end;
          end if;
       end loop;
 

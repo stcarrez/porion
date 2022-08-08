@@ -82,68 +82,10 @@ package body Porion.Nodes.Local is
    --  ------------------------------
    overriding
    procedure Execute (Controller  : in out Controller_Type;
-                      Command     : in String;
-                      Working_Dir : in String := "";
-                      Process     : not null access procedure (Line : in String);
-                      Strip_Crlf  : in Boolean := False;
-                      Status      : out Integer) is
-   begin
-      Controller.Record_Command (Command);
-      if Controller.Is_Dry_Run then
-         Status := 0;
-         return;
-      end if;
-
-      declare
-         Proc    : Util.Processes.Process;
-         Output  : Util.Streams.Input_Stream_Access;
-         Input   : Util.Streams.Output_Stream_Access;
-         Reader  : Util.Streams.Texts.Reader_Stream;
-         Start   : Usage_Type;
-         Usage   : Usage_Type;
-      begin
-         if Working_Dir'Length > 0 then
-            Log.Info ("Running '{0}' in '{1}'", Command, Working_Dir);
-            Util.Processes.Set_Working_Directory (Proc, Working_Dir);
-         else
-            Log.Info ("Running '{0}'", Command);
-         end if;
-
-         Controller.Set_Environment (Proc);
-         Sys_Rusage (Start);
-         Util.Processes.Spawn (Proc    => Proc,
-                               Command => Command,
-                               Mode    => Util.Processes.READ_WRITE_ALL);
-         Input := Util.Processes.Get_Input_Stream (Proc);
-         Output := Util.Processes.Get_Output_Stream (Proc);
-         Reader.Initialize (Output, 4096);
-         Input.Close;
-         while not Reader.Is_Eof loop
-            declare
-               Line : Ada.Strings.Unbounded.Unbounded_String;
-            begin
-               Reader.Read_Line (Line, Strip_Crlf);
-               Process (Ada.Strings.Unbounded.To_String (Line));
-            end;
-         end loop;
-         Util.Processes.Wait (Proc);
-
-         Sys_Rusage (Usage);
-         Controller.Usage := Controller.Usage + (Usage - Start);
-
-         Status := Util.Processes.Get_Exit_Status (Proc);
-         if Status /= 0 then
-            Log.Warn ("Command '{0}' terminated with exit code{1}", Command,
-                      Integer'Image (Status));
-         end if;
-      end;
-   end Execute;
-
-   procedure Execute (Controller  : in out Controller_Type;
                       Args        : in Util.Strings.Vectors.Vector;
                       Working_Dir : in String := "";
-                      Process     : not null access procedure (Line : in String);
-                      Strip_Crlf  : in Boolean := False;
+                      Process     : not null access
+                           procedure (Stream : in out Input_Buffer_Stream'Class);
                       Status      : out Integer) is
 
       Command : constant String := Porion.Tools.To_String (Args);
@@ -178,14 +120,7 @@ package body Porion.Nodes.Local is
          Output := Util.Processes.Get_Output_Stream (Proc);
          Reader.Initialize (Output, 4096);
          Input.Close;
-         while not Reader.Is_Eof loop
-            declare
-               Line : Ada.Strings.Unbounded.Unbounded_String;
-            begin
-               Reader.Read_Line (Line, Strip_Crlf);
-               Process (Ada.Strings.Unbounded.To_String (Line));
-            end;
-         end loop;
+         Process (Reader);
          Util.Processes.Wait (Proc);
 
          Sys_Rusage (Usage);
@@ -218,5 +153,18 @@ package body Porion.Nodes.Local is
 
       Ada.Directories.Create_Path (Path);
    end Create_Directory;
+
+   --  ------------------------------
+   --  Read the file with the controller and execute the `Process` procedure with the
+   --  input buffer stream that gives access to the file content.
+   --  ------------------------------
+   overriding
+   procedure Read_File (Controller : in out Controller_Type;
+                        Path       : in String;
+                        Process    : not null access
+                           procedure (Stream : in out Input_Buffer_Stream'Class)) is
+   begin
+      null;
+   end Read_File;
 
 end Porion.Nodes.Local;

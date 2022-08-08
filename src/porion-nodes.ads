@@ -131,6 +131,12 @@ package Porion.Nodes is
                         Process    : not null access
                            procedure (Stream : in out Input_Buffer_Stream'Class)) is null;
 
+   --  Scan the directory for files matching the given pattern.
+   procedure Scan_Directory (Controller : in out Controller_Type;
+                             Path       : in String;
+                             Pattern    : in String;
+                             List       : in out Util.Strings.Vectors.Vector) is null;
+
 private
 
    type Controller_Type is abstract limited new Ada.Finalization.Limited_Controlled with record

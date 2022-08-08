@@ -37,15 +37,11 @@ private package Porion.Nodes.SSH is
    overriding
    function Is_Local (Controller : in Controller_Type) return Boolean is (False);
 
-   --  Execute the command in the working directory on the remote host through
-   --  ssh and for each output line produced by the command call Process.
    overriding
-   procedure Execute (Controller  : in out Controller_Type;
-                      Command     : in String;
-                      Working_Dir : in String := "";
-                      Process     : not null access procedure (Line : in String);
-                      Strip_Crlf  : in Boolean := False;
-                      Status      : out Integer);
+   procedure Expand (Controller  : in out Controller_Type;
+                     Command     : in String;
+                     Working_Dir : in String;
+                     Args        : in out Util.Strings.Vectors.Vector);
 
    --  Create the directory and optionally make sure it is cleaned.
    overriding
@@ -54,6 +50,14 @@ private package Porion.Nodes.SSH is
                                Clean      : in Boolean;
                                Process    : not null access
                                  procedure (Line : in String));
+
+   --  Read the file with the controller and execute the `Process` procedure with the
+   --  input buffer stream that gives access to the file content.
+   overriding
+   procedure Read_File (Controller : in out Controller_Type;
+                        Path       : in String;
+                        Process    : not null access
+                           procedure (Stream : in out Input_Buffer_Stream'Class));
 
 private
 

@@ -16,6 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Util.Strings.Vectors;
+with Util.Files;
 with Porion.Configs;
 with EL.Contexts.Default;
 package body Porion.Nodes.SSH is
@@ -42,6 +43,7 @@ package body Porion.Nodes.SSH is
    procedure Expand (Controller  : in out Controller_Type;
                      Command     : in String;
                      Working_Dir : in String;
+                     Ignore_Working_Dir : out Boolean;
                      Args        : in out Util.Strings.Vectors.Vector) is
       Props : aliased EL.Contexts.Default.Default_ELResolver;
       Ctx   : EL.Contexts.Default.Default_Context;
@@ -54,7 +56,7 @@ package body Porion.Nodes.SSH is
          Cmd   : constant UBO.Object := Controller.Command.Get_Value (Ctx);
          Ssh   : constant String := UBO.To_String (Cmd);
       begin
-         Porion.Nodes.Controller_Type (Controller).Expand (Ssh, Working_Dir, Args);
+         Porion.Nodes.Controller_Type (Controller).Expand (Ssh, Working_Dir, Ignore_Working_Dir, Args);
 
          --  cd <working_dir> && <command>
          if Working_Dir'Length > 0 then
@@ -62,6 +64,7 @@ package body Porion.Nodes.SSH is
          else
             Args.Append (Command);
          end if;
+         Ignore_Working_Dir := True;
       end;
    end Expand;
 
@@ -100,12 +103,38 @@ package body Porion.Nodes.SSH is
                            procedure (Stream : in out Input_Buffer_Stream'Class)) is
       Status : Integer;
       Args   : Util.Strings.Vectors.Vector;
+      Ignore_Working_Dir : Boolean;
    begin
-      Controller.Expand ("cat " & Path, "", Args);
+      Controller.Expand ("cat " & Path, "", Ignore_Working_Dir, Args);
       Controller.Execute (Args => Args,
                           Working_Dir => "",
                           Process => Process,
                           Status => Status);
    end Read_File;
+
+   --  ------------------------------
+   --  Scan the directory for files matching the given pattern.
+   --  ------------------------------
+   overriding
+   procedure Scan_Directory (Controller : in out Controller_Type;
+                             Path       : in String;
+                             Pattern    : in String;
+                             List       : in out Util.Strings.Sets.Set) is
+
+      procedure Process (Line : in String) is
+      begin
+         if Line'Length > 0 then
+            List.Include (Util.Files.Compose (Path, Line));
+         end if;
+      end Process;
+
+      Status : Integer;
+   begin
+      Controller.Execute (Command => "ls -c " & Pattern,
+                          Working_Dir => Path,
+                          Process => Process'Access,
+                          Strip_Crlf => True,
+                          Status => Status);
+   end Scan_Directory;
 
 end Porion.Nodes.SSH;

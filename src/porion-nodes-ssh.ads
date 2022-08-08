@@ -41,6 +41,7 @@ private package Porion.Nodes.SSH is
    procedure Expand (Controller  : in out Controller_Type;
                      Command     : in String;
                      Working_Dir : in String;
+                     Ignore_Working_Dir : out Boolean;
                      Args        : in out Util.Strings.Vectors.Vector);
 
    --  Create the directory and optionally make sure it is cleaned.
@@ -58,6 +59,13 @@ private package Porion.Nodes.SSH is
                         Path       : in String;
                         Process    : not null access
                            procedure (Stream : in out Input_Buffer_Stream'Class));
+
+   --  Scan the directory for files matching the given pattern.
+   overriding
+   procedure Scan_Directory (Controller : in out Controller_Type;
+                             Path       : in String;
+                             Pattern    : in String;
+                             List       : in out Util.Strings.Sets.Set);
 
 private
 

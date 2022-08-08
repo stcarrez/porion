@@ -83,11 +83,13 @@ package body Porion.Nodes.Local is
    procedure Expand (Controller  : in out Controller_Type;
                      Command     : in String;
                      Working_Dir : in String;
+                     Ignore_Working_Dir : out Boolean;
                      Args        : in out Util.Strings.Vectors.Vector) is
    begin
       Args.Append (Find_Command_Path ("sh"));
       Args.Append ("-c");
       Args.Append (Command);
+      Ignore_Working_Dir := False;
    end Expand;
 
    --  ------------------------------

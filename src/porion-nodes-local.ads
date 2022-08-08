@@ -34,6 +34,7 @@ private package Porion.Nodes.Local is
    procedure Expand (Controller  : in out Controller_Type;
                      Command     : in String;
                      Working_Dir : in String;
+                     Ignore_Working_Dir : out Boolean;
                      Args        : in out Util.Strings.Vectors.Vector);
 
    --  Execute the command in the working directory and for each output

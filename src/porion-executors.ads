@@ -19,11 +19,16 @@ with Ada.Finalization;
 with Ada.Containers.Indefinite_Vectors;
 with EL.Expressions;
 with Util.Properties;
+with Util.Strings.Vectors;
+with Util.Strings.Sets;
 with Util.Strings.Maps;
+with Util.Streams.Buffered;
 with Porion.Logs;
 with Porion.Builds;
 with Porion.Nodes.Models;
 package Porion.Executors is
+
+   subtype Input_Buffer_Stream is Util.Streams.Buffered.Input_Buffer_Stream;
 
    type Command_Type (Len : Positive) is record
       Step    : Porion.Builds.Step_Type;
@@ -95,6 +100,22 @@ package Porion.Executors is
                       Working_Dir : in String := "";
                       Strip_Crlf  : in Boolean := False;
                       Status      : out Integer) with
+      Pre => Executor.Is_Configured;
+
+   --  Read the file with the controller and execute the `Process` procedure with the
+   --  input buffer stream that gives access to the file content.
+   procedure Read_File (Executor    : in out Executor_Type;
+                        Path       : in String;
+                        Process    : not null access
+                           procedure (Stream : in out Input_Buffer_Stream'Class)) with
+      Pre => Executor.Is_Configured;
+
+   --  Scan the directory for files matching the given pattern.
+   procedure Scan_Directory (Executor    : in out Executor_Type;
+                             Path       : in String;
+                             Pattern    : in String;
+                             Excludes   : in Util.Strings.Vectors.Vector;
+                             List       : in out Util.Strings.Sets.Set) with
       Pre => Executor.Is_Configured;
 
    procedure Create_Logger (Executor : in out Executor_Type;

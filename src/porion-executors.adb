@@ -223,6 +223,46 @@ package body Porion.Executors is
       end if;
    end Execute;
 
+   --  ------------------------------
+   --  Read the file with the controller and execute the `Process` procedure with the
+   --  input buffer stream that gives access to the file content.
+   --  ------------------------------
+   procedure Read_File (Executor    : in out Executor_Type;
+                        Path       : in String;
+                        Process    : not null access
+                           procedure (Stream : in out Input_Buffer_Stream'Class)) is
+   begin
+      if Executor.Controller /= null then
+         Executor.Controller.Read_File (Path => Path, Process => Process);
+
+      else
+         if Executor.Local = null then
+            Executor.Local := Nodes.Services.Create_Controller (Executor'Unchecked_Access);
+         end if;
+         Executor.Local.Read_File (Path => Path, Process => Process);
+      end if;
+   end Read_File;
+
+   --  ------------------------------
+   --  Scan the directory for files matching the given pattern.
+   --  ------------------------------
+   procedure Scan_Directory (Executor    : in out Executor_Type;
+                             Path       : in String;
+                             Pattern    : in String;
+                             Excludes   : in Util.Strings.Vectors.Vector;
+                             List       : in out Util.Strings.Sets.Set) is
+   begin
+      if Executor.Controller /= null then
+         Executor.Controller.Scan_Directory (Path => Path, Pattern => Pattern, List => List);
+
+      else
+         if Executor.Local = null then
+            Executor.Local := Nodes.Services.Create_Controller (Executor'Unchecked_Access);
+         end if;
+         Executor.Local.Scan_Directory (Path => Path, Pattern => Pattern, List => List);
+      end if;
+   end Scan_Directory;
+
    procedure Create_Logger (Executor : in out Executor_Type;
                             Dir      : in String;
                             Name     : in String) is

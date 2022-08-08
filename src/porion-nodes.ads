@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 with Ada.Finalization;
 with Util.Strings.Maps;
+with Util.Strings.Sets;
 with Util.Streams.Buffered;
 with Util.Strings.Vectors;
 with Util.Beans.Objects.Enums;
@@ -135,7 +136,7 @@ package Porion.Nodes is
    procedure Scan_Directory (Controller : in out Controller_Type;
                              Path       : in String;
                              Pattern    : in String;
-                             List       : in out Util.Strings.Vectors.Vector) is null;
+                             List       : in out Util.Strings.Sets.Set) is null;
 
 private
 

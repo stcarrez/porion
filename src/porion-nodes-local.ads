@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-nodes-local -- Local build node management
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021-2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,17 +34,10 @@ private package Porion.Nodes.Local is
    --  line produced by the command call the Process procedure.
    overriding
    procedure Execute (Controller  : in out Controller_Type;
-                      Command     : in String;
-                      Working_Dir : in String := "";
-                      Process     : not null access procedure (Line : in String);
-                      Strip_Crlf  : in Boolean := False;
-                      Status      : out Integer);
-
-   procedure Execute (Controller  : in out Controller_Type;
                       Args        : in Util.Strings.Vectors.Vector;
                       Working_Dir : in String := "";
-                      Process     : not null access procedure (Line : in String);
-                      Strip_Crlf  : in Boolean := False;
+                      Process     : not null access
+                           procedure (Stream : in out Input_Buffer_Stream'Class);
                       Status      : out Integer);
 
    --  Create the directory and optionally make sure it is cleaned.
@@ -54,6 +47,14 @@ private package Porion.Nodes.Local is
                                Clean      : in Boolean;
                                Process    : not null access
                                  procedure (Line : in String));
+
+   --  Read the file with the controller and execute the `Process` procedure with the
+   --  input buffer stream that gives access to the file content.
+   overriding
+   procedure Read_File (Controller : in out Controller_Type;
+                        Path       : in String;
+                        Process    : not null access
+                           procedure (Stream : in out Input_Buffer_Stream'Class));
 
 private
 

@@ -16,8 +16,13 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Util.Strings.Vectors;
+with Util.Streams.Buffered;
 with Porion.XUnit.Analysis;
 package Porion.XUnit.Parsers is
+
+   procedure Scan (Path    : in String;
+                   Stream  : in out Util.Streams.Buffered.Input_Buffer_Stream'Class;
+                   Results : in out Analysis.Test_Results);
 
    procedure Scan (Path    : in String;
                    Results : in out Porion.XUnit.Analysis.Test_Results);

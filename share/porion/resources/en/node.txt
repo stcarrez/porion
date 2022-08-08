@@ -1,14 +1,20 @@
 porion node: add, update or remove build nodes
 
-Usage: porion node {uri} [directory]
+Usage: porion node {uri}
 
   Add a build node described by the URI.  The build node can be a remote
   server access through an SSH connection, a docker container, a virtual
   machine that is controlled through virsh.
 
+  local://hostname/directory
   ssh://[login@]hostname[:port]/directory
   docker:image
   virsh:image
+
+Usage: porion node {-u|--update} {uri} [directory]
+
+  With the --update option, update the build node configuration with
+  the given name.
 
 Usage: porion node {-r|--remove} {name}
 

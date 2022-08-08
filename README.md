@@ -50,7 +50,7 @@ Get information about a project or a build number:
    porion info ada-util:2
 ```
 
-## Version 0.9.0  -
+## Version 0.9.0   - Jul 2022
   - Fix cleaning of build directories when it contains socket files
 
 ## Version 0.8.0   - Jun 2022

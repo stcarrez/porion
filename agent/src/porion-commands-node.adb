@@ -162,6 +162,10 @@ package body Porion.Commands.Node is
             return Porion.Nodes.NODE_DOCKER;
          end if;
 
+         if Scheme = "local" then
+            return Porion.Nodes.NODE_LOCAL;
+         end if;
+
          return Porion.Nodes.NODE_SSH;
       end Get_Type;
 
@@ -199,11 +203,19 @@ package body Porion.Commands.Node is
             Directory : constant String := Get_Path (URI);
             Rules     : Porion.Nodes.Services.Rule_Status_Vector;
          begin
-            Nodes.Services.Add_Node (Context.Project_Service,
-                                     Kind       => Get_Type (Scheme),
-                                     Hostname   => Hostname,
-                                     Login      => Login,
-                                     Repository => Directory);
+            if Command.Update then
+               Nodes.Services.Update_Node (Context.Project_Service,
+                                           Kind       => Get_Type (Scheme),
+                                           Hostname   => Hostname,
+                                           Login      => Login,
+                                           Repository => Directory);
+            else
+               Nodes.Services.Add_Node (Context.Project_Service,
+                                        Kind       => Get_Type (Scheme),
+                                        Hostname   => Hostname,
+                                        Login      => Login,
+                                        Repository => Directory);
+            end if;
 
             Nodes.Services.Probe_Node (Context.Project_Service, Command.Rules.all, Rules);
             Context.Notice (-("Node {0} is {1}"), Hostname, Get_Node_Status);
@@ -228,6 +240,8 @@ package body Porion.Commands.Node is
       Drivers.Command_Type (Command).Setup (Config, Context);
       GC.Define_Switch (Config, Command.Remove'Access,
                         "-r", "--remove", -("remove the build node"));
+      GC.Define_Switch (Config, Command.Update'Access,
+                        "-u", "--update", -("update the build node"));
       GC.Define_Switch (Config, Command.Probe'Access,
                         "-P", "--probe", -("probe the build node"));
       GC.Define_Switch (Config, Command.Rules'Access,

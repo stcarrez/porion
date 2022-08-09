@@ -32,6 +32,7 @@ package Porion.Executors is
 
    type Command_Type (Len : Positive) is record
       Step    : Porion.Builds.Step_Type;
+      Mode    : Porion.Builds.Execution_Type;
       Command : String (1 .. Len);
    end record;
 
@@ -73,7 +74,8 @@ package Porion.Executors is
 
    --  Set the current execution step when building a project.
    procedure Set_Step (Executor : in out Executor_Type;
-                       Step     : in Porion.Builds.Step_Type);
+                       Step     : in Porion.Builds.Step_Type;
+                       Mode     : in Porion.Builds.Execution_Type);
 
    --  Setup the executor to build with the given build node.
    procedure Set_Build_Node (Executor : in out Executor_Type;
@@ -157,6 +159,7 @@ private
       Output_Log : Boolean := False;
       Status     : Integer := 0;
       Step       : Porion.Builds.Step_Type := Porion.Builds.STEP_CHECKOUT;
+      Mode       : Porion.Builds.Execution_Type := Porion.Builds.EXEC_NO_ERROR;
       Commands   : Command_Vector;
       Logger     : Porion.Logs.Logger_Type;
       Controller : Porion.Nodes.Controller_Access;

@@ -50,22 +50,13 @@ Get information about a project or a build number:
    porion info ada-util:2
 ```
 
+## Version 0.10.0 - Under development
+  - Update presentation of build results in the Web server
+  - Update collecting test results from a remote host through ssh
+  - Update to use AWA 2.4.0
+
 ## Version 0.9.0   - Jul 2022
   - Fix cleaning of build directories when it contains socket files
-
-## Version 0.8.0   - Jun 2022
-  - Update to latest Ada Web Application
-  - Update the set command to allow changing the source URL and source scheme
-
-## Version 0.7.0   - Feb 2022
-  - Added Debian packages for porion and porion-server
-  - Added list of recipes in the project page
-  - Added man page for porion-server
-
-## Version 0.6.0   - Jan 2022
-  - REST API to get a schields badge using https://shields.io/endpoint
-  - Build dynamo and are if they are not installed
-  - Setup for first Debian package
 
 [List all versions](https://gitlab.com/stcarrez/porion/blob/master/NEWS.md)
 

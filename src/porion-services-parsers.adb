@@ -148,7 +148,7 @@ package body Porion.Services.Parsers is
                N.Step.Step.Set_Builder (Builds.Models.Builder_Type_Objects.To_Value (Value));
 
             when BUILD_STEP_EXECUTION =>
-               N.Step.Step.Set_Execution (Builds.Models.Execution_Type_Objects.To_Value (Value));
+               N.Step.Step.Set_Execution (Builds.Execution_Type_Objects.To_Value (Value));
 
             when BUILD_PARAM_NAME =>
                N.Param_Name := Value;

@@ -42,7 +42,6 @@ package body Porion.Builds.Services is
    use type Ada.Calendar.Time;
    use type ADO.Identifier;
    use type Porion.Nodes.Usage_Type;
-   use type Porion.Builds.Models.Execution_Type;
    use type Porion.Builds.Models.Build_Status_Type;
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Builds.Services");
@@ -205,7 +204,7 @@ package body Porion.Builds.Services is
 
       Executor.Set_Build_Node (Service.Build_Node, Env);
 
-      Executor.Set_Step (Builds.STEP_CHECKOUT);
+      Executor.Set_Step (Builds.STEP_CHECKOUT, Builds.EXEC_NO_ERROR);
       if not Executor.Is_Dry_Run then
          Executor.Create_Directory (Path, False);
       end if;
@@ -219,7 +218,7 @@ package body Porion.Builds.Services is
       Porion.Sources.Checkout (Service.Project.Get_Scm, Config, Path, Executor);
 
       for Step of Steps loop
-         if Step.Step.Get_Execution /= Builds.Models.EXEC_DISABLED then
+         if Step.Step.Get_Execution /= Builds.EXEC_DISABLED then
             declare
                Exec_Step   : Builds.Models.Build_Step_Ref;
                Step_Status : Integer;
@@ -230,7 +229,7 @@ package body Porion.Builds.Services is
                   Exec_Step.Set_Recipe_Step (Step.Step);
                   Exec_Step.Save (Service.DB);
                end if;
-               Executor.Set_Step (Step.Step.Get_Step);
+               Executor.Set_Step (Step.Step.Get_Step, Step.Step.Get_Execution);
                Executor.Set_Status (0);
                Builders.Run (Step.Step.Get_Builder, Service.DB, Step.Config,
                              Service.Build, Path, Executor);
@@ -252,7 +251,7 @@ package body Porion.Builds.Services is
                      Exec_Step.Save (Service.DB);
                   end;
                   if Step_Status /= 0
-                    and Step.Step.Get_Execution = Builds.Models.EXEC_NO_ERROR
+                    and Step.Step.Get_Execution = Builds.EXEC_NO_ERROR
                   then
                      Status := Porion.Builds.Models.BUILD_FAIL;
                      exit;
@@ -958,7 +957,7 @@ package body Porion.Builds.Services is
       New_Step.Step.Set_Builder (Kind);
       New_Step.Step.Set_Number (Pos);
       New_Step.Step.Set_Step (Step);
-      New_Step.Step.Set_Execution (Builds.Models.EXEC_NO_ERROR);
+      New_Step.Step.Set_Execution (Builds.EXEC_NO_ERROR);
       New_Step.Step.Set_Recipe (Recipe);
       New_Step.Step.Save (Service.DB);
       Steps.Insert (Pos, New_Step);
@@ -1638,7 +1637,7 @@ package body Porion.Builds.Services is
                           Kind    : in Builds.Step_Type) is
       begin
          Step.Set_Step (Kind);
-         Step.Set_Execution (Builds.Models.EXEC_NO_ERROR);
+         Step.Set_Execution (Builds.EXEC_NO_ERROR);
          Step.Set_Builder (Builder);
          Step.Set_Timeout (10 * 60);
          Step.Set_Number (Current_Step);

@@ -67,9 +67,9 @@ package body Porion.Commands.Steps is
             Step.Set_Timeout (Command.Timeout);
          end if;
          if Command.Disable then
-            Step.Set_Execution (Porion.Builds.Models.EXEC_DISABLED);
+            Step.Set_Execution (Porion.Builds.EXEC_DISABLED);
          elsif Command.Ignore_Error then
-            Step.Set_Execution (Porion.Builds.Models.EXEC_IGNORE_ERROR);
+            Step.Set_Execution (Porion.Builds.EXEC_IGNORE_ERROR);
          end if;
       end Update;
 

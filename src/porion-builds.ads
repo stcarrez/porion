@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-builds -- Continuous integration controller
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,6 +38,16 @@ package Porion.Builds is
    type Nullable_Step_Type is record
       Is_Null : Boolean := True;
       Value   : Step_Type;
+   end record;
+
+   type Execution_Type is (EXEC_DISABLED, EXEC_NO_ERROR, EXEC_IGNORE_ERROR);
+   for Execution_Type use (EXEC_DISABLED => 0, EXEC_NO_ERROR => 1, EXEC_IGNORE_ERROR => 2);
+   package Execution_Type_Objects is
+      new Util.Beans.Objects.Enums (Execution_Type);
+
+   type Nullable_Execution_Type is record
+      Is_Null : Boolean := True;
+      Value   : Execution_Type;
    end record;
 
 end Porion.Builds;

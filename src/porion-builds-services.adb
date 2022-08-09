@@ -218,7 +218,7 @@ package body Porion.Builds.Services is
       Porion.Sources.Checkout (Service.Project.Get_Scm, Config, Path, Executor);
 
       for Step of Steps loop
-         if Step.Step.Get_Execution /= Builds.EXEC_DISABLED then
+         if Executor.Is_Dry_Run or else Step.Step.Get_Execution /= Builds.EXEC_DISABLED then
             declare
                Exec_Step   : Builds.Models.Build_Step_Ref;
                Step_Status : Integer;

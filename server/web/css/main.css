@@ -217,6 +217,13 @@ div.awa-title dd {
     height: 32px;
     background-color: #00C000;
 }
+.build-BUILD_FAIL .build-status {
+    float: left;
+    padding-right: 0;
+    width: 32px;
+    height: 32px;
+    background-color: red;
+}
 .build-info-line {
     float: left;
     width: 100%;
@@ -229,6 +236,14 @@ div.awa-title dd {
     padding-left: 1em;
     padding-right: 1em;
 }
+.build-info-line .dashboard-title, .build-info-line .dashboard-value {
+    float: left;
+    width: 50%;
+}
+.build-info-line .dashboard-progress {
+    float: left;
+    width: 100%;
+}
 .porion-label {
     text-align: center;
     font-size: 1.2em;
@@ -239,6 +254,49 @@ div.awa-title dd {
     text-align: center;
     border-bottom-size: 3px;
 }
+/* Build step */
+.build-step {
+    float: left;
+    width: 100%;
+    border: 1px solid #ccc;
+    margin-bottom: 0.5em;
+    border-radius: 1em;
+}
+.build-step div {
+    float: left;
+    padding: 0.25em;
+}
+.build-step .build-step-number {
+    width: 4.0em;
+    text-align: center;
+    border-top-left-radius: 1em;
+    border-bottom-left-radius: 1em;
+}
+.build-step .build-step-energy {
+    width: 5%;
+    text-align: right;
+}
+.build-step .build-step-duration {
+    width: 5%;
+    text-align: right;
+}
+.build-step .build-step-command {
+    width: 75%;
+}
+.build-step-ok .build-step-number {
+    background-color: green;
+    color: white;
+}
+.build-step-fail .build-step-number {
+    background-color: red;
+    color: white;
+}
+.build-step-header {
+    border: none;
+    font-weight: bold;
+    margin-bottom: 0;
+}
+
 /* Build logs */
 .build-log {
     float: left;

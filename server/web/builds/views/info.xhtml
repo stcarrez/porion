@@ -71,6 +71,7 @@
   <div class='build-info'>
     <ul class='build-info-line'>
 
+      <h:panelGroup rendered="#{build.pass_count + build.fail_count + build.timeout_count ne 0}">
       <li>
         <div class='dashboard-title'>
           Tests
@@ -78,12 +79,13 @@
         <div class='dashboard-value'>
           #{build.pass_count}
         </div>
-        <div class='dashboard-value'>
+        <div class='dashboard-progress'>
           <div class="progress-bar">
-            <span class="progress-status" style="width: #{build.pass_count == 0 ? 0 : ((100 * build.pass_count) / (build.pass_count + build.fail_count + build_timeout_count))}%"/>
+            <span class="progress-status" style="width: #{build.pass_count == 0 ? 0 : ((100 * build.pass_count) / (build.pass_count + build.fail_count + build.timeout_count))}%"/>
           </div>
         </div>
       </li>
+      </h:panelGroup>
 
       <h:panelGroup rendered="#{build.metrics.lines.count ne 0}">
       <li>
@@ -95,7 +97,7 @@
             <f:converter converterId="percentConverter"/>
           </h:outputText> %
         </div>
-        <div class='dashboard-value'>
+        <div class='dashboard-progress'>
           <div class="progress-bar">
             <span class="progress-status" style="width: #{build.metrics.lines.count == 0 ? 0 : build.metrics.lines.sum_value / (10 * build.metrics.lines.count)}%"/>
           </div>
@@ -112,7 +114,7 @@
             <f:converter converterId="percentConverter"/>
           </h:outputText> %
         </div>
-        <div class='dashboard-value'>
+        <div class='dashboard-progress'>
           <div class="progress-bar">
             <span class="progress-status" style="width: #{build.metrics.functions.count == 0 ? 0 : build.metrics.functions.sum_value / (10 * build.metrics.functions.count)}%"/>
           </div>

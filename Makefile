@@ -120,7 +120,7 @@ install::
 	mkdir -p $(DESTDIR)$(prefix)/bin
 	$(INSTALL) bin/porion $(DESTDIR)$(prefix)/bin/porion
 	mkdir -p $(DESTDIR)$(prefix)/share/man/man1 $(DESTDIR)$(prefix)/share/man/man8
-	$(INSTALL) docs/porion.1 $(DESTDIR)$(prefix)/share/man/man1/porion.1
+	$(INSTALL) docs/man1/porion.1 $(DESTDIR)$(prefix)/share/man/man1/porion.1
 	$(INSTALL) docs/porion-server.8 $(DESTDIR)$(prefix)/share/man/man8/porion-server.8
 	(cd share && tar --exclude='*~' -cf - .) \
        | (cd $(DESTDIR)$(prefix)/share/ && tar xf -)

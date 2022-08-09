@@ -88,9 +88,11 @@ package body Porion.Executors is
    --  Set the current execution step when building a project.
    --  ------------------------------
    procedure Set_Step (Executor : in out Executor_Type;
-                       Step     : in Porion.Builds.Step_Type) is
+                       Step     : in Porion.Builds.Step_Type;
+                       Mode     : in Porion.Builds.Execution_Type) is
    begin
       Executor.Step := Step;
+      Executor.Mode := Mode;
    end Set_Step;
 
    --  ------------------------------
@@ -300,6 +302,7 @@ package body Porion.Executors is
       Executor.Log (Logs.LOG_COMMAND, Command);
       Executor.Commands.Append ((Len     => Command'Length,
                                  Step    => Executor.Step,
+                                 Mode    => Executor.Mode,
                                  Command => Command));
    end Record_Command;
 

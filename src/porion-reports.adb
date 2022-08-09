@@ -471,6 +471,17 @@ package body Porion.Reports is
 
       for Cmd of Commands loop
          Step := Step + 1;
+         case Cmd.Mode is
+            when Builds.EXEC_DISABLED =>
+               Writer.Copy_Style (To => Style1, From => Styles.Disabled);
+
+            when Builds.EXEC_IGNORE_ERROR =>
+               Writer.Copy_Style (To => Style1, From => Styles.Success);
+
+            when Builds.Exec_NO_ERROR =>
+               Writer.Copy_Style (To => Style1, From => Styles.Default);
+         end case;
+
          Writer.Put (Fields (1), Util.Strings.Image (Step) & ".");
          Writer.Put (Fields (2), Get_Image (Cmd.Step));
          Writer.Put (Fields (3), Cmd.Command);

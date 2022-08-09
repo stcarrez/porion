@@ -345,8 +345,9 @@ div.awa-title dd {
 }
 .build-show-warning .log-level-debug,
 .build-show-warning .log-level-unknown,
+.build-show-warning .log-level-porion,
 .build-show-warning .log-level-info,
-.build-show-info .log-level-unkown,
+.build-show-info .log-level-unknown,
 .build-show-info .log-level-debug {
     display: none;
 }

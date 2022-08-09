@@ -26,7 +26,7 @@ with Util.Beans.Objects.Time;
 pragma Warnings (On);
 package body Porion.Queries is
 
-   pragma Style_Checks ("-mr");
+   pragma Style_Checks ("-mrIu");
    pragma Warnings (Off, "formal parameter * is not referenced");
    pragma Warnings (Off, "use clause for type *");
    pragma Warnings (Off, "use clause for private type *");
@@ -342,7 +342,7 @@ package body Porion.Queries is
       elsif Name = "kind" then
          return Porion.Builds.Step_Type_Objects.To_Object (From.Kind);
       elsif Name = "execution" then
-         return Porion.Builds.Models.Execution_Type_Objects.To_Object (From.Execution);
+         return Porion.Builds.Execution_Type_Objects.To_Object (From.Execution);
       elsif Name = "start_date" then
          return Util.Beans.Objects.Time.To_Object (From.Start_Date);
       elsif Name = "end_date" then
@@ -381,7 +381,7 @@ package body Porion.Queries is
       elsif Name = "kind" then
          Item.Kind := Porion.Builds.Step_Type_Objects.To_Value (Value);
       elsif Name = "execution" then
-         Item.Execution := Porion.Builds.Models.Execution_Type_Objects.To_Value (Value);
+         Item.Execution := Porion.Builds.Execution_Type_Objects.To_Value (Value);
       elsif Name = "start_date" then
          Item.Start_Date := Util.Beans.Objects.Time.To_Time (Value);
       elsif Name = "end_date" then
@@ -428,7 +428,7 @@ package body Porion.Queries is
          Into.Number := Stmt.Get_Integer (1);
          Into.Builder := Porion.Builds.Models.Builder_Type'Enum_Val (Stmt.Get_Integer (2));
          Into.Kind := Porion.Builds.Step_Type'Enum_Val (Stmt.Get_Integer (3));
-         Into.Execution := Porion.Builds.Models.Execution_Type'Enum_Val (Stmt.Get_Integer (4));
+         Into.Execution := Porion.Builds.Execution_Type'Enum_Val (Stmt.Get_Integer (4));
          Into.Start_Date := Stmt.Get_Time (5);
          Into.End_Date := Stmt.Get_Nullable_Time (6);
          Into.Status := Stmt.Get_Integer (7);

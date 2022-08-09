@@ -39,7 +39,7 @@ with Porion.Sources;
 pragma Warnings (On);
 package Porion.Projects.Models is
 
-   pragma Style_Checks ("-mr");
+   pragma Style_Checks ("-mrIu");
 
    type Branch_Status_Type is (BUILD_DISABLED, BUILD_REQUIRED, BUILD_SUCCEEDED, BUILD_FAILED);
    for Branch_Status_Type use (BUILD_DISABLED => 0, BUILD_REQUIRED => 1, BUILD_SUCCEEDED => 2, BUILD_FAILED => 3);
@@ -742,6 +742,7 @@ private
    procedure Save (Object  : in out Project_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class);
 
+   overriding
    procedure Create (Object  : in out Project_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class);
 
@@ -857,6 +858,7 @@ private
    procedure Save (Object  : in out Branch_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class);
 
+   overriding
    procedure Create (Object  : in out Branch_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class);
 
@@ -919,6 +921,7 @@ private
    procedure Save (Object  : in out Dependency_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class);
 
+   overriding
    procedure Create (Object  : in out Dependency_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class);
 

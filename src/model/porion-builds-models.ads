@@ -41,7 +41,7 @@ with Porion.Projects.Models;
 pragma Warnings (On);
 package Porion.Builds.Models is
 
-   pragma Style_Checks ("-mr");
+   pragma Style_Checks ("-mrIu");
 
    type Build_Status_Type is (BUILD_RUNNING, BUILD_FAIL, BUILD_PASS);
    for Build_Status_Type use (BUILD_RUNNING => 0, BUILD_FAIL => 1, BUILD_PASS => 2);
@@ -71,16 +71,6 @@ package Porion.Builds.Models is
    type Nullable_Config_Status_Type is record
       Is_Null : Boolean := True;
       Value   : Config_Status_Type;
-   end record;
-
-   type Execution_Type is (EXEC_DISABLED, EXEC_NO_ERROR, EXEC_IGNORE_ERROR);
-   for Execution_Type use (EXEC_DISABLED => 0, EXEC_NO_ERROR => 1, EXEC_IGNORE_ERROR => 2);
-   package Execution_Type_Objects is
-      new Util.Beans.Objects.Enums (Execution_Type);
-
-   type Nullable_Execution_Type is record
-      Is_Null : Boolean := True;
-      Value   : Execution_Type;
    end record;
 
    type Reason_Type is (REASON_MANUAL, REASON_SCM, REASON_UPSTREAM, REASON_CONFIG);
@@ -939,11 +929,11 @@ package Porion.Builds.Models is
 
    --
    procedure Set_Execution (Object : in out Recipe_Step_Ref;
-                            Value  : in Execution_Type);
+                            Value  : in Porion.Builds.Execution_Type);
 
    --
    function Get_Execution (Object : in Recipe_Step_Ref)
-                 return Execution_Type;
+                 return Porion.Builds.Execution_Type;
 
    --
    procedure Set_Next_Version (Object : in out Recipe_Step_Ref;
@@ -1588,6 +1578,7 @@ private
    procedure Save (Object  : in out Build_Executor_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class);
 
+   overriding
    procedure Create (Object  : in out Build_Executor_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class);
 
@@ -1685,6 +1676,7 @@ private
    procedure Save (Object  : in out Recipe_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class);
 
+   overriding
    procedure Create (Object  : in out Recipe_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class);
 
@@ -1789,6 +1781,7 @@ private
    procedure Save (Object  : in out Build_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class);
 
+   overriding
    procedure Create (Object  : in out Build_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class);
 
@@ -1863,6 +1856,7 @@ private
    procedure Save (Object  : in out Build_Queue_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class);
 
+   overriding
    procedure Create (Object  : in out Build_Queue_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class);
 
@@ -1934,6 +1928,7 @@ private
    procedure Save (Object  : in out Build_Reason_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class);
 
+   overriding
    procedure Create (Object  : in out Build_Reason_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class);
 
@@ -1987,7 +1982,7 @@ private
        Timeout : Integer;
        Step : Porion.Builds.Step_Type;
        Version : Integer;
-       Execution : Execution_Type;
+       Execution : Porion.Builds.Execution_Type;
        Next_Version : Recipe_Step_Ref;
        Recipe : Recipe_Ref;
    end record;
@@ -2014,6 +2009,7 @@ private
    procedure Save (Object  : in out Recipe_Step_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class);
 
+   overriding
    procedure Create (Object  : in out Recipe_Step_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class);
 
@@ -2091,6 +2087,7 @@ private
    procedure Save (Object  : in out Build_Step_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class);
 
+   overriding
    procedure Create (Object  : in out Build_Step_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class);
 
@@ -2174,6 +2171,7 @@ private
    procedure Save (Object  : in out Environment_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class);
 
+   overriding
    procedure Create (Object  : in out Environment_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class);
 
@@ -2245,6 +2243,7 @@ private
    procedure Save (Object  : in out Last_Build_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class);
 
+   overriding
    procedure Create (Object  : in out Last_Build_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class);
 

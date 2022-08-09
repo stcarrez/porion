@@ -35,7 +35,7 @@ with Porion.Metrics;
 pragma Warnings (On);
 package Porion.Metrics.Models is
 
-   pragma Style_Checks ("-mr");
+   pragma Style_Checks ("-mrIu");
 
    type Metric_Ref is new ADO.Objects.Object_Ref with null record;
 
@@ -335,6 +335,7 @@ private
    procedure Save (Object  : in out Metric_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class);
 
+   overriding
    procedure Create (Object  : in out Metric_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class);
 
@@ -403,6 +404,7 @@ private
    procedure Save (Object  : in out Build_Metric_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class);
 
+   overriding
    procedure Create (Object  : in out Build_Metric_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class);
 

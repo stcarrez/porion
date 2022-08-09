@@ -36,7 +36,7 @@ with Porion.Builds.Models;
 pragma Warnings (On);
 package Porion.Xunit.Models is
 
-   pragma Style_Checks ("-mr");
+   pragma Style_Checks ("-mrIu");
 
    type Test_Status_Type is (TEST_PASS, TEST_FAIL, TEST_TIMEOUT, TEST_NEW_PASS, TEST_NEW_FAIL, TEST_NEW_TIMEOUT, TEST_SKIP, TEST_NEW_SKIP);
    for Test_Status_Type use (TEST_PASS => 0, TEST_FAIL => 1, TEST_TIMEOUT => 2, TEST_NEW_PASS => 3, TEST_NEW_FAIL => 4, TEST_NEW_TIMEOUT => 5, TEST_SKIP => 6, TEST_NEW_SKIP => 7);
@@ -723,6 +723,7 @@ private
    procedure Save (Object  : in out Test_Group_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class);
 
+   overriding
    procedure Create (Object  : in out Test_Group_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class);
 
@@ -824,6 +825,7 @@ private
    procedure Save (Object  : in out Test_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class);
 
+   overriding
    procedure Create (Object  : in out Test_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class);
 
@@ -913,6 +915,7 @@ private
    procedure Save (Object  : in out Test_Run_Group_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class);
 
+   overriding
    procedure Create (Object  : in out Test_Run_Group_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class);
 
@@ -981,6 +984,7 @@ private
    procedure Save (Object  : in out Test_Run_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class);
 
+   overriding
    procedure Create (Object  : in out Test_Run_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class);
 

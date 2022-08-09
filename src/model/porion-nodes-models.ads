@@ -36,7 +36,7 @@ with Porion.Nodes;
 pragma Warnings (On);
 package Porion.Nodes.Models is
 
-   pragma Style_Checks ("-mr");
+   pragma Style_Checks ("-mrIu");
 
    type Node_Ref is new ADO.Objects.Object_Ref with null record;
 
@@ -377,6 +377,7 @@ private
    procedure Save (Object  : in out Node_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class);
 
+   overriding
    procedure Create (Object  : in out Node_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class);
 

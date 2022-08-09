@@ -26,7 +26,7 @@ with Util.Beans.Objects.Time;
 pragma Warnings (On);
 package body Porion.Nodes.Models is
 
-   pragma Style_Checks ("-mr");
+   pragma Style_Checks ("-mrIu");
    pragma Warnings (Off, "formal parameter * is not referenced");
    pragma Warnings (Off, "use clause for type *");
    pragma Warnings (Off, "use clause for private type *");
@@ -64,6 +64,7 @@ package body Porion.Nodes.Models is
    end Set_Field;
 
    --  Internal method to allocate the Object_Record instance
+   overriding
    procedure Allocate (Object : in out Node_Ref) is
       Impl : Node_Access;
    begin
@@ -509,6 +510,7 @@ package body Porion.Nodes.Models is
       Into := Result;
    end Copy;
 
+   overriding
    procedure Find (Object  : in out Node_Ref;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class;
@@ -579,6 +581,7 @@ package body Porion.Nodes.Models is
          Stmt : ADO.Statements.Query_Statement
              := Session.Create_Statement (Query, NODE_DEF'Access);
       begin
+         Stmt.Execute;
          if Stmt.Has_Elements then
             Updated := True;
             Impl.Load (Stmt, Session);
@@ -588,6 +591,7 @@ package body Porion.Nodes.Models is
       end;
    end Reload;
 
+   overriding
    procedure Save (Object  : in out Node_Ref;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;
@@ -603,6 +607,7 @@ package body Porion.Nodes.Models is
       end if;
    end Save;
 
+   overriding
    procedure Delete (Object  : in out Node_Ref;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : constant ADO.Objects.Object_Record_Access := Object.Get_Object;
@@ -615,6 +620,7 @@ package body Porion.Nodes.Models is
    --  --------------------
    --  Free the object
    --  --------------------
+   overriding
    procedure Destroy (Object : access Node_Impl) is
       type Node_Impl_Ptr is access all Node_Impl;
       procedure Unchecked_Free is new Ada.Unchecked_Deallocation
@@ -626,6 +632,7 @@ package body Porion.Nodes.Models is
       Unchecked_Free (Ptr);
    end Destroy;
 
+   overriding
    procedure Find (Object  : in out Node_Impl;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class;
@@ -658,6 +665,7 @@ package body Porion.Nodes.Models is
       end if;
    end Load;
 
+   overriding
    procedure Save (Object  : in out Node_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Stmt : ADO.Statements.Update_Statement
@@ -766,6 +774,7 @@ package body Porion.Nodes.Models is
       end if;
    end Save;
 
+   overriding
    procedure Create (Object  : in out Node_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Query : ADO.Statements.Insert_Statement
@@ -816,6 +825,7 @@ package body Porion.Nodes.Models is
       ADO.Audits.Save (Object, Session);
    end Create;
 
+   overriding
    procedure Delete (Object  : in out Node_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Stmt : ADO.Statements.Delete_Statement

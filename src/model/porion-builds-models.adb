@@ -26,7 +26,7 @@ with Util.Beans.Objects.Time;
 pragma Warnings (On);
 package body Porion.Builds.Models is
 
-   pragma Style_Checks ("-mr");
+   pragma Style_Checks ("-mrIu");
    pragma Warnings (Off, "formal parameter * is not referenced");
    pragma Warnings (Off, "use clause for type *");
    pragma Warnings (Off, "use clause for private type *");
@@ -64,6 +64,7 @@ package body Porion.Builds.Models is
    end Set_Field;
 
    --  Internal method to allocate the Object_Record instance
+   overriding
    procedure Allocate (Object : in out Build_Executor_Ref) is
       Impl : Build_Executor_Access;
    begin
@@ -196,6 +197,7 @@ package body Porion.Builds.Models is
       Into := Result;
    end Copy;
 
+   overriding
    procedure Find (Object  : in out Build_Executor_Ref;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class;
@@ -266,6 +268,7 @@ package body Porion.Builds.Models is
          Stmt : ADO.Statements.Query_Statement
              := Session.Create_Statement (Query, BUILD_EXECUTOR_DEF'Access);
       begin
+         Stmt.Execute;
          if Stmt.Has_Elements then
             Updated := True;
             Impl.Load (Stmt, Session);
@@ -275,6 +278,7 @@ package body Porion.Builds.Models is
       end;
    end Reload;
 
+   overriding
    procedure Save (Object  : in out Build_Executor_Ref;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;
@@ -290,6 +294,7 @@ package body Porion.Builds.Models is
       end if;
    end Save;
 
+   overriding
    procedure Delete (Object  : in out Build_Executor_Ref;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : constant ADO.Objects.Object_Record_Access := Object.Get_Object;
@@ -302,6 +307,7 @@ package body Porion.Builds.Models is
    --  --------------------
    --  Free the object
    --  --------------------
+   overriding
    procedure Destroy (Object : access Build_Executor_Impl) is
       type Build_Executor_Impl_Ptr is access all Build_Executor_Impl;
       procedure Unchecked_Free is new Ada.Unchecked_Deallocation
@@ -313,6 +319,7 @@ package body Porion.Builds.Models is
       Unchecked_Free (Ptr);
    end Destroy;
 
+   overriding
    procedure Find (Object  : in out Build_Executor_Impl;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class;
@@ -345,6 +352,7 @@ package body Porion.Builds.Models is
       end if;
    end Load;
 
+   overriding
    procedure Save (Object  : in out Build_Executor_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Stmt : ADO.Statements.Update_Statement
@@ -397,6 +405,7 @@ package body Porion.Builds.Models is
       end if;
    end Save;
 
+   overriding
    procedure Create (Object  : in out Build_Executor_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Query : ADO.Statements.Insert_Statement
@@ -424,6 +433,7 @@ package body Porion.Builds.Models is
       ADO.Objects.Set_Created (Object);
    end Create;
 
+   overriding
    procedure Delete (Object  : in out Build_Executor_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Stmt : ADO.Statements.Delete_Statement
@@ -529,6 +539,7 @@ package body Porion.Builds.Models is
    end Set_Field;
 
    --  Internal method to allocate the Object_Record instance
+   overriding
    procedure Allocate (Object : in out Recipe_Ref) is
       Impl : Recipe_Access;
    begin
@@ -800,6 +811,7 @@ package body Porion.Builds.Models is
       Into := Result;
    end Copy;
 
+   overriding
    procedure Find (Object  : in out Recipe_Ref;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class;
@@ -870,6 +882,7 @@ package body Porion.Builds.Models is
          Stmt : ADO.Statements.Query_Statement
              := Session.Create_Statement (Query, RECIPE_DEF'Access);
       begin
+         Stmt.Execute;
          if Stmt.Has_Elements then
             Updated := True;
             Impl.Load (Stmt, Session);
@@ -879,6 +892,7 @@ package body Porion.Builds.Models is
       end;
    end Reload;
 
+   overriding
    procedure Save (Object  : in out Recipe_Ref;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;
@@ -894,6 +908,7 @@ package body Porion.Builds.Models is
       end if;
    end Save;
 
+   overriding
    procedure Delete (Object  : in out Recipe_Ref;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : constant ADO.Objects.Object_Record_Access := Object.Get_Object;
@@ -906,6 +921,7 @@ package body Porion.Builds.Models is
    --  --------------------
    --  Free the object
    --  --------------------
+   overriding
    procedure Destroy (Object : access Recipe_Impl) is
       type Recipe_Impl_Ptr is access all Recipe_Impl;
       procedure Unchecked_Free is new Ada.Unchecked_Deallocation
@@ -917,6 +933,7 @@ package body Porion.Builds.Models is
       Unchecked_Free (Ptr);
    end Destroy;
 
+   overriding
    procedure Find (Object  : in out Recipe_Impl;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class;
@@ -949,6 +966,7 @@ package body Porion.Builds.Models is
       end if;
    end Load;
 
+   overriding
    procedure Save (Object  : in out Recipe_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Stmt : ADO.Statements.Update_Statement
@@ -1027,6 +1045,7 @@ package body Porion.Builds.Models is
       end if;
    end Save;
 
+   overriding
    procedure Create (Object  : in out Recipe_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Query : ADO.Statements.Insert_Statement
@@ -1065,6 +1084,7 @@ package body Porion.Builds.Models is
       ADO.Audits.Save (Object, Session);
    end Create;
 
+   overriding
    procedure Delete (Object  : in out Recipe_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Stmt : ADO.Statements.Delete_Statement
@@ -1185,6 +1205,7 @@ package body Porion.Builds.Models is
    end Set_Field;
 
    --  Internal method to allocate the Object_Record instance
+   overriding
    procedure Allocate (Object : in out Build_Ref) is
       Impl : Build_Access;
    begin
@@ -1569,6 +1590,7 @@ package body Porion.Builds.Models is
       Into := Result;
    end Copy;
 
+   overriding
    procedure Find (Object  : in out Build_Ref;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class;
@@ -1639,6 +1661,7 @@ package body Porion.Builds.Models is
          Stmt : ADO.Statements.Query_Statement
              := Session.Create_Statement (Query, BUILD_DEF'Access);
       begin
+         Stmt.Execute;
          if Stmt.Has_Elements then
             Updated := True;
             Impl.Load (Stmt, Session);
@@ -1648,6 +1671,7 @@ package body Porion.Builds.Models is
       end;
    end Reload;
 
+   overriding
    procedure Save (Object  : in out Build_Ref;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;
@@ -1663,6 +1687,7 @@ package body Porion.Builds.Models is
       end if;
    end Save;
 
+   overriding
    procedure Delete (Object  : in out Build_Ref;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : constant ADO.Objects.Object_Record_Access := Object.Get_Object;
@@ -1675,6 +1700,7 @@ package body Porion.Builds.Models is
    --  --------------------
    --  Free the object
    --  --------------------
+   overriding
    procedure Destroy (Object : access Build_Impl) is
       type Build_Impl_Ptr is access all Build_Impl;
       procedure Unchecked_Free is new Ada.Unchecked_Deallocation
@@ -1686,6 +1712,7 @@ package body Porion.Builds.Models is
       Unchecked_Free (Ptr);
    end Destroy;
 
+   overriding
    procedure Find (Object  : in out Build_Impl;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class;
@@ -1718,6 +1745,7 @@ package body Porion.Builds.Models is
       end if;
    end Load;
 
+   overriding
    procedure Save (Object  : in out Build_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Stmt : ADO.Statements.Update_Statement
@@ -1820,6 +1848,7 @@ package body Porion.Builds.Models is
       end if;
    end Save;
 
+   overriding
    procedure Create (Object  : in out Build_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Query : ADO.Statements.Insert_Statement
@@ -1871,6 +1900,7 @@ package body Porion.Builds.Models is
       ADO.Objects.Set_Created (Object);
    end Create;
 
+   overriding
    procedure Delete (Object  : in out Build_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Stmt : ADO.Statements.Delete_Statement
@@ -1996,6 +2026,7 @@ package body Porion.Builds.Models is
    end Set_Field;
 
    --  Internal method to allocate the Object_Record instance
+   overriding
    procedure Allocate (Object : in out Build_Queue_Ref) is
       Impl : Build_Queue_Access;
    begin
@@ -2165,6 +2196,7 @@ package body Porion.Builds.Models is
       Into := Result;
    end Copy;
 
+   overriding
    procedure Find (Object  : in out Build_Queue_Ref;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class;
@@ -2235,6 +2267,7 @@ package body Porion.Builds.Models is
          Stmt : ADO.Statements.Query_Statement
              := Session.Create_Statement (Query, BUILD_QUEUE_DEF'Access);
       begin
+         Stmt.Execute;
          if Stmt.Has_Elements then
             Updated := True;
             Impl.Load (Stmt, Session);
@@ -2244,6 +2277,7 @@ package body Porion.Builds.Models is
       end;
    end Reload;
 
+   overriding
    procedure Save (Object  : in out Build_Queue_Ref;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;
@@ -2259,6 +2293,7 @@ package body Porion.Builds.Models is
       end if;
    end Save;
 
+   overriding
    procedure Delete (Object  : in out Build_Queue_Ref;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : constant ADO.Objects.Object_Record_Access := Object.Get_Object;
@@ -2271,6 +2306,7 @@ package body Porion.Builds.Models is
    --  --------------------
    --  Free the object
    --  --------------------
+   overriding
    procedure Destroy (Object : access Build_Queue_Impl) is
       type Build_Queue_Impl_Ptr is access all Build_Queue_Impl;
       procedure Unchecked_Free is new Ada.Unchecked_Deallocation
@@ -2282,6 +2318,7 @@ package body Porion.Builds.Models is
       Unchecked_Free (Ptr);
    end Destroy;
 
+   overriding
    procedure Find (Object  : in out Build_Queue_Impl;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class;
@@ -2314,6 +2351,7 @@ package body Porion.Builds.Models is
       end if;
    end Load;
 
+   overriding
    procedure Save (Object  : in out Build_Queue_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Stmt : ADO.Statements.Update_Statement
@@ -2371,6 +2409,7 @@ package body Porion.Builds.Models is
       end if;
    end Save;
 
+   overriding
    procedure Create (Object  : in out Build_Queue_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Query : ADO.Statements.Insert_Statement
@@ -2402,6 +2441,7 @@ package body Porion.Builds.Models is
       ADO.Objects.Set_Created (Object);
    end Create;
 
+   overriding
    procedure Delete (Object  : in out Build_Queue_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Stmt : ADO.Statements.Delete_Statement
@@ -2513,6 +2553,7 @@ package body Porion.Builds.Models is
    end Set_Field;
 
    --  Internal method to allocate the Object_Record instance
+   overriding
    procedure Allocate (Object : in out Build_Reason_Ref) is
       Impl : Build_Reason_Access;
    begin
@@ -2665,6 +2706,7 @@ package body Porion.Builds.Models is
       Into := Result;
    end Copy;
 
+   overriding
    procedure Find (Object  : in out Build_Reason_Ref;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class;
@@ -2735,6 +2777,7 @@ package body Porion.Builds.Models is
          Stmt : ADO.Statements.Query_Statement
              := Session.Create_Statement (Query, BUILD_REASON_DEF'Access);
       begin
+         Stmt.Execute;
          if Stmt.Has_Elements then
             Updated := True;
             Impl.Load (Stmt, Session);
@@ -2744,6 +2787,7 @@ package body Porion.Builds.Models is
       end;
    end Reload;
 
+   overriding
    procedure Save (Object  : in out Build_Reason_Ref;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;
@@ -2759,6 +2803,7 @@ package body Porion.Builds.Models is
       end if;
    end Save;
 
+   overriding
    procedure Delete (Object  : in out Build_Reason_Ref;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : constant ADO.Objects.Object_Record_Access := Object.Get_Object;
@@ -2771,6 +2816,7 @@ package body Porion.Builds.Models is
    --  --------------------
    --  Free the object
    --  --------------------
+   overriding
    procedure Destroy (Object : access Build_Reason_Impl) is
       type Build_Reason_Impl_Ptr is access all Build_Reason_Impl;
       procedure Unchecked_Free is new Ada.Unchecked_Deallocation
@@ -2782,6 +2828,7 @@ package body Porion.Builds.Models is
       Unchecked_Free (Ptr);
    end Destroy;
 
+   overriding
    procedure Find (Object  : in out Build_Reason_Impl;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class;
@@ -2814,6 +2861,7 @@ package body Porion.Builds.Models is
       end if;
    end Load;
 
+   overriding
    procedure Save (Object  : in out Build_Reason_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Stmt : ADO.Statements.Update_Statement
@@ -2866,6 +2914,7 @@ package body Porion.Builds.Models is
       end if;
    end Save;
 
+   overriding
    procedure Create (Object  : in out Build_Reason_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Query : ADO.Statements.Insert_Statement
@@ -2895,6 +2944,7 @@ package body Porion.Builds.Models is
       ADO.Objects.Set_Created (Object);
    end Create;
 
+   overriding
    procedure Delete (Object  : in out Build_Reason_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Stmt : ADO.Statements.Delete_Statement
@@ -3003,6 +3053,7 @@ package body Porion.Builds.Models is
    end Set_Field;
 
    --  Internal method to allocate the Object_Record instance
+   overriding
    procedure Allocate (Object : in out Recipe_Step_Ref) is
       Impl : Recipe_Step_Access;
    begin
@@ -3012,7 +3063,7 @@ package body Porion.Builds.Models is
       Impl.Timeout := 0;
       Impl.Step := Porion.Builds.Step_Type'First;
       Impl.Version := 0;
-      Impl.Execution := Execution_Type'First;
+      Impl.Execution := Porion.Builds.Execution_Type'First;
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Allocate;
 
@@ -3159,10 +3210,10 @@ package body Porion.Builds.Models is
 
 
    procedure Set_Execution (Object : in out Recipe_Step_Ref;
-                            Value  : in Execution_Type) is
+                            Value  : in Porion.Builds.Execution_Type) is
       procedure Set_Field_Discrete is
         new ADO.Objects.Set_Field_Operation
-          (Execution_Type);
+          (Porion.Builds.Execution_Type);
       Impl : Recipe_Step_Access;
    begin
       Set_Field (Object, Impl);
@@ -3170,7 +3221,7 @@ package body Porion.Builds.Models is
    end Set_Execution;
 
    function Get_Execution (Object : in Recipe_Step_Ref)
-                  return Execution_Type is
+                  return Porion.Builds.Execution_Type is
       Impl : constant Recipe_Step_Access
          := Recipe_Step_Impl (Object.Get_Load_Object.all)'Access;
    begin
@@ -3239,6 +3290,7 @@ package body Porion.Builds.Models is
       Into := Result;
    end Copy;
 
+   overriding
    procedure Find (Object  : in out Recipe_Step_Ref;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class;
@@ -3288,6 +3340,7 @@ package body Porion.Builds.Models is
       end if;
    end Load;
 
+   overriding
    procedure Save (Object  : in out Recipe_Step_Ref;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;
@@ -3303,6 +3356,7 @@ package body Porion.Builds.Models is
       end if;
    end Save;
 
+   overriding
    procedure Delete (Object  : in out Recipe_Step_Ref;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : constant ADO.Objects.Object_Record_Access := Object.Get_Object;
@@ -3315,6 +3369,7 @@ package body Porion.Builds.Models is
    --  --------------------
    --  Free the object
    --  --------------------
+   overriding
    procedure Destroy (Object : access Recipe_Step_Impl) is
       type Recipe_Step_Impl_Ptr is access all Recipe_Step_Impl;
       procedure Unchecked_Free is new Ada.Unchecked_Deallocation
@@ -3326,6 +3381,7 @@ package body Porion.Builds.Models is
       Unchecked_Free (Ptr);
    end Destroy;
 
+   overriding
    procedure Find (Object  : in out Recipe_Step_Impl;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class;
@@ -3358,6 +3414,7 @@ package body Porion.Builds.Models is
       end if;
    end Load;
 
+   overriding
    procedure Save (Object  : in out Recipe_Step_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Stmt : ADO.Statements.Update_Statement
@@ -3375,7 +3432,7 @@ package body Porion.Builds.Models is
       end if;
       if Object.Is_Modified (8) then
          Stmt.Save_Field (Name  => COL_7_6_NAME, --  execution
-                          Value => Integer (Execution_Type'Enum_Rep (Object.Execution)));
+                          Value => Integer (Porion.Builds.Execution_Type'Enum_Rep (Object.Execution)));
          Object.Clear_Modified (8);
       end if;
       if Object.Is_Modified (9) then
@@ -3404,6 +3461,7 @@ package body Porion.Builds.Models is
       end if;
    end Save;
 
+   overriding
    procedure Create (Object  : in out Recipe_Step_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Query : ADO.Statements.Insert_Statement
@@ -3426,7 +3484,7 @@ package body Porion.Builds.Models is
       Query.Save_Field (Name  => COL_6_6_NAME, --  version
                         Value => Object.Version);
       Query.Save_Field (Name  => COL_7_6_NAME, --  execution
-                        Value => Integer (Execution_Type'Enum_Rep (Object.Execution)));
+                        Value => Integer (Porion.Builds.Execution_Type'Enum_Rep (Object.Execution)));
       Query.Save_Field (Name  => COL_8_6_NAME, --  next_version_id
                         Value => Object.Next_Version);
       Query.Save_Field (Name  => COL_9_6_NAME, --  recipe_id
@@ -3438,6 +3496,7 @@ package body Porion.Builds.Models is
       ADO.Objects.Set_Created (Object);
    end Create;
 
+   overriding
    procedure Delete (Object  : in out Recipe_Step_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Stmt : ADO.Statements.Delete_Statement
@@ -3477,7 +3536,7 @@ package body Porion.Builds.Models is
       elsif Name = "version" then
          return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Version));
       elsif Name = "execution" then
-         return Execution_Type_Objects.To_Object (Impl.Execution);
+         return Porion.Builds.Execution_Type_Objects.To_Object (Impl.Execution);
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -3518,7 +3577,7 @@ package body Porion.Builds.Models is
       Object.Timeout := Stmt.Get_Integer (4);
       Object.Step := Porion.Builds.Step_Type'Enum_Val (Stmt.Get_Integer (5));
       Object.Version := Stmt.Get_Integer (6);
-      Object.Execution := Execution_Type'Enum_Val (Stmt.Get_Integer (7));
+      Object.Execution := Porion.Builds.Execution_Type'Enum_Val (Stmt.Get_Integer (7));
       if not Stmt.Is_Null (8) then
          Object.Next_Version.Set_Key_Value (Stmt.Get_Identifier (8), Session);
       end if;
@@ -3557,6 +3616,7 @@ package body Porion.Builds.Models is
    end Set_Field;
 
    --  Internal method to allocate the Object_Record instance
+   overriding
    procedure Allocate (Object : in out Build_Step_Ref) is
       Impl : Build_Step_Access;
    begin
@@ -3762,6 +3822,7 @@ package body Porion.Builds.Models is
       Into := Result;
    end Copy;
 
+   overriding
    procedure Find (Object  : in out Build_Step_Ref;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class;
@@ -3811,6 +3872,7 @@ package body Porion.Builds.Models is
       end if;
    end Load;
 
+   overriding
    procedure Save (Object  : in out Build_Step_Ref;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;
@@ -3826,6 +3888,7 @@ package body Porion.Builds.Models is
       end if;
    end Save;
 
+   overriding
    procedure Delete (Object  : in out Build_Step_Ref;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : constant ADO.Objects.Object_Record_Access := Object.Get_Object;
@@ -3838,6 +3901,7 @@ package body Porion.Builds.Models is
    --  --------------------
    --  Free the object
    --  --------------------
+   overriding
    procedure Destroy (Object : access Build_Step_Impl) is
       type Build_Step_Impl_Ptr is access all Build_Step_Impl;
       procedure Unchecked_Free is new Ada.Unchecked_Deallocation
@@ -3849,6 +3913,7 @@ package body Porion.Builds.Models is
       Unchecked_Free (Ptr);
    end Destroy;
 
+   overriding
    procedure Find (Object  : in out Build_Step_Impl;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class;
@@ -3881,6 +3946,7 @@ package body Porion.Builds.Models is
       end if;
    end Load;
 
+   overriding
    procedure Save (Object  : in out Build_Step_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Stmt : ADO.Statements.Update_Statement
@@ -3937,6 +4003,7 @@ package body Porion.Builds.Models is
       end if;
    end Save;
 
+   overriding
    procedure Create (Object  : in out Build_Step_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Query : ADO.Statements.Insert_Statement
@@ -3969,6 +4036,7 @@ package body Porion.Builds.Models is
       ADO.Objects.Set_Created (Object);
    end Create;
 
+   overriding
    procedure Delete (Object  : in out Build_Step_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Stmt : ADO.Statements.Delete_Statement
@@ -4089,6 +4157,7 @@ package body Porion.Builds.Models is
    end Set_Field;
 
    --  Internal method to allocate the Object_Record instance
+   overriding
    procedure Allocate (Object : in out Environment_Ref) is
       Impl : Environment_Access;
    begin
@@ -4280,6 +4349,7 @@ package body Porion.Builds.Models is
       Into := Result;
    end Copy;
 
+   overriding
    procedure Find (Object  : in out Environment_Ref;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class;
@@ -4350,6 +4420,7 @@ package body Porion.Builds.Models is
          Stmt : ADO.Statements.Query_Statement
              := Session.Create_Statement (Query, ENVIRONMENT_DEF'Access);
       begin
+         Stmt.Execute;
          if Stmt.Has_Elements then
             Updated := True;
             Impl.Load (Stmt, Session);
@@ -4359,6 +4430,7 @@ package body Porion.Builds.Models is
       end;
    end Reload;
 
+   overriding
    procedure Save (Object  : in out Environment_Ref;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;
@@ -4374,6 +4446,7 @@ package body Porion.Builds.Models is
       end if;
    end Save;
 
+   overriding
    procedure Delete (Object  : in out Environment_Ref;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : constant ADO.Objects.Object_Record_Access := Object.Get_Object;
@@ -4386,6 +4459,7 @@ package body Porion.Builds.Models is
    --  --------------------
    --  Free the object
    --  --------------------
+   overriding
    procedure Destroy (Object : access Environment_Impl) is
       type Environment_Impl_Ptr is access all Environment_Impl;
       procedure Unchecked_Free is new Ada.Unchecked_Deallocation
@@ -4397,6 +4471,7 @@ package body Porion.Builds.Models is
       Unchecked_Free (Ptr);
    end Destroy;
 
+   overriding
    procedure Find (Object  : in out Environment_Impl;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class;
@@ -4429,6 +4504,7 @@ package body Porion.Builds.Models is
       end if;
    end Load;
 
+   overriding
    procedure Save (Object  : in out Environment_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Stmt : ADO.Statements.Update_Statement
@@ -4487,6 +4563,7 @@ package body Porion.Builds.Models is
       end if;
    end Save;
 
+   overriding
    procedure Create (Object  : in out Environment_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Query : ADO.Statements.Insert_Statement
@@ -4519,6 +4596,7 @@ package body Porion.Builds.Models is
       ADO.Audits.Save (Object, Session);
    end Create;
 
+   overriding
    procedure Delete (Object  : in out Environment_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Stmt : ADO.Statements.Delete_Statement
@@ -4630,6 +4708,7 @@ package body Porion.Builds.Models is
    end Set_Field;
 
    --  Internal method to allocate the Object_Record instance
+   overriding
    procedure Allocate (Object : in out Last_Build_Ref) is
       Impl : Last_Build_Access;
    begin
@@ -4782,6 +4861,7 @@ package body Porion.Builds.Models is
       Into := Result;
    end Copy;
 
+   overriding
    procedure Find (Object  : in out Last_Build_Ref;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class;
@@ -4852,6 +4932,7 @@ package body Porion.Builds.Models is
          Stmt : ADO.Statements.Query_Statement
              := Session.Create_Statement (Query, LAST_BUILD_DEF'Access);
       begin
+         Stmt.Execute;
          if Stmt.Has_Elements then
             Updated := True;
             Impl.Load (Stmt, Session);
@@ -4861,6 +4942,7 @@ package body Porion.Builds.Models is
       end;
    end Reload;
 
+   overriding
    procedure Save (Object  : in out Last_Build_Ref;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;
@@ -4876,6 +4958,7 @@ package body Porion.Builds.Models is
       end if;
    end Save;
 
+   overriding
    procedure Delete (Object  : in out Last_Build_Ref;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : constant ADO.Objects.Object_Record_Access := Object.Get_Object;
@@ -4888,6 +4971,7 @@ package body Porion.Builds.Models is
    --  --------------------
    --  Free the object
    --  --------------------
+   overriding
    procedure Destroy (Object : access Last_Build_Impl) is
       type Last_Build_Impl_Ptr is access all Last_Build_Impl;
       procedure Unchecked_Free is new Ada.Unchecked_Deallocation
@@ -4899,6 +4983,7 @@ package body Porion.Builds.Models is
       Unchecked_Free (Ptr);
    end Destroy;
 
+   overriding
    procedure Find (Object  : in out Last_Build_Impl;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class;
@@ -4931,6 +5016,7 @@ package body Porion.Builds.Models is
       end if;
    end Load;
 
+   overriding
    procedure Save (Object  : in out Last_Build_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Stmt : ADO.Statements.Update_Statement
@@ -4983,6 +5069,7 @@ package body Porion.Builds.Models is
       end if;
    end Save;
 
+   overriding
    procedure Create (Object  : in out Last_Build_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Query : ADO.Statements.Insert_Statement
@@ -5012,6 +5099,7 @@ package body Porion.Builds.Models is
       ADO.Objects.Set_Created (Object);
    end Create;
 
+   overriding
    procedure Delete (Object  : in out Last_Build_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Stmt : ADO.Statements.Delete_Statement

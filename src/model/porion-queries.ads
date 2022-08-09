@@ -42,7 +42,7 @@ with Porion.XUnit.Models;
 pragma Warnings (On);
 package Porion.Queries is
 
-   pragma Style_Checks ("-mr");
+   pragma Style_Checks ("-mrIu");
 
 
    --  --------------------
@@ -257,7 +257,7 @@ package Porion.Queries is
       Kind : Porion.Builds.Step_Type;
 
       --  the recipe execution mode.
-      Execution : Porion.Builds.Models.Execution_Type;
+      Execution : Porion.Builds.Execution_Type;
 
       --  the start date.
       Start_Date : Ada.Calendar.Time;
@@ -947,7 +947,7 @@ private
 
    package File_4 is
       new ADO.Queries.Loaders.File (Path => "report-build-steps.xml",
-                                    Sha1 => "DB0A4B919CBFDB32C2E3D9E08A8DEE7208200970");
+                                    Sha1 => "0DA08233410D459A7FE92733FAFCF40EACB9327D");
 
    package Def_Buildstepinfo_Build_Recipe_List is
       new ADO.Queries.Loaders.Query (Name => "build-recipe-list",

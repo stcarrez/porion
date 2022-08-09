@@ -259,6 +259,9 @@ package Porion.Queries is
       --  the recipe execution mode.
       Execution : Porion.Builds.Execution_Type;
 
+      --  the recipe parameters.
+      Parameters : Ada.Strings.Unbounded.Unbounded_String;
+
       --  the start date.
       Start_Date : Ada.Calendar.Time;
 
@@ -947,7 +950,7 @@ private
 
    package File_4 is
       new ADO.Queries.Loaders.File (Path => "report-build-steps.xml",
-                                    Sha1 => "0DA08233410D459A7FE92733FAFCF40EACB9327D");
+                                    Sha1 => "D80FC19337569F3A670C11A7D4C26E04E80224C7");
 
    package Def_Buildstepinfo_Build_Recipe_List is
       new ADO.Queries.Loaders.Query (Name => "build-recipe-list",

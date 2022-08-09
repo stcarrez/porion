@@ -343,6 +343,8 @@ package body Porion.Queries is
          return Porion.Builds.Step_Type_Objects.To_Object (From.Kind);
       elsif Name = "execution" then
          return Porion.Builds.Execution_Type_Objects.To_Object (From.Execution);
+      elsif Name = "parameters" then
+         return Util.Beans.Objects.To_Object (From.Parameters);
       elsif Name = "start_date" then
          return Util.Beans.Objects.Time.To_Object (From.Start_Date);
       elsif Name = "end_date" then
@@ -382,6 +384,8 @@ package body Porion.Queries is
          Item.Kind := Porion.Builds.Step_Type_Objects.To_Value (Value);
       elsif Name = "execution" then
          Item.Execution := Porion.Builds.Execution_Type_Objects.To_Value (Value);
+      elsif Name = "parameters" then
+         Item.Parameters := Util.Beans.Objects.To_Unbounded_String (Value);
       elsif Name = "start_date" then
          Item.Start_Date := Util.Beans.Objects.Time.To_Time (Value);
       elsif Name = "end_date" then
@@ -429,12 +433,13 @@ package body Porion.Queries is
          Into.Builder := Porion.Builds.Models.Builder_Type'Enum_Val (Stmt.Get_Integer (2));
          Into.Kind := Porion.Builds.Step_Type'Enum_Val (Stmt.Get_Integer (3));
          Into.Execution := Porion.Builds.Execution_Type'Enum_Val (Stmt.Get_Integer (4));
-         Into.Start_Date := Stmt.Get_Time (5);
-         Into.End_Date := Stmt.Get_Nullable_Time (6);
-         Into.Status := Stmt.Get_Integer (7);
-         Into.User_Time := Porion.Millisecond_Type (Stmt.Get_Integer (8));
-         Into.Sys_Time := Porion.Millisecond_Type (Stmt.Get_Integer (9));
-         Into.Step_Duration := Porion.Millisecond_Type (Stmt.Get_Integer (10));
+         Into.Parameters := Stmt.Get_Unbounded_String (5);
+         Into.Start_Date := Stmt.Get_Time (6);
+         Into.End_Date := Stmt.Get_Nullable_Time (7);
+         Into.Status := Stmt.Get_Integer (8);
+         Into.User_Time := Porion.Millisecond_Type (Stmt.Get_Integer (9));
+         Into.Sys_Time := Porion.Millisecond_Type (Stmt.Get_Integer (10));
+         Into.Step_Duration := Porion.Millisecond_Type (Stmt.Get_Integer (11));
       end Read;
    begin
       Stmt.Execute;

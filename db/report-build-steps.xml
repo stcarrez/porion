@@ -20,6 +20,9 @@
         <property type='Porion.Builds.Execution_Type' name="execution">
             <comment>the recipe execution mode.</comment>
         </property>
+        <property type='String' name="parameters">
+            <comment>the recipe parameters.</comment>
+        </property>
         <property type='Date' name="start_date">
             <comment>the start date.</comment>
         </property>
@@ -49,6 +52,7 @@
             recipe_step.builder,
             recipe_step.step,
             recipe_step.execution,
+	    recipe_step.parameters,
             build_step.start_date,
             build_step.end_date,
             build_step.exit_status,

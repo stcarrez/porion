@@ -29,7 +29,7 @@ with Util.Beans.Methods;
 pragma Warnings (On);
 package Porion.Dashboards.Models is
 
-   pragma Style_Checks ("-mr");
+   pragma Style_Checks ("-mrIu");
 
 
 

@@ -1,4 +1,4 @@
---  Advanced Resource Embedder 1.2.0
+--  Advanced Resource Embedder 1.2.1
 with Interfaces; use Interfaces;
 
 package body Porion.Resources.Queries is
@@ -589,44 +589,43 @@ package body Porion.Resources.Queries is
        & " </property>" & ASCII.LF & "        <property type='Porion.Builds.Step_T"
        & "ype' name=""kind"">" & ASCII.LF & "            <comment>the recipe step "
        & "type.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "      "
-       & "  <property type='Porion.Builds.Models.Execution_Type' name=""execution"""
-       & ">" & ASCII.LF & "            <comment>the recipe execution mode.</commen"
+       & "  <property type='Porion.Builds.Execution_Type' name=""execution"">" & ASCII.LF
+       & "            <comment>the recipe execution mode.</comment>" & ASCII.LF & " "
+       & "       </property>" & ASCII.LF & "        <property type='Date' name=""s"
+       & "tart_date"">" & ASCII.LF & "            <comment>the start date.</commen"
        & "t>" & ASCII.LF & "        </property>" & ASCII.LF & "        <property t"
-       & "ype='Date' name=""start_date"">" & ASCII.LF & "            <comment>the "
-       & "start date.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & " "
-       & "       <property type='Nullable_Date' name=""end_date"" not-null=""no"">"
-       & ASCII.LF & "            <comment>the finish date.</comment>" & ASCII.LF
-       & "        </property>" & ASCII.LF & "        <property type='Integer' name"
-       & "=""status"">" & ASCII.LF & "            <comment>the execution status.</"
-       & "comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <prop"
-       & "erty type='Porion.Millisecond_Type' name=""user_time"">" & ASCII.LF & " "
-       & "           <comment>the user time.</comment>" & ASCII.LF & "        </pr"
+       & "ype='Nullable_Date' name=""end_date"" not-null=""no"">" & ASCII.LF & "  "
+       & "          <comment>the finish date.</comment>" & ASCII.LF & "        </p"
+       & "roperty>" & ASCII.LF & "        <property type='Integer' name=""status"""
+       & ">" & ASCII.LF & "            <comment>the execution status.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Porion.Millis"
+       & "econd_Type' name=""user_time"">" & ASCII.LF & "            <comment>the "
+       & "user time.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & " "
+       & "       <property type='Porion.Millisecond_Type' name=""sys_time"">" & ASCII.LF
+       & "            <comment>the sys time.</comment>" & ASCII.LF & "        </pr"
        & "operty>" & ASCII.LF & "        <property type='Porion.Millisecond_Type' "
-       & "name=""sys_time"">" & ASCII.LF & "            <comment>the sys time.</co"
-       & "mment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <proper"
-       & "ty type='Porion.Millisecond_Type' name=""step_duration"">" & ASCII.LF & " "
-       & "           <comment>the execution step duration.</comment>" & ASCII.LF & " "
-       & "       </property>" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF & " "
-       & "  <query name='build-recipe-list'>" & ASCII.LF & "        <comment>Get t"
-       & "he list of build execution recipes</comment>" & ASCII.LF & "        <sql"
-       & ">" & ASCII.LF & "            SELECT" & ASCII.LF & "            recipe_st"
-       & "ep.id," & ASCII.LF & "            recipe_step.number," & ASCII.LF & "   "
-       & "         recipe_step.builder," & ASCII.LF & "            recipe_step.ste"
-       & "p," & ASCII.LF & "            recipe_step.execution," & ASCII.LF & "    "
-       & "        build_step.start_date," & ASCII.LF & "            build_step.end"
-       & "_date," & ASCII.LF & "            build_step.exit_status," & ASCII.LF & " "
-       & "           build_step.user_time," & ASCII.LF & "            build_step.s"
-       & "ys_time," & ASCII.LF & "            build_step.step_duration" & ASCII.LF
-       & "            FROM porion_build_step AS build_step" & ASCII.LF & "        "
-       & "    INNER JOIN porion_recipe_step as recipe_step ON build_step.recipe_st"
-       & "ep_id = recipe_step.id" & ASCII.LF & "            WHERE build_step.build"
-       & "_id = :build_id" & ASCII.LF & "            ORDER BY build_step.id ASC" & ASCII.LF
-       & "        </sql>" & ASCII.LF & "        <sql-count>" & ASCII.LF & "       "
-       & "     SELECT" & ASCII.LF & "            count(build_step.id)" & ASCII.LF
-       & "            FROM porion_build_step AS build_step" & ASCII.LF & "        "
-       & "    WHERE build_step.build_id = :build_id" & ASCII.LF & "        </sql-c"
-       & "ount>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</query-map"
-       & "ping>" & ASCII.LF;
+       & "name=""step_duration"">" & ASCII.LF & "            <comment>the executio"
+       & "n step duration.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "    </class>" & ASCII.LF & ASCII.LF & "   <query name='build-recipe-lis"
+       & "t'>" & ASCII.LF & "        <comment>Get the list of build execution reci"
+       & "pes</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & "            SE"
+       & "LECT" & ASCII.LF & "            recipe_step.id," & ASCII.LF & "         "
+       & "   recipe_step.number," & ASCII.LF & "            recipe_step.builder," & ASCII.LF
+       & "            recipe_step.step," & ASCII.LF & "            recipe_step.exe"
+       & "cution," & ASCII.LF & "            build_step.start_date," & ASCII.LF & " "
+       & "           build_step.end_date," & ASCII.LF & "            build_step.ex"
+       & "it_status," & ASCII.LF & "            build_step.user_time," & ASCII.LF
+       & "            build_step.sys_time," & ASCII.LF & "            build_step.s"
+       & "tep_duration" & ASCII.LF & "            FROM porion_build_step AS build_"
+       & "step" & ASCII.LF & "            INNER JOIN porion_recipe_step as recipe_"
+       & "step ON build_step.recipe_step_id = recipe_step.id" & ASCII.LF & "      "
+       & "      WHERE build_step.build_id = :build_id" & ASCII.LF & "            O"
+       & "RDER BY build_step.id ASC" & ASCII.LF & "        </sql>" & ASCII.LF & " "
+       & "       <sql-count>" & ASCII.LF & "            SELECT" & ASCII.LF & "    "
+       & "        count(build_step.id)" & ASCII.LF & "            FROM porion_buil"
+       & "d_step AS build_step" & ASCII.LF & "            WHERE build_step.build_i"
+       & "d = :build_id" & ASCII.LF & "        </sql-count>" & ASCII.LF & "    </q"
+       & "uery>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
    C_15 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of builds" & ASCII.LF & " "

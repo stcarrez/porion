@@ -76,7 +76,7 @@ package body Porion.Builds.Rest is
          Stream.Write_Attribute ("number", Line.Number);
          case Line.Level is
             when LOG_UNKNOWN =>
-               Stream.Write_Attribute ("level", "unkown");
+               Stream.Write_Attribute ("level", "unknown");
 
             when LOG_PORION =>
                Stream.Write_Attribute ("level", "porion");

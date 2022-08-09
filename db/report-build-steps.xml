@@ -17,7 +17,7 @@
         <property type='Porion.Builds.Step_Type' name="kind">
             <comment>the recipe step type.</comment>
         </property>
-        <property type='Porion.Builds.Models.Execution_Type' name="execution">
+        <property type='Porion.Builds.Execution_Type' name="execution">
             <comment>the recipe execution mode.</comment>
         </property>
         <property type='Date' name="start_date">

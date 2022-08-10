@@ -186,3 +186,20 @@ make install
 # Sites Using Porion
 
 * [Porion Build Manager](https://porion.vacs.fr/porion/index.html)
+
+# Porion server development setup
+
+Typescript development setup:
+
+```
+pkg install npm-node18-8.13.0
+npm install typescript --save-dev
+npm install --save @types/jquery
+npm install --save @types/flot
+```
+
+To build the Javascript files:
+
+```
+make build-ts
+```

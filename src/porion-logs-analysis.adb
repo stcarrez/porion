@@ -57,16 +57,22 @@ package body Porion.Logs.Analysis is
       procedure Process (Line : in String);
 
       Line_Num : Natural := 0;
+      Step     : ADO.Identifier := ADO.NO_IDENTIFIER;
 
       procedure Process (Line : in String) is
          State : Line_Info_Type;
       begin
          Line_Num := Line_Num + 1;
          if Line'Length > 10 and then Util.Strings.Starts_With (Line, "porion:") then
+            if Util.Strings.Starts_With (Line, "porion:step:") then
+               Step := ADO.Identifier'Value (Line (Line'First + 13 .. Line'Last));
+               return;
+            end if;
             if Context.Levels (LOG_PORION) then
                Result.Append ((Length  => Line'Length,
                                Number  => Line_Num,
                                Level   => LOG_PORION,
+                               Step    => Step,
                                Context => False,
                                Content => Line));
             end if;
@@ -78,6 +84,7 @@ package body Porion.Logs.Analysis is
             Result.Append ((Length  => Line'Length,
                             Number  => Line_Num,
                             Level   => State.Level,
+                            Step    => Step,
                             Context => False,
                             Content => Line));
          end if;

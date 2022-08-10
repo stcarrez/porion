@@ -54,6 +54,7 @@ package body Porion.Builds.Rest is
       pragma Unreferenced (Req, Reply);
 
       use Porion.Logs.Analysis;
+      use type ADO.Identifier;
 
       Rules  : constant String := Context.Recipe.Get_Filter_Rules;
       Ctx    : Porion.Logs.Analysis.Analyser_Type;
@@ -61,6 +62,32 @@ package body Porion.Builds.Rest is
       List   : Porion.Logs.Analysis.Line_Vector;
       Dir    : constant String := Builds.Services.Get_Log_Directory (Context);
       Path   : constant String := Ada.Directories.Compose (Dir, "build.log");
+      Step   : ADO.Identifier := ADO.NO_IDENTIFIER;
+      Has_Log     : Boolean := False;
+      Trace_Count : Natural := 0;
+      Debug_Count : Natural := 0;
+      Info_Count  : Natural := 0;
+      Warn_Count  : Natural := 0;
+      Error_Count : Natural := 0;
+      Fatal_Count : Natural := 0;
+      Unknown_Count : Natural := 0;
+      Context_Count : Natural := 0;
+
+      procedure Finish_Log_Stats is
+      begin
+         Stream.End_Array ("logs");
+         Stream.Start_Entity ("counts");
+         Stream.Write_Attribute ("trace", Trace_Count);
+         Stream.Write_Attribute ("debug", Debug_Count);
+         Stream.Write_Attribute ("info", Info_Count);
+         Stream.Write_Attribute ("warning", Warn_Count);
+         Stream.Write_Attribute ("error", Error_Count);
+         Stream.Write_Attribute ("fatal", Fatal_Count);
+         Stream.Write_Attribute ("unkown", Unknown_Count);
+         Stream.Write_Attribute ("context", Context_Count);
+         Stream.End_Entity ("counts");
+         Stream.End_Entity ("log_step");
+      end Finish_Log_Stats;
    begin
       if not Porion.Projects.Has_Build (Context.Ident) then
          raise Porion.Services.Not_Found;
@@ -72,40 +99,70 @@ package body Porion.Builds.Rest is
       Porion.Logs.Analysis.Read (Ctx, Path, List);
       Stream.Start_Array ("");
       for Line of List loop
+         if Step /= Line.Step or else not Has_Log then
+            if Has_Log then
+               Finish_Log_Stats;
+            else
+               Has_Log := True;
+            end if;
+            Trace_Count := 0;
+            Debug_Count := 0;
+            Info_Count := 0;
+            Warn_Count := 0;
+            Error_Count := 0;
+            Fatal_Count := 0;
+            Unknown_Count := 0;
+            Context_Count := 0;
+            Stream.Start_Entity ("log_step");
+            Stream.Write_Long_Entity ("step", Long_Long_Integer (Line.Step));
+            Stream.Start_Array ("logs");
+            Step := Line.Step;
+         end if;
          Stream.Start_Entity ("log");
          Stream.Write_Attribute ("number", Line.Number);
          case Line.Level is
             when LOG_UNKNOWN =>
                Stream.Write_Attribute ("level", "unknown");
+               Unknown_Count := Unknown_Count + 1;
 
             when LOG_PORION =>
                Stream.Write_Attribute ("level", "porion");
 
             when LOG_FATAL =>
                Stream.Write_Attribute ("level", "fatal");
+               Fatal_Count := Fatal_Count + 1;
 
             when LOG_ERROR =>
                Stream.Write_Attribute ("level", "error");
+               Error_Count := Error_Count + 1;
 
             when LOG_WARNING =>
                Stream.Write_Attribute ("level", "warning");
+               Warn_Count := Warn_Count + 1;
 
             when LOG_CONTEXT =>
                Stream.Write_Attribute ("level", "context");
+               Context_Count := Context_Count + 1;
 
             when LOG_INFO =>
                Stream.Write_Attribute ("level", "info");
+               Info_Count := Info_Count + 1;
 
             when LOG_TRACE =>
                Stream.Write_Attribute ("level", "trace");
+               Trace_Count := Trace_Count + 1;
 
             when LOG_DEBUG =>
                Stream.Write_Attribute ("level", "debug");
+               Debug_Count := Debug_Count + 1;
 
          end case;
          Stream.Write_Entity ("content", Line.Content);
          Stream.End_Entity ("log");
       end loop;
+      if Has_Log then
+         Finish_Log_Stats;
+      end if;
       Stream.End_Array ("");
 
    exception

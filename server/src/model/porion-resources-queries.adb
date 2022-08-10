@@ -8,15 +8,15 @@ package body Porion.Resources.Queries is
      (1, 8, 12, 14);
 
    T1 : constant array (0 .. 3) of Unsigned_8 :=
-     (10, 12, 7, 42);
+     (32, 19, 26, 22);
 
    T2 : constant array (0 .. 3) of Unsigned_8 :=
-     (40, 0, 46, 26);
+     (14, 2, 13, 21);
 
-   G : constant array (0 .. 46) of Unsigned_8 :=
-     (0, 0, 0, 0, 0, 0, 11, 12, 8, 0, 22, 3, 17, 5, 0, 0, 10, 0, 0, 1, 17,
-      20, 0, 0, 7, 21, 18, 0, 5, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 7, 6,
-      5, 7, 17, 0);
+   G : constant array (0 .. 50) of Unsigned_8 :=
+     (0, 0, 0, 7, 0, 0, 0, 13, 15, 0, 19, 0, 0, 0, 10, 13, 0, 0, 0, 19, 9,
+      0, 0, 0, 0, 0, 13, 0, 0, 9, 0, 0, 0, 12, 20, 0, 1, 2, 10, 24, 1, 0, 4,
+      0, 8, 0, 19, 18, 7, 22, 15);
 
    function Hash (S : String) return Natural is
       F : constant Natural := S'First - 1;
@@ -27,10 +27,10 @@ package body Porion.Resources.Queries is
       for K in P'Range loop
          exit when L < P (K);
          J  := Character'Pos (S (P (K) + F));
-         F1 := (F1 + Natural (T1 (K)) * J) mod 47;
-         F2 := (F2 + Natural (T2 (K)) * J) mod 47;
+         F1 := (F1 + Natural (T1 (K)) * J) mod 51;
+         F2 := (F2 + Natural (T2 (K)) * J) mod 51;
       end loop;
-      return (Natural (G (F1)) + Natural (G (F2))) mod 23;
+      return (Natural (G (F1)) + Natural (G (F2))) mod 25;
    end Hash;
 
    C_0 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
@@ -461,6 +461,40 @@ package body Porion.Resources.Queries is
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
    C_13 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+       & "    <description>" & ASCII.LF & "        Stats for the tests executed in"
+       & " builds" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF & "   "
+       & " <class name=""Porion.Queries.Build_Metric_Info"" bean=""yes"">" & ASCII.LF
+       & "        <comment>Build metrics.</comment>" & ASCII.LF & "        <proper"
+       & "ty type='Integer' name=""build_id"">" & ASCII.LF & "            <comment"
+       & ">the build id.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Natural' name=""build_number"">" & ASCII.LF & " "
+       & "           <comment>the build number.</comment>" & ASCII.LF & "        <"
+       & "/property>" & ASCII.LF & "        <property type='Date' name=""build_dat"
+       & "e"" not-null=""no"">" & ASCII.LF & "            <comment>the build start"
+       & "ing date.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "  "
+       & "      <property type='Porion.Builds.Models.Build_Status_Type' name=""bui"
+       & "ld_status"">" & ASCII.LF & "            <comment>the build status.</comm"
+       & "ent>" & ASCII.LF & "        </property>" & ASCII.LF & "        <property"
+       & " type='String' name=""metric"">" & ASCII.LF & "            <comment>the "
+       & "metric name.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & " "
+       & "       <property type='Integer' name=""value"">" & ASCII.LF & "         "
+       & "   <comment>the metric value.</comment>" & ASCII.LF & "        </propert"
+       & "y>" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF & "    <query nam"
+       & "e='report-build-metrics'>" & ASCII.LF & "        <comment>The build metr"
+       & "ics for a given metric kind</comment>" & ASCII.LF & ASCII.HT & "<sql>" & ASCII.LF
+       & ASCII.HT & "  SELECT" & ASCII.LF & "          build.id AS build_id," & ASCII.LF
+       & ASCII.HT & "  build.number AS build_number," & ASCII.LF & "          bui"
+       & "ld.create_date AS build_date," & ASCII.LF & "          build.status AS b"
+       & "uild_status," & ASCII.LF & ASCII.HT & "  metric.name," & ASCII.LF & "  "
+       & "        mb.value AS value" & ASCII.LF & ASCII.HT & "  FROM porion_build"
+       & " AS build" & ASCII.LF & ASCII.HT & "  INNER JOIN porion_build_metric as"
+       & " mb ON mb.build_id = build.id" & ASCII.LF & ASCII.HT & "  INNER JOIN po"
+       & "rion_metric AS metric ON mb.metric_id = metric.id AND metric.metric = :m"
+       & "etric" & ASCII.LF & ASCII.HT & "  WHERE build.project_id = :project_id" & ASCII.LF
+       & ASCII.HT & "</sql>" & ASCII.LF & "    </query> " & ASCII.LF & ASCII.LF
+       & "</query-mapping>" & ASCII.LF;
+
+   C_14 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List the build queues" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
        & "ueries.Queue_Info"" bean=""yes"">" & ASCII.LF & "        <comment>Inform"
@@ -574,7 +608,7 @@ package body Porion.Resources.Queries is
        & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</"
        & "query-mapping>" & ASCII.LF;
 
-   C_14 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_15 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of build steps with the ex"
        & "ecution time" & ASCII.LF & "    </description>" & ASCII.LF & " " & ASCII.LF
        & "    <class name=""Porion.Queries.Build_Step_Info"" bean=""yes"">" & ASCII.LF
@@ -630,7 +664,45 @@ package body Porion.Resources.Queries is
        & "id = :build_id" & ASCII.LF & "        </sql-count>" & ASCII.LF & "    </"
        & "query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_15 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_16 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+       & "    <description>" & ASCII.LF & "        Stats for the tests executed in"
+       & " builds" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF & "   "
+       & " <class name=""Porion.Queries.Build_Test_Info"" bean=""yes"">" & ASCII.LF
+       & "        <comment>Statistics about a tests executed during the builds.</c"
+       & "omment>" & ASCII.LF & "        <property type='Integer' name=""build_id"""
+       & ">" & ASCII.LF & "            <comment>the build id.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Natural' name"
+       & "=""build_number"">" & ASCII.LF & "            <comment>the build number."
+       & "</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <pr"
+       & "operty type='Date' name=""build_date"" not-null=""no"">" & ASCII.LF & " "
+       & "           <comment>the build starting date.</comment>" & ASCII.LF & "  "
+       & "      </property>" & ASCII.LF & "        <property type='Porion.Builds.M"
+       & "odels.Build_Status_Type' name=""build_status"">" & ASCII.LF & "         "
+       & "   <comment>the build status.</comment>" & ASCII.LF & "        </propert"
+       & "y>" & ASCII.LF & "        <property type='Natural' name=""pass_count"">" & ASCII.LF
+       & "            <comment>the total number of tests that passed.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Natural' name"
+       & "=""fail_count"">" & ASCII.LF & "            <comment>the total number of"
+       & " tests that failed.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Natural' name=""timeout_count"">" & ASCII.LF & " "
+       & "           <comment>the total number of tests that timeout.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Natural' name"
+       & "=""test_duration"">" & ASCII.LF & "            <comment>the total durati"
+       & "on of all tests.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "    </class>" & ASCII.LF & ASCII.LF & "    <query name='stat-tests'>" & ASCII.LF
+       & "        <comment>Statistics about the last project builds</comment>" & ASCII.LF
+       & "        <sql>" & ASCII.LF & "          SELECT" & ASCII.LF & "          b"
+       & "uild.id AS build_id," & ASCII.LF & ASCII.HT & "  build.number AS build_"
+       & "number," & ASCII.LF & "          build.create_date AS build_date," & ASCII.LF
+       & "          build.status AS build_status," & ASCII.LF & "          build.p"
+       & "ass_count AS pass_count," & ASCII.LF & "          build.fail_count AS fa"
+       & "il_count," & ASCII.LF & "          build.timeout_count AS timeout_count,"
+       & ASCII.LF & "          build.test_duration AS test_duration" & ASCII.LF & " "
+       & "         FROM porion_build AS build" & ASCII.LF & "          WHERE build"
+       & ".project_id = :project_id" & ASCII.LF & "        </sql>" & ASCII.LF & " "
+       & "   </query> " & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+
+   C_17 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of builds" & ASCII.LF & " "
        & "   </description>" & ASCII.LF & " " & ASCII.LF & "    <class name=""Pori"
        & "on.Queries.Build_Info"" bean=""yes"">" & ASCII.LF & "        <comment>In"
@@ -725,7 +797,7 @@ package body Porion.Resources.Queries is
        & "ER BY finish_date DESC" & ASCII.LF & "        </sql>" & ASCII.LF & "    "
        & "</query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_16 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_18 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of environment variables" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
        & "ueries.Environment_Info"" bean=""yes"">" & ASCII.LF & "        <comment>"
@@ -782,7 +854,7 @@ package body Porion.Resources.Queries is
        & "R env.project_id IS NULL" & ASCII.LF & "        </sql-count>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_17 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_19 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of builds" & ASCII.LF & " "
        & "   </description>" & ASCII.LF & " " & ASCII.LF & "    <class name=""Pori"
        & "on.Queries.Node_Info"" bean=""yes"">" & ASCII.LF & "        <comment>Inf"
@@ -850,7 +922,7 @@ package body Porion.Resources.Queries is
        & "            ORDER BY node.name" & ASCII.LF & "        </sql>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_18 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_20 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of projects" & ASCII.LF & " "
        & "   </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Qu"
        & "eries.Project_Info"" bean=""yes"">" & ASCII.LF & "        <comment>Infor"
@@ -990,7 +1062,7 @@ package body Porion.Resources.Queries is
        & "count>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</query-ma"
        & "pping>" & ASCII.LF;
 
-   C_19 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_21 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of recipes for a project" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
        & "ueries.Recipe_Info"" bean=""yes"">" & ASCII.LF & "        <comment>Infor"
@@ -1072,7 +1144,7 @@ package body Porion.Resources.Queries is
        & " recipe.project_id = :project_id" & ASCII.LF & "        </sql-count>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_20 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_22 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List the tests" & ASCII.LF & " "
        & "   </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Qu"
        & "eries.Test_Info"" bean=""yes"">" & ASCII.LF & "        <comment>Informat"
@@ -1116,7 +1188,7 @@ package body Porion.Resources.Queries is
        & "id = :build_id" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>"
        & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_21 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_23 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        Stats for the builds" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
        & "ueries.Build_Stat"" bean=""yes"">" & ASCII.LF & "        <comment>Statis"
@@ -1188,7 +1260,7 @@ package body Porion.Resources.Queries is
        & "        </sql>" & ASCII.LF & "    </query> " & ASCII.LF & ASCII.LF & "<"
        & "/query-mapping>" & ASCII.LF;
 
-   C_22 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_24 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        Stats with the build metrics" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
        & "ueries.Metric_Stat"" bean=""yes"">" & ASCII.LF & "        <comment>Stati"
@@ -1268,7 +1340,8 @@ package body Porion.Resources.Queries is
       C_0'Access, C_1'Access, C_2'Access, C_3'Access, C_4'Access, C_5'Access,
       C_6'Access, C_7'Access, C_8'Access, C_9'Access, C_10'Access, C_11'Access,
       C_12'Access, C_13'Access, C_14'Access, C_15'Access, C_16'Access, C_17'Access,
-      C_18'Access, C_19'Access, C_20'Access, C_21'Access, C_22'Access);
+      C_18'Access, C_19'Access, C_20'Access, C_21'Access, C_22'Access, C_23'Access,
+      C_24'Access);
 
    function Get_Content (Name : String) return access constant String is
       H : constant Natural := Hash (Name);

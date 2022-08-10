@@ -389,12 +389,19 @@ div.awa-title dd {
     text-align: center;
     border-left: 1px solid red;
 }
+.porion-graph-view {
+    float: left;
+}
+.porion-graph-title {
+    float: left;
+    width: 100%;
+    text-align: center;
+}
 .project-graph {
     float: left;
     width: 100%;
     padding-left: 1%;
     padding-right: 1%;
-    background: #424342;
 }
 #project-lang-graph, #graph-month, #graph-total {
     float: left;
@@ -408,10 +415,6 @@ div.awa-title dd {
     height: 150px;
     padding-left: 1em;
     padding-right: 1em;
-}
-
-.flot-y-axis {
-  fill: white;
 }
 
 .project-recipe-list {
@@ -458,4 +461,9 @@ div.awa-title dd {
 /* Fix display if parent line-height is > 1em */
 .asf-progress-bar {
     line-height: 1em;
+}
+#project-tests {
+    float: left;
+    width: 640px;
+    height: 300px;
 }

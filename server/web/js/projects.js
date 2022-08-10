@@ -49,6 +49,83 @@ var Porion;
         return BarGraph;
     }());
     Porion.BarGraph = BarGraph;
+    var TestChart = /** @class */ (function () {
+        function TestChart(options, project) {
+            this.graphContainer = document.createElement('div');
+            this.project = "";
+            this.container = document.getElementById(options.container);
+            this.container.appendChild(this.graphContainer);
+            this.project = project;
+            this.getData(null);
+        }
+        TestChart.prototype.getData = function (event) {
+            var _this = this;
+            if (this.project) {
+                var project = this.project;
+                var xmlhttp_1 = new XMLHttpRequest();
+                xmlhttp_1.onload = function (evt) {
+                    if (xmlhttp_1.status == 200 && _this.container) {
+                        _this.updateData(JSON.parse(xmlhttp_1.response));
+                    }
+                };
+                xmlhttp_1.open("GET", "/porion/api/v1/projects/" + project + "/tests");
+                xmlhttp_1.send();
+            }
+        };
+        TestChart.prototype.updateData = function (content) {
+            var pass = new Array();
+            var fail = new Array();
+            var timeout = new Array();
+            var duration = new Array();
+            var first_build = 10000;
+            var last_build = 0;
+            for (var _i = 0, _a = content.tests; _i < _a.length; _i++) {
+                var test = _a[_i];
+                if (test.build_status == "BUILD_PASS") {
+                    if (test.build_number < first_build) {
+                        first_build = test.build_number;
+                    }
+                    if (test.build_number > last_build) {
+                        last_build = test.build_number;
+                    }
+                    timeout.push([test.build_number, test.timeout_count]);
+                    fail.push([test.build_number, test.fail_count + test.timeout_count]);
+                    pass.push([test.build_number, test.pass_count + test.fail_count + test.timeout_count]);
+                    duration.push([test.build_number, test.test_duration]);
+                }
+            }
+            $.plot($(this.container), [timeout, fail, pass], {
+                colors: ["red", "green", "blue"],
+                series: {
+                    lines: {
+                        show: true,
+                        fill: true
+                    },
+                    points: {
+                        show: true
+                    },
+                    clickable: true,
+                    hoverable: true
+                },
+                grid: {
+                    hoverable: true,
+                    clickable: true
+                },
+                xaxis: {
+                    color: "#993D00",
+                    show: true
+                },
+                yaxis: {
+                    show: true
+                },
+                legend: {
+                    show: false
+                }
+            });
+        };
+        return TestChart;
+    }());
+    Porion.TestChart = TestChart;
     /*    export class PieChart {
     
             constructor(container: string, legend: string, series: jquery.flot.dataSeries[], ticks: any) {

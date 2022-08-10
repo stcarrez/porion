@@ -48,6 +48,105 @@ namespace Porion {
         }
     }
 
+    export interface BuildTestInfo {
+       build_id: number,
+       build_number: number,
+       build_date: string,
+       build_status: string,
+       pass_count: number,
+       fail_count: number,
+       timeout_count : number,
+       test_duration: number
+    }
+    export interface BuildTests {
+       project_id: string,
+       tests: BuildTestInfo[]
+    }
+    export interface Options {
+        container: string,
+        btnShowAll: string,
+        btnShowInfo: string,
+        btnShowWarning: string,
+	countAll: string,
+	countInfo: string,
+	countWarn: string
+    }
+    export class TestChart {
+        readonly graphContainer : HTMLDivElement = <HTMLDivElement>document.createElement('div');
+        container  : HTMLElement | null;
+        project    : string = "";
+
+        constructor(options : Options, project: string) {
+            this.container = document.getElementById(options.container);
+            this.container.appendChild(this.graphContainer);
+	    this.project = project;
+            this.getData(null)
+	}
+        getData(event : Event) {
+            if (this.project) {
+                const project : string = this.project;
+                const xmlhttp : XMLHttpRequest = new XMLHttpRequest();
+                
+                xmlhttp.onload = evt => {
+                    if (xmlhttp.status == 200 && this.container) {
+                        this.updateData(JSON.parse(xmlhttp.response));
+                    }
+                };
+                xmlhttp.open("GET", "/porion/api/v1/projects/" + project + "/tests");
+                xmlhttp.send();
+            }
+        }
+	updateData(content : BuildTests) {
+	   var pass : number[][] = new Array();
+	   var fail : number[][] = new Array();
+	   var timeout : number[][] = new Array();
+	   var duration : number[][] = new Array();
+	   var first_build : number = 10000;
+	   var last_build : number = 0;
+           for (var test of content.tests) {
+	      if (test.build_status == "BUILD_PASS") {
+	      	 if (test.build_number < first_build) {
+	            first_build = test.build_number;
+	      	 }
+	      	 if (test.build_number > last_build) {
+                    last_build = test.build_number;
+	      	 }
+	      	 timeout.push([test.build_number, test.timeout_count]);
+	      	 fail.push([test.build_number, test.fail_count + test.timeout_count]);
+	      	 pass.push([test.build_number, test.pass_count + test.fail_count + test.timeout_count]);
+	      	 duration.push([test.build_number, test.test_duration]);
+	      }
+	   }
+           $.plot($(this.container), [ timeout, fail, pass ], {
+                colors: [ "red", "green", "blue"],
+                series: {
+                    lines: {
+                        show: true,
+			fill: true
+                    },
+		    points: {
+		        show: true
+		    },
+		    clickable: true,
+		    hoverable: true
+                },
+		grid: {
+		   hoverable: true,
+		   clickable: true
+		},
+                xaxis: {
+                    color: "#993D00",
+		    show: true
+                },
+		yaxis: {
+		    show: true
+		},
+                legend: {
+                    show: false
+                }
+            });
+	}
+    }
 /*    export class PieChart {
 
         constructor(container: string, legend: string, series: jquery.flot.dataSeries[], ticks: any) {

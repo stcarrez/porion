@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-reports -- Report generation
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -77,24 +77,29 @@ package body Porion.Reports is
    --  Format a duration expressed in milliseconds.
    --  ------------------------------
    function Format (Value : in Millisecond_Type) return String is
-      Ms   : constant Natural := Natural (Value mod 1000);
-      Ms2  : constant Natural := Ms mod 100;
-      Ms3  : constant Natural := Ms2 mod 10;
       Secs : constant Natural := Natural (Value / 1000);
-      Mins : Natural;
    begin
-      if Ms2 = 0 then
-         return Util.Strings.Image (Secs) & "." & To_Digit (Ms / 100);
-      elsif Ms3 = 0 then
-         return Util.Strings.Image (Secs) & "." & To_Digit (Ms / 100) & To_Digit (Ms2 / 10);
-      elsif Secs < 60 then
-         return Util.Strings.Image (Secs) & "." & To_Digit (Ms / 100) & To_Digit (Ms2 / 10)
-                   & To_Digit (Ms3);
+      if Secs > 60 then
+         declare
+            Ss : constant Natural := Secs mod 60;
+         begin
+            return Util.Strings.Image (Secs / 60) & ":" & To_Digit (Ss / 10) & To_Digit (Ss mod 10);
+         end;
       else
-         Mins := Secs / 60;
-         return Util.Strings.Image (Mins) & ":"
-                   & Util.Strings.Image (Secs mod 60)
-                   & "." & To_Digit (Ms / 100);
+         declare
+            Ms   : constant Natural := Natural (Value mod 1000);
+            Ms2  : constant Natural := Ms mod 100;
+            Ms3  : constant Natural := Ms2 mod 10;
+         begin
+            if Ms2 = 0 then
+               return Util.Strings.Image (Secs) & "." & To_Digit (Ms / 100);
+            elsif Ms3 = 0 then
+               return Util.Strings.Image (Secs) & "." & To_Digit (Ms / 100) & To_Digit (Ms2 / 10);
+            else
+               return Util.Strings.Image (Secs) & "." & To_Digit (Ms / 100) & To_Digit (Ms2 / 10)
+                           & To_Digit (Ms3);
+            end if;
+         end;
       end if;
    end Format;
 

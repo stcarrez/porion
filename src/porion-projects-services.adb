@@ -307,7 +307,7 @@ package body Porion.Projects.Services is
       Log.Info ("Checking changes in {0}", Name);
 
       Executor.Create_Logger (Log_Dir, "source.log");
-      Executor.Set_Step (Builds.STEP_CHECKOUT, Builds.EXEC_NO_ERROR);
+      Executor.Set_Step (Builds.STEP_CHECKOUT, Builds.EXEC_NO_ERROR, ADO.NO_IDENTIFIER);
 
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
 

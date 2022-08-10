@@ -24,6 +24,7 @@ with Porion.Nodes.Services;
 package body Porion.Executors is
 
    use type Porion.Nodes.Controller_Access;
+   use type ADO.Identifier;
 
    Glog : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Executors");
 
@@ -89,10 +90,14 @@ package body Porion.Executors is
    --  ------------------------------
    procedure Set_Step (Executor : in out Executor_Type;
                        Step     : in Porion.Builds.Step_Type;
-                       Mode     : in Porion.Builds.Execution_Type) is
+                       Mode     : in Porion.Builds.Execution_Type;
+                       Ident    : in ADO.Identifier) is
    begin
       Executor.Step := Step;
       Executor.Mode := Mode;
+      if Ident /= ADO.NO_IDENTIFIER then
+         Executor.Log (Logs.LOG_STEP_INFO, Ident'Image);
+      end if;
    end Set_Step;
 
    --  ------------------------------

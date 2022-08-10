@@ -342,4 +342,37 @@ package body Porion.Builds.Rest is
       Stream.End_Document;
    end Get_Project_Schields_Status;
 
+   procedure Get_Project_Tests
+     (Req     : in out Swagger.Servers.Request'Class;
+      Reply   : in out Swagger.Servers.Response'Class;
+      Stream  : in out Swagger.Servers.Output_Stream'Class;
+      Context : in out Porion.Services.Context_Type) is
+      Query   : ADO.Queries.Context;
+      List    : Porion.Queries.Build_Test_Info_Vector;
+   begin
+      Query.Bind_Param ("project_id", Context.Project.Get_Id);
+      Query.Set_Query (Porion.Queries.Query_Stat_Tests);
+      Porion.Queries.List (List, Context.DB, Query);
+
+      Stream.Start_Document;
+      Stream.Start_Entity ("");
+      Stream.Write_Long_Entity ("project_id", Long_Long_Integer (Context.Project.Get_Id));
+      Stream.Start_Array ("tests");
+      for Test_Info of List loop
+         Stream.Start_Entity ("test");
+         Stream.Write_Long_Entity ("build_id", Long_Long_Integer (Test_Info.Build_Id));
+         Stream.Write_Entity ("build_number", Test_Info.Build_Number);
+         Stream.Write_Entity ("build_date", Test_Info.Build_Date);
+         Stream.Write_Entity ("build_status", Test_Info.Build_Status'Image);
+         Stream.Write_Entity ("pass_count", Test_Info.Pass_Count);
+         Stream.Write_Entity ("fail_count", Test_Info.Fail_Count);
+         Stream.Write_Entity ("timeout_count", Test_Info.Timeout_Count);
+         Stream.Write_Entity ("test_duration", Test_Info.Test_Duration);
+         Stream.End_Entity ("test");
+      end loop;
+      Stream.End_Array ("tests");
+      Stream.End_Entity ("");
+      Stream.End_Document;
+   end Get_Project_Tests;
+
 end Porion.Builds.Rest;

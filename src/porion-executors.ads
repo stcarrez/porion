@@ -23,6 +23,7 @@ with Util.Strings.Vectors;
 with Util.Strings.Sets;
 with Util.Strings.Maps;
 with Util.Streams.Buffered;
+with ADO;
 with Porion.Logs;
 with Porion.Builds;
 with Porion.Nodes.Models;
@@ -75,7 +76,8 @@ package Porion.Executors is
    --  Set the current execution step when building a project.
    procedure Set_Step (Executor : in out Executor_Type;
                        Step     : in Porion.Builds.Step_Type;
-                       Mode     : in Porion.Builds.Execution_Type);
+                       Mode     : in Porion.Builds.Execution_Type;
+                       Ident    : in ADO.Identifier);
 
    --  Setup the executor to build with the given build node.
    procedure Set_Build_Node (Executor : in out Executor_Type;

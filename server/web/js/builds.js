@@ -28,6 +28,9 @@ var Porion;
             this.showAll = document.getElementById(options.btnShowAll);
             this.showInfo = document.getElementById(options.btnShowInfo);
             this.showWarn = document.getElementById(options.btnShowWarning);
+            this.countAll = document.getElementById(options.countAll);
+            this.countInfo = document.getElementById(options.countInfo);
+            this.countWarn = document.getElementById(options.countWarn);
             this.getBuildLogs(null);
             if (this.showAll) {
                 this.showAll.addEventListener("click", function (event) {
@@ -60,19 +63,42 @@ var Porion;
             }
         };
         BuildLog.prototype.updateResult = function (content) {
+            var warnCount = 0;
+            var infoCount = 0;
+            var allCount = 0;
             for (var _i = 0, content_1 = content; _i < content_1.length; _i++) {
-                var log = content_1[_i];
-                var div = document.createElement("div");
-                var line = document.createElement("div");
-                var content_2 = document.createElement("div");
-                div.className = 'log-line log-level-' + log.level;
-                line.className = 'log-line-number';
-                line.textContent = log.number.toString();
-                content_2.className = 'log-content';
-                content_2.textContent = log.content;
-                div.appendChild(line);
-                div.appendChild(content_2);
-                this.logContainer.appendChild(div);
+                var step = content_1[_i];
+                var stepWarn = step.counts.warning + step.counts.error + step.counts.fatal;
+                var infoCount = step.counts.info + step.counts.unkown;
+                warnCount = warnCount + stepWarn;
+                infoCount = infoCount + infoCount + stepWarn;
+                allCount = allCount + infoCount + stepWarn + step.counts.debug + step.counts.debug + step.counts.context;
+                var stepDiv = document.createElement("div");
+                stepDiv.className = 'log-step';
+                for (var _a = 0, _b = step.logs; _a < _b.length; _a++) {
+                    var log = _b[_a];
+                    var div = document.createElement("div");
+                    var line = document.createElement("div");
+                    var content_2 = document.createElement("div");
+                    div.className = 'log-line log-level-' + log.level;
+                    line.className = 'log-line-number';
+                    line.textContent = log.number.toString();
+                    content_2.className = 'log-content';
+                    content_2.textContent = log.content;
+                    div.appendChild(line);
+                    div.appendChild(content_2);
+                    stepDiv.appendChild(div);
+                }
+                this.logContainer.appendChild(stepDiv);
+            }
+            if (this.countAll) {
+                this.countAll.textContent = String(allCount);
+            }
+            if (this.countInfo) {
+                this.countInfo.textContent = String(infoCount);
+            }
+            if (this.countWarn) {
+                this.countWarn.textContent = String(warnCount);
             }
         };
         BuildLog.prototype.setMode = function (event, mode) {

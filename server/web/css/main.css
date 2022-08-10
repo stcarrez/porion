@@ -326,6 +326,10 @@ div.awa-title dd {
     padding-right: 1em;
     border-radius: 0.5em;
 }
+.log-step {
+    float: left;
+    width: 100%;
+}
 .log-line, .log-line-number, .log-content {
     float: left;
 }

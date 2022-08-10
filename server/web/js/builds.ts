@@ -21,11 +21,29 @@ namespace Porion {
         level  : string,
         content: string
     }
+    export interface LogCounters {
+    	trace: number,
+	debug: number,
+	info: number,
+	warning: number,
+	error: number,
+	fatal: number,
+	unkown: number,
+	context: number
+    }
+    export interface LogsStep {
+    	step: number,
+	logs: LogLine[],
+	counts: LogCounters
+    }
     export interface Options {
         container: string,
         btnShowAll: string,
         btnShowInfo: string,
-        btnShowWarning: string
+        btnShowWarning: string,
+	countAll: string,
+	countInfo: string,
+	countWarn: string
     }
     export class BuildLog {
         readonly logContainer : HTMLDivElement = <HTMLDivElement>document.createElement('div');
@@ -33,6 +51,9 @@ namespace Porion {
         showAll   : HTMLElement | null;
         showInfo  : HTMLElement | null;
         showWarn  : HTMLElement | null;
+	countAll  : HTMLElement | null;
+	countInfo : HTMLElement | null;
+	countWarn : HTMLElement | null;
         build     : string = "";
 
         constructor(options : Options, build: string) {
@@ -42,6 +63,9 @@ namespace Porion {
             this.showAll = document.getElementById(options.btnShowAll);
             this.showInfo = document.getElementById(options.btnShowInfo);
             this.showWarn = document.getElementById(options.btnShowWarning);
+            this.countAll = document.getElementById(options.countAll);
+            this.countInfo = document.getElementById(options.countInfo);
+            this.countWarn = document.getElementById(options.countWarn);
             this.getBuildLogs(null);
             if (this.showAll) {
                 this.showAll.addEventListener("click", (event: Event) => {
@@ -73,21 +97,43 @@ namespace Porion {
                 xmlhttp.send();
             }
         }
-        updateResult(content : LogLine[]) {
-            for (var log of content) {
-                let div = document.createElement("div");
-                let line = document.createElement("div");
-                let content = document.createElement("div");
-                div.className = 'log-line log-level-' + log.level;
-                line.className = 'log-line-number';
-                line.textContent = log.number.toString();
-                content.className = 'log-content';
-                content.textContent = log.content;
-                div.appendChild(line);
-                div.appendChild(content);
-                
-                this.logContainer.appendChild(div);
-            }
+        updateResult(content : LogsStep[]) {
+	    var warnCount : number = 0;
+	    var infoCount : number = 0;
+	    var allCount : number = 0;
+	    for (var step of content) {
+	    	var stepWarn : number = step.counts.warning + step.counts.error + step.counts.fatal;
+		var infoCount : number = step.counts.info + step.counts.unkown;
+	        warnCount = warnCount + stepWarn;
+		infoCount = infoCount + infoCount + stepWarn;
+		allCount = allCount + infoCount + stepWarn + step.counts.debug + step.counts.debug + step.counts.context;
+
+	    	let stepDiv = document.createElement("div");
+		stepDiv.className = 'log-step'
+            	for (var log of step.logs) {
+                    let div = document.createElement("div");
+                    let line = document.createElement("div");
+                    let content = document.createElement("div");
+                    div.className = 'log-line log-level-' + log.level;
+                    line.className = 'log-line-number';
+                    line.textContent = log.number.toString();
+                    content.className = 'log-content';
+                    content.textContent = log.content;
+                    div.appendChild(line);
+                    div.appendChild(content);
+                    stepDiv.appendChild(div);
+            	}
+		this.logContainer.appendChild(stepDiv);
+	    }
+	    if (this.countAll) {
+	       this.countAll.textContent = String(allCount);
+	    }
+	    if (this.countInfo) {
+	       this.countInfo.textContent = String(infoCount);
+	    }
+	    if (this.countWarn) {
+	       this.countWarn.textContent = String(warnCount);
+	    }
         }
         setMode(event : Event, mode : string) {
             this.container.classList.remove('build-show-all', 'build-show-info', 'build-show-warning');

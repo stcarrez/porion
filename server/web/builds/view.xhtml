@@ -20,12 +20,15 @@
           <ul>
             <li id='build-log-show-all'>
               Show all
+	      <span id='build-log-all-count'/>
             </li>
             <li id='build-log-show-info'>
               Info
+	      <span id='build-log-info-count'/>
             </li>
             <li id='build-log-show-warning'>
               Warnings
+	      <span id='build-log-warn-count'/>
             </li>
           </ul>
         </div>
@@ -33,7 +36,8 @@
     </div>
     <u:script>
     $(function() {
-    new Porion.BuildLog({container: 'build-log', btnShowAll: 'build-log-show-all', btnShowInfo: 'build-log-show-info', btnShowWarning: 'build-log-show-warning'}, '#{build.ident}');
+    new Porion.BuildLog({container: 'build-log', btnShowAll: 'build-log-show-all', btnShowInfo: 'build-log-show-info', btnShowWarning: 'build-log-show-warning',
+    countAll: 'build-log-all-count', countInfo: 'build-log-info-count', countWarn: 'build-log-warn-count'}, '#{build.ident}');
 });
     </u:script>
   </ui:define>

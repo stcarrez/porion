@@ -55,6 +55,7 @@
 
     <h:list var="recipe" value="#{project.recipes}">
       <div class='project-recipe #{recipe.recipe_status}'>
+	<div class='recipe-status'/>
         <div class='recipe-name'>
           #{recipe.name}
         </div>
@@ -90,7 +91,7 @@
           </h:outputText>
         </div>
         <div class='recipe-build-count'>
-          <div class='dashboard-value'>
+          <div class='dashboard-value build-progress'>
             <w:progress value="#{recipe.build_pass_count}" maxValue="#{recipe.build_pass_count + recipe.build_fail_count}" />
           </div>
         </div>

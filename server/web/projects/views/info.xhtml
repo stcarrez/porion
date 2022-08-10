@@ -74,7 +74,7 @@
             <f:converter converterId="percentConverter"/>
           </h:outputText> %
         </div>
-        <div class='dashboard-value'>
+        <div class='dashboard-progress'>
           <w:progress value="#{project.project.build_progress}" maxValue="1000" />
         </div>
       </li>
@@ -88,7 +88,7 @@
             <f:converter converterId="percentConverter"/>
           </h:outputText> %
         </div>
-        <div class='dashboard-value'>
+        <div class='dashboard-progress build-progress'>
           <w:progress value="#{project.project.build_rate}" maxValue="1000" />
         </div>
       </li>
@@ -102,7 +102,7 @@
             <f:converter converterId="percentConverter"/>
           </h:outputText> %
         </div>
-        <div class='dashboard-value'>
+        <div class='dashboard-progress'>
           <w:progress value="#{project.project.pass_rate}" maxValue="1000" />
         </div>
       </li>
@@ -117,7 +117,7 @@
             <f:converter converterId="percentConverter"/>
           </h:outputText> %
         </div>
-        <div class='dashboard-value'>
+        <div class='dashboard-progress'>
           <w:progress value="#{project.metrics.lines.sum_value}" maxValue="#{project.metrics.lines.count * 1000}" />
         </div>
       </li>
@@ -132,7 +132,7 @@
             <f:converter converterId="percentConverter"/>
           </h:outputText> %
         </div>
-        <div class='dashboard-value'>
+        <div class='dashboard-progress'>
           <w:progress value="#{project.metrics.functions.sum_value}" direction='vertical' maxValue="#{project.metrics.functions.count * 1000}" />
         </div>
       </li>

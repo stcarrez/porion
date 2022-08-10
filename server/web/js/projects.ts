@@ -48,7 +48,7 @@ namespace Porion {
         }
     }
 
-    export class PieChart {
+/*    export class PieChart {
 
         constructor(container: string, legend: string, series: jquery.flot.dataSeries[], ticks: any) {
             var div : HTMLElement = document.getElementById(container);
@@ -65,5 +65,5 @@ namespace Porion {
                 }
             });
         }
-    }
+    }*/
 }

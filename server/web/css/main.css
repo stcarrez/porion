@@ -150,7 +150,6 @@ div.awa-title dd {
 .project-dashboard .dashboard-value {
     float: left;
     width: 100%;
-    text-align: center;
 }
 .dashboard-cloc {
     overflow: hidden;
@@ -183,7 +182,9 @@ div.awa-title dd {
     margin-bottom: 0.5em;
     text-align: left;
 }
-
+.build-progress .asf-progress-bar {
+    background: red;
+}
 /* Build info */
 .build-info {
     float: left;
@@ -239,6 +240,9 @@ div.awa-title dd {
 .build-info-line .dashboard-title, .build-info-line .dashboard-value {
     float: left;
     width: 50%;
+}
+.build-info-line .dashboard-value {
+    text-align: right;
 }
 .build-info-line .dashboard-progress {
     float: left;
@@ -416,6 +420,7 @@ div.awa-title dd {
 .project-recipe, .project-recipe-header {
     float: left;
     width: 100%;
+    line-height: 1.5em;
 }
 .project-recipe-header {
     font-weight: bold;
@@ -425,8 +430,28 @@ div.awa-title dd {
 .project-recipe-header > div, .project-recipe > div {
     height: 2em;
     float: left;
+    padding: 0.25em;
 }
 .recipe-name, .recipe-node, .recipe-build-count, .recipe-build-number, .recipe-test-pass, .recipe-test-fail {
     float: left;
     width: 10%;
+}
+.project-recipe .recipe-status {
+    border-radius: 1em;
+    width: 1.8em;
+    height: 1.8em;
+    background-color: red;
+    display: inline-block;
+    margin-top: 0.1em;
+    margin-bottom: 0.1em;
+}
+.CONFIG_BUILD_PASS .recipe-status {
+    background-color: #00cc00;
+}
+.CONFIG_BUILD_REQUIRED .recipe-status {
+    background-color: #0000cc;
+}
+/* Fix display if parent line-height is > 1em */
+.asf-progress-bar {
+    line-height: 1em;
 }

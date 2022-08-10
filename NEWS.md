@@ -2,6 +2,7 @@ Version 0.10.0 - Under development
   - Update presentation of build results in the Web server
   - Update collecting test results from a remote host through ssh
   - Update to use AWA 2.4.0
+  - Add graph in project view to show the evolution of unit tests over the builds
 
 Version 0.9.0  - Jul 2022
   - Fix cleaning of build directories when it contains socket files

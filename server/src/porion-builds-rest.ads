@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-builds-beans -- Beans for module builds
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,6 +39,12 @@ package Porion.Builds.Rest is
       Stream  : in out Swagger.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type);
 
+   procedure Get_Project_Tests
+     (Req     : in out Swagger.Servers.Request'Class;
+      Reply   : in out Swagger.Servers.Response'Class;
+      Stream  : in out Swagger.Servers.Output_Stream'Class;
+      Context : in out Porion.Services.Context_Type);
+
    package API_Get_Build_Log is
      new Porion.Projects.Operation
         (Handler => Get_Build_Log,
@@ -56,5 +62,11 @@ package Porion.Builds.Rest is
         (Handler => Get_Project_Schields_Status,
          Method  => Swagger.Servers.GET,
          URI     => "/api/v1/projects/{project}/badges/{mode}");
+
+   package API_Get_Project_Tests is
+     new Porion.Projects.Operation
+        (Handler => Get_Project_Tests,
+         Method  => Swagger.Servers.GET,
+         URI     => "/api/v1/projects/{project}/tests");
 
 end Porion.Builds.Rest;

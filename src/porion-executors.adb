@@ -96,7 +96,7 @@ package body Porion.Executors is
       Executor.Step := Step;
       Executor.Mode := Mode;
       if Ident /= ADO.NO_IDENTIFIER then
-         Executor.Log (Logs.LOG_STEP_INFO, Ident'Image);
+         Executor.Logger.Write (Logs.LOG_STEP_INFO, Ident'Image);
       end if;
    end Set_Step;
 

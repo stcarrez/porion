@@ -204,7 +204,7 @@ package body Porion.Builds.Services is
 
       Executor.Set_Build_Node (Service.Build_Node, Env);
 
-      Executor.Set_Step (Builds.STEP_CHECKOUT, Builds.EXEC_NO_ERROR);
+      Executor.Set_Step (Builds.STEP_CHECKOUT, Builds.EXEC_NO_ERROR, ADO.NO_IDENTIFIER);
       if not Executor.Is_Dry_Run then
          Executor.Create_Directory (Path, False);
       end if;
@@ -229,7 +229,7 @@ package body Porion.Builds.Services is
                   Exec_Step.Set_Recipe_Step (Step.Step);
                   Exec_Step.Save (Service.DB);
                end if;
-               Executor.Set_Step (Step.Step.Get_Step, Step.Step.Get_Execution);
+               Executor.Set_Step (Step.Step.Get_Step, Step.Step.Get_Execution, Step.Step.Get_Id);
                Executor.Set_Status (0);
                Builders.Run (Step.Step.Get_Builder, Service.DB, Step.Config,
                              Service.Build, Path, Executor);

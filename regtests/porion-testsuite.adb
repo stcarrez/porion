@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-testsuite -- Testsuite for porion
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,6 +30,7 @@ with Porion.Configs;
 with Porion.Resources.Queries;
 with Porion.Resources.Schema;
 with Porion.Tests;
+with Porion.Reports.Tests;
 with Porion.Nodes.Tests;
 with Porion.Projects.Tests;
 with Porion.Sources.Tests;
@@ -98,6 +99,7 @@ package body Porion.Testsuite is
       Porion.Sources.Tests.Add_Tests (Tests'Access);
       Porion.Nodes.Tests.Add_Tests (Tests'Access);
       Porion.Projects.Tests.Add_Tests (Tests'Access);
+      Porion.Reports.Tests.Add_Tests (Tests'Access);
       return Tests'Access;
    end Suite;
 

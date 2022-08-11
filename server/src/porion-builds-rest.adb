@@ -55,6 +55,7 @@ package body Porion.Builds.Rest is
 
       use Porion.Logs.Analysis;
       use type ADO.Identifier;
+      procedure Finish_Log_Stats;
 
       Rules  : constant String := Context.Recipe.Get_Filter_Rules;
       Ctx    : Porion.Logs.Analysis.Analyser_Type;
@@ -347,6 +348,8 @@ package body Porion.Builds.Rest is
       Reply   : in out Swagger.Servers.Response'Class;
       Stream  : in out Swagger.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type) is
+      pragma Unreferenced (Req, Reply);
+
       Query   : ADO.Queries.Context;
       List    : Porion.Queries.Build_Test_Info_Vector;
    begin
@@ -374,5 +377,52 @@ package body Porion.Builds.Rest is
       Stream.End_Entity ("");
       Stream.End_Document;
    end Get_Project_Tests;
+
+   procedure Get_Project_Coverage
+     (Req     : in out Swagger.Servers.Request'Class;
+      Reply   : in out Swagger.Servers.Response'Class;
+      Stream  : in out Swagger.Servers.Output_Stream'Class;
+      Context : in out Porion.Services.Context_Type) is
+      pragma Unreferenced (Req, Reply);
+
+      Query   : ADO.Queries.Context;
+      List    : Porion.Queries.Build_Metric_Info_Vector;
+      Current : Integer := -1;
+   begin
+      Query.Bind_Param ("project_id", Context.Project.Get_Id);
+      Query.Bind_Param ("metric",
+                        Integer (Metrics.Metric_Type'Enum_Rep (Metrics.METRIC_COVERAGE)));
+      Query.Set_Query (Porion.Queries.Query_Report_Build_Metrics);
+      Porion.Queries.List (List, Context.DB, Query);
+
+      Stream.Start_Document;
+      Stream.Start_Entity ("");
+      Stream.Write_Long_Entity ("project_id", Long_Long_Integer (Context.Project.Get_Id));
+      Stream.Start_Array ("metrics");
+      for Metric_Info of List loop
+         if Metric_Info.Build_Number /= Current then
+            if Current > 0 then
+               Stream.End_Entity ("coverage");
+            end if;
+            Current := Metric_Info.Build_Number;
+            Stream.Start_Entity ("coverage");
+            Stream.Write_Long_Entity ("build_id", Long_Long_Integer (Metric_Info.Build_Id));
+            Stream.Write_Entity ("build_number", Current);
+            Stream.Write_Entity ("build_date", Metric_Info.Build_Date);
+            Stream.Write_Entity ("build_status", Metric_Info.Build_Status'Image);
+         end if;
+         if Metric_Info.Metric = "lines" then
+            Stream.Write_Entity ("lines", Metric_Info.Value);
+         elsif Metric_Info.Metric = "functions" then
+            Stream.Write_Entity ("functions", Metric_Info.Value);
+         end if;
+      end loop;
+      if Current > 0 then
+         Stream.End_Entity ("coverage");
+      end if;
+      Stream.End_Array ("metrics");
+      Stream.End_Entity ("");
+      Stream.End_Document;
+   end Get_Project_Coverage;
 
 end Porion.Builds.Rest;

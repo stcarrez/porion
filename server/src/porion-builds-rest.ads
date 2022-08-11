@@ -45,6 +45,12 @@ package Porion.Builds.Rest is
       Stream  : in out Swagger.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type);
 
+   procedure Get_Project_Coverage
+     (Req     : in out Swagger.Servers.Request'Class;
+      Reply   : in out Swagger.Servers.Response'Class;
+      Stream  : in out Swagger.Servers.Output_Stream'Class;
+      Context : in out Porion.Services.Context_Type);
+
    package API_Get_Build_Log is
      new Porion.Projects.Operation
         (Handler => Get_Build_Log,
@@ -68,5 +74,11 @@ package Porion.Builds.Rest is
         (Handler => Get_Project_Tests,
          Method  => Swagger.Servers.GET,
          URI     => "/api/v1/projects/{project}/tests");
+
+   package API_Get_Project_Coverage is
+     new Porion.Projects.Operation
+        (Handler => Get_Project_Coverage,
+         Method  => Swagger.Servers.GET,
+         URI     => "/api/v1/projects/{project}/coverage");
 
 end Porion.Builds.Rest;

@@ -39,6 +39,7 @@
 	  INNER JOIN porion_build_metric as mb ON mb.build_id = build.id
 	  INNER JOIN porion_metric AS metric ON mb.metric_id = metric.id AND metric.metric = :metric
 	  WHERE build.project_id = :project_id
+	  ORDER BY build.number ASC
 	</sql>
     </query> 
 

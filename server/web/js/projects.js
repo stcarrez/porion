@@ -126,6 +126,99 @@ var Porion;
         return TestChart;
     }());
     Porion.TestChart = TestChart;
+    var CoverageChart = /** @class */ (function () {
+        function CoverageChart(options, project) {
+            this.graphContainer = document.createElement('div');
+            this.tooltipContainer = document.createElement('div');
+            this.project = "";
+            this.container = document.getElementById(options.container);
+            this.container.appendChild(this.graphContainer);
+            this.project = project;
+            this.tooltipContainer.className = 'graph-tooltip';
+            document.body.appendChild(this.tooltipContainer);
+            this.getData(null);
+        }
+        CoverageChart.prototype.getData = function (event) {
+            var _this = this;
+            if (this.project) {
+                var project = this.project;
+                var xmlhttp_2 = new XMLHttpRequest();
+                xmlhttp_2.onload = function (evt) {
+                    if (xmlhttp_2.status == 200 && _this.container) {
+                        _this.updateData(JSON.parse(xmlhttp_2.response));
+                    }
+                };
+                xmlhttp_2.open("GET", "/porion/api/v1/projects/" + project + "/coverage");
+                xmlhttp_2.send();
+            }
+        };
+        CoverageChart.prototype.updateData = function (content) {
+            var lines = new Array();
+            var functions = new Array();
+            var first_build = 10000;
+            var last_build = 0;
+            for (var _i = 0, _a = content.metrics; _i < _a.length; _i++) {
+                var build = _a[_i];
+                if (build.build_status == "BUILD_PASS") {
+                    if (build.build_number < first_build) {
+                        first_build = build.build_number;
+                    }
+                    if (build.build_number > last_build) {
+                        last_build = build.build_number;
+                    }
+                    lines.push([build.build_number, build.lines / 10.0]);
+                    functions.push([build.build_number, build.functions / 10.0]);
+                }
+            }
+            $.plot($(this.container), [lines, functions], {
+                colors: ["green", "blue"],
+                series: {
+                    lines: {
+                        show: true,
+                        fill: false
+                    },
+                    points: {
+                        show: true
+                    },
+                    clickable: true,
+                    hoverable: true
+                },
+                grid: {
+                    hoverable: true,
+                    clickable: true
+                },
+                xaxis: {
+                    color: "#993D00",
+                    show: true
+                },
+                yaxis: {
+                    show: true
+                },
+                legend: {
+                    show: true,
+                    margin: -200,
+                    backgroundColor: "white",
+                    backgroundOpacity: 0.5
+                }
+            });
+            var t = this;
+            $(this.container).bind("plothover", function (event, pos, item) {
+                if (!pos.x || !pos.y) {
+                    return;
+                }
+                if (item) {
+                    var build_number = item.datapoint[0];
+                    var cover = item.datapoint[1];
+                    $(t.tooltipContainer).html("Build " + build_number + " Coverage: " + cover).css({ top: item.pageY + 5, left: item.pageX + 5 }).fadeIn(200);
+                }
+                else {
+                    $(t.tooltipContainer).stop().hide();
+                }
+            });
+        };
+        return CoverageChart;
+    }());
+    Porion.CoverageChart = CoverageChart;
     /*    export class PieChart {
     
             constructor(container: string, legend: string, series: jquery.flot.dataSeries[], ticks: any) {

@@ -389,10 +389,10 @@ div.awa-title dd {
     text-align: center;
     border-left: 1px solid red;
 }
-.porion-graph-view {
+.project-graph-view {
     float: left;
 }
-.porion-graph-title {
+.project-graph-title {
     float: left;
     width: 100%;
     text-align: center;
@@ -462,8 +462,19 @@ div.awa-title dd {
 .asf-progress-bar {
     line-height: 1em;
 }
-#project-tests {
+#project-tests, #project-coverage {
     float: left;
-    width: 640px;
-    height: 300px;
+    width: 340px;
+    height: 200px;
+}
+.legendLayer {
+    background: white;
+}
+.graph-tooltip {
+    position: absolute;
+    display: none;
+    border: 1px solid #fdd;
+    padding: 2px;
+    background-color: #fee;
+    opacity: 0.80;
 }

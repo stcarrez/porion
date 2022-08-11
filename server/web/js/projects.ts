@@ -62,6 +62,20 @@ namespace Porion {
        project_id: string,
        tests: BuildTestInfo[]
     }
+
+    export interface BuildCoverageInfo {
+       build_id: number,
+       build_number: number,
+       build_date: string,
+       build_status: string,
+       lines: number,
+       functions: number
+    }
+    export interface BuildCoverage {
+       project_id: string,
+       metrics: BuildCoverageInfo[]
+    }
+
     export interface Options {
         container: string,
         btnShowAll: string,
@@ -145,6 +159,98 @@ namespace Porion {
                     show: false
                 }
             });
+	}
+    }
+
+    export class CoverageChart {
+        readonly graphContainer : HTMLDivElement = <HTMLDivElement>document.createElement('div');
+        readonly tooltipContainer : HTMLDivElement = <HTMLDivElement>document.createElement('div');
+        container  : HTMLElement | null;
+        project    : string = "";
+
+        constructor(options : Options, project: string) {
+            this.container = document.getElementById(options.container);
+            this.container.appendChild(this.graphContainer);
+	    this.project = project;
+	    this.tooltipContainer.className = 'graph-tooltip';
+	    document.body.appendChild(this.tooltipContainer);
+            this.getData(null)
+	}
+        getData(event : Event) {
+            if (this.project) {
+                const project : string = this.project;
+                const xmlhttp : XMLHttpRequest = new XMLHttpRequest();
+                
+                xmlhttp.onload = evt => {
+                    if (xmlhttp.status == 200 && this.container) {
+                        this.updateData(JSON.parse(xmlhttp.response));
+                    }
+                };
+                xmlhttp.open("GET", "/porion/api/v1/projects/" + project + "/coverage");
+                xmlhttp.send();
+            }
+        }
+	updateData(content : BuildCoverage) {
+	   var lines : number[][] = new Array();
+	   var functions : number[][] = new Array();
+	   var first_build : number = 10000;
+	   var last_build : number = 0;
+           for (var build of content.metrics) {
+	      if (build.build_status == "BUILD_PASS") {
+	      	 if (build.build_number < first_build) {
+	            first_build = build.build_number;
+	      	 }
+	      	 if (build.build_number > last_build) {
+                    last_build = build.build_number;
+	      	 }
+	      	 lines.push([build.build_number, build.lines / 10.0]);
+	      	 functions.push([build.build_number, build.functions / 10.0]);
+	      }
+	   }
+           $.plot($(this.container), [ lines, functions ], {
+                colors: [ "green", "blue"],
+                series: {
+                    lines: {
+                        show: true,
+			fill: false
+                    },
+		    points: {
+		        show: true
+		    },
+		    clickable: true,
+		    hoverable: true
+                },
+		grid: {
+		   hoverable: true,
+		   clickable: true
+		},
+                xaxis: {
+                    color: "#993D00",
+		    show: true
+                },
+		yaxis: {
+		    show: true
+		},
+                legend: {
+                    show: true,
+		    margin: -200,
+		    backgroundColor: "white",
+		    backgroundOpacity: 0.5
+                }
+            });
+	    var t = this;
+	    $(this.container).bind("plothover", function (event, pos, item) {
+	       if (!pos.x || !pos.y) {
+	          return;
+	       }
+	       if (item) {
+	          var build_number : number = item.datapoint[0];
+		  var cover : number = item.datapoint[1];
+	          $(t.tooltipContainer).html("Build " + build_number + " Coverage: " + cover).css({top: item.pageY+5, left: item.pageX+5}).fadeIn(200);
+	       } else {
+	          $(t.tooltipContainer).stop().hide();
+	       }
+	    });
 	}
     }
 /*    export class PieChart {

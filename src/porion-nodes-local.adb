@@ -204,16 +204,24 @@ package body Porion.Nodes.Local is
       Search  : Search_Type;
       Ent     : Ada.Directories.Directory_Entry_Type;
    begin
+      Log.Debug ("Scan directroy {0} for {1}", Path, Pattern);
+
       Start_Search (Search, Directory => Path,
                     Pattern => Pattern, Filter => Filter);
       while More_Entries (Search) loop
          Get_Next_Entry (Search, Ent);
          declare
+            Name      : constant String := Ada.Directories.Simple_Name (Ent);
             Full_Path : constant String := Ada.Directories.Full_Name (Ent);
          begin
-            List.Include (Full_Path);
+            if Name /= "." and Name /= ".." then
+               List.Include (Full_Path);
+            end if;
          end;
       end loop;
+
+      Log.Info ("Scanned directory {0} for {1} found {2} entries",
+                Path, Pattern, List.Length'Image);
    end Scan_Directory;
 
 end Porion.Nodes.Local;

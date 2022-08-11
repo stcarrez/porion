@@ -52,6 +52,7 @@
             INNER JOIN porion_test_run AS run ON run.group_id = rgrp.id
             INNER JOIN porion_test AS test ON run.test_id = test.id
             WHERE rgrp.build_id = :build_id
+	    ORDER BY grp.name, test.name
         </sql>
     </query>
 

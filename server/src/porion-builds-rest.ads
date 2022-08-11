@@ -27,6 +27,12 @@ package Porion.Builds.Rest is
       Stream  : in out Swagger.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type);
 
+   procedure Get_Build_Tests
+     (Req     : in out Swagger.Servers.Request'Class;
+      Reply   : in out Swagger.Servers.Response'Class;
+      Stream  : in out Swagger.Servers.Output_Stream'Class;
+      Context : in out Porion.Services.Context_Type);
+
    procedure Jenkins_Get_Last_Completed_Build
      (Req     : in out Swagger.Servers.Request'Class;
       Reply   : in out Swagger.Servers.Response'Class;
@@ -56,6 +62,12 @@ package Porion.Builds.Rest is
         (Handler => Get_Build_Log,
          Method  => Swagger.Servers.GET,
          URI     => "/api/v1/builds/{buildId}/logs");
+
+   package API_Get_Build_Tests is
+     new Porion.Projects.Operation
+        (Handler => Get_Build_Tests,
+         Method  => Swagger.Servers.GET,
+         URI     => "/api/v1/builds/{buildId}/tests");
 
    package API_Jenkins_Get_Last_Completed_Build is
      new Porion.Projects.Operation

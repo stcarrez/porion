@@ -30,6 +30,7 @@ package body Porion.Builds.Rest is
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Builds.Rest");
 
    use type Porion.Builds.Models.Build_Status_Type;
+   use type ADO.Identifier;
 
    type Badge_Info is record
       Label   : UString;
@@ -172,6 +173,52 @@ package body Porion.Builds.Rest is
          raise;
 
    end Get_Build_Log;
+
+   procedure Get_Build_Tests
+     (Req     : in out Swagger.Servers.Request'Class;
+      Reply   : in out Swagger.Servers.Response'Class;
+      Stream  : in out Swagger.Servers.Output_Stream'Class;
+      Context : in out Porion.Services.Context_Type) is
+      Query     : ADO.Queries.Context;
+      List      : Porion.Queries.Test_Info_Vector;
+      Current_Group : ADO.Identifier := ADO.NO_IDENTIFIER;
+   begin
+      if not Porion.Projects.Has_Build (Context.Ident) then
+         raise Porion.Services.Not_Found;
+      end if;
+
+      Query.Set_Query (Porion.Queries.Query_Build_Test_List);
+      Query.Bind_Param ("build_id", Context.Build.Get_Id);
+      Porion.Queries.List (List, Context.DB, Query);
+      Stream.Start_Document;
+      Stream.Start_Array ("");
+      for Test_Info of List loop
+         if Current_Group /= Test_Info.Id then
+            if Current_Group /= ADO.NO_IDENTIFIER then
+               Stream.End_Array ("tests");
+               Stream.End_Entity ("group");
+            end if;
+            Current_Group := Test_Info.Id;
+            Stream.Start_Entity ("group");
+            Stream.Write_Attribute ("name", Test_Info.Group_Name);
+            Stream.Start_Array ("tests");
+         end if;
+         Stream.Start_Entity ("test");
+         Stream.Write_Attribute ("name", Test_Info.Test_Name);
+         Stream.Write_Attribute ("total_pass", Test_Info.Test_Pass_Count);
+         Stream.Write_Attribute ("total_fail", Test_Info.Test_Fail_Count);
+         Stream.Write_Attribute ("total_timeout", Test_Info.Test_Timeout_Count);
+         Stream.Write_Attribute ("status", Test_Info.Test_Status'Image);
+         Stream.Write_Attribute ("duration", Natural (Test_Info.Test_Duration));
+         Stream.End_Entity ("test");
+      end loop;
+      if Current_Group /= ADO.NO_IDENTIFIER then
+         Stream.End_Array ("tests");
+         Stream.End_Entity ("group");
+      end if;
+      Stream.End_Array ("");
+      Stream.End_Document;
+   end Get_Build_Tests;
 
    procedure Jenkins_Get_Last_Completed_Build
      (Req     : in out Swagger.Servers.Request'Class;

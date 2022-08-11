@@ -16,14 +16,17 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Directories;
+with Ada.Containers;
 with Util.Log.Loggers;
-with Util.Strings;
+with Util.Strings.Sets;
+with Util.Strings.Vectors;
 with Util.Files;
 with EL.Contexts.Default;
 with Porion.Logs;
 package body Porion.Sources.Files is
 
    use Ada.Directories;
+   use type Ada.Containers.Count_Type;
 
    Log   : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Sources.Files");
 
@@ -128,13 +131,17 @@ package body Porion.Sources.Files is
    overriding
    procedure Checkout (Controller : in out Controller_Type;
                        Path       : in String;
+                       Result     : out UString;
                        Executor   : in out Porion.Executors.Executor_Type'Class) is
       Status   : Integer;
       Src_Path : constant String := Controller.Config.Get ("repository_url");
       Kind     : constant File_Type := Get_File_Type (Src_Path);
+      List     : Util.Strings.Sets.Set;
+      Empty    : Util.Strings.Vectors.Vector;
    begin
       Log.Info ("Extracting files from '{0}' to '{1}'", Src_Path, Path);
 
+      Result := To_UString ("");
       Controller.Setup (Kind);
       Controller.Config.Set ("build_dir", Path);
       Executor.Execute (Command     => Controller.Extract_Command,
@@ -142,6 +149,23 @@ package body Porion.Sources.Files is
                         Working_Dir => Path,
                         Strip_Crlf  => False,
                         Status      => Status);
+      if Status = 0 then
+         Log.Info ("Checking extraction in {0}", Path);
+         Executor.Scan_Directory (Path => Path,
+                                  Pattern => "*",
+                                  Excludes => Empty,
+                                  List => List);
+         if List.Length = 1 then
+            declare
+               New_Path : constant String := Util.Strings.Sets.Element (List.First);
+            begin
+               if New_Path'Length > Path'Length then
+                  Result := To_UString (New_Path (New_Path'First + Path'Length .. New_Path'Last));
+                  Log.Info ("Using sources stored in {0}", Result);
+               end if;
+            end;
+         end if;
+      end if;
    end Checkout;
 
    overriding

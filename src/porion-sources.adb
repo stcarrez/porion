@@ -45,10 +45,11 @@ package body Porion.Sources is
    procedure Checkout (Kind     : in Source_Control_Type;
                        Config   : in Porion.Configs.Config_Type;
                        Path     : in String;
+                       Result     : out UString;
                        Executor : in out Porion.Executors.Executor_Type'Class) is
       Controller : Controller_Access := Factories.Create (Kind, Config);
    begin
-      Controller.Checkout (Path, Executor);
+      Controller.Checkout (Path, Result, Executor);
       Free (Controller);
    end Checkout;
 

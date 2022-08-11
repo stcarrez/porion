@@ -69,9 +69,11 @@ package Porion.Sources is
    --  Checkout the source of the project by using the executor.
    --  The checkout parameters are configured in Config and the
    --  files are extracted in the Path directory (possibly on a remote host).
+   --  Return in Result the relative path within Path of the source locations.
    procedure Checkout (Kind     : in Source_Control_Type;
                        Config   : in Porion.Configs.Config_Type;
                        Path     : in String;
+                       Result   : out UString;
                        Executor : in out Porion.Executors.Executor_Type'Class) with
       Pre => Executor.Is_Configured and Path'Length > 0;
 
@@ -96,6 +98,7 @@ private
 
    procedure Checkout (Controller : in out Controller_Type;
                        Path       : in String;
+                       Result     : out UString;
                        Executor   : in out Porion.Executors.Executor_Type'Class) is abstract;
 
    procedure Changes (Controller : in out Controller_Type;

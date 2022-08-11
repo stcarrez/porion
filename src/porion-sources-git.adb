@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-sources-git -- Source management with git
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -92,9 +92,11 @@ package body Porion.Sources.Git is
    overriding
    procedure Checkout (Controller : in out Controller_Type;
                        Path       : in String;
+                       Result     : out UString;
                        Executor   : in out Porion.Executors.Executor_Type'Class) is
       Status : Integer;
    begin
+      Result := To_UString ("");
       if not Executor.Is_Dry_Run then
          Executor.Create_Directory (Path, True);
       end if;

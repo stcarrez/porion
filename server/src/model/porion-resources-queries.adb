@@ -491,8 +491,9 @@ package body Porion.Resources.Queries is
        & " mb ON mb.build_id = build.id" & ASCII.LF & ASCII.HT & "  INNER JOIN po"
        & "rion_metric AS metric ON mb.metric_id = metric.id AND metric.metric = :m"
        & "etric" & ASCII.LF & ASCII.HT & "  WHERE build.project_id = :project_id" & ASCII.LF
-       & ASCII.HT & "</sql>" & ASCII.LF & "    </query> " & ASCII.LF & ASCII.LF
-       & "</query-mapping>" & ASCII.LF;
+       & ASCII.HT & "  ORDER BY build.number ASC" & ASCII.LF & ASCII.HT & "</sql"
+       & ">" & ASCII.LF & "    </query> " & ASCII.LF & ASCII.LF & "</query-mappin"
+       & "g>" & ASCII.LF;
 
    C_14 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List the build queues" & ASCII.LF

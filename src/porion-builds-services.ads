@@ -237,4 +237,10 @@ private
                                   Is_Finished : in Boolean) with
       Pre => not Service.Queue.Is_Null;
 
+   procedure Run_Build_Steps (Service     : in out Context_Type;
+                              Steps       : in Build_Step_Vector;
+                              Path        : in String;
+                              Status      : out Builds.Models.Build_Status_Type;
+                              Executor    : in out Porion.Executors.Executor_Type'Class);
+
 end Porion.Builds.Services;

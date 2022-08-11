@@ -193,9 +193,9 @@ package body Porion.Builds.Services is
       Branch_Name : constant String := Service.Branch.Get_Name;
       Path        : constant String := Get_Build_Directory (Service);
       Log_Dir     : constant String := Get_Log_Directory (Service);
+      Dir         : UString;
       Config      : Util.Properties.Manager;
       Status      : Builds.Models.Build_Status_Type := Builds.Models.BUILD_RUNNING;
-      Usage       : Nodes.Usage_Type := (others => 0);
       Env         : Util.Strings.Maps.Map;
    begin
       Log.Info ("Build {0} in {1}", Ident, Path);
@@ -215,8 +215,37 @@ package body Porion.Builds.Services is
 
       Executor.Create_Logger (Log_Dir, "build.log");
       Executor.Log (Porion.Logs.LOG_INFO, "Build '" & Ident & "' in " & Path);
-      Porion.Sources.Checkout (Service.Project.Get_Scm, Config, Path, Executor);
+      Porion.Sources.Checkout (Service.Project.Get_Scm, Config, Path, Dir, Executor);
 
+      if Length (Dir) > 0 then
+         Run_Build_Steps (Service, Steps,
+                          Util.Files.Compose (Path, To_String (Dir)), Status, Executor);
+      else
+         Run_Build_Steps (Service, Steps, Path, Status, Executor);
+      end if;
+
+      if not Executor.Is_Dry_Run then
+         --  Save the resource usage in the build.
+         declare
+            Usage   : constant Nodes.Usage_Type := Executor.Get_Usage;
+            Updated : Boolean;
+         begin
+            Service.Build.Reload (Service.DB, Updated);
+            Service.Build.Set_User_Time (Millisecond_Type (Usage.User_Time));
+            Service.Build.Set_Sys_Time (Millisecond_Type (Usage.Sys_Time));
+         end;
+         Update_Build (Service, Status);
+      end if;
+   end Build;
+
+   procedure Run_Build_Steps (Service     : in out Context_Type;
+                              Steps       : in Build_Step_Vector;
+                              Path        : in String;
+                              Status      : out Builds.Models.Build_Status_Type;
+                              Executor    : in out Porion.Executors.Executor_Type'Class) is
+      Usage       : Nodes.Usage_Type := (others => 0);
+   begin
+      Status := Builds.Models.BUILD_RUNNING;
       for Step of Steps loop
          if Executor.Is_Dry_Run or else Step.Step.Get_Execution /= Builds.EXEC_DISABLED then
             declare
@@ -254,30 +283,14 @@ package body Porion.Builds.Services is
                     and Step.Step.Get_Execution = Builds.EXEC_NO_ERROR
                   then
                      Status := Porion.Builds.Models.BUILD_FAIL;
-                     exit;
+                     return;
                   end if;
                end if;
             end;
          end if;
       end loop;
-
-      if not Executor.Is_Dry_Run then
-         if Status = Builds.Models.BUILD_RUNNING then
-            Status := Builds.Models.BUILD_PASS;
-         end if;
-
-         --  Save the resource usage in the build.
-         declare
-            Usage   : constant Nodes.Usage_Type := Executor.Get_Usage;
-            Updated : Boolean;
-         begin
-            Service.Build.Reload (Service.DB, Updated);
-            Service.Build.Set_User_Time (Millisecond_Type (Usage.User_Time));
-            Service.Build.Set_Sys_Time (Millisecond_Type (Usage.Sys_Time));
-         end;
-         Update_Build (Service, Status);
-      end if;
-   end Build;
+      Status := Porion.Builds.Models.BUILD_PASS;
+   end Run_Build_Steps;
 
    --  ------------------------------
    --  Cancel the building status on the build queues for the given node.
@@ -1457,6 +1470,7 @@ package body Porion.Builds.Services is
       Query   : ADO.SQL.Query;
       Found   : Boolean;
       Added   : Boolean;
+      Dir     : UString;
    begin
       Log.Info ("Make build config {0} for branch {1} in {2}", Name, Branch, Path);
 
@@ -1475,7 +1489,7 @@ package body Porion.Builds.Services is
 
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
 
-      Sources.Checkout (Service.Project.Get_Scm, Config, Path, Executor);
+      Sources.Checkout (Service.Project.Get_Scm, Config, Path, Dir, Executor);
 
       if Service.Build_Node.Is_Null then
          Nodes.Services.Load_Default_Node (Service);
@@ -1489,7 +1503,11 @@ package body Porion.Builds.Services is
       Service.Recipe.Set_Rate_Factor (100);
       Service.Recipe.Set_Name ("main");
       Service.Recipe.Save (Service.DB);
-      Guess (Service, Path, Executor);
+      if Length (Dir) > 0 then
+         Guess (Service, Util.Files.Compose (Path, To_String (Dir)), Executor);
+      else
+         Guess (Service, Path, Executor);
+      end if;
 
       Add_Build_Queue (Service, Models.REASON_CONFIG, Added);
       if Added then
@@ -1682,18 +1700,20 @@ package body Porion.Builds.Services is
       Has_Package_Json : Boolean;
       Rules           : UString;
    begin
-      Has_Autogen := Check ("autogen.sh", -("checking for {0}"));
-      Has_Autoconf := Check ("configure.ac", -("checking for {0}"))
-        or else Check ("configure.in", -("checking for {0}"));
+      Log.Info ("Guess default build recipes in {0}", Path);
 
-      Has_Automake := Check ("Makefile.am", -("checking for {0}"));
-      Has_Makefile_In := Check ("Makefile.in", -("checking for {0}"));
-      Has_Configure := Check ("configure", -("checking for {0}"));
-      Has_CMake := Check ("CMakeLists.txt", -("checking for {0}"));
-      Has_Makefile := Check ("Makefile", -("checking for {0}"))
-        or else Check ("makefile", -("checking for {0}"));
-      Has_Pom_Xml := Check ("pom.xml", -("checking for {0}"));
-      Has_Package_Json := Check ("package.json", -("checking for {0}"));
+      Has_Autogen := Check ("autogen.sh", -("checking for {0} {1}"));
+      Has_Autoconf := Check ("configure.ac", -("checking for {0} {1}"))
+        or else Check ("configure.in", -("checking for {0} {1}"));
+
+      Has_Automake := Check ("Makefile.am", -("checking for {0} {1}"));
+      Has_Makefile_In := Check ("Makefile.in", -("checking for {0} {1}"));
+      Has_Configure := Check ("configure", -("checking for {0} {1}"));
+      Has_CMake := Check ("CMakeLists.txt", -("checking for {0} {1}"));
+      Has_Makefile := Check ("Makefile", -("checking for {0} {1}"))
+        or else Check ("makefile", -("checking for {0} {1}"));
+      Has_Pom_Xml := Check ("pom.xml", -("checking for {0} {1}"));
+      Has_Package_Json := Check ("package.json", -("checking for {0} {1}"));
 
       Add_Metric_Step ("disk", "before");
 

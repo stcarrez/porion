@@ -57,6 +57,7 @@ package body Porion.Testsuite is
       Buffer   : Util.Streams.Buffered.Input_Buffer_Stream;
    begin
       Log.Info ("Execute: {0}", Command);
+      Result := To_UString ("");
       P.Open (Command, Util.Processes.READ_ALL);
 
       --  Write on the process input stream.

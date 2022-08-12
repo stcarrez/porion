@@ -1450,6 +1450,16 @@ package body Porion.Queries is
          return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Test_Fail_Count));
       elsif Name = "test_timeout_count" then
          return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Test_Timeout_Count));
+      elsif Name = "test_skip_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Test_Skip_Count));
+      elsif Name = "last_pass_build" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Last_Pass_Build));
+      elsif Name = "last_fail_build" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Last_Fail_Build));
+      elsif Name = "last_timeout_build" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Last_Timeout_Build));
+      elsif Name = "last_skip_build" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Last_Skip_Build));
       elsif Name = "test_duration" then
          return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Test_Duration));
       elsif Name = "test_status" then
@@ -1481,6 +1491,16 @@ package body Porion.Queries is
          Item.Test_Fail_Count := Util.Beans.Objects.To_Integer (Value);
       elsif Name = "test_timeout_count" then
          Item.Test_Timeout_Count := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "test_skip_count" then
+         Item.Test_Skip_Count := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "last_pass_build" then
+         Item.Last_Pass_Build := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "last_fail_build" then
+         Item.Last_Fail_Build := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "last_timeout_build" then
+         Item.Last_Timeout_Build := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "last_skip_build" then
+         Item.Last_Skip_Build := Util.Beans.Objects.To_Integer (Value);
       elsif Name = "test_duration" then
          Item.Test_Duration := Porion.Microsecond_Type (Util.Beans.Objects.To_Integer (Value));
       elsif Name = "test_status" then
@@ -1519,8 +1539,13 @@ package body Porion.Queries is
          Into.Test_Pass_Count := Stmt.Get_Integer (4);
          Into.Test_Fail_Count := Stmt.Get_Integer (5);
          Into.Test_Timeout_Count := Stmt.Get_Integer (6);
-         Into.Test_Duration := Porion.Microsecond_Type (Stmt.Get_Integer (7));
-         Into.Test_Status := Porion.XUnit.Models.Test_Status_Type'Enum_Val (Stmt.Get_Integer (8));
+         Into.Test_Skip_Count := Stmt.Get_Integer (7);
+         Into.Last_Pass_Build := Stmt.Get_Integer (8);
+         Into.Last_Fail_Build := Stmt.Get_Integer (9);
+         Into.Last_Timeout_Build := Stmt.Get_Integer (10);
+         Into.Last_Skip_Build := Stmt.Get_Integer (11);
+         Into.Test_Duration := Porion.Microsecond_Type (Stmt.Get_Integer (12));
+         Into.Test_Status := Porion.XUnit.Models.Test_Status_Type'Enum_Val (Stmt.Get_Integer (13));
       end Read;
    begin
       Stmt.Execute;

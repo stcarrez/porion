@@ -978,6 +978,21 @@ package Porion.Queries is
       --  the number of times the test timed out.
       Test_Timeout_Count : Integer;
 
+      --  the number of times the test was skipped.
+      Test_Skip_Count : Integer;
+
+      --  the last build number where this test passed.
+      Last_Pass_Build : Integer;
+
+      --  the last build number where this test failed.
+      Last_Fail_Build : Integer;
+
+      --  the last build number where this test timed out.
+      Last_Timeout_Build : Integer;
+
+      --  the last build number where this test was skipped.
+      Last_Skip_Build : Integer;
+
       --  the test duration.
       Test_Duration : Porion.Microsecond_Type;
 
@@ -1017,6 +1032,8 @@ package Porion.Queries is
                    Context : in out ADO.Queries.Context'Class);
 
    Query_Build_Test_List : constant ADO.Queries.Query_Definition_Access;
+
+   Query_Project_Test_List : constant ADO.Queries.Query_Definition_Access;
 
 
 
@@ -1226,11 +1243,17 @@ private
 
    package File_14 is
       new ADO.Queries.Loaders.File (Path => "report-tests.xml",
-                                    Sha1 => "156DC07FA310576EE59560D133C5C3BF4C945A83");
+                                    Sha1 => "60F65D7D89313D8C4B9DD2DB4A3D96FB80F1FD02");
 
    package Def_Testinfo_Build_Test_List is
       new ADO.Queries.Loaders.Query (Name => "build-test-list",
                                      File => File_14.File'Access);
    Query_Build_Test_List : constant ADO.Queries.Query_Definition_Access
    := Def_Testinfo_Build_Test_List.Query'Access;
+
+   package Def_Testinfo_Project_Test_List is
+      new ADO.Queries.Loaders.Query (Name => "project-test-list",
+                                     File => File_14.File'Access);
+   Query_Project_Test_List : constant ADO.Queries.Query_Definition_Access
+   := Def_Testinfo_Project_Test_List.Query'Access;
 end Porion.Queries;

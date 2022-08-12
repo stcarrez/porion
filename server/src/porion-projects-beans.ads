@@ -24,6 +24,7 @@ with Porion.Queries;
 with Porion.Dashboards.Models;
 with Porion.Projects.Modules;
 with Porion.Projects.Models;
+with Porion.Builds.Models;
 with Porion.Nodes.Models;
 with Porion.Dashboards.Beans.Stats;
 package Porion.Projects.Beans is
@@ -42,8 +43,11 @@ package Porion.Projects.Beans is
       Recipes_Bean : UBB.Readonly_Bean_Access;
       Node         : aliased Porion.Nodes.Models.Node_Ref;
       Node_Bean    : UBB.Readonly_Bean_Access;
+      Builds       : aliased Porion.Queries.Build_Info_List_Bean;
+      Builds_Bean  : UBB.Readonly_Bean_Access;
       Metric       : aliased Porion.Dashboards.Beans.Stats.Metrics_Bean;
       Metric_Bean  : UBB.Readonly_Bean_Access;
+      Build_Status : Porion.Builds.Models.Build_Status_Type;
    end record;
    type Project_Bean_Access is access all Project_Bean'Class;
 

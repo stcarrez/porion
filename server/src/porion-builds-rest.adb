@@ -390,7 +390,7 @@ package body Porion.Builds.Rest is
       Stream.End_Document;
    end Get_Project_Schields_Status;
 
-   procedure Get_Project_Tests
+   procedure Get_Project_Tests_Builds
      (Req     : in out Swagger.Servers.Request'Class;
       Reply   : in out Swagger.Servers.Response'Class;
       Stream  : in out Swagger.Servers.Output_Stream'Class;
@@ -422,6 +422,72 @@ package body Porion.Builds.Rest is
       end loop;
       Stream.End_Array ("tests");
       Stream.End_Entity ("");
+      Stream.End_Document;
+   end Get_Project_Tests_Builds;
+
+   procedure Get_Project_Tests
+     (Req     : in out Swagger.Servers.Request'Class;
+      Reply   : in out Swagger.Servers.Response'Class;
+      Stream  : in out Swagger.Servers.Output_Stream'Class;
+      Context : in out Porion.Services.Context_Type) is
+      pragma Unreferenced (Req, Reply);
+
+      Query         : ADO.Queries.Context;
+      List          : Porion.Queries.Test_Info_Vector;
+      Current_Group : ADO.Identifier := ADO.NO_IDENTIFIER;
+   begin
+      Query.Bind_Param ("project_id", Context.Project.Get_Id);
+      Query.Set_Query (Porion.Queries.Query_Project_Test_List);
+      Porion.Queries.List (List, Context.DB, Query);
+
+      Stream.Start_Document;
+      Stream.Start_Array ("");
+      for Test_Info of List loop
+         if Current_Group /= Test_Info.Id then
+            if Current_Group /= ADO.NO_IDENTIFIER then
+               Stream.End_Array ("tests");
+               Stream.End_Entity ("group");
+            end if;
+            Current_Group := Test_Info.Id;
+            Stream.Start_Entity ("group");
+            Stream.Write_Attribute ("name", Test_Info.Group_Name);
+            Stream.Start_Array ("tests");
+         end if;
+         Stream.Start_Entity ("test");
+         Stream.Write_Attribute ("name", Test_Info.Test_Name);
+         Stream.Write_Attribute ("total_pass", Test_Info.Test_Pass_Count);
+         Stream.Write_Attribute ("total_fail", Test_Info.Test_Fail_Count);
+         Stream.Write_Attribute ("total_timeout", Test_Info.Test_Timeout_Count);
+         Stream.Write_Attribute ("total_skipped", Test_Info.Test_Skip_Count);
+         if Test_Info.Last_Pass_Build > 0 then
+            Stream.Write_Attribute ("last_pass_build", Test_Info.Last_Pass_Build);
+         else
+            Stream.Write_Null_Attribute ("last_pass_build");
+         end if;
+         if Test_Info.Last_Fail_Build > 0 then
+            Stream.Write_Attribute ("last_fail_build", Test_Info.Last_Fail_Build);
+         else
+            Stream.Write_Null_Attribute ("last_fail_build");
+         end if;
+         if Test_Info.Last_Timeout_Build > 0 then
+            Stream.Write_Attribute ("last_timeout_build", Test_Info.Last_Timeout_Build);
+         else
+            Stream.Write_Null_Attribute ("last_timeout_build");
+         end if;
+         if Test_Info.Last_Skip_Build > 0 then
+            Stream.Write_Attribute ("last_skip_build", Test_Info.Last_Skip_Build);
+         else
+            Stream.Write_Null_Attribute ("last_skip_build");
+         end if;
+         Stream.Write_Attribute ("status", Test_Info.Test_Status'Image);
+         Stream.Write_Attribute ("duration", Natural (Test_Info.Test_Duration));
+         Stream.End_Entity ("test");
+      end loop;
+      if Current_Group /= ADO.NO_IDENTIFIER then
+         Stream.End_Array ("tests");
+         Stream.End_Entity ("group");
+      end if;
+      Stream.End_Array ("");
       Stream.End_Document;
    end Get_Project_Tests;
 

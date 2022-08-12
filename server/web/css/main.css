@@ -52,6 +52,35 @@ div.awa-title dd {
     text-decoration: none;
 }
 
+/* Project page */
+.project-header {
+    float: left;
+    width: 100%;
+}
+.project-header .awa-page-tab {
+    background: #eee;
+}
+.page-summary .project-header .project-tab-summary,
+.page-tests .project-header .project-tab-tests,
+.page-builds .project-header .project-tab-builds,
+.page-coverage .project-header .project-tab-coverage {
+    background: white;
+    border-top-left-radius: 0.5em;
+    border-top-right-radius: 0.5em;
+}
+.project-header .project-title {
+    float: left;
+    padding-left: 0.5em;
+    font-size: 2em;
+    color: #626263;
+    width: 100%;
+}
+.project-header .project-title span {
+    width: 1em;
+    height: 1em;
+    margin-right: 0.5em;
+    border-radius: 1em;
+}
 .project-page-grid {
     float: left;
     width: 32%;
@@ -70,7 +99,7 @@ div.awa-title dd {
     line-height: 32px;
     vertical-align: top;
 }
-.project-page-grid .project-build-status, .project-page-grid .project-progress-status {
+.project-build-status, .project-page-grid .project-progress-status {
     display: inline-block;
     width: 16px;
     height: 40px;
@@ -185,6 +214,7 @@ div.awa-title dd {
 .build-progress .asf-progress-bar {
     background: red;
 }
+
 /* Build info */
 .build-info {
     float: left;
@@ -478,3 +508,63 @@ div.awa-title dd {
     background-color: #fee;
     opacity: 0.80;
 }
+
+/* Build tests */
+.project-tests {
+    float: left;
+    width: 98%;
+    padding-left: 1%;
+    padding-right: 1%;
+}
+.build-test-group, .build-test, .build-test-group-title {
+    float: left;
+    width: 100%;
+}
+.build-test-group-title {
+    font-size: 1.2em;
+    color: #424343;
+    font-weight: bold;
+    padding-top: 0.2em;
+    cursor: pointer;
+}
+.group-name {
+    float: left;
+    width: 40%;
+    background: url(../images/icon-expand-tree-32.png) no-repeat;    
+    height: 32px;
+    line-height: 32px;
+}
+.group-name, .build-test {
+    padding-left: 32px;
+}
+.group-visible .group-name {
+    background: url(../images/icon-collapse-tree-32.png) no-repeat;    
+}
+.build-tests {
+    display: none;
+}
+.group-visible .build-tests {
+    display: block;
+}
+.build-tests {
+    float: left;
+    padding-left: 1%;
+    width: 99%;
+}
+.test-name {
+    float: left;
+    width: 60%;
+}
+.test-duration {
+    float: left;
+    width: 20%;
+}
+.test-build {
+    float: left;
+    width: 20%;
+}
+.group-pass, .group-fail, .group-timeout {
+    float: left;
+    width: 10%;
+}
+

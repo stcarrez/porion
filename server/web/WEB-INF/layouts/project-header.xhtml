@@ -1,0 +1,28 @@
+<div class="project-header" xmlns:h="http://java.sun.com/jsf/html">
+    <div class="project-title build-status-#{projectBuildStatus}">
+        <span class="project-build-status"/>
+        <h2>#{projectName}</h2>
+    </div>
+    <ul class="awa-page-tab">
+        <li class="project-tab-summary">
+            <a href="#{contextPath}/projects/view/#{projectName}/summary">
+                <span>Summary</span>
+            </a>
+        </li>
+        <li class="project-tab-builds">
+            <a href="#{contextPath}/projects/view/#{projectName}/builds">
+                <span>Builds</span>
+            </a>
+        </li>
+        <li class="project-tab-tests">
+            <a href="#{contextPath}/projects/view/#{projectName}/tests">
+                <span>Tests</span>
+            </a>
+        </li>
+        <li class="project-tab-coverage">
+            <a href="#{contextPath}/projects/view/#{projectName}/coverage">
+                <span>Coverage</span>
+            </a>
+        </li>
+    </ul>
+</div>

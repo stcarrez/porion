@@ -5,14 +5,20 @@
                 xmlns:util="http://code.google.com/p/ada-asf/util"
                 xmlns:c="http://java.sun.com/jstl/core"
                 template="/WEB-INF/layouts/layout.xhtml">
-  <ui:param name="title" value="#{layoutMsg.homePageTitle}" />
-  <ui:param name="pageStyle" value="page-build"/>
+  <ui:param name="title" value="#{project.name} - Summary" />
+  <ui:param name="pageStyle" value="page-project"/>
+  <ui:param name="top_nav" value="page-summary"/>
+
   <!-- Main page body -->
   <ui:define name="pageBody">
     <f:metadata>
       <f:viewAction action='#{project.load}'/>
     </f:metadata>
     <div id='awa-content'>
+      <ui:include src="/WEB-INF/layouts/project-header.xhtml">
+	<ui:param name="projectName" value="#{project.name}"/>
+	<ui:param name="projectBuildStatus" value="#{project.build_status}"/>
+      </ui:include>
       <ui:include src="views/info.xhtml"/>
       <ui:include src="lists/recipes.xhtml"/>
      </div>

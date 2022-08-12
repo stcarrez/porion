@@ -5,16 +5,23 @@
   xmlns:f="http://java.sun.com/jsf/core"
   xmlns:c="http://java.sun.com/jstl/core"
   template="/WEB-INF/layouts/layout.xhtml">
-  <ui:param name="title" value="#{layoutMsg.homePageTitle}" />
-  <ui:param name="pageStyle" value="page-build"/>
+  <ui:param name="title" value="#{project.name} - Build" />
+  <ui:param name="pageStyle" value="page-project"/>
+  <ui:param name="top_nav" value="page-builds"/>
+
   <!-- Main page body -->
   <ui:define name="pageBody">
     <f:metadata>
       <f:viewAction action='#{build.load}'/>
     </f:metadata>
     <div id='awa-content'>
+      <ui:include src="/WEB-INF/layouts/project-header.xhtml">
+	<ui:param name="projectName" value="#{build.project.name}"/>
+      </ui:include>
       <ui:include src="views/info.xhtml"/>
       <ui:include src="lists/build-steps.xhtml"/>
+      <div id='build-tests'>
+      </div>
       <div id='build-log' class='build-log build-show-warning'>
         <div class='build-log-header'>
           <ul>
@@ -34,6 +41,7 @@
         </div>
       </div>
     </div>
+
     <u:script>
     $(function() {
     new Porion.BuildLog({container: 'build-log', btnShowAll: 'build-log-show-all', btnShowInfo: 'build-log-show-info', btnShowWarning: 'build-log-show-warning',

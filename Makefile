@@ -83,6 +83,7 @@ server-package:
 build-ts:
 	tsc server/web/js/projects.ts
 	tsc server/web/js/builds.ts
+	tsc server/web/js/xunits.ts
 
 setup:: src/porion-configs-setup.ads
 src/porion-configs-setup.ads:   Makefile.conf src/porion-configs-setup.gpb

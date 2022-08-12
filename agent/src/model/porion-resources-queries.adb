@@ -1046,28 +1046,72 @@ package body Porion.Resources.Queries is
        & " the test failed.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
        & "        <property type='Integer' name=""test_timeout_count"">" & ASCII.LF
        & "            <comment>the number of times the test timed out.</comment>" & ASCII.LF
-       & "        </property>" & ASCII.LF & "        <property type='Porion.Micros"
-       & "econd_Type' name=""test_duration"">" & ASCII.LF & "            <comment>"
-       & "the test duration.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
-       & "        <property type='Porion.XUnit.Models.Test_Status_Type' name=""tes"
-       & "t_status"">" & ASCII.LF & "            <comment>the test status.</commen"
-       & "t>" & ASCII.LF & "        </property>" & ASCII.LF & "    </class>" & ASCII.LF
-       & ASCII.LF & "    <query name='build-test-list'>" & ASCII.LF & "        <c"
-       & "omment>Get the list of tests for a build</comment>" & ASCII.LF & "      "
-       & "  <sql>" & ASCII.LF & "            SELECT" & ASCII.LF & "            grp"
-       & ".id AS id," & ASCII.LF & "            grp.name AS grp_name," & ASCII.LF
-       & "            test.id AS tid," & ASCII.LF & "            test.name AS test"
-       & "_name," & ASCII.LF & "            test.total_pass_count AS pass_count," & ASCII.LF
-       & "            test.total_fail_count AS fail_count," & ASCII.LF & "        "
-       & "    test.total_timeout_count AS timeout_count," & ASCII.LF & "          "
-       & "  run.duration AS duration," & ASCII.LF & "            run.status AS sta"
-       & "tus" & ASCII.LF & "            FROM porion_test_run_group AS rgrp" & ASCII.LF
-       & "            INNER JOIN porion_test_group AS grp ON rgrp.group_id = grp.i"
-       & "d" & ASCII.LF & "            INNER JOIN porion_test_run AS run ON run.gr"
-       & "oup_id = rgrp.id" & ASCII.LF & "            INNER JOIN porion_test AS te"
-       & "st ON run.test_id = test.id" & ASCII.LF & "            WHERE rgrp.build_"
-       & "id = :build_id" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>"
-       & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+       & "        </property>" & ASCII.LF & "        <property type='Integer' name"
+       & "=""test_skip_count"">" & ASCII.LF & "            <comment>the number of "
+       & "times the test was skipped.</comment>" & ASCII.LF & "        </property>"
+       & ASCII.LF & "        <property type='Integer' name=""last_pass_build"">" & ASCII.LF
+       & "            <comment>the last build number where this test passed.</comm"
+       & "ent>" & ASCII.LF & "        </property>" & ASCII.LF & "        <property"
+       & " type='Integer' name=""last_fail_build"">" & ASCII.LF & "            <co"
+       & "mment>the last build number where this test failed.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Integer' name"
+       & "=""last_timeout_build"">" & ASCII.LF & "            <comment>the last bu"
+       & "ild number where this test timed out.</comment>" & ASCII.LF & "        <"
+       & "/property>" & ASCII.LF & "        <property type='Integer' name=""last_s"
+       & "kip_build"">" & ASCII.LF & "            <comment>the last build number w"
+       & "here this test was skipped.</comment>" & ASCII.LF & "        </property>"
+       & ASCII.LF & "        <property type='Porion.Microsecond_Type' name=""test"
+       & "_duration"">" & ASCII.LF & "            <comment>the test duration.</com"
+       & "ment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <propert"
+       & "y type='Porion.XUnit.Models.Test_Status_Type' name=""test_status"">" & ASCII.LF
+       & "            <comment>the test status.</comment>" & ASCII.LF & "        <"
+       & "/property>" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF & "    <q"
+       & "uery name='build-test-list'>" & ASCII.LF & "        <comment>Get the lis"
+       & "t of tests for a build</comment>" & ASCII.LF & "        <sql>" & ASCII.LF
+       & "            SELECT" & ASCII.LF & "            grp.id AS id," & ASCII.LF
+       & "            grp.name AS grp_name," & ASCII.LF & "            test.id AS "
+       & "tid," & ASCII.LF & "            test.name AS test_name," & ASCII.LF & " "
+       & "           test.total_pass_count AS pass_count," & ASCII.LF & "         "
+       & "   test.total_fail_count AS fail_count," & ASCII.LF & "            test."
+       & "total_timeout_count AS timeout_count," & ASCII.LF & ASCII.HT & "    tes"
+       & "t.total_skip_count AS skip_count," & ASCII.LF & ASCII.HT & "    test.la"
+       & "st_pass_build AS pass_build," & ASCII.LF & ASCII.HT & "    test.last_fa"
+       & "il_build AS fail_build," & ASCII.LF & ASCII.HT & "    test.last_timeout"
+       & "_build AS timeout_build," & ASCII.LF & ASCII.HT & "    test.last_skip_b"
+       & "uild AS skip_build" & ASCII.LF & "            run.duration AS duration," & ASCII.LF
+       & "            run.status AS status" & ASCII.LF & "            FROM porion_"
+       & "test_run_group AS rgrp" & ASCII.LF & "            INNER JOIN porion_test"
+       & "_group AS grp ON rgrp.group_id = grp.id" & ASCII.LF & "            INNER"
+       & " JOIN porion_test_run AS run ON run.group_id = rgrp.id" & ASCII.LF & "  "
+       & "          INNER JOIN porion_test AS test ON run.test_id = test.id" & ASCII.LF
+       & "            WHERE rgrp.build_id = :build_id" & ASCII.LF & ASCII.HT & " "
+       & "   ORDER BY grp.name, test.name" & ASCII.LF & "        </sql>" & ASCII.LF
+       & "    </query>" & ASCII.LF & ASCII.LF & "    <query name='project-test-li"
+       & "st'>" & ASCII.LF & "        <comment>Get the list of tests for a project"
+       & "</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & "            SELEC"
+       & "T" & ASCII.LF & "            grp.id AS id," & ASCII.LF & "            gr"
+       & "p.name AS grp_name," & ASCII.LF & "            test.id AS tid," & ASCII.LF
+       & "            test.name AS test_name," & ASCII.LF & "            test.tota"
+       & "l_pass_count AS pass_count," & ASCII.LF & "            test.total_fail_c"
+       & "ount AS fail_count," & ASCII.LF & "            test.total_timeout_count "
+       & "AS timeout_count," & ASCII.LF & ASCII.HT & "    test.total_skip_count A"
+       & "S skip_count," & ASCII.LF & ASCII.HT & "    COALESCE(test.last_pass_bui"
+       & "ld, 0) AS pass_build," & ASCII.LF & ASCII.HT & "    COALESCE(test.last_"
+       & "fail_build, 0) AS fail_build," & ASCII.LF & ASCII.HT & "    COALESCE(te"
+       & "st.last_timeout_build, 0) AS timeout_build," & ASCII.LF & ASCII.HT & " "
+       & "   COALESCE(test.last_skip_build, 0) AS skip_build," & ASCII.LF & "     "
+       & "       COALESCE(run.duration, 0) AS duration," & ASCII.LF & "           "
+       & " COALESCE(run.status, 1) AS status" & ASCII.LF & "            FROM porio"
+       & "n_test_group AS grp" & ASCII.LF & "            INNER JOIN porion_test AS"
+       & " test ON grp.id = test.group_id" & ASCII.LF & ASCII.HT & "    LEFT JOIN"
+       & " porion_build AS build ON build.project_id = :project_id AND build.numbe"
+       & "r = test.last_pass_build" & ASCII.LF & ASCII.HT & "    LEFT JOIN porion"
+       & "_test_run_group AS rgrp ON rgrp.group_id = test.group_id AND rgrp.build_"
+       & "id = build.id" & ASCII.LF & "            LEFT JOIN porion_test_run AS ru"
+       & "n ON run.test_id = test.id AND run.group_id = rgrp.id" & ASCII.LF & "   "
+       & "         WHERE grp.project_id = :project_id" & ASCII.LF & ASCII.HT & " "
+       & "   ORDER BY grp.name, test.name" & ASCII.LF & "        </sql>" & ASCII.LF
+       & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
    C_18 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        Stats for the builds" & ASCII.LF

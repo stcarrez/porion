@@ -27,6 +27,7 @@ with Porion.Queries;
 with Porion.Beans;
 package Porion.Nodes.Beans is
 
+   package UBB renames Util.Beans.Basic;
    package UBO renames Util.Beans.Objects;
 
    type Node_List_Bean is new Porion.Beans.Node_List_Bean with record
@@ -54,6 +55,40 @@ package Porion.Nodes.Beans is
 
    --  Create the project list bean instance.
    function Create_Node_List_Bean (Module : in Modules.Node_Module_Access)
+      return Util.Beans.Basic.Readonly_Bean_Access;
+
+   type Node_Bean is new Porion.Beans.Node_Bean with record
+      Ident       : UString;
+      Node        : aliased Porion.Nodes.Models.Node_Ref;
+      Node_Bean   : UBB.Readonly_Bean_Access;
+      Builds      : aliased Porion.Queries.Build_Info_List_Bean;
+      Builds_Bean : UBB.Readonly_Bean_Access;
+      Queue_Count : Natural := 0;
+      Queue_Nodes : Natural := 0;
+   end record;
+   type Node_Bean_Access is access all Node_Bean'Class;
+
+   --  Get the value identified by the name.
+   overriding
+   function Get_Value (From : in Node_Bean;
+                       Name : in String) return UBO.Object;
+
+   --  Set the value identified by the name.
+   overriding
+   procedure Set_Value (From  : in out Node_Bean;
+                        Name  : in String;
+                        Value : in UBO.Object);
+
+   --  Load the build node information.
+   procedure Load (Bean    : in out Node_Bean;
+                   Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
+
+   --  Load the build node information.
+   procedure Load_Builds (Bean    : in out Node_Bean;
+                          Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
+
+   --  Create the node bean instance.
+   function Create_Node_Bean (Module : in Modules.Node_Module_Access)
       return Util.Beans.Basic.Readonly_Bean_Access;
 
 end Porion.Nodes.Beans;

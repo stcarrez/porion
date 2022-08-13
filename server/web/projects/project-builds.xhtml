@@ -19,7 +19,26 @@
 	<ui:param name="projectName" value="#{project.name}"/>
 	<ui:param name="projectBuildStatus" value="#{project.build_status}"/>
       </ui:include>
-      <ui:include src="lists/builds.xhtml"/>
+
+      <ui:composition template="/projects/lists/builds.xhtml">
+	<ui:param name="builds" value="#{project.builds}"/>
+
+	<ui:define name="list-header">
+          <div class='build-node'>
+            Build node
+          </div>
+	</ui:define>
+	
+	<ui:define name="list-item">
+          <div class='build-node'>
+	    <a href="#{contextPath}/nodes/view/#{build.node_name}/summary" title="Build node #{build.node_name}">
+              #{build.node_name}
+	    </a>
+          </div>
+	</ui:define>
+
+      </ui:composition>
+
      </div>
   </ui:define>
 

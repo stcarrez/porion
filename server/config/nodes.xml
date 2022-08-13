@@ -12,24 +12,46 @@
     <managed-bean-scope>request</managed-bean-scope>
   </managed-bean>
 
+  <managed-bean>
+    <description>Information about a build node</description>
+    <managed-bean-name>node</managed-bean-name>
+    <managed-bean-class>Porion.Nodes.Beans.Node_Bean</managed-bean-class>
+    <managed-bean-scope>request</managed-bean-scope>
+  </managed-bean>
+
   <filter-mapping>
     <filter-name>service</filter-name>
     <url-pattern>/nodes/*.html</url-pattern>
+    <url-pattern>/nodes/view/#{node.ident}/summary</url-pattern>
+    <url-pattern>/nodes/view/#{node.ident}/builds</url-pattern>
   </filter-mapping>
 
   <filter-mapping>
     <filter-name>auth-filter</filter-name>
     <url-pattern>/nodes/*.html</url-pattern>
+    <url-pattern>/nodes/view/#{node.ident}/summary</url-pattern>
+    <url-pattern>/nodes/view/#{node.ident}/builds</url-pattern>
   </filter-mapping>
 
   <url-policy>
     <permission>anonymous</permission>
     <url-pattern>/nodes/.*\.html</url-pattern>
+    <url-pattern>/nodes/view/.*</url-pattern>
   </url-policy>
 
   <url-policy>
     <permission>logged-user</permission>
     <url-pattern>/nodes/admin/.*</url-pattern>
   </url-policy>
+
+  <url-mapping>
+    <pattern>/nodes/view/#{node.ident}/summary</pattern>
+    <view-id>/nodes/node-summary.html</view-id>
+  </url-mapping>
+
+  <url-mapping>
+    <pattern>/nodes/view/#{node.ident}/builds</pattern>
+    <view-id>/nodes/node-builds.html</view-id>
+  </url-mapping>
 
 </module>

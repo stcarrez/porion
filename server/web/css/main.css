@@ -68,7 +68,7 @@ div.awa-title dd {
     border-top-left-radius: 0.5em;
     border-top-right-radius: 0.5em;
 }
-.project-header .project-title {
+.project-header .project-title, .node-header .node-title {
     float: left;
     padding-left: 0.5em;
     font-size: 2em;
@@ -647,3 +647,17 @@ div.awa-title dd {
     margin-right: 0.5em;
 }
 
+/* Node information */
+.node-info {
+    float: left;
+    width: 100%;
+    padding-left: 1em;
+}
+.node-info-title {
+    float: left;
+    width: 140px;
+}
+.node-info-value {
+    float: left;
+    width: 70%;
+}

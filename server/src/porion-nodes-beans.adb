@@ -18,6 +18,8 @@
 with ADO.Sessions;
 with ADO.Queries;
 with AWA.Services.Contexts;
+with Porion.Nodes.Services;
+with Porion.Services;
 package body Porion.Nodes.Beans is
 
    package ASC renames AWA.Services.Contexts;
@@ -88,5 +90,95 @@ package body Porion.Nodes.Beans is
       Object.Nodes_Bean := Object.Nodes'Access;
       return Object.all'Access;
    end Create_Node_List_Bean;
+
+   --  ------------------------------
+   --  Load the build node information.
+   --  ------------------------------
+   procedure Load (Bean    : in out Node_Bean;
+                   Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
+      Ctx     : constant ASC.Service_Context_Access := ASC.Current;
+      Session : ADO.Sessions.Session := ASC.Get_Session (Ctx);
+      Query   : ADO.Queries.Context;
+      Context : Porion.Services.Context_Type;
+   begin
+      Context.DB := ASC.Get_Master_Session (Ctx);
+
+      Porion.Nodes.Services.Load_Node (Context, To_String (Bean.Ident));
+      Bean.Node := Context.Build_Node;
+
+   exception
+      when Porion.Services.Not_Found =>
+         Outcome := To_UString ("not-found");
+   end Load;
+
+   --  ------------------------------
+   --  Load the build node information.
+   --  ------------------------------
+   procedure Load_Builds (Bean    : in out Node_Bean;
+                          Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
+      Ctx     : constant ASC.Service_Context_Access := ASC.Current;
+      Session : ADO.Sessions.Session := ASC.Get_Session (Ctx);
+      Query   : ADO.Queries.Context;
+      Context : Porion.Services.Context_Type;
+   begin
+      Context.DB := ASC.Get_Master_Session (Ctx);
+
+      Porion.Nodes.Services.Load_Node (Context, To_String (Bean.Ident));
+      Bean.Node := Context.Build_Node;
+
+      Query.Set_Query (Porion.Queries.Query_Node_Build_List);
+      Query.Bind_Param ("node_id", Context.Build_Node.Get_Id);
+      Porion.Queries.List (Bean.Builds, Context.DB, Query);
+
+   exception
+      when Porion.Services.Not_Found =>
+         Outcome := To_UString ("not-found");
+   end Load_Builds;
+
+   --  ------------------------------
+   --  Get the value identified by the name.
+   --  ------------------------------
+   overriding
+   function Get_Value (From : in Node_Bean;
+                       Name : in String) return UBO.Object is
+   begin
+      if Name = "queue_count" then
+         return UBO.To_Object (From.Queue_Count);
+      elsif Name = "queue_nodes" then
+         return UBO.To_Object (From.Queue_Nodes);
+      elsif Name = "builds" then
+         return Util.Beans.Objects.To_Object (Value   => From.Builds_Bean,
+                                              Storage => Util.Beans.Objects.STATIC);
+      else
+         return From.Node.Get_Value (Name);
+      end if;
+   end Get_Value;
+
+   --  ------------------------------
+   --  Set the value identified by the name.
+   --  ------------------------------
+   overriding
+   procedure Set_Value (From  : in out Node_Bean;
+                        Name  : in String;
+                        Value : in UBO.Object) is
+   begin
+      if Name = "ident" then
+         From.Ident := UBO.To_Unbounded_String (Value);
+      end if;
+   end Set_Value;
+
+   --  ------------------------------
+   --  Create the node bean instance.
+   --  ------------------------------
+   function Create_Node_Bean (Module : in Modules.Node_Module_Access)
+      return Util.Beans.Basic.Readonly_Bean_Access is
+      pragma Unreferenced (Module);
+
+      Object : constant Node_Bean_Access := new Node_Bean;
+   begin
+      Object.Node_Bean := Object.Node'Access;
+      Object.Builds_Bean := Object.Builds'Access;
+      return Object.all'Access;
+   end Create_Node_Bean;
 
 end Porion.Nodes.Beans;

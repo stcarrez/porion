@@ -33,6 +33,9 @@ package Porion.Dashboards.Models is
 
 
 
+   --  --------------------
+   --    Load the project from the database as well as other information
+   --  --------------------
    type Project_List_Bean is abstract
      new Util.Beans.Basic.Bean and Util.Beans.Methods.Method_Bean with null record;
 

@@ -106,7 +106,7 @@ namespace Porion {
                         this.updateData(JSON.parse(xmlhttp.response));
                     }
                 };
-                xmlhttp.open("GET", "/porion/api/v1/projects/" + project + "/tests");
+                xmlhttp.open("GET", "/porion/api/v1/projects/" + project + "/tests/builds");
                 xmlhttp.send();
             }
         }
@@ -164,14 +164,19 @@ namespace Porion {
 
     export class CoverageChart {
         readonly graphContainer : HTMLDivElement = <HTMLDivElement>document.createElement('div');
+        readonly legendContainer : HTMLDivElement = <HTMLDivElement>document.createElement('div');
         readonly tooltipContainer : HTMLDivElement = <HTMLDivElement>document.createElement('div');
         container  : HTMLElement | null;
         project    : string = "";
 
         constructor(options : Options, project: string) {
             this.container = document.getElementById(options.container);
+	    
             this.container.appendChild(this.graphContainer);
+	    this.container.appendChild(this.legendContainer);
 	    this.project = project;
+	    this.legendContainer.className = 'graph-legend';
+	    this.graphContainer.className = 'graph-view';
 	    this.tooltipContainer.className = 'graph-tooltip';
 	    document.body.appendChild(this.tooltipContainer);
             this.getData(null)
@@ -207,7 +212,7 @@ namespace Porion {
 	      	 functions.push([build.build_number, build.functions / 10.0]);
 	      }
 	   }
-           $.plot($(this.container), [ lines, functions ], {
+           $.plot($(this.graphContainer), [ { data: lines, label: "Lines" }, { data: functions, label: "Functions" }], {
                 colors: [ "green", "blue"],
                 series: {
                     lines: {
@@ -233,13 +238,13 @@ namespace Porion {
 		},
                 legend: {
                     show: true,
-		    margin: -200,
-		    backgroundColor: "white",
-		    backgroundOpacity: 0.5
+		    margin: [-100, -50],
+		    backgroundOpacity: 0.5,
+		    container: this.legendContainer
                 }
             });
 	    var t = this;
-	    $(this.container).bind("plothover", function (event, pos, item) {
+	    $(this.graphContainer).bind("plothover", function (event, pos, item) {
 	       if (!pos.x || !pos.y) {
 	          return;
 	       }

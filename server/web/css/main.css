@@ -492,14 +492,31 @@ div.awa-title dd {
 .asf-progress-bar {
     line-height: 1em;
 }
-#project-tests, #project-coverage {
+#project-tests, #project-coverage .graph-view {
     float: left;
     width: 340px;
     height: 200px;
 }
+.graph-legend {
+    float: right;
+    display: block;
+    border-width: initial;
+    border-style: none;
+    border-color: initial;
+    border-image: initial;
+    padding-right: 10px;
+    padding-top: 10px;
+}
+
 .legendLayer {
     background: white;
 }
+.legendLayer .background {
+    fill: rgba(255, 255, 255, 0.85);
+    stroke: rgba(0, 0, 0, 0.85);
+    stroke-width: 1;
+}
+
 .graph-tooltip {
     position: absolute;
     display: none;

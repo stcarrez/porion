@@ -111,27 +111,9 @@
       </h:panelGroup>
     </ul>
   </div>
-  <div class='project-graph-view'>
-    <div class='project-graph-title'>Test execution</div>
-    <div id='project-tests' class='project-graph'/>
-    <u:script>
-    $(function() {
-    new Porion.TestChart({container: 'project-tests'}, '#{project.name}');
-});
-    </u:script>
-  </div>
-  <div class='project-graph-view'>
-    <div class='project-graph-title'>Coverage</div>
-    <div id='project-coverage' class='project-graph'/>
-    <u:script>
-    $(function() {
-    new Porion.CoverageChart({container: 'project-coverage'}, '#{project.name}');
-});
-    </u:script>
-  </div>
   <div id="project-lang-graph" class='porion-graph'>
     <u:script>
-    $(function() {
+      $(function() {
     var series = [];
     var pos = 1;
     var ticks = [];
@@ -140,9 +122,27 @@
       ticks.push([pos, "#{lang.label}"]);
       pos++;
     </h:list>
-
     new Porion.BarGraph('project-lang-graph', '', series, ticks);
-    });
+});
+    </u:script>
+  </div>
+  <div class='project-graph-view'>
+    <div class='project-graph-title'>Test execution</div>
+    <div id='project-tests' class='project-graph'/>
+
+    <u:script>
+      $(function() {
+    new Porion.TestChart({container: 'project-tests'}, '#{project.name}');
+      });
+    </u:script>
+  </div>
+  <div class='project-graph-view'>
+    <div class='project-graph-title'>Coverage</div>
+    <div id='project-coverage' class='project-graph'/>
+    <u:script>
+      $(function() {
+      new Porion.CoverageChart({container: 'project-coverage'}, '#{project.name}');
+      });
     </u:script>
   </div>
 

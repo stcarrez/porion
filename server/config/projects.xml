@@ -47,7 +47,7 @@
     <url-pattern>/projects/*.html</url-pattern>
     <url-pattern>/projects/view/#{project.ident}/summary</url-pattern>
     <url-pattern>/projects/view/#{project.ident}/builds</url-pattern>
-    <url-pattern>/projects/view/#{project.ident}/tests</url-pattern>
+    <url-pattern>/projects/view/#{project.ident}/xunits</url-pattern>
     <url-pattern>/projects/view/#{project.ident}/coverage</url-pattern>
   </filter-mapping>
 
@@ -56,7 +56,7 @@
     <url-pattern>/projects/*.html</url-pattern>
     <url-pattern>/projects/view/#{project.ident}/summary</url-pattern>
     <url-pattern>/projects/view/#{project.ident}/builds</url-pattern>
-    <url-pattern>/projects/view/#{project.ident}/tests</url-pattern>
+    <url-pattern>/projects/view/#{project.ident}/xunits</url-pattern>
     <url-pattern>/projects/view/#{project.ident}/coverage</url-pattern>
   </filter-mapping>
 
@@ -73,7 +73,7 @@
 
   <url-mapping>
     <pattern>/projects/view/#{project.ident}/summary</pattern>
-    <view-id>/projects/view.html</view-id>
+    <view-id>/projects/project-summary.html</view-id>
   </url-mapping>
 
   <url-mapping>
@@ -82,8 +82,8 @@
   </url-mapping>
 
   <url-mapping>
-    <pattern>/projects/view/#{project.ident}/tests</pattern>
-    <view-id>/projects/project-tests.html</view-id>
+    <pattern>/projects/view/#{project.ident}/xunits</pattern>
+    <view-id>/projects/project-xunits.html</view-id>
   </url-mapping>
 
   <url-mapping>

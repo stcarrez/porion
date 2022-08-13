@@ -47,7 +47,7 @@ AGENT_DYNAMO_ARGS=\
   db
 
 SERVER_DYNAMO_ARGS=\
-  --package Porion.Dashboards.Models \
+  --package Porion.Beans \
   db ../uml/porion.zargo
 
 ROOTDIR=.
@@ -65,6 +65,9 @@ test:	build
 	bin/porion_harness -v -config test.properties -xml porion-aunit.xml
 
 generate:: build-dynamo
+	$(MAKE) generate-model
+
+generate-model::
 	mkdir -p db agent/db
 	$(DYNAMO) generate $(DYNAMO_ARGS)
 	cd agent && $(DYNAMO) generate $(AGENT_DYNAMO_ARGS)

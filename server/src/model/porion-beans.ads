@@ -111,6 +111,32 @@ package Porion.Beans is
    procedure Load (Bean : in out Build_List_Bean;
                   Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is abstract;
 
+   type Node_Bean is abstract
+     new Util.Beans.Basic.Bean and Util.Beans.Methods.Method_Bean with null record;
+
+
+   --  This bean provides some methods that can be used in a Method_Expression.
+   overriding
+   function Get_Method_Bindings (From : in Node_Bean)
+                                 return Util.Beans.Methods.Method_Binding_Array_Access;
+
+   --  Get the bean attribute identified by the name.
+   overriding
+   function Get_Value (From : in Node_Bean;
+                       Name : in String) return Util.Beans.Objects.Object;
+
+   --  Set the bean attribute identified by the name.
+   overriding
+   procedure Set_Value (Item  : in out Node_Bean;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object);
+
+   procedure Load (Bean : in out Node_Bean;
+                  Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is abstract;
+
+   procedure Load_Builds (Bean : in out Node_Bean;
+                         Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is abstract;
+
 
 private
 end Porion.Beans;

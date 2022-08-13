@@ -186,5 +186,65 @@ package body Porion.Beans is
       null;
    end Set_Value;
 
+   procedure Op_Load (Bean    : in out Node_Bean;
+                      Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
+   procedure Op_Load (Bean    : in out Node_Bean;
+                      Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
+   begin
+      Node_Bean'Class (Bean).Load (Outcome);
+   end Op_Load;
+   package Binding_Node_Bean_1 is
+     new ASF.Events.Faces.Actions.Action_Method.Bind (Bean   => Node_Bean,
+                                                      Method => Op_Load,
+                                                      Name   => "load");
+   procedure Op_Load_Builds (Bean    : in out Node_Bean;
+                             Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
+   procedure Op_Load_Builds (Bean    : in out Node_Bean;
+                             Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
+   begin
+      Node_Bean'Class (Bean).Load_Builds (Outcome);
+   end Op_Load_Builds;
+   package Binding_Node_Bean_2 is
+     new ASF.Events.Faces.Actions.Action_Method.Bind (Bean   => Node_Bean,
+                                                      Method => Op_Load_Builds,
+                                                      Name   => "load_builds");
+
+   Binding_Node_Bean_Array : aliased constant Util.Beans.Methods.Method_Binding_Array
+     := (1 => Binding_Node_Bean_1.Proxy'Access,
+         2 => Binding_Node_Bean_2.Proxy'Access
+     );
+
+   --  ------------------------------
+   --  This bean provides some methods that can be used in a Method_Expression.
+   --  ------------------------------
+   overriding
+   function Get_Method_Bindings (From : in Node_Bean)
+                                 return Util.Beans.Methods.Method_Binding_Array_Access is
+      pragma Unreferenced (From);
+   begin
+      return Binding_Node_Bean_Array'Access;
+   end Get_Method_Bindings;
+   --  ------------------------------
+   --  Get the bean attribute identified by the name.
+   --  ------------------------------
+   overriding
+   function Get_Value (From : in Node_Bean;
+                       Name : in String) return Util.Beans.Objects.Object is
+   begin
+      return Util.Beans.Objects.Null_Object;
+   end Get_Value;
+
+
+   --  ------------------------------
+   --  Set the value identified by the name
+   --  ------------------------------
+   overriding
+   procedure Set_Value (Item  : in out Node_Bean;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object) is
+   begin
+      null;
+   end Set_Value;
+
 
 end Porion.Beans;

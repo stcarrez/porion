@@ -169,6 +169,8 @@ package Porion.Queries is
 
    Query_Project_Build_List : constant ADO.Queries.Query_Definition_Access;
 
+   Query_Node_Build_List : constant ADO.Queries.Query_Definition_Access;
+
    --  --------------------
    --    Build metrics.
    --  --------------------
@@ -1072,6 +1074,12 @@ private
                                      File => File_2.File'Access);
    Query_Project_Build_List : constant ADO.Queries.Query_Definition_Access
    := Def_Buildinfo_Project_Build_List.Query'Access;
+
+   package Def_Buildinfo_Node_Build_List is
+      new ADO.Queries.Loaders.Query (Name => "node-build-list",
+                                     File => File_2.File'Access);
+   Query_Node_Build_List : constant ADO.Queries.Query_Definition_Access
+   := Def_Buildinfo_Node_Build_List.Query'Access;
 
    package File_3 is
       new ADO.Queries.Loaders.File (Path => "report-build-metrics.xml",

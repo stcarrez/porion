@@ -61,7 +61,7 @@ div.awa-title dd {
     background: #eee;
 }
 .page-summary .project-header .project-tab-summary,
-.page-tests .project-header .project-tab-tests,
+.page-xunits .project-header .project-tab-xunits,
 .page-builds .project-header .project-tab-builds,
 .page-coverage .project-header .project-tab-coverage {
     background: white;
@@ -501,6 +501,9 @@ div.awa-title dd {
     height: 1em;
     border-radius: 1em;
 }
+.project-build-header .build-status {
+    border: none;
+}
 .project-build-list .build-number {
     width: 5em;
 }
@@ -514,9 +517,10 @@ div.awa-title dd {
     font-family: monospace;
 }
 .project-build-list .build-xunit-pass, .project-build-list .build-xunit-fail, .project-build-list .build-xunit-timeout {
-    width: 30%;
+    width: 33.3%;
     float: left;
     text-align: right;
+    height: 1em;
 }
 .project-build-list .build-xunit-title {
     width: 100%;
@@ -536,7 +540,7 @@ div.awa-title dd {
 .asf-progress-bar {
     line-height: 1em;
 }
-#project-tests, #project-coverage .graph-view {
+#project-xunits, #project-coverage .graph-view {
     float: left;
     width: 340px;
     height: 200px;
@@ -570,18 +574,24 @@ div.awa-title dd {
     opacity: 0.80;
 }
 
-/* Build tests */
-.project-tests {
+/* Build unit tests */
+.project-xunits-header .project-xunits-name {
+    width: 40%;
+}
+.project-xunits-header .project-xunits-tests {
+    width: 5%;
+}
+.project-xunits {
     float: left;
     width: 98%;
     padding-left: 1%;
     padding-right: 1%;
 }
-.build-test-group, .build-test, .build-test-group-title {
+.build-xunit-group, .build-xunit, .build-xunit-group-title {
     float: left;
     width: 100%;
 }
-.build-test-group-title {
+.build-xunit-group-title {
     font-size: 1.2em;
     color: #424343;
     font-weight: bold;
@@ -595,37 +605,45 @@ div.awa-title dd {
     height: 32px;
     line-height: 32px;
 }
-.group-name, .build-test {
+.group-name, .xbuild-xunit {
     padding-left: 32px;
 }
 .group-visible .group-name {
     background: url(../images/icon-collapse-tree-32.png) no-repeat;    
 }
-.build-tests {
+.build-xunit-group-single .group-name {
+    background: none;
+    cursor: default;
+}
+.build-xunits {
     display: none;
 }
-.group-visible .build-tests {
+.group-visible .build-xunits {
     display: block;
 }
-.build-tests {
+.build-xunits {
     float: left;
     padding-left: 1%;
     width: 99%;
 }
-.test-name {
+.xunit-name {
     float: left;
-    width: 60%;
+    width: 50%;
 }
-.test-duration {
+.xunit-duration, .group-duration {
     float: left;
     width: 20%;
+    text-align: right;
+    padding-right: 0.5em;
 }
-.test-build {
+.xunit-build {
     float: left;
     width: 20%;
 }
 .group-pass, .group-fail, .group-timeout {
     float: left;
-    width: 10%;
+    width: 5%;
+    text-align: right;
+    margin-right: 0.5em;
 }
 

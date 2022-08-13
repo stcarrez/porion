@@ -1,6 +1,6 @@
 /*
- *  wi2wic -- Wiki To Wiki Converter
- *  Copyright (C) 2020 Stephane Carrez
+ *  xunits -- Display unit tests for a project
+ *  Copyright (C) 2022 Stephane Carrez
  *  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,37 +34,16 @@ var Porion;
             this.project = project;
             this.container = document.getElementById(options.container);
             this.container.appendChild(this.testContainer);
-            this.showAll = document.getElementById(options.btnShowAll);
-            this.showInfo = document.getElementById(options.btnShowInfo);
-            this.showWarn = document.getElementById(options.btnShowWarning);
-            this.countAll = document.getElementById(options.countAll);
-            this.countInfo = document.getElementById(options.countInfo);
-            this.countWarn = document.getElementById(options.countWarn);
             this.getData(null);
             this.container.addEventListener("click", function (event) {
                 _this.onClick(event);
             });
-            if (this.showAll) {
-                this.showAll.addEventListener("click", function (event) {
-                    _this.setMode(event, 'build-show-all');
-                });
-            }
-            if (this.showInfo) {
-                this.showInfo.addEventListener("click", function (event) {
-                    _this.setMode(event, 'build-show-info');
-                });
-            }
-            if (this.showWarn) {
-                this.showWarn.addEventListener("click", function (event) {
-                    _this.setMode(event, 'build-show-warning');
-                });
-            }
         }
         ProjectTests.prototype.onClick = function (event) {
             if (event.target instanceof HTMLElement) {
                 var target = event.target;
                 if (target.className == "group-name") {
-                    var parent = target.closest('.build-test-group');
+                    var parent = target.closest('.build-xunit-group');
                     if (parent) {
                         if (parent.classList.contains("group-visible")) {
                             parent.classList.remove("group-visible");
@@ -97,17 +76,58 @@ var Porion;
             for (var _i = 0, content_1 = content; _i < content_1.length; _i++) {
                 var group = content_1[_i];
                 var groupDiv = document.createElement("div");
-                groupDiv.className = 'build-test-group';
+                groupDiv.className = 'build-xunit-group';
                 var groupTestDiv = document.createElement("div");
-                groupTestDiv.className = 'build-tests';
+                groupTestDiv.className = 'build-xunits';
                 var groupDuration = 0;
                 var groupPass = 0;
                 var groupFail = 0;
                 var groupTimeout = 0;
-                for (var _a = 0, _b = group.tests; _a < _b.length; _a++) {
-                    var test = _b[_a];
-                    var divTest = document.createElement("div");
-                    divTest.className = 'build-test';
+                var build_number = 0;
+                var divGroup = document.createElement("div");
+                var tests = group.tests;
+                if (tests.length > 1) {
+                    divGroup.className = 'build-xunit-group-title';
+                    for (var _a = 0, _b = group.tests; _a < _b.length; _a++) {
+                        var test = _b[_a];
+                        var divTest = document.createElement("div");
+                        divTest.className = 'build-xunit';
+                        if (test.status == "TEST_PASS") {
+                            groupPass++;
+                        }
+                        else if (test.status == "TEST_FAIL") {
+                            groupFail++;
+                        }
+                        else {
+                            groupTimeout++;
+                        }
+                        groupDuration = groupDuration + test.duration;
+                        var div_1 = document.createElement("div");
+                        div_1.textContent = test.name;
+                        div_1.className = 'xunit-name';
+                        divTest.appendChild(div_1);
+                        div_1 = document.createElement("div");
+                        div_1.textContent = FormatMicrosecond(test.duration);
+                        div_1.className = 'xunit-duration';
+                        divTest.appendChild(div_1);
+                        div_1 = document.createElement("div");
+                        div_1.className = 'xunit-build';
+                        if (test.last_pass_build) {
+                            if (test.last_pass_build > build_number) {
+                                build_number = test.last_pass_build;
+                            }
+                            var link = document.createElement("a");
+                            link.href = "/porion/builds/view/" + this.project + ":" + test.last_pass_build;
+                            link.appendChild(document.createTextNode(String(test.last_pass_build)));
+                            div_1.appendChild(link);
+                        }
+                        divTest.appendChild(div_1);
+                        groupTestDiv.appendChild(divTest);
+                    }
+                }
+                else {
+                    var test = tests[0];
+                    divGroup.className = 'build-xunit-group-title build-xunit-group-single';
                     if (test.status == "TEST_PASS") {
                         groupPass++;
                     }
@@ -118,27 +138,7 @@ var Porion;
                         groupTimeout++;
                     }
                     groupDuration = groupDuration + test.duration;
-                    var div_1 = document.createElement("div");
-                    div_1.textContent = test.name;
-                    div_1.className = 'test-name';
-                    divTest.appendChild(div_1);
-                    div_1 = document.createElement("div");
-                    div_1.textContent = FormatMicrosecond(test.duration);
-                    div_1.className = 'test-duration';
-                    divTest.appendChild(div_1);
-                    div_1 = document.createElement("div");
-                    div_1.className = 'test-build';
-                    if (test.last_pass_build) {
-                        var link = document.createElement("a");
-                        link.href = "/porion/builds/view/" + this.project + ":" + test.last_pass_build;
-                        link.appendChild(document.createTextNode(String(test.last_pass_build)));
-                        div_1.appendChild(link);
-                    }
-                    divTest.appendChild(div_1);
-                    groupTestDiv.appendChild(divTest);
                 }
-                var divGroup = document.createElement("div");
-                divGroup.className = 'build-test-group-title';
                 var div = document.createElement("div");
                 div.textContent = group.name;
                 div.className = 'group-name';
@@ -155,14 +155,19 @@ var Porion;
                 div.className = "group-duration";
                 div.textContent = FormatMicrosecond(groupDuration);
                 divGroup.appendChild(div);
+                div = document.createElement("div");
+                div.className = 'xunit-build';
+                if (build_number > 0) {
+                    var link = document.createElement("a");
+                    link.href = "/porion/builds/view/" + this.project + ":" + test.last_pass_build;
+                    link.appendChild(document.createTextNode(String(test.last_pass_build)));
+                    div.appendChild(link);
+                }
+                divGroup.appendChild(div);
                 groupDiv.appendChild(divGroup);
                 groupDiv.appendChild(groupTestDiv);
                 this.testContainer.appendChild(groupDiv);
             }
-        };
-        ProjectTests.prototype.setMode = function (event, mode) {
-            this.container.classList.remove('build-show-all', 'build-show-info', 'build-show-warning');
-            this.container.classList.add(mode);
         };
         return ProjectTests;
     }());

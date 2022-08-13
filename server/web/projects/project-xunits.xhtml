@@ -18,11 +18,28 @@
 	<ui:param name="projectName" value="#{project.name}"/>
 	<ui:param name="projectBuildStatus" value="#{project.build_status}"/>
       </ui:include>
-      <div id='project-list-tests' class='project-tests'/>
+      <div id='project-list-xunits' class='project-xunits'>
+	<div class='awa-list-header project-xunits-header'>
+	  <div class='awa-header-col project-xunits-name'>
+	    Test name
+	  </div>
+	  <div class='awa-header-col group-pass'>
+	    Pass
+	  </div>
+	  <div class='awa-header-col group-fail'>
+	    Fail
+	  </div>
+	  <div class='awa-header-col group-duration'>
+	    Duration
+	  </div>
+	  <div class='awa-header-col test-build'>
+	    Build
+	  </div>
+	</div>
+      </div>
     </div>
     <util:script>
-    new Porion.ProjectTests({container: 'project-list-tests', btnShowAll: 'build-log-show-all', btnShowInfo: 'build-log-show-info', btnShowWarning: 'build-log-show-warning',
-    countAll: 'build-log-all-count', countInfo: 'build-log-info-count', countWarn: 'build-log-warn-count'}, '#{project.name}');
+    new Porion.ProjectTests({container: 'project-list-xunits'}, '#{project.name}');
     </util:script>
   </ui:define>
 

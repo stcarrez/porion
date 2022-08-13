@@ -25,6 +25,7 @@
   xmlns:h="http://java.sun.com/jsf/html">
   <div class='project-build-list'>
       <div class='awa-list-header project-build-header'>
+	<div class='awa-header-col build-status'/>
         <div class='awa-header-col build-number'>
           Number
         </div>
@@ -86,13 +87,13 @@
 	  <div class="build-xunit">
 	    <a href="#{contextPath}/builds/view/#{project.name}:#{build.build_number}/xunits" title="Tests for #{build.build_number}">
               <span class='build-xunit-pass'>
-		#{build.pass_count}
+		<h:outputText value="#{build.pass_count}" rendered="#{build.pass_count gt 0}"/>
               </span>
               <span class='build-xunit-fail'>
-		#{build.fail_count}
+		<h:outputText value="#{build.fail_count}" rendered="#{build.fail_count gt 0}"/>
               </span>
               <span class='build-xunit-timeout'>
-		#{build.timeout_count}
+		<h:outputText value="#{build.timeout_count}" rendered="#{build.timeout_count gt 0}"/>
               </span>
 	    </a>
 	  </div>

@@ -7,8 +7,8 @@
     <property name="is_gtk">FALSE</property>
     <property name="use_postgresql">false</property>
     <property name="use_mysql">false</property>
-    <property name="build">14</property>
     <property name="is_lib">FALSE</property>
+    <property name="build">14</property>
     <property name="author">Stephane Carrez</property>
     <property name="is_web">FALSE</property>
     <property name="gnat_project">porion_server.gpr</property>

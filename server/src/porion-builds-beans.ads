@@ -20,7 +20,7 @@ with Ada.Strings.Unbounded;
 
 with Util.Beans.Basic;
 with Util.Beans.Objects;
-with Porion.Dashboards.Models;
+with Porion.Beans;
 with Porion.Builds.Modules;
 with Porion.Projects.Models;
 with Porion.Builds.Models;
@@ -32,7 +32,7 @@ package Porion.Builds.Beans is
    package UBB renames Util.Beans.Basic;
    package UBO renames Util.Beans.Objects;
 
-   type Build_Bean is new Porion.Dashboards.Models.Project_List_Bean with record
+   type Build_Bean is new Porion.Beans.Build_List_Bean with record
       Ident        : Porion.Projects.Ident_Type;
       Module       : Porion.Builds.Modules.Build_Module_Access := null;
       Build        : aliased Porion.Builds.Models.Build_Ref;

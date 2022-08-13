@@ -22,13 +22,14 @@ with Util.Beans.Basic;
 with Util.Beans.Objects;
 
 with Porion.Nodes.Modules;
+with Porion.Nodes.Models;
 with Porion.Queries;
-with Porion.Dashboards.Models;
+with Porion.Beans;
 package Porion.Nodes.Beans is
 
    package UBO renames Util.Beans.Objects;
 
-   type Node_List_Bean is new Porion.Dashboards.Models.Project_List_Bean with record
+   type Node_List_Bean is new Porion.Beans.Node_List_Bean with record
       Nodes       : aliased Porion.Queries.Node_Info_List_Bean;
       Nodes_Bean  : Porion.Queries.Node_Info_List_Bean_Access;
       Queue_Count : Natural := 0;

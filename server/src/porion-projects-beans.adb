@@ -70,6 +70,7 @@ package body Porion.Projects.Beans is
    --  ------------------------------
    --  Load the stats.
    --  ------------------------------
+   overriding
    procedure Load (Bean    : in out Project_Bean;
                    Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
       Ctx     : constant ASC.Service_Context_Access := ASC.Current;
@@ -110,6 +111,44 @@ package body Porion.Projects.Beans is
          Outcome := To_UString ("not-found");
 
    end Load;
+
+   --  Load the project and the list of builds.
+   overriding
+   procedure Load_Builds (Bean    : in out Project_Bean;
+                         Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
+      Ctx     : constant ASC.Service_Context_Access := ASC.Current;
+      Context : Porion.Services.Context_Type;
+      Query   : ADO.Queries.Context;
+   begin
+      Context.DB := ASC.Get_Master_Session (Ctx);
+
+      Context.Load (Bean.Ident);
+      Bean.Project := Context.Project;
+      Bean.Branch := Context.Branch;
+      Bean.Metric.Project := Context.Project.Get_Id;
+      Bean.Metric.Cloc_Max_Count := 4;
+      Bean.Metric.Load (Outcome);
+
+      Query.Set_Query (Porion.Queries.Query_Project_Build_List);
+      Query.Bind_Param ("project_id", Context.Project.Get_Id);
+      Porion.Queries.List (Bean.Builds, Context.DB, Query);
+
+      if not Bean.Builds.List.Is_Empty then
+         Bean.Build_Status := Porion.Builds.Models.BUILD_PASS;
+         for Build of Bean.Builds.List loop
+            if Build.Build_Status = Porion.Builds.Models.BUILD_FAIL then
+               Bean.Build_Status := Porion.Builds.Models.BUILD_FAIL;
+               exit;
+            end if;
+         end loop;
+      else
+         Bean.Build_Status := Porion.Builds.Models.BUILD_FAIL;
+      end if;
+
+   exception
+      when Porion.Services.Not_Found =>
+         Outcome := To_UString ("not-found");
+   end Load_Builds;
 
    --  ------------------------------
    --  Create the Project_Bean bean instance.

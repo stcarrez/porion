@@ -1,0 +1,30 @@
+<ui:composition xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:u="http://code.google.com/p/ada-asf/util"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:util="http://code.google.com/p/ada-asf/util"
+                xmlns:c="http://java.sun.com/jstl/core"
+                template="/WEB-INF/layouts/layout.xhtml">
+  <ui:param name="title" value="#{project.name} - Summary" />
+  <ui:param name="pageStyle" value="page-project"/>
+  <ui:param name="top_nav" value="page-builds"/>
+
+  <!-- Main page body -->
+  <ui:define name="pageBody">
+    <f:metadata>
+      <f:viewAction action='#{project.load_builds}'/>
+    </f:metadata>
+    <div id='awa-content'>
+      <ui:include src="/WEB-INF/layouts/project-header.xhtml">
+	<ui:param name="projectName" value="#{project.name}"/>
+	<ui:param name="projectBuildStatus" value="#{project.build_status}"/>
+      </ui:include>
+      <ui:include src="lists/builds.xhtml"/>
+     </div>
+  </ui:define>
+
+  <ui:define name="pageScript">
+    <script type="text/javascript" src="#{contextPath}/js/projects.js"></script>
+  </ui:define>
+
+</ui:composition>

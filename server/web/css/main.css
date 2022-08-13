@@ -108,13 +108,19 @@ div.awa-title dd {
 .project-page-grid .project-progress-status {
     float: right;
 }
-.build-status-BUILD_FAIL .project-build-status, .build-status-BUILD_FAIL .project-progress-status {
+.CONFIG_BUILD_REQUIRED .recipe-status {
+    background-color: #0000cc;
+}
+.build-status-BUILD_FAIL .project-build-status, .build-status-BUILD_FAIL .project-progress-status,
+.project-build-list .BUILD_FAIL .build-status {
     background: red;
 }
-.build-status-BUILD_PASS .project-build-status, .build-status-BUILD_PASS .project-progress-status {
+.build-status-BUILD_PASS .project-build-status, .build-status-BUILD_PASS .project-progress-status,
+.CONFIG_BUILD_PASS .recipe-status, .project-build-list .BUILD_PASS .build-status {
     background: green;
 }
-.build-status-BUILD_RUNNING .project-build-status, .build-status-BUILD_RUNNING .project-progress-status {
+.build-status-BUILD_RUNNING .project-build-status, .build-status-BUILD_RUNNING .project-progress-status,
+.project-build-list .BUILD_RUNNING .build-status {
     background: orange;
 }
 .project-page-grid .project-title {
@@ -447,6 +453,7 @@ div.awa-title dd {
     padding-right: 1em;
 }
 
+/* Project summary with recipes */
 .project-recipe-list {
     margin-top: 1em;
     float: left;
@@ -482,12 +489,49 @@ div.awa-title dd {
     margin-top: 0.1em;
     margin-bottom: 0.1em;
 }
-.CONFIG_BUILD_PASS .recipe-status {
-    background-color: #00cc00;
+
+/* Project builds */
+.awa-list-header > div, .awa-list-item > div {
+    float: left;
+    overflow: hidden;
+    margin-right: 0.5em;
 }
-.CONFIG_BUILD_REQUIRED .recipe-status {
-    background-color: #0000cc;
+.project-build-list .build-status {
+    width: 1em;
+    height: 1em;
+    border-radius: 1em;
 }
+.project-build-list .build-number {
+    width: 5em;
+}
+.project-build-list .build-branch-name, .project-build-list .build-node, .project-build-list .build-recipe, .project-build-list .build-xunit {
+    width: 13%;
+}
+.project-build-list .build-tag {
+    width: 10%;
+}
+.project-build-list .awa-list .build-tag {
+    font-family: monospace;
+}
+.project-build-list .build-xunit-pass, .project-build-list .build-xunit-fail, .project-build-list .build-xunit-timeout {
+    width: 30%;
+    float: left;
+    text-align: right;
+}
+.project-build-list .build-xunit-title {
+    width: 100%;
+    float: left;
+    text-align: center;
+}
+.project-build-list .build-duration {
+    width: 7%;
+    text-align: right;
+}
+.project-build-list .build-date {
+    width: 13%;
+    text-align: right;
+}
+
 /* Fix display if parent line-height is > 1em */
 .asf-progress-bar {
     line-height: 1em;

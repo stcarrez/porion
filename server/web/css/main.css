@@ -665,3 +665,7 @@ div.awa-title dd {
     float: left;
     width: 70%;
 }
+#node-usage-graph, #node-duration-graph {
+    width: 800px;
+    height: 400px;
+}

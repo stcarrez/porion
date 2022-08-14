@@ -1,0 +1,71 @@
+<ui:composition xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:u="http://code.google.com/p/ada-asf/util"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:util="http://code.google.com/p/ada-asf/util"
+                xmlns:c="http://java.sun.com/jstl/core"
+                template="/WEB-INF/layouts/layout.xhtml">
+  <ui:param name="title" value="#{node.name} - Summary" />
+  <ui:param name="pageStyle" value="page-node"/>
+  <ui:param name="top_nav" value="page-summary"/>
+
+  <!-- Main page body -->
+  <ui:define name="pageBody">
+    <f:metadata>
+      <f:viewAction action='#{node.load}'/>
+    </f:metadata>
+    <div id='awa-content'>
+      <ui:include src="/WEB-INF/layouts/node-header.xhtml">
+	<ui:param name="nodeName" value="#{node.name}"/>
+	<ui:param name="projectBuildStatus" value="#{project.build_status}"/>
+      </ui:include>
+      <ui:include src="views/info.xhtml"/>
+
+      <div class='project-graph-view'>
+	<div class='project-graph-title'>Build duration</div>
+	<div id='node-duration-graph' class='project-graph'/>
+      </div>
+
+      <div class='project-graph-view'>
+	<div class='project-graph-title'>User and system time usage</div>
+	<div id='node-usage-graph' class='project-graph'/>
+      </div>
+
+    <u:script>
+      $(function() {
+    new Porion.NodeUsageChart({durationContainer: 'node-duration-graph', systemContainer: 'node-usage-graph'}, '#{node.name}');
+      });
+    </u:script>
+     </div>
+  </ui:define>
+
+  <ui:define name="pageScript">
+<script type="text/javascript" src="#{jquery.path}"></script>
+<script type="text/javascript" src="#{jquery.uiPath}core.js"></script>
+<script type="text/javascript" src="#{jquery.uiPath}widget.js"></script>
+<script type="text/javascript" src="#{jquery.uiPath}position.js"></script>
+<script type="text/javascript" src="#{jquery.uiPath}mouse.js"></script>
+<script type="text/javascript" src="#{jquery.uiPath}autocomplete.js"></script>
+<script type="text/javascript" src="#{contextPath}/js/asf.js"></script>
+<script type="text/javascript" src="#{contextPath}/js/asf-editable.js"></script>
+<script type="text/javascript" src="#{contextPath}/js/asf-message.js"></script>
+<script type="text/javascript" src="#{contextPath}/js/asf-list.js"></script>
+<script type="text/javascript" src="#{contextPath}/js/asf-widgets.js"></script>
+<script type="text/javascript" src="#{contextPath}/js/awa.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/jquery.canvaswrapper.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/jquery.colorhelpers.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.saturated.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.browser.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.drawSeries.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.uiConstants.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.symbol.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.legend.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.time.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.stack.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.pie.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.hover.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/nodes.js"></script>
+  </ui:define>
+
+</ui:composition>

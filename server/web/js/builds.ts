@@ -211,16 +211,16 @@ namespace Porion {
 	    var allCount : number = 0;
 	    for (var group of content) {
 	       let groupDiv = document.createElement("div");
-               groupDiv.className = 'build-test-group';
+               groupDiv.className = 'build-xunit-group';
                let groupTestDiv = document.createElement("div");
-	       groupTestDiv.className = 'build-tests';
+	       groupTestDiv.className = 'build-xunits';
 	       var groupDuration : number = 0;
 	       var groupPass : number = 0;
 	       var groupFail : number = 0;
 	       var groupTimeout : number = 0;
 	       for (var test of group.tests) {
                   let divTest = document.createElement("div");
-		  divTest.className = 'build-test';
+		  divTest.className = 'build-xunit';
 
                   if (test.status == "TEST_PASS") {
 		     groupPass++;
@@ -233,18 +233,18 @@ namespace Porion {
 
 		  let div = document.createElement("div");
 		  div.textContent = test.name;
-		  div.className = 'test-name';
+		  div.className = 'xunit-name';
 		  divTest.appendChild(div);
 		  
 		  div = document.createElement("div");
 		  div.textContent = String(test.duration);
-		  div.className = 'test-duration';
+		  div.className = 'xunit-duration';
 		  divTest.appendChild(div);
 
 		  groupTestDiv.appendChild(divTest);
 	       }
                let divGroup = document.createElement("div");
-	       divGroup.className = 'build-test-group-title';
+	       divGroup.className = 'build-xunit-group-title';
 
                let div = document.createElement("div");
 	       div.textContent = group.name;

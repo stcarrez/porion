@@ -19,12 +19,12 @@
 	<ui:param name="projectName" value="#{build.project.name}"/>
       </ui:include>
       <ui:include src="views/info.xhtml"/>
-      <div id='build-tests'>
+      <div id='build-xunits'>
       </div>
     </div>
 
     <u:script>
-    new Porion.BuildTests({container: 'build-tests', btnShowAll: 'build-log-show-all', btnShowInfo: 'build-log-show-info', btnShowWarning: 'build-log-show-warning',
+    new Porion.BuildTests({container: 'build-xunits', btnShowAll: 'build-log-show-all', btnShowInfo: 'build-log-show-info', btnShowWarning: 'build-log-show-warning',
     countAll: 'build-log-all-count', countInfo: 'build-log-info-count', countWarn: 'build-log-warn-count'}, '#{build.ident}');
     </u:script>
   </ui:define>

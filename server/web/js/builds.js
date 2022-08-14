@@ -160,9 +160,9 @@ var Porion;
             for (var _i = 0, content_3 = content; _i < content_3.length; _i++) {
                 var group = content_3[_i];
                 var groupDiv = document.createElement("div");
-                groupDiv.className = 'build-test-group';
+                groupDiv.className = 'build-xunit-group';
                 var groupTestDiv = document.createElement("div");
-                groupTestDiv.className = 'build-tests';
+                groupTestDiv.className = 'build-xunits';
                 var groupDuration = 0;
                 var groupPass = 0;
                 var groupFail = 0;
@@ -170,7 +170,7 @@ var Porion;
                 for (var _a = 0, _b = group.tests; _a < _b.length; _a++) {
                     var test = _b[_a];
                     var divTest = document.createElement("div");
-                    divTest.className = 'build-test';
+                    divTest.className = 'build-xunit';
                     if (test.status == "TEST_PASS") {
                         groupPass++;
                     }
@@ -183,16 +183,16 @@ var Porion;
                     groupDuration = groupDuration + test.duration;
                     var div_1 = document.createElement("div");
                     div_1.textContent = test.name;
-                    div_1.className = 'test-name';
+                    div_1.className = 'xunit-name';
                     divTest.appendChild(div_1);
                     div_1 = document.createElement("div");
                     div_1.textContent = String(test.duration);
-                    div_1.className = 'test-duration';
+                    div_1.className = 'xunit-duration';
                     divTest.appendChild(div_1);
                     groupTestDiv.appendChild(divTest);
                 }
                 var divGroup = document.createElement("div");
-                divGroup.className = 'build-test-group-title';
+                divGroup.className = 'build-xunit-group-title';
                 var div = document.createElement("div");
                 div.textContent = group.name;
                 div.className = 'group-name';

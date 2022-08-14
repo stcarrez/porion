@@ -127,8 +127,8 @@ var Porion;
                 }
                 if (build_pass) {
                     build_duration_pass.push([day, build_pass.build_duration + offset]);
-                    day_user_time += build_fail.user_time;
-                    day_sys_time += build_fail.sys_time;
+                    day_user_time += build_pass.user_time;
+                    day_sys_time += build_pass.sys_time;
                 }
                 sys_time.push([day, day_sys_time]);
                 user_time.push([day, day_sys_time + day_user_time]);

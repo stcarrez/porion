@@ -21,21 +21,32 @@ namespace Porion {
           return us + " us";
        }
        if (us < 1000000) {
-          return (us / 1000) + " ms";
+          us = us / 1000;
+          return us.toFixed(3) + " ms";
        }
-       return (us / 1000000) + " s";
-    }
-    export interface Options {
-        container: string,
+       us = us / 1000000;
+       return us.toFixed(3) + " s";
     }
 
-    export interface TestInfo {
+    /* Options to control the Xunit renderer */
+    export interface Options {
+        container: string,
+        project: string | null,
+	build: string | null
+    }
+
+    /* JSON to describe a build test result */
+    export interface BuildTestInfo {
        name: string;
        duration: number;
        status: string;
        total_pass: number;
        total_fail: number;
        total_timeout: number;
+    }
+
+    /* JSON to describe the project wide test info */
+    export interface TestInfo extends BuildTestInfo {
        total_skip: number;
        last_pass_build: number | null;
        last_fail_build: number | null;
@@ -47,69 +58,109 @@ namespace Porion {
        tests: TestInfo[];
     }
     export class ProjectTests {
-        readonly testContainer : HTMLDivElement = <HTMLDivElement>document.createElement('div');
-        container : HTMLElement | null;
-        project   : string = "";
+        testContainer : HTMLElement | null;
+        project   : string | null;
+	build     : string | null;
 
         constructor(options : Options, project: string) {
-            this.project = project;
-            this.container = document.getElementById(options.container);
-            this.container.appendChild(this.testContainer);
-            this.getData(null);
-	    this.container.addEventListener("click", (event: Event) => {
-	       this.onClick(event);
-	    });
+            this.project = options.project;
+	    this.build = options.build;
+            this.testContainer = document.getElementById(options.container);
+	    if (this.testContainer) {
+	       this.testContainer.addEventListener("click", (event: Event) => {
+	          this.onClick(event);
+	       });
+               this.getData(null);
+	    }
         }
 	onClick(event: Event) {
 	   if (event.target instanceof HTMLElement) {
-	      var target : HTMLElement = event.target;
-	      if (target.className == "group-name") {
-	         var parent : HTMLElement = target.closest('.build-xunit-group');
+	      const target : HTMLElement = event.target;
+	      if (target.className == "xunit-group-name") {
+	         const parent : HTMLElement = target.closest('.xunit-group');
 		 if (parent) {
-	      	    if (parent.classList.contains("group-visible")) {
-		       parent.classList.remove("group-visible");
+	      	    if (parent.classList.contains("xunit-group-visible")) {
+		       parent.classList.remove("xunit-group-visible");
 		    } else {
-		       parent.classList.add("group-visible");
+		       parent.classList.add("xunit-group-visible");
 		    }
 		 }
 	      }
 	   }
 	}
         getData(event : Event) {
-            if (this.project) {
+            if (this.project || this.build) {
                 const project : string = this.project;
                 const xmlhttp : XMLHttpRequest = new XMLHttpRequest();
                 
                 xmlhttp.onload = evt => {
-                    if (xmlhttp.status == 200 && this.container) {
+                    if (xmlhttp.status == 200 && this.testContainer) {
                         this.updateResult(JSON.parse(xmlhttp.response));
                     }
-                };
-                xmlhttp.open("GET", "/porion/api/v1/projects/" + project + "/tests");
+                }
+		let uri : string;
+		if (this.project) {
+		   uri = "/porion/api/v1/projects/" + this.project + "/tests";
+		} else {
+		   uri = "/porion/api/v1/builds/" + this.build + "/tests";
+		}
+                xmlhttp.open("GET", uri);
                 xmlhttp.send();
             }
         }
+        createInfo(title : string, pass : number, fail : number, duration: number) : HTMLDivElement {
+            const divGroup : HTMLDivElement = document.createElement("div");
+            divGroup.className = 'xunit-group-title';
+
+            let div : HTMLDivElement = document.createElement("div");
+	    div.textContent = title;
+	    div.className = 'xunit-group-name';
+	    divGroup.appendChild(div);
+
+            div = document.createElement("div");
+	    div.className = "xunit-pass";
+	    div.textContent = String(pass);
+	    divGroup.appendChild(div);
+
+            div = document.createElement("div");
+	    div.className = "xunit-fail";
+	    div.textContent = String(fail);
+	    divGroup.appendChild(div);
+
+            div = document.createElement("div");
+	    div.className = "xunit-duration";
+	    div.textContent = FormatMicrosecond(duration);
+	    divGroup.appendChild(div);
+
+            return divGroup;
+	}
         updateResult(content : TestGroup[]) {
-	    var warnCount : number = 0;
-	    var infoCount : number = 0;
-	    var allCount : number = 0;
-	    for (var group of content) {
+	    let warnCount : number = 0;
+	    let infoCount : number = 0;
+	    let allCount : number = 0;
+	    let totPass : number = 0;
+	    let totFail : number = 0;
+	    let totDuration : number = 0;
+	    const totDiv = document.createElement("div");
+	    totDiv.className = 'xunit-total';
+	    this.testContainer.appendChild(totDiv);
+
+	    for (let group of content) {
 	       let groupDiv = document.createElement("div");
-               groupDiv.className = 'build-xunit-group';
-               let groupTestDiv = document.createElement("div");
-	       groupTestDiv.className = 'build-xunits';
-	       var groupDuration : number = 0;
-	       var groupPass : number = 0;
-	       var groupFail : number = 0;
-	       var groupTimeout : number = 0;
+               groupDiv.className = 'xunit-group';
+	       let groupDuration : number = 0;
+	       let groupPass : number = 0;
+	       let groupFail : number = 0;
+	       let groupTimeout : number = 0;
                let build_number : number = 0;
-               let divGroup = document.createElement("div");
 	       let tests = group.tests;
+	       let groupTestDiv : HTMLDivElement | null;
 	       if (tests.length > 1) {
-	          divGroup.className = 'build-xunit-group-title';
-	       	  for (var test of group.tests) {
+	          groupTestDiv = document.createElement("div");
+	       	  groupTestDiv.className = 'xunits';
+	       	  for (let test of group.tests) {
                       let divTest = document.createElement("div");
-		      divTest.className = 'build-xunit';
+		      divTest.className = 'xunit';
 
                       if (test.status == "TEST_PASS") {
 		         groupPass++;
@@ -146,8 +197,7 @@ namespace Porion {
 		      groupTestDiv.appendChild(divTest);
 	           }
 	       } else {
-                   var test = tests[0];
-	           divGroup.className = 'build-xunit-group-title build-xunit-group-single';
+                   let test = tests[0];
 
                    if (test.status == "TEST_PASS") {
 		      groupPass++;
@@ -162,40 +212,37 @@ namespace Porion {
 		   }
 	       }
 
-               let div = document.createElement("div");
-	       div.textContent = group.name;
-	       div.className = 'group-name';
-	       divGroup.appendChild(div);
+               totPass += groupPass;
+	       totFail += groupFail;
+	       totDuration += groupDuration;
 
-               div = document.createElement("div");
-	       div.className = "group-pass";
-	       div.textContent = String(groupPass);
-	       divGroup.appendChild(div);
+               const divGroup = this.createInfo(group.name, groupPass, groupFail, groupDuration);
+	       if (tests.length > 1) {
+	           divGroup.className = 'xunit-group-title';
+	       } else {
+	           divGroup.className = 'xunit-group-title xunit-group-single';
+	       }
 
-               div = document.createElement("div");
-	       div.className = "group-fail";
-	       div.textContent = String(groupFail);
-	       divGroup.appendChild(div);
-
-               div = document.createElement("div");
-	       div.className = "group-duration";
-	       div.textContent = FormatMicrosecond(groupDuration);
-	       divGroup.appendChild(div);
-
-	       div = document.createElement("div");
+	       let div = document.createElement("div");
 	       div.className = 'xunit-build';
 	       if (build_number > 0) {
 	          let link = document.createElement("a");
-		  link.href = "/porion/builds/view/" + this.project + ":" + test.last_pass_build + "/summary";
-		  link.appendChild(document.createTextNode(String(test.last_pass_build)));
+		  link.href = "/porion/builds/view/" + this.project + ":" + build_number + "/summary";
+		  link.appendChild(document.createTextNode(String(build_number)));
 		  div.appendChild(link);
 	       }
 	       divGroup.appendChild(div);
 
                groupDiv.appendChild(divGroup);
-	       groupDiv.appendChild(groupTestDiv);
+	       if (groupTestDiv) {
+	          groupDiv.appendChild(groupTestDiv);
+	       }
 	       this.testContainer.appendChild(groupDiv);
 	    }
+
+            const divGroup = this.createInfo("Total", totPass, totFail, totDuration);
+	    divGroup.className = 'xunit-group-title xunit-group-single';
+            totDiv.appendChild(divGroup);
         }
     }
 }

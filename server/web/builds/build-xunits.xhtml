@@ -7,7 +7,7 @@
   template="/WEB-INF/layouts/layout.xhtml">
   <ui:param name="title" value="#{project.name} - Tests" />
   <ui:param name="pageStyle" value="page-project"/>
-  <ui:param name="top_nav" value="page-tests"/>
+  <ui:param name="top_nav" value="page-xunits"/>
 
   <!-- Main page body -->
   <ui:define name="pageBody">
@@ -19,16 +19,31 @@
 	<ui:param name="projectName" value="#{build.project.name}"/>
       </ui:include>
       <ui:include src="views/info.xhtml"/>
-      <div id='build-xunits'>
+      <div id='build-xunits' class="build-xunits">
+	<div class='awa-list-header xunit-header'>
+	  <div class='awa-header-col xunit-name'>
+	  </div>
+	  <div class='awa-header-col xunit-pass'>
+	    Pass
+	  </div>
+	  <div class='awa-header-col xunit-fail'>
+	    Fail
+	  </div>
+	  <div class='awa-header-col xunit-duration'>
+	    Duration
+	  </div>
+	  <div class='awa-header-col test-build'>
+	    Build
+	  </div>
+	</div>
       </div>
     </div>
 
     <u:script>
-    new Porion.BuildTests({container: 'build-xunits', btnShowAll: 'build-log-show-all', btnShowInfo: 'build-log-show-info', btnShowWarning: 'build-log-show-warning',
-    countAll: 'build-log-all-count', countInfo: 'build-log-info-count', countWarn: 'build-log-warn-count'}, '#{build.ident}');
+    new Porion.ProjectTests({container: 'build-xunits', build: '#{build.ident}'});
     </u:script>
   </ui:define>
   <ui:define name="pageScript">
-    <script type="text/javascript" src="#{contextPath}/js/builds.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/xunits.js"></script>
   </ui:define>
 </ui:composition>

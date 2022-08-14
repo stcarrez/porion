@@ -223,22 +223,4 @@ var Porion;
         return CoverageChart;
     }());
     Porion.CoverageChart = CoverageChart;
-    /*    export class PieChart {
-    
-            constructor(container: string, legend: string, series: jquery.flot.dataSeries[], ticks: any) {
-                var div : HTMLElement = document.getElementById(container);
-                $.plot($(div), series, {
-                    series: {
-                        pie: {
-                            show: true,
-                            startAngle: 1.0, radius: 1.0, innerRadius: 0.5, tilt: 1.0, offset: { top: 0, left: 0 },
-                            label: { show: true }
-                        }
-                    },
-                    legend: {
-                        show: false
-                    }
-                });
-            }
-        }*/
 })(Porion || (Porion = {}));

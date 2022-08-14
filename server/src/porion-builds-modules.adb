@@ -54,6 +54,7 @@ package body Porion.Builds.Modules is
       Servlet.Rest.Register (App.all, Rest.API_Get_Project_Tests.Definition);
       Servlet.Rest.Register (App.all, Rest.API_Get_Project_Tests_Builds.Definition);
       Servlet.Rest.Register (App.all, Rest.API_Get_Project_Coverage.Definition);
+      Servlet.Rest.Register (App.all, Rest.API_Get_Node_Usage.Definition);
    end Initialize;
 
    --  ------------------------------

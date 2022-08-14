@@ -17,15 +17,20 @@
 -----------------------------------------------------------------------
 with Ada.Directories;
 with ADO.Queries;
+with ADO.Sessions;
 with Util.Strings;
 with Util.Log.Loggers;
+with AWA.Services.Contexts;
 with Porion.Logs.Analysis;
 with Porion.Projects;
 with Porion.Queries;
 with Porion.Metrics;
+with Porion.Nodes.Services;
 with Porion.Builds.Models;
 with Porion.Builds.Services;
 package body Porion.Builds.Rest is
+
+   package ASC renames AWA.Services.Contexts;
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Builds.Rest");
 
@@ -48,9 +53,9 @@ package body Porion.Builds.Rest is
                                  Badge   : in out Badge_Info);
 
    procedure Get_Build_Log
-     (Req     : in out Swagger.Servers.Request'Class;
-      Reply   : in out Swagger.Servers.Response'Class;
-      Stream  : in out Swagger.Servers.Output_Stream'Class;
+     (Req     : in out OpenAPI.Servers.Request'Class;
+      Reply   : in out OpenAPI.Servers.Response'Class;
+      Stream  : in out OpenAPI.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type) is
       pragma Unreferenced (Req, Reply);
 
@@ -175,9 +180,9 @@ package body Porion.Builds.Rest is
    end Get_Build_Log;
 
    procedure Get_Build_Tests
-     (Req     : in out Swagger.Servers.Request'Class;
-      Reply   : in out Swagger.Servers.Response'Class;
-      Stream  : in out Swagger.Servers.Output_Stream'Class;
+     (Req     : in out OpenAPI.Servers.Request'Class;
+      Reply   : in out OpenAPI.Servers.Response'Class;
+      Stream  : in out OpenAPI.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type) is
       Query     : ADO.Queries.Context;
       List      : Porion.Queries.Test_Info_Vector;
@@ -221,9 +226,9 @@ package body Porion.Builds.Rest is
    end Get_Build_Tests;
 
    procedure Jenkins_Get_Last_Completed_Build
-     (Req     : in out Swagger.Servers.Request'Class;
-      Reply   : in out Swagger.Servers.Response'Class;
-      Stream  : in out Swagger.Servers.Output_Stream'Class;
+     (Req     : in out OpenAPI.Servers.Request'Class;
+      Reply   : in out OpenAPI.Servers.Response'Class;
+      Stream  : in out OpenAPI.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type) is
       pragma Unreferenced (Req, Reply, Context);
    begin
@@ -357,9 +362,9 @@ package body Porion.Builds.Rest is
    end Get_Coverage_Badge;
 
    procedure Get_Project_Schields_Status
-     (Req     : in out Swagger.Servers.Request'Class;
-      Reply   : in out Swagger.Servers.Response'Class;
-      Stream  : in out Swagger.Servers.Output_Stream'Class;
+     (Req     : in out OpenAPI.Servers.Request'Class;
+      Reply   : in out OpenAPI.Servers.Response'Class;
+      Stream  : in out OpenAPI.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type) is
       pragma Unreferenced (Reply);
 
@@ -391,9 +396,9 @@ package body Porion.Builds.Rest is
    end Get_Project_Schields_Status;
 
    procedure Get_Project_Tests_Builds
-     (Req     : in out Swagger.Servers.Request'Class;
-      Reply   : in out Swagger.Servers.Response'Class;
-      Stream  : in out Swagger.Servers.Output_Stream'Class;
+     (Req     : in out OpenAPI.Servers.Request'Class;
+      Reply   : in out OpenAPI.Servers.Response'Class;
+      Stream  : in out OpenAPI.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type) is
       pragma Unreferenced (Req, Reply);
 
@@ -426,9 +431,9 @@ package body Porion.Builds.Rest is
    end Get_Project_Tests_Builds;
 
    procedure Get_Project_Tests
-     (Req     : in out Swagger.Servers.Request'Class;
-      Reply   : in out Swagger.Servers.Response'Class;
-      Stream  : in out Swagger.Servers.Output_Stream'Class;
+     (Req     : in out OpenAPI.Servers.Request'Class;
+      Reply   : in out OpenAPI.Servers.Response'Class;
+      Stream  : in out OpenAPI.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type) is
       pragma Unreferenced (Req, Reply);
 
@@ -492,9 +497,9 @@ package body Porion.Builds.Rest is
    end Get_Project_Tests;
 
    procedure Get_Project_Coverage
-     (Req     : in out Swagger.Servers.Request'Class;
-      Reply   : in out Swagger.Servers.Response'Class;
-      Stream  : in out Swagger.Servers.Output_Stream'Class;
+     (Req     : in out OpenAPI.Servers.Request'Class;
+      Reply   : in out OpenAPI.Servers.Response'Class;
+      Stream  : in out OpenAPI.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type) is
       pragma Unreferenced (Req, Reply);
 
@@ -537,5 +542,47 @@ package body Porion.Builds.Rest is
       Stream.End_Entity ("");
       Stream.End_Document;
    end Get_Project_Coverage;
+
+   procedure Get_Node_Usage
+     (Req     : in out OpenAPI.Servers.Request'Class;
+      Reply   : in out OpenAPI.Servers.Response'Class;
+      Stream  : in out OpenAPI.Servers.Output_Stream'Class) is
+      pragma Unreferenced (Reply);
+
+      API_Ctx   : OpenAPI.Servers.Context_Type;
+      Ctx       : constant ASC.Service_Context_Access := ASC.Current;
+      Prj_Ctx   : Porion.Services.Context_Type;
+      Query     : ADO.Queries.Context;
+      List      : Porion.Queries.Node_Stat_Vector;
+      Node_Name : constant String := Req.Get_Path_Parameter (1);
+   begin
+      API_Ctx.Initialize (Req, Reply, Stream);
+      Prj_Ctx.DB := ASC.Get_Master_Session (Ctx);
+      Porion.Nodes.Services.Load_Node (Prj_Ctx, Node_Name);
+
+      Query.Bind_Param ("node_id", Prj_Ctx.Build_Node.Get_Id);
+      Query.Set_Query (Porion.Queries.Query_Stat_Nodes);
+      Porion.Queries.List (List, Prj_Ctx.DB, Query);
+
+      Stream.Start_Document;
+      Stream.Start_Array ("");
+      for Node_Info of List loop
+         Stream.Start_Entity ("node");
+         Stream.Write_Entity ("date", Node_Info.Day);
+         Stream.Write_Entity ("build_status", Node_Info.Build_Status'Image);
+         Stream.Write_Entity ("count", Node_Info.Count);
+         Stream.Write_Entity ("test_duration", Node_Info.Test_Duration);
+         Stream.Write_Long_Entity ("build_duration", Long_Long_Integer (Node_Info.Build_Duration));
+         Stream.Write_Long_Entity ("sys_time", Long_Long_Integer (Node_Info.Sys_Time));
+         Stream.Write_Long_Entity ("user_time", Long_Long_Integer (Node_Info.User_Time));
+         Stream.End_Entity ("node");
+      end loop;
+      Stream.End_Array ("");
+      Stream.End_Document;
+
+   exception
+      when Porion.Services.Not_Found =>
+         API_Ctx.Set_Error (404, "node not found");
+   end Get_Node_Usage;
 
 end Porion.Builds.Rest;

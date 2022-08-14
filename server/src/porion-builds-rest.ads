@@ -16,93 +16,107 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Swagger.Servers;
+with Servlet.REST.Operation;
+with Security.Permissions;
+with OpenAPI.Servers;
 with Porion.Services;
 with Porion.Projects.Operation;
 package Porion.Builds.Rest is
 
    procedure Get_Build_Log
-     (Req     : in out Swagger.Servers.Request'Class;
-      Reply   : in out Swagger.Servers.Response'Class;
-      Stream  : in out Swagger.Servers.Output_Stream'Class;
+     (Req     : in out OpenAPI.Servers.Request'Class;
+      Reply   : in out OpenAPI.Servers.Response'Class;
+      Stream  : in out OpenAPI.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type);
 
    procedure Get_Build_Tests
-     (Req     : in out Swagger.Servers.Request'Class;
-      Reply   : in out Swagger.Servers.Response'Class;
-      Stream  : in out Swagger.Servers.Output_Stream'Class;
+     (Req     : in out OpenAPI.Servers.Request'Class;
+      Reply   : in out OpenAPI.Servers.Response'Class;
+      Stream  : in out OpenAPI.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type);
 
    procedure Jenkins_Get_Last_Completed_Build
-     (Req     : in out Swagger.Servers.Request'Class;
-      Reply   : in out Swagger.Servers.Response'Class;
-      Stream  : in out Swagger.Servers.Output_Stream'Class;
+     (Req     : in out OpenAPI.Servers.Request'Class;
+      Reply   : in out OpenAPI.Servers.Response'Class;
+      Stream  : in out OpenAPI.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type);
 
    procedure Get_Project_Schields_Status
-     (Req     : in out Swagger.Servers.Request'Class;
-      Reply   : in out Swagger.Servers.Response'Class;
-      Stream  : in out Swagger.Servers.Output_Stream'Class;
+     (Req     : in out OpenAPI.Servers.Request'Class;
+      Reply   : in out OpenAPI.Servers.Response'Class;
+      Stream  : in out OpenAPI.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type);
 
    procedure Get_Project_Tests_Builds
-     (Req     : in out Swagger.Servers.Request'Class;
-      Reply   : in out Swagger.Servers.Response'Class;
-      Stream  : in out Swagger.Servers.Output_Stream'Class;
+     (Req     : in out OpenAPI.Servers.Request'Class;
+      Reply   : in out OpenAPI.Servers.Response'Class;
+      Stream  : in out OpenAPI.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type);
 
    procedure Get_Project_Tests
-     (Req     : in out Swagger.Servers.Request'Class;
-      Reply   : in out Swagger.Servers.Response'Class;
-      Stream  : in out Swagger.Servers.Output_Stream'Class;
+     (Req     : in out OpenAPI.Servers.Request'Class;
+      Reply   : in out OpenAPI.Servers.Response'Class;
+      Stream  : in out OpenAPI.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type);
 
    procedure Get_Project_Coverage
-     (Req     : in out Swagger.Servers.Request'Class;
-      Reply   : in out Swagger.Servers.Response'Class;
-      Stream  : in out Swagger.Servers.Output_Stream'Class;
+     (Req     : in out OpenAPI.Servers.Request'Class;
+      Reply   : in out OpenAPI.Servers.Response'Class;
+      Stream  : in out OpenAPI.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type);
+
+   procedure Get_Node_Usage
+     (Req     : in out OpenAPI.Servers.Request'Class;
+      Reply   : in out OpenAPI.Servers.Response'Class;
+      Stream  : in out OpenAPI.Servers.Output_Stream'Class);
 
    package API_Get_Build_Log is
      new Porion.Projects.Operation
         (Handler => Get_Build_Log,
-         Method  => Swagger.Servers.GET,
+         Method  => OpenAPI.Servers.GET,
          URI     => "/api/v1/builds/{buildId}/logs");
 
    package API_Get_Build_Tests is
      new Porion.Projects.Operation
         (Handler => Get_Build_Tests,
-         Method  => Swagger.Servers.GET,
+         Method  => OpenAPI.Servers.GET,
          URI     => "/api/v1/builds/{buildId}/tests");
 
    package API_Jenkins_Get_Last_Completed_Build is
      new Porion.Projects.Operation
         (Handler => Jenkins_Get_Last_Completed_Build,
-         Method  => Swagger.Servers.GET,
+         Method  => OpenAPI.Servers.GET,
          URI     => "/api/v1/jenkins/{project}/lastCompletedBuild/api/json");
 
    package API_Get_Project_Schields_Status is
      new Porion.Projects.Operation
         (Handler => Get_Project_Schields_Status,
-         Method  => Swagger.Servers.GET,
+         Method  => OpenAPI.Servers.GET,
          URI     => "/api/v1/projects/{project}/badges/{mode}");
 
    package API_Get_Project_Tests_Builds is
      new Porion.Projects.Operation
         (Handler => Get_Project_Tests_Builds,
-         Method  => Swagger.Servers.GET,
+         Method  => OpenAPI.Servers.GET,
          URI     => "/api/v1/projects/{project}/tests/builds");
 
    package API_Get_Project_Coverage is
      new Porion.Projects.Operation
         (Handler => Get_Project_Coverage,
-         Method  => Swagger.Servers.GET,
+         Method  => OpenAPI.Servers.GET,
          URI     => "/api/v1/projects/{project}/coverage");
 
    package API_Get_Project_Tests is
      new Porion.Projects.Operation
         (Handler => Get_Project_Tests,
-         Method  => Swagger.Servers.GET,
+         Method  => OpenAPI.Servers.GET,
          URI     => "/api/v1/projects/{project}/tests");
+
+   package API_Get_Node_Usage is
+     new Servlet.REST.Operation
+        (Handler => Get_Node_Usage'Access,
+         Method  => OpenAPI.Servers.GET,
+         Permission => Security.Permissions.NONE,
+         URI     => "/api/v1/nodes/{node}/usage");
 
 end Porion.Builds.Rest;

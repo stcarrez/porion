@@ -188,6 +188,9 @@ package body Porion.Commands.Add is
       end if;
 
    exception
+      when Porion.Builds.Services.Name_Used =>
+         Commands.Error (-("recipe name '{0}' is already used"), To_String (Target_Ident.Recipe));
+
       when Porion.Nodes.Services.Not_Found =>
          Commands.Error (-("invalid build node '{0}'"), To_String (Ident.Node));
 

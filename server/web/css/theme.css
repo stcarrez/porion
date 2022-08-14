@@ -208,5 +208,42 @@
     .recipe-name, .recipe-node, .recipe-build-count, .recipe-build-number, .recipe-test-pass, .recipe-test-fail {
         width: 95%;
     }
-
+    /* Project builds */
+    .project-build-list .build-node, .project-build-list .build-branch-name,
+    .project-build-list .build-tag, .project-build-list .build-xunit,
+    .project-build-list .build-duration, .project-build-list .build-date {
+	width: 32%;
+    }
+    .project-build-list .build-number, .project-build-list .build-recipe {
+	width: 20%;
+    }
+    .project-build-list .build-recipe {
+	margin-left: 1.5em;
+    }
+    .project-build-list .build-duration, .project-build-list .build-date {
+	text-align: left;
+	float: left;
+    }
+    .project-build-header .build-xunit-pass, .project-build-header .build-xunit-fail, .project-build-header .build-xunit-timeout {
+	display: none;
+    }
+    /* Build page */
+    .build-step .build-step-energy, .build-step .build-step-duration {
+	width: 30%;
+    }
+    .build-step .build-step-command {
+	width: 100%;
+	text-align: right;
+	overflow: hidden;
+    }
+    /* Test page */
+    .build-xunit-group .group-name {
+	width: 80%;
+    }
+    .build-xunit-group .group-pass, .build-xunit-group .group-fail, .build-xunit-group .group-duration, .build-xunit-group .xunit-build {
+	width: 20%;
+    }
+    .build-xunit-group .xunit-build {
+	float: right;
+    }
 }

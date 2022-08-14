@@ -53,13 +53,15 @@ div.awa-title dd {
 }
 
 /* Project page */
-.project-header {
+.project-header, .node-header {
     float: left;
     width: 100%;
 }
-.project-header .awa-page-tab {
+.project-header .awa-page-tab, .node-header .awa-page-tab {
     background: #eee;
 }
+.page-summary .node-header .node-tab-summary,
+.page-builds .node-header .node-tab-builds,
 .page-summary .project-header .project-tab-summary,
 .page-xunits .project-header .project-tab-xunits,
 .page-builds .project-header .project-tab-builds,
@@ -635,6 +637,8 @@ div.awa-title dd {
     width: 20%;
     text-align: right;
     padding-right: 0.5em;
+    height: 1.0em;
+    overflow: hidden;
 }
 .xunit-build {
     float: left;

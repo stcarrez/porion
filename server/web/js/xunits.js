@@ -117,7 +117,7 @@ var Porion;
                                 build_number = test.last_pass_build;
                             }
                             var link = document.createElement("a");
-                            link.href = "/porion/builds/view/" + this.project + ":" + test.last_pass_build;
+                            link.href = "/porion/builds/view/" + this.project + ":" + test.last_pass_build + "/summary";
                             link.appendChild(document.createTextNode(String(test.last_pass_build)));
                             div_1.appendChild(link);
                         }
@@ -138,6 +138,9 @@ var Porion;
                         groupTimeout++;
                     }
                     groupDuration = groupDuration + test.duration;
+                    if (test.last_pass_build) {
+                        build_number = test.last_pass_build;
+                    }
                 }
                 var div = document.createElement("div");
                 div.textContent = group.name;
@@ -159,7 +162,7 @@ var Porion;
                 div.className = 'xunit-build';
                 if (build_number > 0) {
                     var link = document.createElement("a");
-                    link.href = "/porion/builds/view/" + this.project + ":" + test.last_pass_build;
+                    link.href = "/porion/builds/view/" + this.project + ":" + test.last_pass_build + "/summary";
                     link.appendChild(document.createTextNode(String(test.last_pass_build)));
                     div.appendChild(link);
                 }

@@ -137,7 +137,7 @@ namespace Porion {
 			    build_number = test.last_pass_build;
 			 }
 		         let link = document.createElement("a");
-		     	 link.href = "/porion/builds/view/" + this.project + ":" + test.last_pass_build;
+		     	 link.href = "/porion/builds/view/" + this.project + ":" + test.last_pass_build + "/summary";
 		     	 link.appendChild(document.createTextNode(String(test.last_pass_build)));
 		     	 div.appendChild(link);
 		      }
@@ -157,6 +157,9 @@ namespace Porion {
 		      groupTimeout++;
 		   }
 		   groupDuration = groupDuration + test.duration;
+	           if (test.last_pass_build) {
+                      build_number = test.last_pass_build;
+		   }
 	       }
 
                let div = document.createElement("div");
@@ -183,7 +186,7 @@ namespace Porion {
 	       div.className = 'xunit-build';
 	       if (build_number > 0) {
 	          let link = document.createElement("a");
-		  link.href = "/porion/builds/view/" + this.project + ":" + test.last_pass_build;
+		  link.href = "/porion/builds/view/" + this.project + ":" + test.last_pass_build + "/summary";
 		  link.appendChild(document.createTextNode(String(test.last_pass_build)));
 		  div.appendChild(link);
 	       }

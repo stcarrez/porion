@@ -78,6 +78,10 @@ package body Porion.Commands.Steps is
          Porion.Commands.Error (-("cannot update the first step"));
          return;
       end if;
+      if Recipe.Is_Null then
+         Porion.Commands.Error (-("recipe was not found"));
+         return;
+      end if;
 
       if Args.Get_Count = 1 then
          Builds.Services.Update_Step (Context.Project_Service, Recipe,
@@ -119,6 +123,10 @@ package body Porion.Commands.Steps is
    begin
       if Command.Delete_Pos = 1 then
          Porion.Commands.Error (-("cannot delete the first step"));
+         return;
+      end if;
+      if Recipe.Is_Null then
+         Porion.Commands.Error (-("recipe was not found"));
          return;
       end if;
 
@@ -173,7 +181,7 @@ package body Porion.Commands.Steps is
             Command.Add_Step (Context.Project_Service.Recipe, Args, Context);
          end if;
 
-         if not Command.Quiet then
+         if not Command.Quiet and not Context.Project_Service.Recipe.Is_Null then
             Porion.Commands.Print_Recipe_Steps (Context);
          end if;
 

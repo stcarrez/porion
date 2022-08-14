@@ -993,6 +993,102 @@ package body Porion.Queries is
    --  Get the bean attribute identified by the name.
    --  ------------------------------
    overriding
+   function Get_Value (From : in Node_Stat;
+                       Name : in String) return Util.Beans.Objects.Object is
+   begin
+      if Name = "day" then
+         return Util.Beans.Objects.Time.To_Object (From.Day);
+      elsif Name = "build_status" then
+         return Porion.Builds.Models.Build_Status_Type_Objects.To_Object (From.Build_Status);
+      elsif Name = "count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Count));
+      elsif Name = "test_duration" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Test_Duration));
+      elsif Name = "build_duration" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Build_Duration));
+      elsif Name = "sys_time" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Sys_Time));
+      elsif Name = "user_time" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.User_Time));
+      end if;
+      return Util.Beans.Objects.Null_Object;
+   end Get_Value;
+
+
+   --  ------------------------------
+   --  Set the value identified by the name
+   --  ------------------------------
+   overriding
+   procedure Set_Value (Item  : in out Node_Stat;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object) is
+   begin
+      if Name = "day" then
+         Item.Day := Util.Beans.Objects.Time.To_Time (Value);
+      elsif Name = "build_status" then
+         Item.Build_Status := Porion.Builds.Models.Build_Status_Type_Objects.To_Value (Value);
+      elsif Name = "count" then
+         Item.Count := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "test_duration" then
+         Item.Test_Duration := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "build_duration" then
+         Item.Build_Duration := Porion.Millisecond_Type (Util.Beans.Objects.To_Integer (Value));
+      elsif Name = "sys_time" then
+         Item.Sys_Time := Porion.Millisecond_Type (Util.Beans.Objects.To_Integer (Value));
+      elsif Name = "user_time" then
+         Item.User_Time := Porion.Millisecond_Type (Util.Beans.Objects.To_Integer (Value));
+      end if;
+   end Set_Value;
+
+
+   --  --------------------
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   --  --------------------
+   procedure List (Object  : in out Node_Stat_List_Bean'Class;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+   begin
+      List (Object.List, Session, Context);
+   end List;
+
+   --  --------------------
+   --  Statistics about the usage of a build node.
+   --  --------------------
+   procedure List (Object  : in out Node_Stat_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+      procedure Read (Into : in out Node_Stat);
+
+      Stmt : ADO.Statements.Query_Statement
+          := Session.Create_Statement (Context);
+      Pos  : Positive := 1;
+      procedure Read (Into : in out Node_Stat) is
+      begin
+         Into.Day := Stmt.Get_Time (0);
+         Into.Build_Status := Porion.Builds.Models.Build_Status_Type'Enum_Val (Stmt.Get_Integer (1));
+         Into.Count := Stmt.Get_Natural (2);
+         Into.Test_Duration := Stmt.Get_Natural (3);
+         Into.Build_Duration := Porion.Millisecond_Type (Stmt.Get_Integer (4));
+         Into.Sys_Time := Porion.Millisecond_Type (Stmt.Get_Integer (5));
+         Into.User_Time := Porion.Millisecond_Type (Stmt.Get_Integer (6));
+      end Read;
+   begin
+      Stmt.Execute;
+      Node_Stat_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         Object.Insert_Space (Before => Pos);
+         Object.Update_Element (Index => Pos, Process => Read'Access);
+         Pos := Pos + 1;
+         Stmt.Next;
+      end loop;
+   end List;
+
+
+
+   --  ------------------------------
+   --  Get the bean attribute identified by the name.
+   --  ------------------------------
+   overriding
    function Get_Value (From : in Project_Info;
                        Name : in String) return Util.Beans.Objects.Object is
    begin

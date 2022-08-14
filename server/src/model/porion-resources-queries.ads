@@ -35,6 +35,7 @@ private
    K_22            : aliased constant String := "report-tests.xml";
    K_23            : aliased constant String := "stat-builds.xml";
    K_24            : aliased constant String := "stat-metrics.xml";
+   K_25            : aliased constant String := "stat-nodes.xml";
 
    Names : constant Name_Array := (
       K_0'Access, K_1'Access, K_2'Access, K_3'Access,
@@ -43,5 +44,5 @@ private
       K_12'Access, K_13'Access, K_14'Access, K_15'Access,
       K_16'Access, K_17'Access, K_18'Access, K_19'Access,
       K_20'Access, K_21'Access, K_22'Access, K_23'Access,
-      K_24'Access);
+      K_24'Access, K_25'Access);
 end Porion.Resources.Queries;

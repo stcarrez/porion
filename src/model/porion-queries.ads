@@ -678,6 +678,71 @@ package Porion.Queries is
    Query_Project_Node_List : constant ADO.Queries.Query_Definition_Access;
 
    --  --------------------
+   --    Statistics about the usage of a build node.
+   --  --------------------
+   type Node_Stat is
+     new Util.Beans.Basic.Bean with  record
+
+      --  the build status.
+      Day : Ada.Calendar.Time;
+
+      --  the build status.
+      Build_Status : Porion.Builds.Models.Build_Status_Type;
+
+      --  the number of builds.
+      Count : Natural;
+
+      --  the total duration of all tests.
+      Test_Duration : Natural;
+
+      --  the total build duration.
+      Build_Duration : Porion.Millisecond_Type;
+
+      --  the total system time.
+      Sys_Time : Porion.Millisecond_Type;
+
+      --  the total user time.
+      User_Time : Porion.Millisecond_Type;
+   end record;
+
+   --  Get the bean attribute identified by the name.
+   overriding
+   function Get_Value (From : in Node_Stat;
+                       Name : in String) return Util.Beans.Objects.Object;
+
+   --  Set the bean attribute identified by the name.
+   overriding
+   procedure Set_Value (Item  : in out Node_Stat;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object);
+
+
+   package Node_Stat_Beans is
+      new Util.Beans.Basic.Lists (Element_Type => Node_Stat);
+   package Node_Stat_Vectors renames Node_Stat_Beans.Vectors;
+   subtype Node_Stat_List_Bean is Node_Stat_Beans.List_Bean;
+
+   type Node_Stat_List_Bean_Access is access all Node_Stat_List_Bean;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Node_Stat_List_Bean'Class;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
+
+   subtype Node_Stat_Vector is Node_Stat_Vectors.Vector;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Node_Stat_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
+
+   Query_Stat_Nodes : constant ADO.Queries.Query_Definition_Access;
+
+   Query_Stat_Project_Nodes : constant ADO.Queries.Query_Definition_Access;
+
+   Query_Stat_All_Nodes : constant ADO.Queries.Query_Definition_Access;
+
+   --  --------------------
    --    Information about a project.
    --  --------------------
    type Project_Info is
@@ -1204,72 +1269,94 @@ private
    := Def_Nodeinfo_Project_Node_List.Query'Access;
 
    package File_11 is
+      new ADO.Queries.Loaders.File (Path => "stat-nodes.xml",
+                                    Sha1 => "41552876102DED0323C9D7D2DB9CB29FCAE3E898");
+
+   package Def_Nodestat_Stat_Nodes is
+      new ADO.Queries.Loaders.Query (Name => "stat-nodes",
+                                     File => File_11.File'Access);
+   Query_Stat_Nodes : constant ADO.Queries.Query_Definition_Access
+   := Def_Nodestat_Stat_Nodes.Query'Access;
+
+   package Def_Nodestat_Stat_Project_Nodes is
+      new ADO.Queries.Loaders.Query (Name => "stat-project-nodes",
+                                     File => File_11.File'Access);
+   Query_Stat_Project_Nodes : constant ADO.Queries.Query_Definition_Access
+   := Def_Nodestat_Stat_Project_Nodes.Query'Access;
+
+   package Def_Nodestat_Stat_All_Nodes is
+      new ADO.Queries.Loaders.Query (Name => "stat-all-nodes",
+                                     File => File_11.File'Access);
+   Query_Stat_All_Nodes : constant ADO.Queries.Query_Definition_Access
+   := Def_Nodestat_Stat_All_Nodes.Query'Access;
+
+   package File_12 is
       new ADO.Queries.Loaders.File (Path => "report-projects.xml",
                                     Sha1 => "1FFA4E073FB7C85C6EFFF6906DF1AAB2B71133F2");
 
    package Def_Projectinfo_Project_List is
       new ADO.Queries.Loaders.Query (Name => "project-list",
-                                     File => File_11.File'Access);
+                                     File => File_12.File'Access);
    Query_Project_List : constant ADO.Queries.Query_Definition_Access
    := Def_Projectinfo_Project_List.Query'Access;
 
    package Def_Projectinfo_Project_Summary_List is
       new ADO.Queries.Loaders.Query (Name => "project-summary-list",
-                                     File => File_11.File'Access);
+                                     File => File_12.File'Access);
    Query_Project_Summary_List : constant ADO.Queries.Query_Definition_Access
    := Def_Projectinfo_Project_Summary_List.Query'Access;
 
    package Def_Projectinfo_Project_Dependency_List is
       new ADO.Queries.Loaders.Query (Name => "project-dependency-list",
-                                     File => File_11.File'Access);
+                                     File => File_12.File'Access);
    Query_Project_Dependency_List : constant ADO.Queries.Query_Definition_Access
    := Def_Projectinfo_Project_Dependency_List.Query'Access;
 
-   package File_12 is
+   package File_13 is
       new ADO.Queries.Loaders.File (Path => "report-build-queue.xml",
                                     Sha1 => "6DDF3CCE1B8BCE9D2009013C1705B52EDF3D127E");
 
    package Def_Queueinfo_Build_Queue_List is
       new ADO.Queries.Loaders.Query (Name => "build-queue-list",
-                                     File => File_12.File'Access);
+                                     File => File_13.File'Access);
    Query_Build_Queue_List : constant ADO.Queries.Query_Definition_Access
    := Def_Queueinfo_Build_Queue_List.Query'Access;
 
    package Def_Queueinfo_Project_Build_Queue_List is
       new ADO.Queries.Loaders.Query (Name => "project-build-queue-list",
-                                     File => File_12.File'Access);
+                                     File => File_13.File'Access);
    Query_Project_Build_Queue_List : constant ADO.Queries.Query_Definition_Access
    := Def_Queueinfo_Project_Build_Queue_List.Query'Access;
 
    package Def_Queueinfo_Node_Build_Queue_List is
       new ADO.Queries.Loaders.Query (Name => "node-build-queue-list",
-                                     File => File_12.File'Access);
+                                     File => File_13.File'Access);
    Query_Node_Build_Queue_List : constant ADO.Queries.Query_Definition_Access
    := Def_Queueinfo_Node_Build_Queue_List.Query'Access;
 
-   package File_13 is
+   package File_14 is
       new ADO.Queries.Loaders.File (Path => "report-recipes.xml",
                                     Sha1 => "3116DEDCF858DB61A9818C8A6EA3B93CAF83A5E8");
 
    package Def_Recipeinfo_Recipe_List is
       new ADO.Queries.Loaders.Query (Name => "recipe-list",
-                                     File => File_13.File'Access);
+                                     File => File_14.File'Access);
    Query_Recipe_List : constant ADO.Queries.Query_Definition_Access
    := Def_Recipeinfo_Recipe_List.Query'Access;
 
-   package File_14 is
+   package File_15 is
       new ADO.Queries.Loaders.File (Path => "report-tests.xml",
                                     Sha1 => "60F65D7D89313D8C4B9DD2DB4A3D96FB80F1FD02");
 
    package Def_Testinfo_Build_Test_List is
       new ADO.Queries.Loaders.Query (Name => "build-test-list",
-                                     File => File_14.File'Access);
+                                     File => File_15.File'Access);
    Query_Build_Test_List : constant ADO.Queries.Query_Definition_Access
    := Def_Testinfo_Build_Test_List.Query'Access;
 
    package Def_Testinfo_Project_Test_List is
       new ADO.Queries.Loaders.Query (Name => "project-test-list",
-                                     File => File_14.File'Access);
+                                     File => File_15.File'Access);
    Query_Project_Test_List : constant ADO.Queries.Query_Definition_Access
    := Def_Testinfo_Project_Test_List.Query'Access;
 end Porion.Queries;

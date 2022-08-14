@@ -8,14 +8,14 @@ package body Porion.Resources.Queries is
      (1, 8, 12, 14);
 
    T1 : constant array (0 .. 3) of Unsigned_8 :=
-     (34, 3, 25, 30);
+     (39, 4, 39, 5);
 
    T2 : constant array (0 .. 3) of Unsigned_8 :=
-     (4, 40, 36, 17);
+     (15, 37, 20, 27);
 
-   G : constant array (0 .. 40) of Unsigned_8 :=
-     (0, 0, 0, 0, 0, 0, 0, 6, 9, 0, 0, 16, 0, 0, 0, 16, 13, 0, 0, 2, 0, 8,
-      5, 8, 0, 12, 3, 0, 0, 0, 8, 0, 19, 13, 10, 18, 7, 19, 0, 17, 0);
+   G : constant array (0 .. 42) of Unsigned_8 :=
+     (0, 0, 20, 0, 0, 0, 0, 13, 0, 0, 6, 5, 0, 13, 0, 4, 1, 0, 0, 17, 5, 7,
+      0, 0, 5, 0, 0, 0, 0, 0, 15, 2, 0, 15, 20, 10, 2, 0, 9, 12, 0, 3, 0);
 
    function Hash (S : String) return Natural is
       F : constant Natural := S'First - 1;
@@ -26,10 +26,10 @@ package body Porion.Resources.Queries is
       for K in P'Range loop
          exit when L < P (K);
          J  := Character'Pos (S (P (K) + F));
-         F1 := (F1 + Natural (T1 (K)) * J) mod 41;
-         F2 := (F2 + Natural (T2 (K)) * J) mod 41;
+         F1 := (F1 + Natural (T1 (K)) * J) mod 43;
+         F2 := (F2 + Natural (T2 (K)) * J) mod 43;
       end loop;
-      return (Natural (G (F1)) + Natural (G (F2))) mod 20;
+      return (Natural (G (F1)) + Natural (G (F2))) mod 21;
    end Hash;
 
    C_0 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
@@ -1305,13 +1305,73 @@ package body Porion.Resources.Queries is
        & "          GROUP BY metric.name" & ASCII.LF & "        </sql>" & ASCII.LF
        & "    </query> " & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
+   C_20 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+       & "    <description>" & ASCII.LF & "        Stats for the builds" & ASCII.LF
+       & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
+       & "ueries.Node_Stat"" bean=""yes"">" & ASCII.LF & "        <comment>Statist"
+       & "ics about the usage of a build node.</comment>" & ASCII.LF & "        <p"
+       & "roperty type='Date' name=""day"" not-null=""yes"">" & ASCII.LF & "      "
+       & "      <comment>the build status.</comment>" & ASCII.LF & "        </prop"
+       & "erty>" & ASCII.LF & "        <property type='Porion.Builds.Models.Build_"
+       & "Status_Type' name=""build_status"">" & ASCII.LF & "            <comment>"
+       & "the build status.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Natural' name=""count"">" & ASCII.LF & "        "
+       & "    <comment>the number of builds.</comment>" & ASCII.LF & "        </pr"
+       & "operty>" & ASCII.LF & "        <property type='Natural' name=""test_dura"
+       & "tion"">" & ASCII.LF & "            <comment>the total duration of all te"
+       & "sts.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "       "
+       & " <property type='Porion.Millisecond_Type' name=""build_duration"" not-nu"
+       & "ll=""yes"">" & ASCII.LF & "            <comment>the total build duration"
+       & ".</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <p"
+       & "roperty type='Porion.Millisecond_Type' name=""sys_time"" not-null=""yes"""
+       & ">" & ASCII.LF & "            <comment>the total system time.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Porion.Millis"
+       & "econd_Type' name=""user_time"" not-null=""yes"">" & ASCII.LF & "        "
+       & "    <comment>the total user time.</comment>" & ASCII.LF & "        </pro"
+       & "perty>" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF & "    <query"
+       & " name='stat-nodes'>" & ASCII.LF & "        <comment>Statistics about the"
+       & " usage of the build node over time</comment>" & ASCII.LF & "        <sql"
+       & ">" & ASCII.LF & "          SELECT" & ASCII.LF & "          strftime('%Y-"
+       & "%m-%d', build.create_date) AS date," & ASCII.LF & "          build.statu"
+       & "s AS status," & ASCII.LF & "          COUNT(build.id) AS cnt," & ASCII.LF
+       & "          SUM(build.test_duration) AS test_duration," & ASCII.LF & "    "
+       & "      SUM(build.build_duration) AS build_duration," & ASCII.LF & "      "
+       & "    SUM(build.sys_time) AS sys_time," & ASCII.LF & "          SUM(build."
+       & "user_time) AS user_time" & ASCII.LF & "          FROM porion_build AS bu"
+       & "ild" & ASCII.LF & "          WHERE build.node_id = :node_id" & ASCII.LF
+       & "          GROUP BY date, build.status" & ASCII.LF & "        </sql>" & ASCII.LF
+       & "    </query> " & ASCII.LF & ASCII.LF & "    <query name='stat-project-n"
+       & "odes'>" & ASCII.LF & "        <comment>Statistics about the usage of the"
+       & " all build nodes over time for a given project</comment>" & ASCII.LF & " "
+       & "       <sql>" & ASCII.LF & "          SELECT" & ASCII.LF & "          st"
+       & "rftime('%Y-%m-%d', build.create_date) AS date," & ASCII.LF & "          "
+       & "build.status AS status," & ASCII.LF & "          COUNT(build.id) AS cnt,"
+       & ASCII.LF & "          SUM(build.test_duration) AS test_duration," & ASCII.LF
+       & "          SUM(build.build_duration) AS build_duration," & ASCII.LF & "  "
+       & "        SUM(build.sys_time) AS sys_time," & ASCII.LF & "          SUM(bu"
+       & "ild.user_time) AS user_time" & ASCII.LF & "          FROM porion_build A"
+       & "S build" & ASCII.LF & "          WHERE build.project_id = :project_id" & ASCII.LF
+       & "          GROUP BY date, build.status" & ASCII.LF & "        </sql>" & ASCII.LF
+       & "    </query> " & ASCII.LF & ASCII.LF & "    <query name='stat-all-nodes"
+       & "'>" & ASCII.LF & "        <comment>Statistics about the usage of the all"
+       & " build nodes over time</comment>" & ASCII.LF & "        <sql>" & ASCII.LF
+       & "          SELECT" & ASCII.LF & "          strftime('%Y-%m-%d', build.cre"
+       & "ate_date) AS date," & ASCII.LF & "          build.status AS status," & ASCII.LF
+       & "          COUNT(build.id) AS cnt," & ASCII.LF & "          SUM(build.tes"
+       & "t_duration) AS test_duration," & ASCII.LF & "          SUM(build.build_d"
+       & "uration) AS build_duration," & ASCII.LF & "          SUM(build.sys_time)"
+       & " AS sys_time," & ASCII.LF & "          SUM(build.user_time) AS user_time"
+       & ASCII.LF & "          FROM porion_build AS build" & ASCII.LF & "        "
+       & "  GROUP BY date, build.status" & ASCII.LF & "        </sql>" & ASCII.LF
+       & "    </query> " & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+
 
    type Content_List_Array is array (Natural range <>) of access constant String;
    Contents : constant Content_List_Array := (
       C_0'Access, C_1'Access, C_2'Access, C_3'Access, C_4'Access, C_5'Access,
       C_6'Access, C_7'Access, C_8'Access, C_9'Access, C_10'Access, C_11'Access,
       C_12'Access, C_13'Access, C_14'Access, C_15'Access, C_16'Access, C_17'Access,
-      C_18'Access, C_19'Access);
+      C_18'Access, C_19'Access, C_20'Access);
 
    function Get_Content (Name : String) return access constant String is
       H : constant Natural := Hash (Name);

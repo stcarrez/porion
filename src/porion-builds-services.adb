@@ -1572,6 +1572,23 @@ package body Porion.Builds.Services is
       --  Load the recipe steps.
       Load_Recipe (Service, From, Steps);
 
+      --  Make sure the new recipe name is not used for the project+branch.
+      declare
+         Count_Statement : ADO.Statements.Query_Statement
+            := Service.DB.Create_Statement ("SELECT COUNT(*) FROM porion_recipe AS r "
+                         & "WHERE r.name = :name AND project_id = :project_id AND branch_id = :branch_id");
+      begin
+         Count_Statement.Bind_Param ("name", Name);
+         Count_Statement.Bind_Param ("project_id", Service.Project.Get_Id);
+         Count_Statement.Bind_Param ("branch_id", Service.Branch.Get_Id);
+         Count_Statement.Execute;
+         if Count_Statement.Get_Result_Integer /= 0 then
+            Log.Warn ("Recipe name {0} is already used", Name);
+            raise Name_Used;
+            return;
+         end if;
+      end;
+
       --  Create the new recipe and copy the build steps.
       Service.DB.Begin_Transaction;
       declare

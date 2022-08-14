@@ -27,6 +27,7 @@ with Porion.Executors;
 package Porion.Builds.Services is
 
    Invalid_Position : exception;
+   Name_Used        : exception;
 
    type Build_Step is record
       Step   : Porion.Builds.Models.Recipe_Step_Ref;

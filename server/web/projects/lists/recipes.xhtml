@@ -60,7 +60,9 @@
           #{recipe.name}
         </div>
         <div class='recipe-node'>
-          #{recipe.node_name}
+          <a href="#{contextPath}/nodes/view/#{recipe.node_name}/summary" title="Build node #{recipe.node_name}">
+            #{recipe.node_name}
+	  </a>
         </div>
         <div class='recipe-build-count'>
           #{recipe.build_pass_count + recipe.build_fail_count}

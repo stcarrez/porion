@@ -542,7 +542,7 @@ div.awa-title dd {
 .asf-progress-bar {
     line-height: 1em;
 }
-#project-xunits, #project-coverage .graph-view {
+#project-xunits-graph, #project-coverage-graph .graph-view {
     float: left;
     width: 340px;
     height: 200px;

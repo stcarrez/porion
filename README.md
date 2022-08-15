@@ -57,6 +57,7 @@ Get information about a project or a build number:
   - Add graph in project view to show the evolution of unit tests over the builds
   - Display the build nodes with their builds
   - Display the project and build unit tests
+  - Display the recipes queued for a build
 
 ## Version 0.9.0   - Jul 2022
   - Fix cleaning of build directories when it contains socket files

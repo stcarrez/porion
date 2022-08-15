@@ -143,7 +143,14 @@ package body Porion.Services is
       end if;
 
       if Length (Ident.Node) > 0 then
-         Nodes.Services.Load_Node (Service, To_String (Ident.Node));
+         begin
+            Nodes.Services.Load_Node (Service, To_String (Ident.Node));
+
+         --  Transform the Nodes Not_Found exception into our Not_Found exception
+         exception
+            when Porion.Nodes.Services.Not_Found =>
+               raise Not_Found;
+         end;
       end if;
 
       if Length (Ident.Recipe) > 0 then

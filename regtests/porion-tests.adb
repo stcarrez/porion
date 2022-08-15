@@ -35,6 +35,8 @@ package body Porion.Tests is
                        Test_Add_With_Tests'Access);
       Caller.Add_Test (Suite, "Test Porion.Command.Step (with unit tests)",
                        Test_Add_Recipe_With_Tests'Access);
+      Caller.Add_Test (Suite, "Test Porion.Command.Remove (recipe)",
+                       Test_Remove_Recipe_With_Tests'Access);
    end Add_Tests;
 
    procedure Test_Init (T : in out Test) is
@@ -203,5 +205,48 @@ package body Porion.Tests is
 
       Util.Tests.Assert_Matches (T, "fake-test-1.0", Result, "Invalid project list");
    end Test_Add_Recipe_With_Tests;
+
+   --  ------------------------------
+   --  Test registration of a project, adding recipes, building and removing a recipe with builds.
+   --  ------------------------------
+   procedure Test_Remove_Recipe_With_Tests (T : in out Test) is
+      Config : constant String := Util.Tests.Get_Test_Path ("porion.config");
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Test_Add_Recipe_With_Tests;
+
+      T.Execute (Command => Tool & " -c " & Config
+                 & " remove fake-test-1.0~new",
+                 Result  => Result,
+                 Status  => 0);
+      Util.Tests.Assert_Matches (T, "Project recipe 'fake-test-1.0~new' is removed",
+                                 Result,
+                                 "invalid message");
+
+      T.Execute (Command => Tool & " -c " & Config
+                 & " remove fake-test-1.0~new",
+                 Result  => Result,
+                 Status  => 1);
+      Util.Tests.Assert_Matches (T, "project 'fake-test-1.0' has no recipe named 'new'",
+                                 Result,
+                                 "invalid error message");
+
+      T.Execute (Command => Tool & " -c " & Config
+                 & " remove fake-test-1.0#branch-test",
+                 Result  => Result,
+                 Status  => 1);
+      Util.Tests.Assert_Matches (T, "project 'fake-test-1.0' has no branch named 'branch-test'",
+                                 Result,
+                                 "invalid error message");
+
+      T.Execute (Command => Tool & " -c " & Config
+                 & " remove fake-test-1.0#main@build-node",
+                 Result  => Result,
+                 Status  => 1);
+      Util.Tests.Assert_Matches (T, "build node 'build-node' not found",
+                                 Result,
+                                 "invalid error message");
+
+   end Test_Remove_Recipe_With_Tests;
 
 end Porion.Tests;

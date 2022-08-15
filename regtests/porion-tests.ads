@@ -34,4 +34,7 @@ package Porion.Tests is
    --  Test registration of a project, adding recipes and scan of some fake unit tests.
    procedure Test_Add_Recipe_With_Tests (T : in out Test);
 
+   --  Test registration of a project, adding recipes, building and removing a recipe with builds.
+   procedure Test_Remove_Recipe_With_Tests (T : in out Test);
+
 end Porion.Tests;

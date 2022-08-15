@@ -110,7 +110,7 @@ div.awa-title dd {
 .project-page-grid .project-progress-status {
     float: right;
 }
-.CONFIG_BUILD_REQUIRED .recipe-status {
+.project-recipe-list .CONFIG_BUILD_REQUIRED .recipe-status {
     background-color: #0000cc;
 }
 .build-status-BUILD_FAIL .project-build-status, .build-status-BUILD_FAIL .project-progress-status,
@@ -118,7 +118,7 @@ div.awa-title dd {
     background: red;
 }
 .build-status-BUILD_PASS .project-build-status, .build-status-BUILD_PASS .project-progress-status,
-.CONFIG_BUILD_PASS .recipe-status, .project-build-list .BUILD_PASS .build-status {
+.project-recipe-list .CONFIG_BUILD_PASS .recipe-status, .project-build-list .BUILD_PASS .build-status {
     background: green;
 }
 .build-status-BUILD_RUNNING .project-build-status, .build-status-BUILD_RUNNING .project-progress-status,
@@ -482,7 +482,7 @@ div.awa-title dd {
     float: left;
     width: 10%;
 }
-.project-recipe .recipe-status {
+.project-recipe-list .recipe-status {
     border-radius: 1em;
     width: 1.8em;
     height: 1.8em;
@@ -536,6 +536,14 @@ div.awa-title dd {
 .project-build-list .build-date {
     width: 13%;
     text-align: right;
+}
+.xunit-group .xunit-TEST_FAIL .xunit-group-name,
+.xunits .xunit-TEST_FAIL {
+    color: red;
+}
+.xunit-group .xunit-TEST_TIMEOUT .xunit-group-name,
+.xunits .xunit-TEST_TIMEOUT {
+    color: blue;
 }
 
 /* Fix display if parent line-height is > 1em */
@@ -636,7 +644,8 @@ div.awa-title dd {
 }
 .xunit-name {
     float: left;
-    width: 50%;
+    width: 55%; /* .xunit-pass.width * 3 + 40% */
+    margin-right: 16px; /* xunit-pass.margin-right * 2 */
 }
 .xunit-duration {
     float: left;
@@ -654,7 +663,7 @@ div.awa-title dd {
     float: left;
     width: 5%;
     text-align: right;
-    margin-right: 0.5em;
+    margin-right: 8px; /* Use px for alignment with xunit-group-name which uses different font size */
 }
 
 /* Node information */

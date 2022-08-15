@@ -108,7 +108,7 @@ namespace Porion {
                 xmlhttp.send();
             }
         }
-        createInfo(title : string, pass : number, fail : number, duration: number) : HTMLDivElement {
+        createInfo(title : string, pass : number, fail : number, timeout : number, duration: number) : HTMLDivElement {
             const divGroup : HTMLDivElement = document.createElement("div");
             divGroup.className = 'xunit-group-title';
 
@@ -128,6 +128,11 @@ namespace Porion {
 	    divGroup.appendChild(div);
 
             div = document.createElement("div");
+	    div.className = "xunit-timeout";
+	    div.textContent = String(timeout);
+	    divGroup.appendChild(div);
+
+            div = document.createElement("div");
 	    div.className = "xunit-duration";
 	    div.textContent = FormatMicrosecond(duration);
 	    divGroup.appendChild(div);
@@ -140,6 +145,7 @@ namespace Porion {
 	    let allCount : number = 0;
 	    let totPass : number = 0;
 	    let totFail : number = 0;
+	    let totTimeout : number = 0;
 	    let totDuration : number = 0;
 	    const totDiv = document.createElement("div");
 	    totDiv.className = 'xunit-total';
@@ -160,7 +166,7 @@ namespace Porion {
 	       	  groupTestDiv.className = 'xunits';
 	       	  for (let test of group.tests) {
                       let divTest = document.createElement("div");
-		      divTest.className = 'xunit';
+		      divTest.className = 'xunit xunit-' + test.status;
 
                       if (test.status == "TEST_PASS") {
 		         groupPass++;
@@ -214,13 +220,15 @@ namespace Porion {
 
                totPass += groupPass;
 	       totFail += groupFail;
+	       totTimeout += groupTimeout;
 	       totDuration += groupDuration;
 
-               const divGroup = this.createInfo(group.name, groupPass, groupFail, groupDuration);
+               const divGroup = this.createInfo(group.name, groupPass, groupFail, groupTimeout, groupDuration);
+	       const passClass = (groupFail > 0 ? 'TEST_FAIL' : (groupTimeout > 0 ? 'TEST_TIMEOUT' : 'TEST_PASS'));
 	       if (tests.length > 1) {
-	           divGroup.className = 'xunit-group-title';
+	           divGroup.className = 'xunit-group-title xunit-' + passClass;
 	       } else {
-	           divGroup.className = 'xunit-group-title xunit-group-single';
+	           divGroup.className = 'xunit-group-title xunit-group-single xunit-' + passClass;
 	       }
 
 	       let div = document.createElement("div");
@@ -240,7 +248,7 @@ namespace Porion {
 	       this.testContainer.appendChild(groupDiv);
 	    }
 
-            const divGroup = this.createInfo("Total", totPass, totFail, totDuration);
+            const divGroup = this.createInfo("Total", totPass, totFail, totTimeout, totDuration);
 	    divGroup.className = 'xunit-group-title xunit-group-single';
             totDiv.appendChild(divGroup);
         }

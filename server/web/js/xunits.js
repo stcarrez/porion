@@ -78,7 +78,7 @@ var Porion;
                 xmlhttp_1.send();
             }
         };
-        ProjectTests.prototype.createInfo = function (title, pass, fail, duration) {
+        ProjectTests.prototype.createInfo = function (title, pass, fail, timeout, duration) {
             var divGroup = document.createElement("div");
             divGroup.className = 'xunit-group-title';
             var div = document.createElement("div");
@@ -94,6 +94,10 @@ var Porion;
             div.textContent = String(fail);
             divGroup.appendChild(div);
             div = document.createElement("div");
+            div.className = "xunit-timeout";
+            div.textContent = String(timeout);
+            divGroup.appendChild(div);
+            div = document.createElement("div");
             div.className = "xunit-duration";
             div.textContent = FormatMicrosecond(duration);
             divGroup.appendChild(div);
@@ -105,6 +109,7 @@ var Porion;
             var allCount = 0;
             var totPass = 0;
             var totFail = 0;
+            var totTimeout = 0;
             var totDuration = 0;
             var totDiv = document.createElement("div");
             totDiv.className = 'xunit-total';
@@ -126,7 +131,7 @@ var Porion;
                     for (var _a = 0, _b = group.tests; _a < _b.length; _a++) {
                         var test = _b[_a];
                         var divTest = document.createElement("div");
-                        divTest.className = 'xunit';
+                        divTest.className = 'xunit xunit-' + test.status;
                         if (test.status == "TEST_PASS") {
                             groupPass++;
                         }
@@ -178,13 +183,15 @@ var Porion;
                 }
                 totPass += groupPass;
                 totFail += groupFail;
+                totTimeout += groupTimeout;
                 totDuration += groupDuration;
-                var divGroup_1 = this.createInfo(group.name, groupPass, groupFail, groupDuration);
+                var divGroup_1 = this.createInfo(group.name, groupPass, groupFail, groupTimeout, groupDuration);
+                var passClass = (groupFail > 0 ? 'TEST_FAIL' : (groupTimeout > 0 ? 'TEST_TIMEOUT' : 'TEST_PASS'));
                 if (tests.length > 1) {
-                    divGroup_1.className = 'xunit-group-title';
+                    divGroup_1.className = 'xunit-group-title xunit-' + passClass;
                 }
                 else {
-                    divGroup_1.className = 'xunit-group-title xunit-group-single';
+                    divGroup_1.className = 'xunit-group-title xunit-group-single xunit-' + passClass;
                 }
                 var div = document.createElement("div");
                 div.className = 'xunit-build';
@@ -201,7 +208,7 @@ var Porion;
                 }
                 this.testContainer.appendChild(groupDiv);
             }
-            var divGroup = this.createInfo("Total", totPass, totFail, totDuration);
+            var divGroup = this.createInfo("Total", totPass, totFail, totTimeout, totDuration);
             divGroup.className = 'xunit-group-title xunit-group-single';
             totDiv.appendChild(divGroup);
         };

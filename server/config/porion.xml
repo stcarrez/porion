@@ -23,6 +23,7 @@
     </description>
     <permission>anonymous</permission>
     <url-pattern>/index.html</url-pattern>
+    <url-pattern>/nodes.html</url-pattern>
   </url-policy>
 
   <filter-mapping>

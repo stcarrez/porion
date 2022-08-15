@@ -1,8 +1,12 @@
 <div class="node-header" xmlns:h="http://java.sun.com/jsf/html">
-    <div class="node-title node-status-#{projectBuildStatus}">
-        <span class="node-status"/>
-        <h2>#{nodeName}</h2>
-    </div>
+  <div class="node-title node-status-#{projectBuildStatus}">
+    <a href="#{contextPath}/nodes.html">
+      Build nodes
+    </a>
+    &gt;
+    <span class="node-status"/>
+    <span>#{nodeName}</span>
+  </div>
     <ul class="awa-page-tab">
         <li class="node-tab-summary">
             <a href="#{contextPath}/nodes/view/#{nodeName}/summary">

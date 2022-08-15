@@ -1,0 +1,82 @@
+<!-- List of build nodes
+  -  Copyright (C) 2022 Stephane Carrez
+  -  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
+  -
+  -  Licensed under the Apache License, Version 2.0 (the "License");
+  -  you may not use this file except in compliance with the License.
+  -  You may obtain a copy of the License at
+  -
+  -      http://www.apache.org/licenses/LICENSE-2.0
+  -
+  -  Unless required by applicable law or agreed to in writing, software
+  -  distributed under the License is distributed on an "AS IS" BASIS,
+  -  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  -  See the License for the specific language governing permissions and
+  -  limitations under the License.
+  -->
+<ui:composition
+  xmlns:awa="http://code.google.com/p/ada-awa/jsf"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+  xmlns:c="http://java.sun.com/jstl/core"
+  xmlns:u="http://code.google.com/p/ada-asf/util"
+  xmlns:w="http://code.google.com/p/ada-asf/widget"
+  xmlns:h="http://java.sun.com/jsf/html">
+  <div class='node-list'>
+      <div class='awa-list-header node-list-header'>
+	<div class='awa-header-col node-status'/>
+	<div class='awa-header-col node-kind'/>
+        <div class='awa-header-col node-name'>
+          Hostname
+        </div>
+        <div class='awa-header-col node-os'>
+          OS
+        </div>
+        <div class='awa-header-col node-recipes'>
+          Recipes
+        </div>
+	<div class="awa-header-col node-builds">
+	  Builds
+	</div>
+        <div class='awa-header-col node-queue'>
+          Build queue
+        </div>
+        <div class='awa-header-col node-dir'>
+          Repository
+        </div>
+      </div>
+
+    <div class='awa-list'>
+      <h:list var="node" value="#{nodeList.nodes}">
+	<div class='awa-list-item build-node #{node.status}'>
+	  <div class='node-status'/>
+          <div class='node-kind #{node.kind}'>
+          </div>
+          <div class='node-name'>
+            <a href="#{contextPath}/nodes/view/#{node.name}/summary" title="Build node #{node.name}">
+              #{node.name}
+            </a>
+          </div>
+          <div class='node-os'>
+            #{node.os_name} #{node.os_version}
+          </div>
+          <div class='node-recipes'>
+            #{node.recipe_count}
+          </div>
+          <div class='node-builds'>
+            <a href="#{contextPath}/nodes/view/#{node.name}/builds" title="Builds on node #{node.name}">
+              #{node.build_count}
+	    </a>
+          </div>
+          <div class='node-queue'>
+            #{node.queue_count}
+          </div>
+          <div class='node-dir'>
+            #{node.repository_dir}
+          </div>
+	</div>
+      </h:list>
+    </div>
+  </div>
+</ui:composition>

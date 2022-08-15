@@ -53,13 +53,15 @@ div.awa-title dd {
 }
 
 /* Project page */
-.project-header, .node-header {
+.project-header, .node-header, .nodes-header {
     float: left;
     width: 100%;
 }
-.project-header .awa-page-tab, .node-header .awa-page-tab {
+.project-header .awa-page-tab, .node-header .awa-page-tab, .nodes-header .awa-page-tab {
     background: #eee;
 }
+.page-summary .nodes-header .nodes-tab-summary,
+.page-queue .nodes-header .nodes-tab-queue,
 .page-summary .node-header .node-tab-summary,
 .page-builds .node-header .node-tab-builds,
 .page-summary .project-header .project-tab-summary,
@@ -70,7 +72,7 @@ div.awa-title dd {
     border-top-left-radius: 0.5em;
     border-top-right-radius: 0.5em;
 }
-.project-header .project-title, .node-header .node-title {
+.project-header .project-title, .node-header .node-title, .nodes-header .node-title {
     float: left;
     padding-left: 0.5em;
     font-size: 2em;
@@ -683,4 +685,33 @@ div.awa-title dd {
 #node-usage-graph, #node-duration-graph {
     width: 800px;
     height: 400px;
+}
+
+/* List of build nodes */
+.node-list .build-node {
+    font-size: 1.0em;
+    line-height: 1.0em;
+}
+.node-list .node-status {
+    width: 1em;
+    height: 1em;
+    border-radius: 1em;
+    background: red;
+}
+.node-list .node-list-header .node-status {
+    background: none;
+}
+.node-list .NODE_ONLINE .node-status {
+    background: green;
+}
+.node-list .node-name, .node-list .node-dir, .node-list .node-os {
+    width: 15%;
+}
+.node-list .node-dir {
+    width: 25%;
+    padding-left: 1em;
+}
+.node-list .node-recipes, .node-list .node-builds, .node-list .node-queue {
+    width: 5%;
+    text-align: right;
 }

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-commands -- Porion agent commands
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,6 +26,7 @@ private with Porion.Projects.Services;
 private with Util.Commands.Consoles.Text;
 private with Util.Strings.Formats;
 private with Porion.Logs.Analysis;
+private with Porion.Audits.Services;
 package Porion.Commands is
 
    Command_Error : exception;
@@ -87,6 +88,7 @@ private
       Command_Config    : GC.Command_Line_Configuration;
       First_Arg         : Positive := 1;
       Project_Service   : Porion.Projects.Services.Context_Type;
+      Audit_Manager     : aliased Porion.Audits.Services.Audit_Manager;
       Styles            : Porion.Reports.Style_Configuration;
       Printer           : PT.Printer_Access;
    end record;

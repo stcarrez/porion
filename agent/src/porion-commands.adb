@@ -400,10 +400,14 @@ package body Porion.Commands is
       end if;
    end Notice;
 
+   --  ------------------------------
    --  Open the database.
+   --  ------------------------------
    procedure Open (Context : in out Context_Type) is
    begin
+      Context.Project_Service.Factory.Set_Audit_Manager (Context.Audit_Manager'Unchecked_Access);
       Context.Project_Service.Open (Porion.Resources.Queries.Get_Content'Access, null);
+      Context.Audit_Manager.Initialize (Context.Project_Service.DB);
    end Open;
 
    overriding

@@ -31,10 +31,12 @@ package Porion.Nodes.Beans is
    package UBO renames Util.Beans.Objects;
 
    type Node_List_Bean is new Porion.Beans.Node_List_Bean with record
-      Nodes       : aliased Porion.Queries.Node_Info_List_Bean;
-      Nodes_Bean  : Porion.Queries.Node_Info_List_Bean_Access;
-      Queue_Count : Natural := 0;
-      Queue_Nodes : Natural := 0;
+      Nodes         : aliased Porion.Queries.Node_Info_List_Bean;
+      Nodes_Bean    : Porion.Queries.Node_Info_List_Bean_Access;
+      Queue_Count   : Natural := 0;
+      Queue_Nodes   : Natural := 0;
+      Online_Count  : Natural := 0;
+      Offline_Count : Natural := 0;
    end record;
    type Node_List_Bean_Access is access all Node_List_Bean'Class;
 
@@ -49,7 +51,8 @@ package Porion.Nodes.Beans is
                         Name  : in String;
                         Value : in UBO.Object);
 
-   --  Load the list of projects.
+   --  Load the list of build nodes.
+   overriding
    procedure Load (Bean    : in out Node_List_Bean;
                    Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
 
@@ -80,10 +83,12 @@ package Porion.Nodes.Beans is
                         Value : in UBO.Object);
 
    --  Load the build node information.
+   overriding
    procedure Load (Bean    : in out Node_Bean;
                    Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
 
    --  Load the build node information.
+   overriding
    procedure Load_Builds (Bean    : in out Node_Bean;
                           Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
 
@@ -92,6 +97,9 @@ package Porion.Nodes.Beans is
       return Util.Beans.Basic.Readonly_Bean_Access;
 
    type Queue_List_Bean is new Porion.Beans.Queue_List_Bean with record
+      Ident       : UString;
+      Node        : aliased Porion.Nodes.Models.Node_Ref;
+      Node_Bean   : UBB.Readonly_Bean_Access;
       Queue       : aliased Porion.Queries.Queue_Info_List_Bean;
       Queue_Bean  : Porion.Queries.Queue_Info_List_Bean_Access;
       Queue_Count : Natural := 0;

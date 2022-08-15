@@ -26,7 +26,6 @@ with Porion.Projects.Modules;
 with Porion.Projects.Models;
 with Porion.Builds.Models;
 with Porion.Nodes.Models;
-with Porion.Nodes.Beans;
 with Porion.Dashboards.Beans.Stats;
 package Porion.Projects.Beans is
 

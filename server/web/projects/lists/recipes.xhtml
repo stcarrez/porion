@@ -23,38 +23,38 @@
   xmlns:w="http://code.google.com/p/ada-asf/widget"
   xmlns:h="http://java.sun.com/jsf/html">
   <div class='project-recipe-list'>
-      <div class='project-recipe-header #{recipe.recipe_status}'>
-        <div class='recipe-name'>
+      <div class='awa-list-header project-recipe-header #{recipe.recipe_status}'>
+        <div class='awa-header-col recipe-name'>
           Recipe name
         </div>
-        <div class='recipe-node'>
+        <div class='awa-header-col recipe-node'>
           Build node
         </div>
-        <div class='recipe-build-count'>
+        <div class='awa-header-col recipe-build-count'>
           # builds
         </div>
-        <div class='recipe-build-number'>
+        <div class='awa-header-col recipe-build-number'>
           Last build
         </div>
-        <div class='recipe-build-number'>
+        <div class='awa-header-col recipe-build-number'>
           Failed build
         </div>
-        <div class='recipe-test-pass'>
+        <div class='awa-header-col recipe-test-pass'>
           Tests OK
         </div>
-        <div class='recipe-test-fail'>
+        <div class='awa-header-col recipe-test-fail'>
           Tests KO
         </div>
-        <div class='recipe-test-fail'>
+        <div class='awa-header-col recipe-build-duration'>
           Build duration
         </div>
-        <div class='recipe-test-fail'>
+        <div class='awa-header-col recipe-build-count'>
           Build success rate
         </div>
       </div>
 
     <h:list var="recipe" value="#{project.recipes}">
-      <div class='project-recipe #{recipe.recipe_status}'>
+      <div class='awa-list-item project-recipe #{recipe.recipe_status}'>
 	<div class='recipe-status'/>
         <div class='recipe-name'>
           #{recipe.name}
@@ -87,12 +87,12 @@
         <div class='recipe-test-fail'>
           #{recipe.max_fail_count}
         </div>
-        <div class='recipe-build-count'>
+        <div class='recipe-build-duration'>
           <h:outputText rendered="#{recipe.build_pass_count}" value="#{recipe.sum_build_duration / recipe.build_pass_count}">
             <f:converter converterId="millisecondConverter"/>
           </h:outputText>
         </div>
-        <div class='recipe-build-count'>
+        <div class='recipe-build-progress'>
           <div class='dashboard-value build-progress'>
             <w:progress value="#{recipe.build_pass_count}" maxValue="#{recipe.build_pass_count + recipe.build_fail_count}" />
           </div>

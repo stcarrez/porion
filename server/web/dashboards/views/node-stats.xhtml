@@ -37,6 +37,19 @@
           <w:progress value="#{nodeList.queue_nodes}" maxValue="#{nodeList.count}"/>
         </div>
       </li>
+      <li>
+        <div class='dashboard-title'>
+	  <a href="#{contextPath}/nodes.html">
+            Build Nodes
+	  </a>
+        </div>
+        <div class='dashboard-value'>
+          #{nodeList.online_count} online on #{nodeList.count} build nodes
+        </div>
+        <div class='dashboard-value'>
+          <w:progress value="#{nodeList.online_count}" maxValue="#{nodeList.count}"/>
+        </div>
+      </li>
 
     </ul>
   </div>

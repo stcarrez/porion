@@ -25,8 +25,9 @@ package body Porion.Nodes.Beans is
    package ASC renames AWA.Services.Contexts;
 
    --  ------------------------------
-   --  Load the list of projects.
+   --  Load the list of build nodes.
    --  ------------------------------
+   overriding
    procedure Load (Bean    : in out Node_List_Bean;
                    Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
       pragma Unreferenced (Outcome);
@@ -38,10 +39,17 @@ package body Porion.Nodes.Beans is
       Query.Set_Query (Porion.Queries.Query_Node_List);
       Porion.Queries.List (Bean.Nodes, Session, Query);
       Bean.Queue_Count := 0;
+      Bean.Online_Count := 0;
+      Bean.Offline_Count := 0;
       for Node of Bean.Nodes.List loop
          if Node.Queue_Count > 0 then
             Bean.Queue_Count := Bean.Queue_Count + Node.Queue_Count;
             Bean.Queue_Nodes := Bean.Queue_Nodes + 1;
+         end if;
+         if Node.Status = Porion.Nodes.NODE_ONLINE then
+            Bean.Online_Count := Bean.Online_Count + 1;
+         elsif Node.Status /= Porion.Nodes.NODE_DISABLED then
+            Bean.Offline_Count := Bean.Offline_Count + 1;
          end if;
       end loop;
    end Load;
@@ -60,8 +68,12 @@ package body Porion.Nodes.Beans is
          return UBO.To_Object (From.Queue_Count);
       elsif Name = "queue_nodes" then
          return UBO.To_Object (From.Queue_Nodes);
+      elsif Name = "online_count" then
+         return UBO.To_Object (From.Online_Count);
+      elsif Name = "offline_count" then
+         return UBO.To_Object (From.Offline_Count);
       elsif Name = "count" then
-         return UBO.To_Object (Natural (From.Nodes.List.Length));
+         return UBO.To_Object (From.Online_Count + From.Offline_Count);
       else
          return UBO.Null_Object;
       end if;
@@ -94,11 +106,10 @@ package body Porion.Nodes.Beans is
    --  ------------------------------
    --  Load the build node information.
    --  ------------------------------
+   overriding
    procedure Load (Bean    : in out Node_Bean;
                    Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
       Ctx     : constant ASC.Service_Context_Access := ASC.Current;
-      Session : ADO.Sessions.Session := ASC.Get_Session (Ctx);
-      Query   : ADO.Queries.Context;
       Context : Porion.Services.Context_Type;
    begin
       Context.DB := ASC.Get_Master_Session (Ctx);
@@ -114,12 +125,12 @@ package body Porion.Nodes.Beans is
    --  ------------------------------
    --  Load the build node information.
    --  ------------------------------
+   overriding
    procedure Load_Builds (Bean    : in out Node_Bean;
                           Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
       Ctx     : constant ASC.Service_Context_Access := ASC.Current;
-      Session : ADO.Sessions.Session := ASC.Get_Session (Ctx);
-      Query   : ADO.Queries.Context;
       Context : Porion.Services.Context_Type;
+      Query   : ADO.Queries.Context;
    begin
       Context.DB := ASC.Get_Master_Session (Ctx);
 
@@ -187,15 +198,30 @@ package body Porion.Nodes.Beans is
    overriding
    procedure Load (Bean    : in out Queue_List_Bean;
                    Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
-      pragma Unreferenced (Outcome);
-
       Ctx     : constant ASC.Service_Context_Access := ASC.Current;
       Session : ADO.Sessions.Session := ASC.Get_Session (Ctx);
       Query   : ADO.Queries.Context;
    begin
-      Query.Set_Query (Porion.Queries.Query_Build_Queue_List);
+      if Length (Bean.Ident) > 0 then
+         declare
+            Context : Porion.Services.Context_Type;
+         begin
+            Context.DB := ASC.Get_Master_Session (Ctx);
+
+            Porion.Nodes.Services.Load_Node (Context, To_String (Bean.Ident));
+            Bean.Node := Context.Build_Node;
+         end;
+         Query.Set_Query (Porion.Queries.Query_Node_Build_Queue_List);
+         Query.Bind_Param ("node_id", Bean.Node.Get_Id);
+      else
+         Query.Set_Query (Porion.Queries.Query_Build_Queue_List);
+      end if;
       Porion.Queries.List (Bean.Queue, Session, Query);
       Bean.Queue_Count := 0;
+
+   exception
+      when Porion.Services.Not_Found =>
+         Outcome := To_UString ("not-found");
    end Load;
 
    --  ------------------------------
@@ -212,6 +238,10 @@ package body Porion.Nodes.Beans is
          return UBO.To_Object (From.Queue_Count);
       elsif Name = "count" then
          return UBO.To_Object (Natural (From.Queue.List.Length));
+      elsif Name = "ident" then
+         return UBO.To_Object (From.Ident);
+      elsif not From.Node.Is_Null then
+         return From.Node.Get_Value (Name);
       else
          return UBO.Null_Object;
       end if;
@@ -225,7 +255,9 @@ package body Porion.Nodes.Beans is
                         Name  : in String;
                         Value : in UBO.Object) is
    begin
-      null;
+      if Name = "ident" then
+         From.Ident := UBO.To_Unbounded_String (Value);
+      end if;
    end Set_Value;
 
    --  ------------------------------
@@ -238,6 +270,7 @@ package body Porion.Nodes.Beans is
       Object : constant Queue_List_Bean_Access := new Queue_List_Bean;
    begin
       Object.Queue_Bean := Object.Queue'Access;
+      Object.Node_Bean := Object.Node'Access;
       return Object.all'Access;
    end Create_Queue_List_Bean;
 

@@ -13,8 +13,26 @@
       <f:viewAction action='#{queueList.load}'/>
     </f:metadata>
     <div id='awa-content'>
-        <ui:include src="/WEB-INF/layouts/nodes-header.xhtml"/>
-        <ui:include src="/nodes/lists/queue.xhtml"/>
+      <ui:include src="/WEB-INF/layouts/nodes-header.xhtml"/>
+      <ui:composition template="/nodes/lists/queue.xhtml">
+	<ui:param name="queue" value="#{queueList.queue}"/>
+
+	<ui:define name="list-header">
+	  <div class='awa-header-col queue-name'>
+            Hostname
+	  </div>
+	</ui:define>
+	
+	<ui:define name="list-item">
+          <div class='queue-name'>
+            <a href="#{contextPath}/nodes/view/#{recipe.node_name}/summary" title="Build node #{recipe.node_name}">
+              #{recipe.node_name}
+            </a>
+          </div>
+	</ui:define>
+
+      </ui:composition>
+
      </div>
   </ui:define>
 </ui:composition>

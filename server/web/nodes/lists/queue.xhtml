@@ -28,9 +28,7 @@
       <div class='awa-header-col queue-order'>
 	Order
       </div>
-      <div class='awa-header-col queue-name'>
-        Hostname
-      </div>
+      <ui:insert name="list-header"/>
       <div class='awa-header-col queue-recipe'>
         Recipe
       </div>
@@ -43,16 +41,12 @@
     </div>
 
     <div class='awa-list'>
-      <h:list var="recipe" value="#{queueList.queue}">
+      <h:list var="recipe" value="#{queue}">
 	<div class="awa-list-item queued-recipe#{recipe.building ? ' queue-building' : ''}#{recipe.main_recipe ? ' queue-main' : ''}">
 	  <div class='queue-order'>
 	    #{recipe.order}
 	  </div>
-          <div class='queue-name'>
-            <a href="#{contextPath}/nodes/view/#{recipe.node_name}/summary" title="Build node #{recipe.node_name}">
-              #{recipe.node_name}
-            </a>
-          </div>
+	  <ui:insert name="list-item"/>
           <div class='queue-recipe'>
             <a href="#{contextPath}/projects/view/#{recipe.project_name}/summary" title="Project #{recipe.project_name}">
               #{recipe.project_name}##{recipe.branch_name}~#{recipe.recipe_name}

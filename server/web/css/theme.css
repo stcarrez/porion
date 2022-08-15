@@ -7,8 +7,8 @@
     background-color: #2b2b2b;
     color: #ccc;
   }
-  .flot-y-axis {
-    fill: white;
+  .flot-y-axis, .flot-x-axis {
+    fill: #eee;
   }
   .project-graph {
     background: #424342;
@@ -39,7 +39,34 @@
   .build-log {
       background-color: #4b4b4b;
   }
-
+  .project-header .project-title {
+      color: #ccc;
+  }
+  .project-header .awa-page-tab, .node-header .awa-page-tab, .nodes-header .awa-page-tab {
+      background-color: #444546;
+  }
+  .page-summary .nodes-header .nodes-tab-summary,
+  .page-queue .nodes-header .nodes-tab-queue,
+  .page-summary .node-header .node-tab-summary,
+  .page-builds .node-header .node-tab-builds,
+  .page-queue .node-header .node-tab-queue,
+  .page-summary .project-header .project-tab-summary,
+  .page-xunits .project-header .project-tab-xunits,
+  .page-builds .project-header .project-tab-builds,
+  .page-coverage .project-header .project-tab-coverage {
+      background: #ddd;
+  }
+  .page-summary .nodes-header .nodes-tab-summary a,
+  .page-queue .nodes-header .nodes-tab-queue a,
+  .page-summary .node-header .node-tab-summary a,
+  .page-builds .node-header .node-tab-builds a,
+  .page-queue .node-header .node-tab-queue a,
+  .page-summary .project-header .project-tab-summary a,
+  .page-xunits .project-header .project-tab-xunits a,
+  .page-builds .project-header .project-tab-builds a,
+  .page-coverage .project-header .project-tab-coverage a {
+      color: #454647;
+  }
   div.post-text a,
   a.feed,
   div.awa-project a,
@@ -132,6 +159,12 @@
       background: #3b3b3b;
       color: #ddd;
    }
+   .xunit-group-title {
+       color: #ddd;
+   }
+   .xunits {
+       color: #bbbd;
+   }
 }
 @media (prefers-color-scheme: light) {
   .day.light-scheme   { background: white; color:  #555; }
@@ -204,7 +237,19 @@
     .project-page-grid {
         width: 96%;
     }
-
+    .project-recipe-list .recipe-name, .project-recipe-list .recipe-node {
+	width: 40%;
+    }
+    .project-recipe-list .recipe-build-count {
+	margin-left: 2em;
+    }
+    .project-recipe-list .recipe-build-count, .project-recipe-list .recipe-build-number, .project-recipe-list .recipe-test-pass,
+    .project-recipe-list .recipe-test-fail, .project-recipe-list .recipe-build-count, .project-recipe-list .recipe-build-count {
+	width: 10%;
+    }
+    .project-recipe-list .recipe-build-progress {
+	width: 100%;
+    }
     .recipe-name, .recipe-node, .recipe-build-count, .recipe-build-number, .recipe-test-pass, .recipe-test-fail {
         width: 95%;
     }

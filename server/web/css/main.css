@@ -64,11 +64,12 @@ div.awa-title dd {
 .page-queue .nodes-header .nodes-tab-queue,
 .page-summary .node-header .node-tab-summary,
 .page-builds .node-header .node-tab-builds,
+.page-queue .node-header .node-tab-queue,
 .page-summary .project-header .project-tab-summary,
 .page-xunits .project-header .project-tab-xunits,
 .page-builds .project-header .project-tab-builds,
 .page-coverage .project-header .project-tab-coverage {
-    background: white;
+    background: white; /* see also theme.css */
     border-top-left-radius: 0.5em;
     border-top-right-radius: 0.5em;
 }
@@ -480,7 +481,8 @@ div.awa-title dd {
     float: left;
     padding: 0.25em;
 }
-.recipe-name, .recipe-node, .recipe-build-count, .recipe-build-number, .recipe-test-pass, .recipe-test-fail {
+.recipe-name, .recipe-node, .recipe-build-count, .recipe-build-number, .recipe-test-pass, .recipe-test-fail, .recipe-build-progress,
+.recipe-build-duration {
     float: left;
     width: 10%;
 }

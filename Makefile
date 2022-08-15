@@ -44,7 +44,8 @@ DYNAMO_ARGS=\
   db uml/porion.zargo
 
 AGENT_DYNAMO_ARGS=\
-  db
+  --package Porion.Audits.Models \
+  db ../uml/porion.zargo
 
 SERVER_DYNAMO_ARGS=\
   --package Porion.Beans \

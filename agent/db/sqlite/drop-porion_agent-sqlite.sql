@@ -1,4 +1,8 @@
 pragma synchronous=OFF;
+/* Copied from porion_agent-drop-sqlite.sql*/
+/* File generated automatically by dynamo */
+DROP TABLE IF EXISTS `awa_audit_field`;
+DROP TABLE IF EXISTS `awa_audit`;
 /* Copied from porion_lib-drop-sqlite.sql*/
 /* File generated automatically by dynamo */
 DROP TABLE IF EXISTS `porion_test_run_group`;

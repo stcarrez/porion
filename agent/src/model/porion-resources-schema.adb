@@ -232,6 +232,18 @@ package body Porion.Resources.Schema is
    L_67  : aliased constant String := "INSERT OR IGNORE INTO awa_audit_field (en"
        & "tity_type, name) VALUES ((SELECT id FROM entity_type WHERE name = ""pori"
        & "on_project""), ""check_delay"")";
+   L_68  : aliased constant String := "CREATE TABLE IF NOT EXISTS awa_audit ( `i"
+       & "d` BIGINT NOT NULL, `date` DATETIME NOT NULL, `old_value` VARCHAR(255) ,"
+       & " `new_value` VARCHAR(255) , `entity_id` BIGINT NOT NULL, `session_id` BI"
+       & "GINT , `field` INTEGER NOT NULL, `entity_type` INTEGER NOT NULL, PRIMARY"
+       & " KEY (`id`))";
+   L_69  : aliased constant String := "CREATE TABLE IF NOT EXISTS awa_audit_fiel"
+       & "d ( `id` INTEGER NOT NULL, `name` VARCHAR(255) NOT NULL, `entity_type` I"
+       & "NTEGER NOT NULL, PRIMARY KEY (`id`))";
+   L_70  : aliased constant String := "INSERT OR IGNORE INTO entity_type (name) "
+       & "VALUES (""awa_audit"")";
+   L_71  : aliased constant String := "INSERT OR IGNORE INTO entity_type (name) "
+       & "VALUES (""awa_audit_field"")";
    C_0 : aliased constant Content_Array :=
      (L_1'Access,
       L_2'Access,
@@ -299,7 +311,11 @@ package body Porion.Resources.Schema is
       L_64'Access,
       L_65'Access,
       L_66'Access,
-      L_67'Access);
+      L_67'Access,
+      L_68'Access,
+      L_69'Access,
+      L_70'Access,
+      L_71'Access);
 
 
    type Content_List_Array is array (Natural range <>) of Content_Access;

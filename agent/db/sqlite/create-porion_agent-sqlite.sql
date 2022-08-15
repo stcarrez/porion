@@ -568,3 +568,37 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "scm_url");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "check_delay");
+/* Copied from porion_agent-sqlite.sql*/
+/* File generated automatically by dynamo */
+/*  */
+CREATE TABLE IF NOT EXISTS awa_audit (
+  /*  */
+  `id` BIGINT NOT NULL,
+  /* the date when the field was modified. */
+  `date` DATETIME NOT NULL,
+  /*  */
+  `old_value` VARCHAR(255) ,
+  /*  */
+  `new_value` VARCHAR(255) ,
+  /*  */
+  `entity_id` BIGINT NOT NULL,
+  /*  */
+  `session_id` BIGINT ,
+  /*  */
+  `field` INTEGER NOT NULL,
+  /*  */
+  `entity_type` INTEGER NOT NULL,
+  PRIMARY KEY (`id`)
+);
+/*  */
+CREATE TABLE IF NOT EXISTS awa_audit_field (
+  /*  */
+  `id` INTEGER NOT NULL,
+  /*  */
+  `name` VARCHAR(255) NOT NULL,
+  /*  */
+  `entity_type` INTEGER NOT NULL,
+  PRIMARY KEY (`id`)
+);
+INSERT OR IGNORE INTO entity_type (name) VALUES ("awa_audit");
+INSERT OR IGNORE INTO entity_type (name) VALUES ("awa_audit_field");

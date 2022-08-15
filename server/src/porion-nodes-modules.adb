@@ -44,6 +44,9 @@ package body Porion.Nodes.Modules is
       Register.Register (Plugin => Plugin,
                          Name   => "Porion.Nodes.Beans.Node_Bean",
                          Handler => Porion.Nodes.Beans.Create_Node_Bean'Access);
+      Register.Register (Plugin => Plugin,
+                         Name   => "Porion.Nodes.Beans.Queue_List_Bean",
+                         Handler => Porion.Nodes.Beans.Create_Queue_List_Bean'Access);
 
       AWA.Modules.Module (Plugin).Initialize (App, Props);
 

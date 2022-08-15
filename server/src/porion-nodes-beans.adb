@@ -181,4 +181,64 @@ package body Porion.Nodes.Beans is
       return Object.all'Access;
    end Create_Node_Bean;
 
+   --  ------------------------------
+   --  Load the build queue with the list of recipes to build.
+   --  ------------------------------
+   overriding
+   procedure Load (Bean    : in out Queue_List_Bean;
+                   Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
+      pragma Unreferenced (Outcome);
+
+      Ctx     : constant ASC.Service_Context_Access := ASC.Current;
+      Session : ADO.Sessions.Session := ASC.Get_Session (Ctx);
+      Query   : ADO.Queries.Context;
+   begin
+      Query.Set_Query (Porion.Queries.Query_Build_Queue_List);
+      Porion.Queries.List (Bean.Queue, Session, Query);
+      Bean.Queue_Count := 0;
+   end Load;
+
+   --  ------------------------------
+   --  Get the value identified by the name.
+   --  ------------------------------
+   overriding
+   function Get_Value (From : in Queue_List_Bean;
+                       Name : in String) return UBO.Object is
+   begin
+      if Name = "queue" then
+         return UBO.To_Object (Value   => From.Queue_Bean,
+                               Storage => UBO.STATIC);
+      elsif Name = "queue_count" then
+         return UBO.To_Object (From.Queue_Count);
+      elsif Name = "count" then
+         return UBO.To_Object (Natural (From.Queue.List.Length));
+      else
+         return UBO.Null_Object;
+      end if;
+   end Get_Value;
+
+   --  ------------------------------
+   --  Set the value identified by the name.
+   --  ------------------------------
+   overriding
+   procedure Set_Value (From  : in out Queue_List_Bean;
+                        Name  : in String;
+                        Value : in UBO.Object) is
+   begin
+      null;
+   end Set_Value;
+
+   --  ------------------------------
+   --  Create the build queue list bean instance.
+   --  ------------------------------
+   function Create_Queue_List_Bean (Module : in Modules.Node_Module_Access)
+      return Util.Beans.Basic.Readonly_Bean_Access is
+      pragma Unreferenced (Module);
+
+      Object : constant Queue_List_Bean_Access := new Queue_List_Bean;
+   begin
+      Object.Queue_Bean := Object.Queue'Access;
+      return Object.all'Access;
+   end Create_Queue_List_Bean;
+
 end Porion.Nodes.Beans;

@@ -13,6 +13,13 @@
   </managed-bean>
 
   <managed-bean>
+    <description>List of recipes that are queued for a build</description>
+    <managed-bean-name>queueList</managed-bean-name>
+    <managed-bean-class>Porion.Nodes.Beans.Queue_List_Bean</managed-bean-class>
+    <managed-bean-scope>request</managed-bean-scope>
+  </managed-bean>
+
+  <managed-bean>
     <description>Information about a build node</description>
     <managed-bean-name>node</managed-bean-name>
     <managed-bean-class>Porion.Nodes.Beans.Node_Bean</managed-bean-class>

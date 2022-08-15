@@ -715,3 +715,20 @@ div.awa-title dd {
     width: 5%;
     text-align: right;
 }
+
+/* Build queue information */
+.queue-list .queue-order {
+    width: 5%;
+}
+.queue-list .queue-name {
+    width: 20%;
+}
+.queue-list .queue-recipe {
+    width: 40%;
+}
+.queue-list .queue-branch-tag {
+    width: 10%;
+}
+.queue-list .queue-date {
+    width: 10%;
+}

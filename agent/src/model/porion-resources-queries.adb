@@ -469,14 +469,14 @@ package body Porion.Resources.Queries is
        & "ue for a given build node</comment>" & ASCII.LF & "        <sql>" & ASCII.LF
        & "            SELECT" & ASCII.LF & "            queue.id AS id," & ASCII.LF
        & "            queue.`order` AS `order`," & ASCII.LF & "            queue.c"
-       & "reation_date AS create_date," & ASCII.LF & "            queue.building A"
-       & "S building," & ASCII.LF & "            project.name AS name," & ASCII.LF
-       & "            project.status AS status," & ASCII.LF & "            branch."
-       & "name AS branch_name," & ASCII.LF & "            branch.tag AS branch_tag"
-       & "," & ASCII.LF & "            branch.status AS branch_status," & ASCII.LF
-       & "            recipe.id AS recipe_id," & ASCII.LF & "            recipe.na"
-       & "me AS recipe_name," & ASCII.LF & "            recipe.status AS recipe_st"
-       & "atus," & ASCII.LF & "            recipe.main_recipe AS main_recipe," & ASCII.LF
+       & "reate_date AS create_date," & ASCII.LF & "            queue.building AS "
+       & "building," & ASCII.LF & "            project.name AS name," & ASCII.LF & " "
+       & "           project.status AS status," & ASCII.LF & "            branch.n"
+       & "ame AS branch_name," & ASCII.LF & "            branch.tag AS branch_tag,"
+       & ASCII.LF & "            branch.status AS branch_status," & ASCII.LF & " "
+       & "           recipe.id AS recipe_id," & ASCII.LF & "            recipe.nam"
+       & "e AS recipe_name," & ASCII.LF & "            recipe.status AS recipe_sta"
+       & "tus," & ASCII.LF & "            recipe.main_recipe AS main_recipe," & ASCII.LF
        & "            node.name AS node_name," & ASCII.LF & "            node.stat"
        & "us AS node_status" & ASCII.LF & "            FROM porion_build_queue AS "
        & "queue" & ASCII.LF & "            INNER JOIN porion_node AS node ON queue"

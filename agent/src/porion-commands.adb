@@ -358,11 +358,23 @@ package body Porion.Commands is
    procedure Error_Not_Found (Context : in out Context_Type;
                               Ident   : in Projects.Ident_Type) is
    begin
-      if Context.Project_Service.Has_Project and Projects.Has_Build (Ident) then
+      if not Context.Project_Service.Has_Project then
+         Error (-("project '{0}' not found"), To_String (Ident.Name));
+      elsif Projects.Has_Branch (Ident) and not Context.Project_Service.Has_Branch then
+         Error (-("project '{0}' has no branch named '{1}'"),
+                To_String (Ident.Name), To_String (Ident.Branch));
+      elsif Projects.Has_Build (Ident) and not Context.Project_Service.Has_Build then
          Error (-("project '{0}' has no build number '{1}'"),
                 To_String (Ident.Name), Util.Strings.Image (Ident.Build));
+      elsif Projects.Has_Node (Ident) and not Context.Project_Service.Has_Node then
+         Error (-("build node '{0}' not found"),
+                To_String (Ident.Node));
+      elsif Projects.Has_Recipe (Ident) and not Context.Project_Service.Has_Recipe then
+         Error (-("project '{0}' has no recipe named '{1}'"),
+                To_String (Ident.Name), To_String (Ident.Recipe));
       else
-         Error (-("project '{0}' not found"), To_String (Ident.Name));
+         Error (-("project '{0}' not found"),
+                To_String (Ident.Name));
       end if;
    end Error_Not_Found;
 

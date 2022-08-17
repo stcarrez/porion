@@ -21,21 +21,22 @@ private
    K_8             : aliased constant String := "permissions.xml";
    K_9             : aliased constant String := "project-branches.xml";
    K_10            : aliased constant String := "project-builds.xml";
-   K_11            : aliased constant String := "project-update-status.xml";
-   K_12            : aliased constant String := "queue-messages.xml";
-   K_13            : aliased constant String := "report-build-metrics.xml";
-   K_14            : aliased constant String := "report-build-queue.xml";
-   K_15            : aliased constant String := "report-build-steps.xml";
-   K_16            : aliased constant String := "report-build-tests.xml";
-   K_17            : aliased constant String := "report-builds.xml";
-   K_18            : aliased constant String := "report-env.xml";
-   K_19            : aliased constant String := "report-nodes.xml";
-   K_20            : aliased constant String := "report-projects.xml";
-   K_21            : aliased constant String := "report-recipes.xml";
-   K_22            : aliased constant String := "report-tests.xml";
-   K_23            : aliased constant String := "stat-builds.xml";
-   K_24            : aliased constant String := "stat-metrics.xml";
-   K_25            : aliased constant String := "stat-nodes.xml";
+   K_11            : aliased constant String := "project-selector.xml";
+   K_12            : aliased constant String := "project-update-status.xml";
+   K_13            : aliased constant String := "queue-messages.xml";
+   K_14            : aliased constant String := "report-build-metrics.xml";
+   K_15            : aliased constant String := "report-build-queue.xml";
+   K_16            : aliased constant String := "report-build-steps.xml";
+   K_17            : aliased constant String := "report-build-tests.xml";
+   K_18            : aliased constant String := "report-builds.xml";
+   K_19            : aliased constant String := "report-env.xml";
+   K_20            : aliased constant String := "report-nodes.xml";
+   K_21            : aliased constant String := "report-projects.xml";
+   K_22            : aliased constant String := "report-recipes.xml";
+   K_23            : aliased constant String := "report-tests.xml";
+   K_24            : aliased constant String := "stat-builds.xml";
+   K_25            : aliased constant String := "stat-metrics.xml";
+   K_26            : aliased constant String := "stat-nodes.xml";
 
    Names : constant Name_Array := (
       K_0'Access, K_1'Access, K_2'Access, K_3'Access,
@@ -44,5 +45,5 @@ private
       K_12'Access, K_13'Access, K_14'Access, K_15'Access,
       K_16'Access, K_17'Access, K_18'Access, K_19'Access,
       K_20'Access, K_21'Access, K_22'Access, K_23'Access,
-      K_24'Access, K_25'Access);
+      K_24'Access, K_25'Access, K_26'Access);
 end Porion.Resources.Queries;

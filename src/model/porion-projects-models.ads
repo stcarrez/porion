@@ -681,7 +681,7 @@ private
       := PROJECT_DEF'Access;
 
    PROJECT_AUDIT_DEF : aliased constant ADO.Audits.Auditable_Mapping :=
-     (Count    => 6,
+     (Count    => 11,
       Of_Class => PROJECT_DEF'Access,
       Members  => (
          1 => 1,
@@ -689,7 +689,12 @@ private
          3 => 6,
          4 => 7,
          5 => 8,
-         6 => 14)
+         6 => 9,
+         7 => 10,
+         8 => 11,
+         9 => 12,
+         10 => 14,
+         11 => 16)
      );
    PROJECT_AUDIT_TABLE : constant ADO.Audits.Auditable_Mapping_Access
       := PROJECT_AUDIT_DEF'Access;
@@ -799,12 +804,21 @@ private
       := BRANCH_DEF'Access;
 
    BRANCH_AUDIT_DEF : aliased constant ADO.Audits.Auditable_Mapping :=
-     (Count    => 3,
+     (Count    => 12,
       Of_Class => BRANCH_DEF'Access,
       Members  => (
          1 => 3,
          2 => 4,
-         3 => 13)
+         3 => 7,
+         4 => 8,
+         5 => 9,
+         6 => 10,
+         7 => 11,
+         8 => 12,
+         9 => 13,
+         10 => 14,
+         11 => 15,
+         12 => 16)
      );
    BRANCH_AUDIT_TABLE : constant ADO.Audits.Auditable_Mapping_Access
       := BRANCH_AUDIT_DEF'Access;

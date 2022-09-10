@@ -7,6 +7,7 @@ body.awa {
 #awa-hdr h2 {
     font-size: 2em;
     padding-left: 0.5em;
+    display: inline-block;
 }
 .awa-title {
   margin: 1em;
@@ -53,7 +54,7 @@ div.awa-title dd {
 }
 
 /* Project page */
-.project-header, .node-header, .nodes-header {
+.project-header, .node-header, .nodes-header, .notification-header {
     float: left;
     width: 100%;
 }
@@ -733,4 +734,28 @@ div.awa-title dd {
 }
 .queue-list .queue-date {
     width: 10%;
+}
+
+/* Notifications */
+.notification-list .notification-project, .notification-list .notification-email,
+.notification-list .notification-date {
+    width: 20%;
+}
+.notification-list .notification-frequency {
+    width: 15%;
+}
+.notification-list .notification-kind {
+    width: 15%;
+}
+.notification-list .notification-count {
+    width: 5%;
+}
+.notification-list .notification-kind-title {
+    width: 100%;
+    text-align: center;
+}
+.notification-list .notification-kind-config, .notification-list .notification-kind-build, .notification-list .notification-kind-xunit {
+    width: 33%;
+    float: left;
+    text-align: center;
 }

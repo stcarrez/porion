@@ -1,0 +1,31 @@
+<ui:composition xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:u="http://code.google.com/p/ada-asf/util"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:util="http://code.google.com/p/ada-asf/util"
+                xmlns:c="http://java.sun.com/jstl/core"
+                template="/WEB-INF/layouts/layout.xhtml">
+  <ui:param name="title" value="Notifications" />
+  <ui:param name="pageStyle" value="page-notification"/>
+  <ui:param name="top_nav" value="page-summary"/>
+
+  <!-- Main page body -->
+  <ui:define name="pageBody">
+    <f:metadata>
+      <f:viewAction action='#{project.load}'/>
+    </f:metadata>
+
+    <div id='awa-content'>
+      <ui:include src="lists/notifications.xhtml"/>
+      <div id='notif'/>
+      <util:script>
+	new Porion.Notifications({container: 'notif', projectSelector: 'project-selector'});
+      </util:script>
+    </div>
+  </ui:define>
+
+  <ui:define name="pageScript">
+    <script type="text/javascript" src="#{contextPath}/js/notifications.js"></script>
+  </ui:define>
+
+</ui:composition>

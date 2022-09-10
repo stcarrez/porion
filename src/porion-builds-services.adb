@@ -667,6 +667,7 @@ package body Porion.Builds.Services is
          end if;
          Service.Branch.Set_Build_Progress (To_Permille (Build_Count, Natural (List.Length)));
          Service.Branch.Save (Service.DB);
+         Log.Info ("Branch rating for {0} updated", String '(Service.Branch.Get_Name));
       end Do_Branch_Ratings;
 
       Retry   : Natural := 0;

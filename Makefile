@@ -14,6 +14,7 @@ DIST_FILE=porion-$(VERSION).tar.gz
 ROOT_DIR=$(shell pwd)
 
 GPRFLAGS += -j$(PROCESSORS) -XROOT_DIR=$(ROOT_DIR) -XUTIL_OS=$(UTIL_OS) -XUTIL_AWS_IMPL=$(UTIL_AWS_VERSION)
+GPRFLAGS += -XAWA_BUILD=$(BUILD) -XADO_BUILD=$(BUILD) -XOPENAPI_BUILD=$(BUILD)
 
 ifeq (${HAVE_DYNAMO},yes)
 GPRFLAGS += -XBUILD_DYNAMO=no
@@ -134,6 +135,9 @@ install::
 
 clean::
 	rm -rf server/$(DIST_DIR)
+	rm -rf awa/obj awa/ada-ado/obj awa/ada-util/obj awa/ada-el/obj awa/ada-asf/obj \
+               awa/ada-keystore/obj awa/ada-security/obj awa/ada-servlet/obj \
+               awa/openapi-ada/obj awa/ada-wiki/obj
 
 PORION_DOC= \
   title.md \

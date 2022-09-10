@@ -2,13 +2,13 @@ pragma synchronous=OFF;
 /* Copied from ado-sqlite.sql*/
 /* File generated automatically by dynamo */
 /* Entity table that enumerates all known database tables */
-CREATE TABLE IF NOT EXISTS entity_type (
+CREATE TABLE IF NOT EXISTS ado_entity_type (
   /* the database table unique entity index */
   `id` INTEGER  PRIMARY KEY AUTOINCREMENT,
   /* the database entity name */
   `name` VARCHAR(127) UNIQUE );
 /* Sequence generator */
-CREATE TABLE IF NOT EXISTS sequence (
+CREATE TABLE IF NOT EXISTS ado_sequence (
   /* the sequence name */
   `name` VARCHAR(127) UNIQUE NOT NULL,
   /* the sequence record version */
@@ -19,8 +19,17 @@ CREATE TABLE IF NOT EXISTS sequence (
   `block_size` BIGINT NOT NULL,
   PRIMARY KEY (`name`)
 );
-INSERT OR IGNORE INTO entity_type (name) VALUES ("entity_type");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("sequence");
+/* Database schema version (per module) */
+CREATE TABLE IF NOT EXISTS ado_version (
+  /* the module name */
+  `name` VARCHAR(127) UNIQUE NOT NULL,
+  /* the database version schema for this module */
+  `version` INTEGER NOT NULL,
+  PRIMARY KEY (`name`)
+);
+INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("ado_entity_type");
+INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("ado_sequence");
+INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("ado_version");
 /* Copied from porion_lib-sqlite.sql*/
 /* File generated automatically by dynamo */
 /*  */
@@ -495,107 +504,108 @@ CREATE TABLE IF NOT EXISTS porion_test_run_group (
   `build_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`)
 );
-INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_executor");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_queue");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_reason");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_step");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_environment");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_last_build");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_recipe");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_recipe_step");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_build_metric");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_metric");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_node");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_branch");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_dependency");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_project");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_test");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_test_group");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_test_run");
-INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_test_run_group");
+INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("porion_build");
+INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("porion_build_executor");
+INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("porion_build_queue");
+INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("porion_build_reason");
+INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("porion_build_step");
+INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("porion_environment");
+INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("porion_last_build");
+INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("porion_recipe");
+INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("porion_recipe_step");
+INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("porion_build_metric");
+INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("porion_metric");
+INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("porion_node");
+INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("porion_branch");
+INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("porion_dependency");
+INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("porion_project");
+INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("porion_test");
+INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("porion_test_group");
+INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("porion_test_run");
+INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("porion_test_run_group");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_build"), "id");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_build"), "id");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_build"), "status");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_build"), "status");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_environment"), "value");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_environment"), "value");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_recipe"), "name");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_recipe"), "name");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_recipe"), "description");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_recipe"), "description");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_recipe"), "status");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_recipe"), "status");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_recipe"), "rate_factor");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_recipe"), "rate_factor");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_recipe"), "main_recipe");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_recipe"), "main_recipe");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_recipe"), "filter_rules");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_recipe"), "filter_rules");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_recipe_step"), "id");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_recipe_step"), "id");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_recipe_step"), "number");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_recipe_step"), "number");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "name");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_node"), "name");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "login");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_node"), "login");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "repository_dir");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_node"), "repository_dir");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "kind");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_node"), "kind");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "deleted");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_node"), "deleted");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "main_node");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_node"), "main_node");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "check_rules");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_node"), "check_rules");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "tag");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_branch"), "tag");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "last_date");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_branch"), "last_date");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "status");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_branch"), "status");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "pass_rate");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_branch"), "pass_rate");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "fail_rate");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_branch"), "fail_rate");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "timeout_rate");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_branch"), "timeout_rate");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "build_rate");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_branch"), "build_rate");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "rate_factor");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_branch"), "rate_factor");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "main_branch");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_branch"), "main_branch");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "last_build_number");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_branch"), "last_build_number");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "build_progress");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_branch"), "build_progress");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "description");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_branch"), "description");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "name");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_project"), "name");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "description");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_project"), "description");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "status");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_project"), "status");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "scm");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_project"), "scm");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "scm_url");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_project"), "scm_url");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "pass_rate");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_project"), "pass_rate");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "fail_rate");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_project"), "fail_rate");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "timeout_rate");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_project"), "timeout_rate");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "build_rate");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_project"), "build_rate");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "check_delay");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_project"), "check_delay");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "build_progress");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_project"), "build_progress");
+INSERT OR IGNORE INTO ado_version (name, version) VALUES ("porion_lib", 2);
 /* Copied from porion_lib-init-sqlite.sql*/
 /* Setup indexes */
 CREATE INDEX IF NOT EXISTS porion_last_build_idx_1 ON porion_last_build (

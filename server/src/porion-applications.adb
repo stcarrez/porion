@@ -19,6 +19,7 @@
 with Util.Log.Loggers;
 with Porion.Configs;
 with Porion.Resources.Queries;
+with Porion.Queries.Server;
 package body Porion.Applications is
 
    use AWA.Applications;
@@ -126,6 +127,10 @@ package body Porion.Applications is
                 Name   => Porion.Nodes.Modules.NAME,
                 URI    => "nodes",
                 Module => App.Node_Module'Access);
+      Register (App    => App.Self.all'Access,
+                Name   => Porion.Notifications.Modules.NAME,
+                URI    => "notifications",
+                Module => App.Notification_Module'Access);
    end Initialize_Modules;
 
 end Porion.Applications;

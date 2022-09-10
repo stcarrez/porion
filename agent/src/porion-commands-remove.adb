@@ -67,7 +67,7 @@ package body Porion.Commands.Remove is
                  or else Confirm (Format (-("remove project '{0}'?"), Arg))
                then
                   Projects.Services.Remove_Project (Context.Project_Service, Arg);
-                  Context.Notice (-("Project '{0}'' is removed"), Arg);
+                  Context.Notice (-("Project '{0}' is removed"), Arg);
                end if;
             end if;
 

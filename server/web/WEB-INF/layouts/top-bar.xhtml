@@ -1,5 +1,5 @@
 <!-- Header bar at top of the page layout
-  -  Copyright (C) 2021 Stephane Carrez
+  -  Copyright (C) 2021, 2022 Stephane Carrez
   -  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
   -
   -  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,8 +17,8 @@
 <div id='awa-hdr' xmlns:c="http://java.sun.com/jstl/core">
     <div id='porion-top'>
         <h2><span><a href="#{contextPath}/index.html">Porion Build Manager</a></span></h2>
-        <c:if test="#{user.isLogged}">
-            <ul id='awa-tools'>
+        <ul id='awa-tools'>
+          <c:if test="#{user.isLogged}">
                 <li id='awa-logout'>
                     <a href="#{contextPath}/auth/logout.html"
                        title="#{layoutMsg.layout_logout_title}">
@@ -33,6 +33,12 @@
                 </c:if>
                 <li>|</li>
                 <li>
+                  <a href="#{contextPath}/notifications/notification-summary.html" title="Notifications">
+                    Notifications
+                  </a>
+                </li>
+                <li>|</li>
+                <li>
                     #{user.name}
                 </li>
                 <c:if test="#{user.id eq 1}">
@@ -43,8 +49,15 @@
                         </a>
                     </li>
                 </c:if>
-            </ul>
-        </c:if>
+          </c:if>
+          <c:if test="#{not user.isLogged}">
+            <li id='awa-logout'>
+              <a href="#{contextPath}/auth/login.html"
+                 title="#{layoutMsg.layout_login_title}">
+                #{layoutMsg.layout_login_label}
+            </a></li>
+	  </c:if>
+        </ul>
     </div>
     <div id='awa-top'>
         <ul id='awa-top-nav'>

@@ -1,0 +1,132 @@
+<!-- Project builds
+  -  Copyright (C) 2022 Stephane Carrez
+  -  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
+  -
+  -  Licensed under the Apache License, Version 2.0 (the "License");
+  -  you may not use this file except in compliance with the License.
+  -  You may obtain a copy of the License at
+  -
+  -      http://www.apache.org/licenses/LICENSE-2.0
+  -
+  -  Unless required by applicable law or agreed to in writing, software
+  -  distributed under the License is distributed on an "AS IS" BASIS,
+  -  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  -  See the License for the specific language governing permissions and
+  -  limitations under the License.
+  -->
+<ui:composition
+  xmlns:awa="http://code.google.com/p/ada-awa/jsf"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+  xmlns:c="http://java.sun.com/jstl/core"
+  xmlns:u="http://code.google.com/p/ada-asf/util"
+  xmlns:w="http://code.google.com/p/ada-asf/widget"
+  xmlns:h="http://java.sun.com/jsf/html">
+  <div class='notification-list'>
+      <div class='awa-list-header notification-header'>
+        <div class='awa-header-col notification-project'>
+          Project
+        </div>
+        <div class='awa-header-col notification-email'>
+          Email
+        </div>
+        <div class='awa-header-col notification-frequency'>
+          Notification frequency
+        </div>
+        <div class='awa-header-col notification-kind'>
+	  <div class='notification-kind-title'>Notification</div>
+	  <div class='notification-kind-config'>Config</div>
+	  <div class='notification-kind-build'>Build</div>
+	  <div class='notification-kind-xunit'>Tests</div>
+        </div>
+	<div class="awa-header-col notification-date">
+	  Last notification date
+	</div>
+	<div class="awa-header-col notification-count">
+	  # sent
+	</div>
+      </div>
+
+    <div class='awa-list'>
+      <div class='awa-list-item notification'>
+        <div class='notification-project'>
+	  <h:selectOneMenu id='project-selector'>
+            <f:selectItem itemLabel="Add notification" itemValue=""/>
+	    <f:selectItems value="#{projectSelector.list}"/>
+	  </h:selectOneMenu>
+        </div>
+      </div>
+
+	<div class='awa-list-item notification'>
+          <div class='notification-project'>
+            <a href="">ada-util</a>
+          </div>
+          <div class='notification-email'>
+            John.Cusak@nowhere.com
+          </div>
+          <div class='notification-frequency'>
+            Daily
+          </div>
+          <div class="notification-kind">
+	    <div class='notification-kind-config'><input type="checkbox" checked="true"/></div>
+	    <div class='notification-kind-build'><input type="checkbox"/></div>
+	    <div class='notification-kind-xunit'><input type="checkbox" checked="true"/></div>
+          </div>
+	  <div class="notification-date">
+	    2022-04-03
+	  </div>
+          <div class="notification-count">
+            23
+          </div>
+	</div>
+
+	<div class='awa-list-item notification'>
+          <div class='notification-project'>
+            <a href="">ada-el</a>
+          </div>
+          <div class='notification-email'>
+            John.Cusak@nowhere.com
+          </div>
+          <div class='notification-frequency'>
+            Immediate
+          </div>
+          <div class="notification-kind">
+	    <div class='notification-kind-config'><input type="checkbox" checked="true"/></div>
+	    <div class='notification-kind-build'><input type="checkbox"/></div>
+	    <div class='notification-kind-xunit'><input type="checkbox" checked="true"/></div>
+          </div>
+	  <div class="notification-date">
+	    2022-04-03
+	  </div>
+          <div class="notification-count">
+            23
+          </div>
+	</div>
+
+	<div class='awa-list-item notification'>
+          <div class='notification-project'>
+            <a href="">ada-el</a>
+          </div>
+          <div class='notification-email'>
+            John.Cusak@nowhere.com
+          </div>
+          <div class='notification-frequency'>
+            Immediate
+          </div>
+          <div class="notification-kind">
+	    <div class='notification-kind-config'><input type="checkbox" checked="true"/></div>
+	    <div class='notification-kind-build'><input type="checkbox"/></div>
+	    <div class='notification-kind-xunit'><input type="checkbox" checked="true"/></div>
+          </div>
+	  <div class="notification-date">
+	    2022-04-03
+	  </div>
+          <div class="notification-count">
+            23
+          </div>
+	</div>
+
+    </div>
+  </div>
+</ui:composition>

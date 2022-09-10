@@ -796,6 +796,10 @@ INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_test_group");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_test_run");
 INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_test_run_group");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_build"), "id");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_build"), "status");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_environment"), "value");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_recipe"), "name");
@@ -809,6 +813,10 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_recipe"), "main_recipe");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_recipe"), "filter_rules");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_recipe_step"), "id");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_recipe_step"), "number");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_node"), "name");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
@@ -828,7 +836,25 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "last_date");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "status");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "pass_rate");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "fail_rate");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "timeout_rate");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "build_rate");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "rate_factor");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "main_branch");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "last_build_number");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "build_progress");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_branch"), "description");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "name");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
@@ -840,6 +866,52 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "scm_url");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "pass_rate");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "fail_rate");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "timeout_rate");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "build_rate");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "check_delay");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_project"), "build_progress");
 /* Copied from porion-sqlite.sql*/
 /* File generated automatically by dynamo */
+/* The subscriber table indicates a user that is interested to be notified by changes
+on the project. */
+CREATE TABLE IF NOT EXISTS porion_subscriber (
+  /* the subscriber id */
+  `id` BIGINT NOT NULL,
+  /* the optimistic lock version */
+  `version` INTEGER NOT NULL,
+  /* the date and time of the last notification. */
+  `last_notification_date` DATETIME ,
+  /* the date and time of the last check for notification. */
+  `check_date` DATETIME ,
+  /*  */
+  `frequency` TINYINT NOT NULL,
+  /*  */
+  `send_count` INTEGER NOT NULL,
+  /* notify when some configuration is changed. */
+  `notify_config` TINYINT NOT NULL,
+  /* notify when a build is made */
+  `notify_build` TINYINT NOT NULL,
+  /* notify when unit tests change */
+  `notify_xunit` TINYINT NOT NULL,
+  /*  */
+  `project_id` BIGINT NOT NULL,
+  /*  */
+  `email_id` BIGINT NOT NULL,
+  PRIMARY KEY (`id`)
+);
+INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_subscriber");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_subscriber"), "frequency");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_subscriber"), "notify_config");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_subscriber"), "notify_build");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "porion_subscriber"), "notify_xunit");

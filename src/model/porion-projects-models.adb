@@ -283,9 +283,12 @@ package body Porion.Projects.Models is
 
    procedure Set_Pass_Rate (Object : in out Project_Ref;
                             Value  : in Porion.Permille_Type) is
+      function To_Object (Value : in Porion.Permille_Type) return Util.Beans.Objects.Object
+        is (Util.Beans.Objects.To_Object (Long_Long_Integer (Value)));
       procedure Set_Field_Discrete is
-        new ADO.Objects.Set_Field_Operation
-          (Porion.Permille_Type);
+        new ADO.Audits.Set_Field_Operation
+          (Porion.Permille_Type,
+           To_Object);
       Impl : Project_Access;
    begin
       Set_Field (Object, Impl);
@@ -303,9 +306,12 @@ package body Porion.Projects.Models is
 
    procedure Set_Fail_Rate (Object : in out Project_Ref;
                             Value  : in Porion.Permille_Type) is
+      function To_Object (Value : in Porion.Permille_Type) return Util.Beans.Objects.Object
+        is (Util.Beans.Objects.To_Object (Long_Long_Integer (Value)));
       procedure Set_Field_Discrete is
-        new ADO.Objects.Set_Field_Operation
-          (Porion.Permille_Type);
+        new ADO.Audits.Set_Field_Operation
+          (Porion.Permille_Type,
+           To_Object);
       Impl : Project_Access;
    begin
       Set_Field (Object, Impl);
@@ -323,9 +329,12 @@ package body Porion.Projects.Models is
 
    procedure Set_Timeout_Rate (Object : in out Project_Ref;
                                Value  : in Porion.Permille_Type) is
+      function To_Object (Value : in Porion.Permille_Type) return Util.Beans.Objects.Object
+        is (Util.Beans.Objects.To_Object (Long_Long_Integer (Value)));
       procedure Set_Field_Discrete is
-        new ADO.Objects.Set_Field_Operation
-          (Porion.Permille_Type);
+        new ADO.Audits.Set_Field_Operation
+          (Porion.Permille_Type,
+           To_Object);
       Impl : Project_Access;
    begin
       Set_Field (Object, Impl);
@@ -343,9 +352,12 @@ package body Porion.Projects.Models is
 
    procedure Set_Build_Rate (Object : in out Project_Ref;
                              Value  : in Porion.Permille_Type) is
+      function To_Object (Value : in Porion.Permille_Type) return Util.Beans.Objects.Object
+        is (Util.Beans.Objects.To_Object (Long_Long_Integer (Value)));
       procedure Set_Field_Discrete is
-        new ADO.Objects.Set_Field_Operation
-          (Porion.Permille_Type);
+        new ADO.Audits.Set_Field_Operation
+          (Porion.Permille_Type,
+           To_Object);
       Impl : Project_Access;
    begin
       Set_Field (Object, Impl);
@@ -414,9 +426,12 @@ package body Porion.Projects.Models is
 
    procedure Set_Build_Progress (Object : in out Project_Ref;
                                  Value  : in Porion.Permille_Type) is
+      function To_Object (Value : in Porion.Permille_Type) return Util.Beans.Objects.Object
+        is (Util.Beans.Objects.To_Object (Long_Long_Integer (Value)));
       procedure Set_Field_Discrete is
-        new ADO.Objects.Set_Field_Operation
-          (Porion.Permille_Type);
+        new ADO.Audits.Set_Field_Operation
+          (Porion.Permille_Type,
+           To_Object);
       Impl : Project_Access;
    begin
       Set_Field (Object, Impl);
@@ -1085,8 +1100,9 @@ package body Porion.Projects.Models is
    procedure Set_Status (Object : in out Branch_Ref;
                          Value  : in Branch_Status_Type) is
       procedure Set_Field_Discrete is
-        new ADO.Objects.Set_Field_Operation
-          (Branch_Status_Type);
+        new ADO.Audits.Set_Field_Operation
+          (Branch_Status_Type,
+           Branch_Status_Type_Objects.To_Object);
       Impl : Branch_Access;
    begin
       Set_Field (Object, Impl);
@@ -1104,9 +1120,12 @@ package body Porion.Projects.Models is
 
    procedure Set_Pass_Rate (Object : in out Branch_Ref;
                             Value  : in Porion.Permille_Type) is
+      function To_Object (Value : in Porion.Permille_Type) return Util.Beans.Objects.Object
+        is (Util.Beans.Objects.To_Object (Long_Long_Integer (Value)));
       procedure Set_Field_Discrete is
-        new ADO.Objects.Set_Field_Operation
-          (Porion.Permille_Type);
+        new ADO.Audits.Set_Field_Operation
+          (Porion.Permille_Type,
+           To_Object);
       Impl : Branch_Access;
    begin
       Set_Field (Object, Impl);
@@ -1124,9 +1143,12 @@ package body Porion.Projects.Models is
 
    procedure Set_Fail_Rate (Object : in out Branch_Ref;
                             Value  : in Porion.Permille_Type) is
+      function To_Object (Value : in Porion.Permille_Type) return Util.Beans.Objects.Object
+        is (Util.Beans.Objects.To_Object (Long_Long_Integer (Value)));
       procedure Set_Field_Discrete is
-        new ADO.Objects.Set_Field_Operation
-          (Porion.Permille_Type);
+        new ADO.Audits.Set_Field_Operation
+          (Porion.Permille_Type,
+           To_Object);
       Impl : Branch_Access;
    begin
       Set_Field (Object, Impl);
@@ -1144,9 +1166,12 @@ package body Porion.Projects.Models is
 
    procedure Set_Timeout_Rate (Object : in out Branch_Ref;
                                Value  : in Porion.Permille_Type) is
+      function To_Object (Value : in Porion.Permille_Type) return Util.Beans.Objects.Object
+        is (Util.Beans.Objects.To_Object (Long_Long_Integer (Value)));
       procedure Set_Field_Discrete is
-        new ADO.Objects.Set_Field_Operation
-          (Porion.Permille_Type);
+        new ADO.Audits.Set_Field_Operation
+          (Porion.Permille_Type,
+           To_Object);
       Impl : Branch_Access;
    begin
       Set_Field (Object, Impl);
@@ -1164,9 +1189,12 @@ package body Porion.Projects.Models is
 
    procedure Set_Build_Rate (Object : in out Branch_Ref;
                              Value  : in Porion.Permille_Type) is
+      function To_Object (Value : in Porion.Permille_Type) return Util.Beans.Objects.Object
+        is (Util.Beans.Objects.To_Object (Long_Long_Integer (Value)));
       procedure Set_Field_Discrete is
-        new ADO.Objects.Set_Field_Operation
-          (Porion.Permille_Type);
+        new ADO.Audits.Set_Field_Operation
+          (Porion.Permille_Type,
+           To_Object);
       Impl : Branch_Access;
    begin
       Set_Field (Object, Impl);
@@ -1184,9 +1212,12 @@ package body Porion.Projects.Models is
 
    procedure Set_Rate_Factor (Object : in out Branch_Ref;
                               Value  : in Porion.Rate_Type) is
+      function To_Object (Value : in Porion.Rate_Type) return Util.Beans.Objects.Object
+        is (Util.Beans.Objects.To_Object (Long_Long_Integer (Value)));
       procedure Set_Field_Discrete is
-        new ADO.Objects.Set_Field_Operation
-          (Porion.Rate_Type);
+        new ADO.Audits.Set_Field_Operation
+          (Porion.Rate_Type,
+           To_Object);
       Impl : Branch_Access;
    begin
       Set_Field (Object, Impl);
@@ -1224,7 +1255,7 @@ package body Porion.Projects.Models is
       Impl : Branch_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Integer (Impl.all, 15, Impl.Last_Build_Number, Value);
+      ADO.Audits.Set_Field_Integer (Impl.all, 15, Impl.Last_Build_Number, Value);
    end Set_Last_Build_Number;
 
    function Get_Last_Build_Number (Object : in Branch_Ref)
@@ -1238,9 +1269,12 @@ package body Porion.Projects.Models is
 
    procedure Set_Build_Progress (Object : in out Branch_Ref;
                                  Value  : in Porion.Permille_Type) is
+      function To_Object (Value : in Porion.Permille_Type) return Util.Beans.Objects.Object
+        is (Util.Beans.Objects.To_Object (Long_Long_Integer (Value)));
       procedure Set_Field_Discrete is
-        new ADO.Objects.Set_Field_Operation
-          (Porion.Permille_Type);
+        new ADO.Audits.Set_Field_Operation
+          (Porion.Permille_Type,
+           To_Object);
       Impl : Branch_Access;
    begin
       Set_Field (Object, Impl);
@@ -1261,7 +1295,7 @@ package body Porion.Projects.Models is
       Impl : Branch_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_String (Impl.all, 17, Impl.Description, Value);
+      ADO.Audits.Set_Field_String (Impl.all, 17, Impl.Description, Value);
    end Set_Description;
 
    procedure Set_Description (Object : in out Branch_Ref;
@@ -1269,7 +1303,7 @@ package body Porion.Projects.Models is
       Impl : Branch_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Unbounded_String (Impl.all, 17, Impl.Description, Value);
+      ADO.Audits.Set_Field_Unbounded_String (Impl.all, 17, Impl.Description, Value);
    end Set_Description;
 
    function Get_Description (Object : in Branch_Ref)

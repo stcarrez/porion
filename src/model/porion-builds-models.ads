@@ -1732,13 +1732,23 @@ private
    BUILD_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := BUILD_DEF'Access;
 
+   BUILD_AUDIT_DEF : aliased constant ADO.Audits.Auditable_Mapping :=
+     (Count    => 2,
+      Of_Class => BUILD_DEF'Access,
+      Members  => (
+         1 => 0,
+         2 => 9)
+     );
+   BUILD_AUDIT_TABLE : constant ADO.Audits.Auditable_Mapping_Access
+      := BUILD_AUDIT_DEF'Access;
 
    Null_Build : constant Build_Ref
       := Build_Ref'(ADO.Objects.Object_Ref with null record);
 
    type Build_Impl is
-      new ADO.Objects.Object_Record (Key_Type => ADO.Objects.KEY_INTEGER,
-                                     Of_Class => BUILD_DEF'Access)
+      new ADO.Audits.Auditable_Object_Record (Key_Type => ADO.Objects.KEY_INTEGER,
+                                     Of_Class => BUILD_DEF'Access,
+                                     With_Audit => BUILD_AUDIT_DEF'Access)
    with record
        Version : Integer;
        Number : Integer;
@@ -1968,13 +1978,23 @@ private
    RECIPE_STEP_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := RECIPE_STEP_DEF'Access;
 
+   RECIPE_STEP_AUDIT_DEF : aliased constant ADO.Audits.Auditable_Mapping :=
+     (Count    => 2,
+      Of_Class => RECIPE_STEP_DEF'Access,
+      Members  => (
+         1 => 0,
+         2 => 2)
+     );
+   RECIPE_STEP_AUDIT_TABLE : constant ADO.Audits.Auditable_Mapping_Access
+      := RECIPE_STEP_AUDIT_DEF'Access;
 
    Null_Recipe_Step : constant Recipe_Step_Ref
       := Recipe_Step_Ref'(ADO.Objects.Object_Ref with null record);
 
    type Recipe_Step_Impl is
-      new ADO.Objects.Object_Record (Key_Type => ADO.Objects.KEY_INTEGER,
-                                     Of_Class => RECIPE_STEP_DEF'Access)
+      new ADO.Audits.Auditable_Object_Record (Key_Type => ADO.Objects.KEY_INTEGER,
+                                     Of_Class => RECIPE_STEP_DEF'Access,
+                                     With_Audit => RECIPE_STEP_AUDIT_DEF'Access)
    with record
        Parameters : Ada.Strings.Unbounded.Unbounded_String;
        Number : Integer;

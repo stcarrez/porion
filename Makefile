@@ -48,6 +48,8 @@ AGENT_DYNAMO_ARGS=\
   db ../uml/porion.zargo
 
 SERVER_DYNAMO_ARGS=\
+  --package Porion.Queries.Server \
+  --package Porion.Notifications.Models \
   --package Porion.Beans \
   db ../uml/porion.zargo
 
@@ -85,7 +87,9 @@ server-package:
 	cd server && $(DYNAMO) dist $(DESTDIR)$(DIST_DIR) $(PACKAGE_XML)
 
 build-ts:
-	tsc server/web/js/projects.ts server/web/js/builds.ts server/web/js/xunits.ts server/web/js/nodes.ts
+	tsc server/web/js/projects.ts server/web/js/builds.ts server/web/js/xunits.ts \
+            server/web/js/nodes.ts \
+            server/web/js/notifications.ts
 
 setup:: src/porion-configs-setup.ads
 src/porion-configs-setup.ads:   Makefile.conf src/porion-configs-setup.gpb

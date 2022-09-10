@@ -1234,7 +1234,7 @@ package body Porion.Builds.Models is
       Impl : Build_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Key_Value (Impl.all, 1, Value);
+      ADO.Audits.Set_Field_Key_Value (Impl.all, 1, Value);
    end Set_Id;
 
    function Get_Id (Object : in Build_Ref)
@@ -1380,8 +1380,9 @@ package body Porion.Builds.Models is
    procedure Set_Status (Object : in out Build_Ref;
                          Value  : in Build_Status_Type) is
       procedure Set_Field_Discrete is
-        new ADO.Objects.Set_Field_Operation
-          (Build_Status_Type);
+        new ADO.Audits.Set_Field_Operation
+          (Build_Status_Type,
+           Build_Status_Type_Objects.To_Object);
       Impl : Build_Access;
    begin
       Set_Field (Object, Impl);
@@ -1844,6 +1845,7 @@ package body Porion.Builds.Models is
                   raise ADO.Objects.LAZY_LOCK;
                end if;
             end if;
+            ADO.Audits.Save (Object, Session);
          end;
       end if;
    end Save;
@@ -1856,7 +1858,7 @@ package body Porion.Builds.Models is
       Result : Integer;
    begin
       Object.Version := 1;
-      Session.Allocate (Id => Object);
+      ADO.Audits.Allocate (Session, Object, 1);
       Query.Save_Field (Name  => COL_0_3_NAME, --  id
                         Value => Object.Get_Key);
       Query.Save_Field (Name  => COL_1_3_NAME, --  version
@@ -1898,6 +1900,7 @@ package body Porion.Builds.Models is
          raise ADO.Objects.INSERT_ERROR;
       end if;
       ADO.Objects.Set_Created (Object);
+      ADO.Audits.Save (Object, Session);
    end Create;
 
    overriding
@@ -3076,7 +3079,7 @@ package body Porion.Builds.Models is
       Impl : Recipe_Step_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Key_Value (Impl.all, 1, Value);
+      ADO.Audits.Set_Field_Key_Value (Impl.all, 1, Value);
    end Set_Id;
 
    function Get_Id (Object : in Recipe_Step_Ref)
@@ -3123,7 +3126,7 @@ package body Porion.Builds.Models is
       Impl : Recipe_Step_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Integer (Impl.all, 3, Impl.Number, Value);
+      ADO.Audits.Set_Field_Integer (Impl.all, 3, Impl.Number, Value);
    end Set_Number;
 
    function Get_Number (Object : in Recipe_Step_Ref)
@@ -3457,6 +3460,7 @@ package body Porion.Builds.Models is
                   raise ADO.Objects.UPDATE_ERROR;
                end if;
             end if;
+            ADO.Audits.Save (Object, Session);
          end;
       end if;
    end Save;
@@ -3468,7 +3472,7 @@ package body Porion.Builds.Models is
                   := Session.Create_Statement (RECIPE_STEP_DEF'Access);
       Result : Integer;
    begin
-      Session.Allocate (Id => Object);
+      ADO.Audits.Allocate (Session, Object, 1);
       Query.Save_Field (Name  => COL_0_6_NAME, --  id
                         Value => Object.Get_Key);
       Query.Save_Field (Name  => COL_1_6_NAME, --  parameters
@@ -3494,6 +3498,7 @@ package body Porion.Builds.Models is
          raise ADO.Objects.INSERT_ERROR;
       end if;
       ADO.Objects.Set_Created (Object);
+      ADO.Audits.Save (Object, Session);
    end Create;
 
    overriding

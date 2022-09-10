@@ -38,6 +38,7 @@ with Porion.Projects.Modules;
 with Porion.Builds.Modules;
 with Porion.Nodes.Modules;
 with Porion.Converters.Durations;
+with Porion.Notifications.Modules;
 package Porion.Applications is
 
    CONFIG_PATH  : constant String := "porion-server";
@@ -106,6 +107,7 @@ private
       Project_Module    : aliased Porion.Projects.Modules.Project_Module;
       Build_Module      : aliased Porion.Builds.Modules.Build_Module;
       Node_Module       : aliased Porion.Nodes.Modules.Node_Module;
+      Notification_Module  : aliased Porion.Notifications.Modules.Notification_Module;
    end record;
 
 end Porion.Applications;

@@ -26,12 +26,13 @@ CREATE TABLE IF NOT EXISTS porion_subscriber (
   `email_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`)
 );
-INSERT OR IGNORE INTO entity_type (name) VALUES ("porion_subscriber");
+INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("porion_subscriber");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_subscriber"), "frequency");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_subscriber"), "frequency");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_subscriber"), "notify_config");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_subscriber"), "notify_config");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_subscriber"), "notify_build");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_subscriber"), "notify_build");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = "porion_subscriber"), "notify_xunit");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_subscriber"), "notify_xunit");
+INSERT OR IGNORE INTO ado_version (name, version) VALUES ("porion", 1);

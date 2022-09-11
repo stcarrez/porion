@@ -1,4 +1,4 @@
---  Advanced Resource Embedder 1.2.1
+--  Advanced Resource Embedder 1.2.0
 package body Porion.Resources.Server_Schema is
    L_1   : aliased constant String := "pragma synchronous=OFF";
    L_2   : aliased constant String := "CREATE TABLE IF NOT EXISTS entity_type ( "

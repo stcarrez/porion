@@ -7,7 +7,7 @@
         <comment>Selector for list of projects</comment>
         <sql>
             SELECT
-            project.id, project.name
+            project.name, project.name
             FROM porion_project AS project
             ORDER BY project.name ASC
         </sql>

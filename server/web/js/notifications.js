@@ -20,8 +20,6 @@ var Porion;
     var Notifications = /** @class */ (function () {
         function Notifications(options, project) {
             var _this = this;
-            this.project = options.project;
-            this.build = options.build;
             this.container = document.getElementById(options.container);
             this.projectSelector = document.getElementById(options.projectSelector);
             if (this.projectSelector) {
@@ -33,13 +31,17 @@ var Porion;
         Notifications.prototype.onSelectProject = function (event) {
             var _this = this;
             var xmlhttp = new XMLHttpRequest();
+            var selector = event.target;
+            if (!selector) {
+                return;
+            }
             xmlhttp.onload = function (evt) {
                 if (xmlhttp.status == 200 && _this.container) {
                 }
             };
-            xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             xmlhttp.open("POST", "/porion/api/v1/subscribers");
-            xmlhttp.send("project=" + event.target);
+            xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xmlhttp.send("project=" + selector.value);
         };
         return Notifications;
     }());

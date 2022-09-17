@@ -20,38 +20,38 @@ namespace Porion {
     /* Options to control the Xunit renderer */
     export interface Options {
         container: string,
-	projectSelector: string,
+	    projectSelector: string,
     }
 
     export class Notifications {
         projectSelector : HTMLElement | null;
         container : HTMLElement | null;
-        project   : string | null;
-	build     : string | null;
 
         constructor(options : Options, project: string) {
-            this.project = options.project;
-	    this.build = options.build;
             this.container = document.getElementById(options.container);
             this.projectSelector = document.getElementById(options.projectSelector);
-	    if (this.projectSelector) {
-	       this.projectSelector.addEventListener("change", (event: Event) => {
-	          this.onSelectProject(event);
-	       });
-	    }
+	        if (this.projectSelector) {
+	            this.projectSelector.addEventListener("change", (event: Event) => {
+	                this.onSelectProject(event);
+	            });
+	        }
         }
-	onSelectProject(event: Event) {
+	    onSelectProject(event: Event) {
             const xmlhttp : XMLHttpRequest = new XMLHttpRequest();
-                
+            const selector : HTMLSelectElement | null = <HTMLSelectElement> event.target;
+            if (!selector) {
+                return;
+            }
+
             xmlhttp.onload = evt => {
                 if (xmlhttp.status == 200 && this.container) {
                     
                 }
             }
-	    xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             xmlhttp.open("POST", "/porion/api/v1/subscribers");
-            xmlhttp.send("project=" + event.target);
-	}
+	        xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xmlhttp.send("project=" + selector.value);
+	    }
     }
 }
 

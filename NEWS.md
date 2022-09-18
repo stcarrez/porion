@@ -1,4 +1,4 @@
-Version 0.10.0 - Under development
+Version 0.10.0 - Aug 2022
   - Update presentation of build results in the Web server
   - Update collecting test results from a remote host through ssh
   - Update to use AWA 2.4.0

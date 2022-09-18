@@ -19,19 +19,22 @@
 with Servlet.Rest;
 with ADO.Sessions;
 with ADO.Queries;
-with AWA.Applications;
 with AWA.Modules.Beans;
 with AWA.Modules.Get;
+with AWA.Services.Contexts;
 with AWA.Users.Models;
 with Util.Log.Loggers;
 with Porion.Services;
-with Porion.Projects.Models;
+with Porion.Projects;
 with Porion.Notifications.Beans;
 with Porion.Notifications.Rest;
 with Porion.Notifications.Models;
 package body Porion.Notifications.Modules is
 
-   Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Notifications.Module");
+   package ASC renames AWA.Services.Contexts;
+
+   Log : constant Util.Log.Loggers.Logger
+     := Util.Log.Loggers.Create ("Porion.Notifications.Module");
 
    package Register is new AWA.Modules.Beans (Module => Notification_Module,
                                               Module_Access => Notification_Module_Access);
@@ -71,6 +74,7 @@ package body Porion.Notifications.Modules is
                                 Project : in String;
                                 Email   : in String;
                                 Result  : out ADO.Identifier) is
+      Ctx        : constant ASC.Service_Context_Access := ASC.Current;
       DB         : ADO.Sessions.Master_Session := Module.Get_Master_Session;
       Query      : ADO.Queries.Context;
       Prj_Ctx    : Porion.Services.Context_Type;
@@ -84,9 +88,13 @@ package body Porion.Notifications.Modules is
       Prj_Ctx.Ident := Porion.Projects.Parse (Project);
       Prj_Ctx.Load (Prj_Ctx.Ident);
 
-      Query.Set_Filter ("o.email = :email");
-      Query.Bind_Param ("email", Email);
-      User_Email.Find (DB, Query, Found);
+      if Email'Length = 0 then
+         User_Email := AWA.Users.Models.Email_Ref (Ctx.Get_User.Get_Email);
+      else
+         Query.Set_Filter ("o.email = :email");
+         Query.Bind_Param ("email", Email);
+         User_Email.Find (DB, Query, Found);
+      end if;
 
       Subscriber.Set_Project (Prj_Ctx.Project);
       Subscriber.Set_Email (User_Email);

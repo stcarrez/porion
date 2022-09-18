@@ -1020,8 +1020,8 @@ package body Porion.Resources.Queries is
        & "        </property>" & ASCII.LF & "        <property type='Integer' name"
        & "=""max_build_duration"">" & ASCII.LF & "            <comment>the max bui"
        & "ld duration.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & " "
-       & "       <property type='Integer' name=""sum_build_duration"">" & ASCII.LF
-       & "            <comment>the sum of build duration.</comment>" & ASCII.LF & " "
+       & "       <property type='Long' name=""sum_build_duration"">" & ASCII.LF & " "
+       & "           <comment>the sum of build duration.</comment>" & ASCII.LF & " "
        & "       </property>" & ASCII.LF & "        <property type='Integer' name="
        & """max_pass_count"">" & ASCII.LF & "            <comment>the number of te"
        & "sts that succeeded.</comment>" & ASCII.LF & "        </property>" & ASCII.LF

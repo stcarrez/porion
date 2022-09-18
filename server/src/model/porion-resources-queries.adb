@@ -418,10 +418,10 @@ package body Porion.Resources.Queries is
        & "for list of project" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF
        & "    <query name='project-selector'>" & ASCII.LF & "        <comment>Sele"
        & "ctor for list of projects</comment>" & ASCII.LF & "        <sql>" & ASCII.LF
-       & "            SELECT" & ASCII.LF & "            project.id, project.name" & ASCII.LF
-       & "            FROM porion_project AS project" & ASCII.LF & "            OR"
-       & "DER BY project.name ASC" & ASCII.LF & "        </sql>" & ASCII.LF & "   "
-       & " </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+       & "            SELECT" & ASCII.LF & "            project.name, project.name"
+       & ASCII.LF & "            FROM porion_project AS project" & ASCII.LF & "  "
+       & "          ORDER BY project.name ASC" & ASCII.LF & "        </sql>" & ASCII.LF
+       & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
    C_13 : aliased constant String := "<query-mapping package='Porion.Builds.Mod"
        & "els'>" & ASCII.LF & "    <description>" & ASCII.LF & "        Provide pr"
@@ -1167,8 +1167,8 @@ package body Porion.Resources.Queries is
        & "        </property>" & ASCII.LF & "        <property type='Integer' name"
        & "=""max_build_duration"">" & ASCII.LF & "            <comment>the max bui"
        & "ld duration.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & " "
-       & "       <property type='Integer' name=""sum_build_duration"">" & ASCII.LF
-       & "            <comment>the sum of build duration.</comment>" & ASCII.LF & " "
+       & "       <property type='Long' name=""sum_build_duration"">" & ASCII.LF & " "
+       & "           <comment>the sum of build duration.</comment>" & ASCII.LF & " "
        & "       </property>" & ASCII.LF & "        <property type='Integer' name="
        & """max_pass_count"">" & ASCII.LF & "            <comment>the number of te"
        & "sts that succeeded.</comment>" & ASCII.LF & "        </property>" & ASCII.LF

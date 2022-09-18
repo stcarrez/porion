@@ -1453,7 +1453,7 @@ package body Porion.Queries is
       elsif Name = "max_build_duration" then
          Item.Max_Build_Duration := Util.Beans.Objects.To_Integer (Value);
       elsif Name = "sum_build_duration" then
-         Item.Sum_Build_Duration := Util.Beans.Objects.To_Integer (Value);
+         Item.Sum_Build_Duration := ADO.Int64 (Util.Beans.Objects.To_Long_Long_Integer (Value));
       elsif Name = "max_pass_count" then
          Item.Max_Pass_Count := Util.Beans.Objects.To_Integer (Value);
       elsif Name = "sum_pass_count" then
@@ -1504,7 +1504,7 @@ package body Porion.Queries is
          Into.Last_Success_Build := Stmt.Get_Integer (8);
          Into.Last_Fail_Build := Stmt.Get_Integer (9);
          Into.Max_Build_Duration := Stmt.Get_Integer (10);
-         Into.Sum_Build_Duration := Stmt.Get_Integer (11);
+         Into.Sum_Build_Duration := Stmt.Get_Int64 (11);
          Into.Max_Pass_Count := Stmt.Get_Integer (12);
          Into.Sum_Pass_Count := Stmt.Get_Integer (13);
          Into.Max_Fail_Count := Stmt.Get_Integer (14);

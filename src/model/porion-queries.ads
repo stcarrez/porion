@@ -966,7 +966,7 @@ package Porion.Queries is
       Max_Build_Duration : Integer;
 
       --  the sum of build duration.
-      Sum_Build_Duration : Integer;
+      Sum_Build_Duration : ADO.Int64;
 
       --  the number of tests that succeeded.
       Max_Pass_Count : Integer;
@@ -1336,7 +1336,7 @@ private
 
    package File_14 is
       new ADO.Queries.Loaders.File (Path => "report-recipes.xml",
-                                    Sha1 => "3116DEDCF858DB61A9818C8A6EA3B93CAF83A5E8");
+                                    Sha1 => "959BB67C285314CAE0FCCE844C913705220AEDCC");
 
    package Def_Recipeinfo_Recipe_List is
       new ADO.Queries.Loaders.Query (Name => "recipe-list",

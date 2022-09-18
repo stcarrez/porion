@@ -50,6 +50,11 @@ Get information about a project or a build number:
    porion info ada-util:2
 ```
 
+## Version 0.11.0 - Under development
+  - Update for AWA development version (2.5.0)
+  - Add support to user login with AWA
+  - Add support for notification
+
 ## Version 0.10.0 - Aug 2022
   - Update presentation of build results in the Web server
   - Update collecting test results from a remote host through ssh
@@ -58,9 +63,6 @@ Get information about a project or a build number:
   - Display the build nodes with their builds
   - Display the project and build unit tests
   - Display the recipes queued for a build
-
-## Version 0.9.0   - Jul 2022
-  - Fix cleaning of build directories when it contains socket files
 
 [List all versions](https://gitlab.com/stcarrez/porion/blob/master/NEWS.md)
 

@@ -1,3 +1,8 @@
+Version 0.11.0 - Under development
+  - Update for AWA development version (2.5.0)
+  - Add support to user login with AWA
+  - Add support for notification
+
 Version 0.10.0 - Aug 2022
   - Update presentation of build results in the Web server
   - Update collecting test results from a remote host through ssh

@@ -38,7 +38,7 @@
         <property type='Integer' name="max_build_duration">
             <comment>the max build duration.</comment>
         </property>
-        <property type='Integer' name="sum_build_duration">
+        <property type='Long' name="sum_build_duration">
             <comment>the sum of build duration.</comment>
         </property>
         <property type='Integer' name="max_pass_count">

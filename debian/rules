@@ -74,5 +74,12 @@ override_dh_auto_install:
 	  dh_installdirs --package=porion-server usr/share/porion/config/$$dir; \
 	  dh_install -pporion-server debian/tmp/usr/share/porion/config/$$i usr/share/porion/config/$$dir ; \
         done
+	# Copy and install only the db/migrate/* directory tree.
+	files=`cd $(CURDIR)/debian/tmp/usr/share/porion/db/migrate && find . -type f`; \
+        for i in $$files; do \
+	  dir=`dirname $$i`; \
+	  dh_installdirs --package=porion-server usr/share/porion/db/migrate/$$dir; \
+	  dh_install -pporion-server debian/tmp/usr/share/porion/db/migrate/$$i usr/share/porion/db/migrate/$$dir ; \
+        done
 	dh_install -pporion-server share/porion/config/porion.properties usr/share/porion/config
 	#rm -rf debian/tmp

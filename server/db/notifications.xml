@@ -1,0 +1,69 @@
+<query-mapping package='Porion.Notifications.Models'>
+    <description>
+        List of subscribed notifications
+    </description>
+
+    <class name="Porion.Notifications.Models.Notification_Info" bean="yes">
+        <comment>Information about a notification.</comment>
+        <property type='ADO.Identifier' name="id">
+            <comment>the subscriber id.</comment>
+        </property>
+        <property type='String' name="name">
+            <comment>the project name.</comment>
+        </property>
+        <property type='Porion.Projects.Models.Project_Status_Type' name="project_status">
+            <comment>the project status.</comment>
+        </property>
+        <property type='String' name="email">
+            <comment>the user email address.</comment>
+        </property>
+        <property type='Porion.Notifications.Models.Frequency_Type' name="frequency">
+            <comment>the notification frequency.</comment>
+        </property>
+        <property type='Date' name="last_notification_date" not-null='false'>
+            <comment>the last notification date.</comment>
+        </property>
+        <property type='Date' name="check_date" not-null='false'>
+            <comment>the last check date.</comment>
+        </property>
+        <property type='Natural' name="send_count">
+            <comment>the number of notification sent.</comment>
+        </property>
+        <property type='Boolean' name="notify_config">
+            <comment>the notify config flag.</comment>
+        </property>
+        <property type='Boolean' name="notify_build">
+            <comment>the notify build flag.</comment>
+        </property>
+        <property type='Boolean' name="notify_xunit">
+            <comment>the notify xunit flag.</comment>
+        </property>
+    </class>
+
+    <query name='notification-list'>
+        <comment>Get the list of notifications</comment>
+        <sql>
+            SELECT
+            subscriber.id AS id,
+            project.name AS name,
+            project.status AS status,
+            email.email AS email,
+            subscriber.frequency AS frequency,
+            subscriber.last_notification_date AS last_notification_date,
+            subscriber.check_date AS check_date,
+            subscriber.send_count AS send_count,
+            subscriber.notify_config AS notify_config,
+            subscriber.notify_build AS notify_build,
+            subscriber.notify_xunit AS notify_xunit
+            FROM porion_subscriber AS subscriber
+            INNER JOIN porion_project AS project ON subscriber.project_id = project.id
+            INNER JOIN awa_email AS email ON subscriber.email_id = email.id
+        </sql>
+        <sql-count>
+            SELECT
+            count(subscriber.id)
+            FROM porion_subscriber AS subscriber
+        </sql-count>
+    </query>
+
+</query-mapping>

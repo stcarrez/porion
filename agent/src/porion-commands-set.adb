@@ -79,7 +79,8 @@ package body Porion.Commands.Set is
       if Name = VAR_NAME then
          Porion.Projects.Services.Set_Name (Context.Project_Service, Value, Modified);
       elsif Name = VAR_SOURCE then
-         Porion.Projects.Services.Set_Source (Context.Project_Service, Value, Porion.Sources.SRC_GIT, Modified);
+         Porion.Projects.Services.Set_Source (Context.Project_Service, Value,
+                                              Porion.Sources.SRC_GIT, Modified);
       elsif Name = VAR_DESCRIPTION then
          Porion.Projects.Services.Set_Description (Context.Project_Service, Value, Modified);
       elsif Name = VAR_STATUS then

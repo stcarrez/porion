@@ -218,8 +218,7 @@ package body Porion.Builds.Services is
       Porion.Sources.Checkout (Service.Project.Get_Scm, Config, Path, Dir, Executor);
 
       if Length (Dir) > 0 then
-         Run_Build_Steps (Service, Steps,
-                          Util.Files.Compose (Path, To_String (Dir)), Status, Executor);
+         Run_Build_Steps (Service, Steps, To_String (Dir), Status, Executor);
       else
          Run_Build_Steps (Service, Steps, Path, Status, Executor);
       end if;
@@ -1505,7 +1504,7 @@ package body Porion.Builds.Services is
       Service.Recipe.Set_Name ("main");
       Service.Recipe.Save (Service.DB);
       if Length (Dir) > 0 then
-         Guess (Service, Util.Files.Compose (Path, To_String (Dir)), Executor);
+         Guess (Service, To_String (Dir), Executor);
       else
          Guess (Service, Path, Executor);
       end if;

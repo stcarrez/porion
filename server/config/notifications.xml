@@ -6,9 +6,9 @@
   </application>
 
   <managed-bean>
-    <description>An example of a bean (change description and bean name)</description>
-    <managed-bean-name>notification</managed-bean-name>
-    <managed-bean-class>Porion.Notifications.Beans.Notifications_Bean</managed-bean-class>
+    <description>List of subscriber for notifications</description>
+    <managed-bean-name>notifications</managed-bean-name>
+    <managed-bean-class>Porion.Notifications.Beans.Notification_List_Bean</managed-bean-class>
     <managed-bean-scope>request</managed-bean-scope>
   </managed-bean>
 
@@ -21,11 +21,6 @@
     <filter-name>auth-filter</filter-name>
     <url-pattern>/notifications/*.html</url-pattern>
   </filter-mapping>
-
-  <url-policy>
-    <permission>anonymous</permission>
-    <url-pattern>/notifications/.*\.html</url-pattern>
-  </url-policy>
 
   <url-policy>
     <permission>logged-user</permission>

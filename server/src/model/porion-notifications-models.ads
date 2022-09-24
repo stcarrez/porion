@@ -214,6 +214,41 @@ package Porion.Notifications.Models is
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class);
 
+   type Audit_Info is record
+
+      --  the date when the change was made.
+      Date : Ada.Calendar.Time;
+
+      --  the field name that was changed.
+      Kind : ADO.Entity_Type;
+
+      --  the field name that was changed.
+      Field : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the id that was changed.
+      Id : ADO.Identifier;
+
+      --  the old value.
+      Old_Value : ADO.Nullable_String;
+
+      --  the new value.
+      New_Value : ADO.Nullable_String;
+   end record;
+
+   package Audit_Info_Vectors is
+      new Ada.Containers.Vectors (Index_Type   => Positive,
+                                  Element_Type => Audit_Info,
+                                  "="          => "=");
+
+   subtype Audit_Info_Vector is Audit_Info_Vectors.Vector;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Audit_Info_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
+
+   Query_Audit_List : constant ADO.Queries.Query_Definition_Access;
+
    --  --------------------
    --    Information about a notification.
    --  --------------------
@@ -388,12 +423,22 @@ private
                         Impl   : out Subscriber_Access);
 
    package File_1 is
+      new ADO.Queries.Loaders.File (Path => "notifications-changes.xml",
+                                    Sha1 => "234BB980AC0B02961BED13DCA8A11575C5020073");
+
+   package Def_Auditinfo_Audit_List is
+      new ADO.Queries.Loaders.Query (Name => "audit-list",
+                                     File => File_1.File'Access);
+   Query_Audit_List : constant ADO.Queries.Query_Definition_Access
+   := Def_Auditinfo_Audit_List.Query'Access;
+
+   package File_2 is
       new ADO.Queries.Loaders.File (Path => "notifications.xml",
                                     Sha1 => "1F7ABC2E691C3EEC40CCED9B1777BCD430145106");
 
    package Def_Notificationinfo_Notification_List is
       new ADO.Queries.Loaders.Query (Name => "notification-list",
-                                     File => File_1.File'Access);
+                                     File => File_2.File'Access);
    Query_Notification_List : constant ADO.Queries.Query_Definition_Access
    := Def_Notificationinfo_Notification_List.Query'Access;
 end Porion.Notifications.Models;

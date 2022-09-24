@@ -667,6 +667,37 @@ package body Porion.Notifications.Models is
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);
    end Load;
+   --  --------------------
+   --  
+   --  --------------------
+   procedure List (Object  : in out Audit_Info_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+      procedure Read (Into : in out Audit_Info);
+
+      Stmt : ADO.Statements.Query_Statement
+          := Session.Create_Statement (Context);
+      Pos  : Positive := 1;
+      procedure Read (Into : in out Audit_Info) is
+      begin
+         Into.Date := Stmt.Get_Time (0);
+         Into.Kind := Stmt.Get_Entity_Type (1);
+         Into.Field := Stmt.Get_Unbounded_String (2);
+         Into.Id := Stmt.Get_Identifier (3);
+         Into.Old_Value := Stmt.Get_Nullable_String (4);
+         Into.New_Value := Stmt.Get_Nullable_String (5);
+      end Read;
+   begin
+      Stmt.Execute;
+      Audit_Info_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         Object.Insert_Space (Before => Pos);
+         Object.Update_Element (Index => Pos, Process => Read'Access);
+         Pos := Pos + 1;
+         Stmt.Next;
+      end loop;
+   end List;
+
 
 
    --  ------------------------------

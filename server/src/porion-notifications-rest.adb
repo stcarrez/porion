@@ -27,6 +27,8 @@ package body Porion.Notifications.Rest is
       Reply   : in out OpenAPI.Servers.Response'Class;
       Stream  : in out OpenAPI.Servers.Output_Stream'Class;
       Context : in out OpenAPI.Servers.Context_Type) is
+      pragma Unreferenced (Req, Reply, Stream);
+
       Project_Name : UString;
       Email : UString;
       Result : ADO.Identifier;

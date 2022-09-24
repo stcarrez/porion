@@ -17,7 +17,6 @@
 -----------------------------------------------------------------------
 with Ada.Directories;
 with ADO.Queries;
-with ADO.Sessions;
 with Util.Strings;
 with Util.Log.Loggers;
 with AWA.Services.Contexts;
@@ -60,7 +59,6 @@ package body Porion.Builds.Rest is
       pragma Unreferenced (Req, Reply);
 
       use Porion.Logs.Analysis;
-      use type ADO.Identifier;
       procedure Finish_Log_Stats;
 
       Rules  : constant String := Context.Recipe.Get_Filter_Rules;
@@ -184,6 +182,8 @@ package body Porion.Builds.Rest is
       Reply   : in out OpenAPI.Servers.Response'Class;
       Stream  : in out OpenAPI.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type) is
+      pragma Unreferenced (Reply);
+
       Query     : ADO.Queries.Context;
       List      : Porion.Queries.Test_Info_Vector;
       Current_Group : ADO.Identifier := ADO.NO_IDENTIFIER;
@@ -547,8 +547,6 @@ package body Porion.Builds.Rest is
      (Req     : in out OpenAPI.Servers.Request'Class;
       Reply   : in out OpenAPI.Servers.Response'Class;
       Stream  : in out OpenAPI.Servers.Output_Stream'Class) is
-      pragma Unreferenced (Reply);
-
       API_Ctx   : OpenAPI.Servers.Context_Type;
       Ctx       : constant ASC.Service_Context_Access := ASC.Current;
       Prj_Ctx   : Porion.Services.Context_Type;

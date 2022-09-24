@@ -26,6 +26,8 @@ with ADO.Objects;
 with ADO.Statements;
 with ADO.SQL;
 with ADO.Schemas;
+with ADO.Queries;
+with ADO.Queries.Loaders;
 with Ada.Calendar;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
@@ -212,6 +214,79 @@ package Porion.Notifications.Models is
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class);
 
+   --  --------------------
+   --    Information about a notification.
+   --  --------------------
+   type Notification_Info is
+     new Util.Beans.Basic.Bean with  record
+
+      --  the subscriber id.
+      Id : ADO.Identifier;
+
+      --  the project name.
+      Name : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the project status.
+      Project_Status : Porion.Projects.Models.Project_Status_Type;
+
+      --  the user email address.
+      Email : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the notification frequency.
+      Frequency : Frequency_Type;
+
+      --  the last notification date.
+      Last_Notification_Date : ADO.Nullable_Time;
+
+      --  the last check date.
+      Check_Date : ADO.Nullable_Time;
+
+      --  the number of notification sent.
+      Send_Count : Natural;
+
+      --  the notify config flag.
+      Notify_Config : Boolean;
+
+      --  the notify build flag.
+      Notify_Build : Boolean;
+
+      --  the notify xunit flag.
+      Notify_Xunit : Boolean;
+   end record;
+
+   --  Get the bean attribute identified by the name.
+   overriding
+   function Get_Value (From : in Notification_Info;
+                       Name : in String) return Util.Beans.Objects.Object;
+
+   --  Set the bean attribute identified by the name.
+   overriding
+   procedure Set_Value (Item  : in out Notification_Info;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object);
+
+
+   package Notification_Info_Beans is
+      new Util.Beans.Basic.Lists (Element_Type => Notification_Info);
+   package Notification_Info_Vectors renames Notification_Info_Beans.Vectors;
+   subtype Notification_Info_List_Bean is Notification_Info_Beans.List_Bean;
+
+   type Notification_Info_List_Bean_Access is access all Notification_Info_List_Bean;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Notification_Info_List_Bean'Class;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
+
+   subtype Notification_Info_Vector is Notification_Info_Vectors.Vector;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Notification_Info_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
+
+   Query_Notification_List : constant ADO.Queries.Query_Definition_Access;
+
 
 
 private
@@ -311,4 +386,14 @@ private
 
    procedure Set_Field (Object : in out Subscriber_Ref'Class;
                         Impl   : out Subscriber_Access);
+
+   package File_1 is
+      new ADO.Queries.Loaders.File (Path => "notifications.xml",
+                                    Sha1 => "1F7ABC2E691C3EEC40CCED9B1777BCD430145106");
+
+   package Def_Notificationinfo_Notification_List is
+      new ADO.Queries.Loaders.Query (Name => "notification-list",
+                                     File => File_1.File'Access);
+   Query_Notification_List : constant ADO.Queries.Query_Definition_Access
+   := Def_Notificationinfo_Notification_List.Query'Access;
 end Porion.Notifications.Models;

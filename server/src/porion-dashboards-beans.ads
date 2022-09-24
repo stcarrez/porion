@@ -21,11 +21,11 @@ with Ada.Strings.Unbounded;
 with Util.Beans.Basic;
 with Util.Beans.Objects;
 with Porion.Queries;
+with Porion.Beans;
 with Porion.Dashboards.Modules;
-with Porion.Dashboards.Models;
 package Porion.Dashboards.Beans is
 
-   type Project_List_Bean is new Porion.Dashboards.Models.Project_List_Bean with record
+   type Project_List_Bean is new Porion.Beans.Project_List_Bean with record
       Module        : Porion.Dashboards.Modules.Dashboard_Module_Access := null;
       Projects      : aliased Porion.Queries.Project_Info_List_Bean;
       Projects_Bean : Porion.Queries.Project_Info_List_Bean_Access;

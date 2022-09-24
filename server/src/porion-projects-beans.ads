@@ -32,7 +32,7 @@ package Porion.Projects.Beans is
    package UBB renames Util.Beans.Basic;
    package UBO renames Util.Beans.Objects;
 
-   type Project_Bean is new Porion.Beans.Project_List_Bean with record
+   type Project_Bean is new Porion.Beans.Project_Bean with record
       Ident        : Porion.Projects.Ident_Type;
       Module       : Porion.Projects.Modules.Project_Module_Access := null;
       Branch       : aliased Porion.Projects.Models.Branch_Ref;

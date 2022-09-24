@@ -20,39 +20,37 @@ with Ada.Strings.Unbounded;
 
 with Util.Beans.Basic;
 with Util.Beans.Objects;
-with Util.Beans.Methods;
+with Porion.Beans;
 with Porion.Notifications.Modules;
+with Porion.Notifications.Models;
 package Porion.Notifications.Beans is
 
-   type Notification_Bean is new Util.Beans.Basic.Bean
-     and Util.Beans.Methods.Method_Bean with record
-      Module : Porion.Notifications.Modules.Notification_Module_Access := null;
-      Count  : Natural := 0;
+   type Notification_List_Bean is new Porion.Beans.Notification_List_Bean with record
+      Module             : Porion.Notifications.Modules.Notification_Module_Access := null;
+      Notifications      : aliased Porion.Notifications.Models.Notification_Info_List_Bean;
+      Notifications_Bean : Porion.Notifications.Models.Notification_Info_List_Bean_Access;
    end record;
-   type Notification_Bean_Access is access all Notification_Bean'Class;
+   type Notification_List_Bean_Access is access all Notification_List_Bean'Class;
 
    --  Get the value identified by the name.
    overriding
-   function Get_Value (From : in Notification_Bean;
+   function Get_Value (From : in Notification_List_Bean;
                        Name : in String) return Util.Beans.Objects.Object;
 
    --  Set the value identified by the name.
    overriding
-   procedure Set_Value (From  : in out Notification_Bean;
+   procedure Set_Value (From  : in out Notification_List_Bean;
                         Name  : in String;
                         Value : in Util.Beans.Objects.Object);
 
-   --  This bean provides some methods that can be used in a Method_Expression
+   --  Load the list of notifications.
    overriding
-   function Get_Method_Bindings (From : in Notification_Bean)
-                                 return Util.Beans.Methods.Method_Binding_Array_Access;
+   procedure Load (Bean    : in out Notification_List_Bean;
+                   Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
 
-   --  Example of action method.
-   procedure Action (Bean    : in out Notification_Bean;
-                     Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
-
-   --  Create the Notifications_Bean bean instance.
-   function Create_Notification_Bean (Module : in Porion.Notifications.Modules.Notification_Module_Access)
+   --  Create the Notification_List_Bean bean instance.
+   function Create_Notification_List_Bean
+     (Module : in Porion.Notifications.Modules.Notification_Module_Access)
       return Util.Beans.Basic.Readonly_Bean_Access;
 
 end Porion.Notifications.Beans;

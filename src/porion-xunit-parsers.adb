@@ -68,7 +68,8 @@ package body Porion.XUnit.Parsers is
    function Get_Status (Config : in XUnit_Config) return Test_Status_Type;
    function To_Duration (Value : in Util.Beans.Objects.Object) return Microsecond_Type;
 
-   Log   : aliased constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.XUnit.Parsers");
+   Log   : aliased constant Util.Log.Loggers.Logger
+     := Util.Log.Loggers.Create ("Porion.XUnit.Parsers");
 
    function To_Duration (Value : in Util.Beans.Objects.Object) return Microsecond_Type is
    begin

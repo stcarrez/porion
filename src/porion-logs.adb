@@ -56,6 +56,16 @@ package body Porion.Logs is
    end Create;
 
    --  ------------------------------
+   --  Close the logger file.
+   --  ------------------------------
+   procedure Close (Logger : in out Logger_Type) is
+   begin
+      if Ada.Text_IO.Is_Open (Logger.File) then
+         Ada.Text_IO.Close (Logger.File);
+      end if;
+   end Close;
+
+   --  ------------------------------
    --  Write the line on the logger with the source to identify the producer.
    --  ------------------------------
    procedure Write (Logger : in out Logger_Type;

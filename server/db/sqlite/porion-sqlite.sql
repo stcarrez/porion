@@ -37,4 +37,4 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_subscriber"), "notify_build");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_subscriber"), "notify_xunit");
-INSERT OR IGNORE INTO ado_version (name, version) VALUES ("porion", 2);
+INSERT OR IGNORE INTO ado_version (name, version) VALUES ("porion", 3);

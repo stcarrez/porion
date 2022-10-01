@@ -58,6 +58,12 @@ package Porion.Sources is
       Changes    : Maps.Map;
    end record;
 
+   type Checkout_Type is record
+      Path         : UString;
+      Previous_Tag : UString;
+      Change_Count : Natural := 0;
+   end record;
+
    --  Check for changes in the project by using the executor.
    --  The source control parameters are configured in Config.
    procedure Check (Kind      : in Source_Control_Type;
@@ -76,6 +82,17 @@ package Porion.Sources is
                        Result   : out UString;
                        Executor : in out Porion.Executors.Executor_Type'Class) with
       Pre => Executor.Is_Configured and Path'Length > 0;
+
+   --  Checkout the source of the project by using the executor.
+   --  The checkout parameters are configured in Config and the extraction
+   --  is controlled by the Extraction record which contains the Path directory
+   --  (possibly on a remote host).  After extraction, the operation computes
+   --  the number of changes made since the previous build.
+   procedure Checkout (Kind       : in Source_Control_Type;
+                       Config     : in Porion.Configs.Config_Type;
+                       Extraction : in out Checkout_Type;
+                       Executor   : in out Porion.Executors.Executor_Type'Class) with
+      Pre => Executor.Is_Configured and Length (Extraction.Path) > 0;
 
    --  Guess some information about the sources located in the given directory.
    --  The source controller tries to find if it can manage the files at the given location
@@ -102,7 +119,8 @@ private
                        Executor   : in out Porion.Executors.Executor_Type'Class) is abstract;
 
    procedure Changes (Controller : in out Controller_Type;
-                      Result     : out Status_Type;
+                      Path       : in String;
+                      Extraction : in out Checkout_Type;
                       Executor   : in out Porion.Executors.Executor_Type'Class) is abstract;
 
    --  Guess some information about the sources located in the given directory.

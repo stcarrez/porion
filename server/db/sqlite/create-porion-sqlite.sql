@@ -917,6 +917,8 @@ CREATE TABLE IF NOT EXISTS porion_subscriber (
   `notify_xunit` TINYINT NOT NULL,
   /*  */
   `project_id` BIGINT NOT NULL,
+  /* the last audit field that was reported. */
+  `last_change` BIGINT ,
   /*  */
   `email_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`)

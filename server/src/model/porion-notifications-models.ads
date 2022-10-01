@@ -142,6 +142,14 @@ package Porion.Notifications.Models is
    function Get_Project (Object : in Subscriber_Ref)
                  return Porion.Projects.Models.Project_Ref'Class;
 
+   --  Set the last audit field that was reported.
+   procedure Set_Last_Change (Object : in out Subscriber_Ref;
+                              Value  : in ADO.Identifier);
+
+   --  Get the last audit field that was reported.
+   function Get_Last_Change (Object : in Subscriber_Ref)
+                 return ADO.Identifier;
+
    --
    procedure Set_Email (Object : in out Subscriber_Ref;
                         Value  : in AWA.Users.Models.Email_Ref'Class);
@@ -336,10 +344,11 @@ private
    COL_7_1_NAME : aliased constant String := "notify_build";
    COL_8_1_NAME : aliased constant String := "notify_xunit";
    COL_9_1_NAME : aliased constant String := "project_id";
-   COL_10_1_NAME : aliased constant String := "email_id";
+   COL_10_1_NAME : aliased constant String := "last_change";
+   COL_11_1_NAME : aliased constant String := "email_id";
 
    SUBSCRIBER_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 11,
+     (Count   => 12,
       Table   => SUBSCRIBER_NAME'Access,
       Members => (
          1 => COL_0_1_NAME'Access,
@@ -352,7 +361,8 @@ private
          8 => COL_7_1_NAME'Access,
          9 => COL_8_1_NAME'Access,
          10 => COL_9_1_NAME'Access,
-         11 => COL_10_1_NAME'Access)
+         11 => COL_10_1_NAME'Access,
+         12 => COL_11_1_NAME'Access)
      );
    SUBSCRIBER_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := SUBSCRIBER_DEF'Access;
@@ -386,6 +396,7 @@ private
        Notify_Build : Boolean;
        Notify_Xunit : Boolean;
        Project : Porion.Projects.Models.Project_Ref;
+       Last_Change : ADO.Identifier;
        Email : AWA.Users.Models.Email_Ref;
    end record;
 

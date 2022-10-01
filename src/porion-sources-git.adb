@@ -110,7 +110,17 @@ package body Porion.Sources.Git is
                       Path       : in String;
                       Extraction : in out Checkout_Type;
                       Executor   : in out Porion.Executors.Executor_Type'Class) is
+      procedure Process_Commit_Log (Line : in String);
+
       Status : Integer;
+      Count  : Natural := 0;
+
+      procedure Process_Commit_Log (Line : in String) is
+      begin
+         if Util.Strings.Starts_With (Line, "commit ") then
+            Count := Count + 1;
+         end if;
+      end Process_Commit_Log;
    begin
       Extraction.Change_Count := 0;
       if Length (Extraction.Previous_Tag) = 0 then
@@ -121,7 +131,9 @@ package body Porion.Sources.Git is
       Controller.Config.Set ("previous_tag", Extraction.Previous_Tag);
       Executor.Command_Logger ("changes.log");
       Executor.Execute (Controller.Changes_Command, Controller.Config,
+                        Process_Commit_Log'Access,
                         Strip_Crlf => False, Status => Status);
+      Extraction.Change_Count := Count;
    end Changes;
 
    --  ------------------------------

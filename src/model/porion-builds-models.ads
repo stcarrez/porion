@@ -512,6 +512,14 @@ package Porion.Builds.Models is
    function Get_User_Time (Object : in Build_Ref)
                  return Porion.Millisecond_Type;
 
+   --
+   procedure Set_Source_Changes (Object : in out Build_Ref;
+                                 Value  : in Integer);
+
+   --
+   function Get_Source_Changes (Object : in Build_Ref)
+                 return Integer;
+
    --  Set the branch associated with the build.
    procedure Set_Branch (Object : in out Build_Ref;
                          Value  : in Porion.Projects.Models.Branch_Ref'Class);
@@ -1701,13 +1709,14 @@ private
    COL_11_3_NAME : aliased constant String := "build_duration";
    COL_12_3_NAME : aliased constant String := "sys_time";
    COL_13_3_NAME : aliased constant String := "user_time";
-   COL_14_3_NAME : aliased constant String := "branch_id";
-   COL_15_3_NAME : aliased constant String := "recipe_id";
-   COL_16_3_NAME : aliased constant String := "node_id";
-   COL_17_3_NAME : aliased constant String := "project_id";
+   COL_14_3_NAME : aliased constant String := "source_changes";
+   COL_15_3_NAME : aliased constant String := "branch_id";
+   COL_16_3_NAME : aliased constant String := "recipe_id";
+   COL_17_3_NAME : aliased constant String := "node_id";
+   COL_18_3_NAME : aliased constant String := "project_id";
 
    BUILD_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 18,
+     (Count   => 19,
       Table   => BUILD_NAME'Access,
       Members => (
          1 => COL_0_3_NAME'Access,
@@ -1727,7 +1736,8 @@ private
          15 => COL_14_3_NAME'Access,
          16 => COL_15_3_NAME'Access,
          17 => COL_16_3_NAME'Access,
-         18 => COL_17_3_NAME'Access)
+         18 => COL_17_3_NAME'Access,
+         19 => COL_18_3_NAME'Access)
      );
    BUILD_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := BUILD_DEF'Access;
@@ -1763,6 +1773,7 @@ private
        Build_Duration : Porion.Millisecond_Type;
        Sys_Time : Porion.Millisecond_Type;
        User_Time : Porion.Millisecond_Type;
+       Source_Changes : Integer;
        Branch : Porion.Projects.Models.Branch_Ref;
        Recipe : Recipe_Ref;
        Node : Porion.Nodes.Models.Node_Ref;

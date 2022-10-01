@@ -164,7 +164,8 @@ package body Porion.Sources.Files is
 
    overriding
    procedure Changes (Controller : in out Controller_Type;
-                      Result     : out Status_Type;
+                      Path       : in String;
+                      Extraction : in out Checkout_Type;
                       Executor   : in out Porion.Executors.Executor_Type'Class) is
    begin
       null;

@@ -186,6 +186,24 @@ package body Porion.Builds.Services is
       return Configs.Get_Build_Log_Directory (Name, Branch_Name, Service.Build.Get_Number);
    end Get_Log_Directory;
 
+   procedure Last_Build_Tag (Service : in out Context_Type;
+                             Tag     : out UString) is
+      Stmt : ADO.Statements.Query_Statement :=
+         Service.DB.Create_Statement ("SELECT build.tag FROM porion_last_build AS lb "
+                                      & "INNER JOIN porion_build AS build ON "
+                                      & "lb.build_id = build.id AND last_build = 1 "
+                                      & "WHERE lb.recipe_id = :recipe AND lb.branch_id = :branch");
+   begin
+      Stmt.Bind_Param ("recipe", Service.Recipe.Get_Id);
+      Stmt.Bind_Param ("branch", Service.Branch.Get_Id);
+      Stmt.Execute;
+      if not Stmt.Has_Elements then
+         Tag := To_UString ("");
+         return;
+      end if;
+      Tag := Stmt.Get_Unbounded_String (0);
+   end Last_Build_Tag;
+
    procedure Build (Service     : in out Context_Type;
                     Steps       : in Build_Step_Vector;
                     Executor    : in out Porion.Executors.Executor_Type'Class) is
@@ -193,10 +211,10 @@ package body Porion.Builds.Services is
       Branch_Name : constant String := Service.Branch.Get_Name;
       Path        : constant String := Get_Build_Directory (Service);
       Log_Dir     : constant String := Get_Log_Directory (Service);
-      Dir         : UString;
       Config      : Util.Properties.Manager;
       Status      : Builds.Models.Build_Status_Type := Builds.Models.BUILD_RUNNING;
       Env         : Util.Strings.Maps.Map;
+      Changes     : Porion.Sources.Checkout_Type;
    begin
       Log.Info ("Build {0} in {1}", Ident, Path);
 
@@ -215,13 +233,11 @@ package body Porion.Builds.Services is
 
       Executor.Create_Logger (Log_Dir, "build.log");
       Executor.Log (Porion.Logs.LOG_INFO, "Build '" & Ident & "' in " & Path);
-      Porion.Sources.Checkout (Service.Project.Get_Scm, Config, Path, Dir, Executor);
+      Changes.Path := To_UString (Path);
+      Last_Build_Tag (Service, Changes.Previous_Tag);
+      Porion.Sources.Checkout (Service.Project.Get_Scm, Config, Changes, Executor);
 
-      if Length (Dir) > 0 then
-         Run_Build_Steps (Service, Steps, To_String (Dir), Status, Executor);
-      else
-         Run_Build_Steps (Service, Steps, Path, Status, Executor);
-      end if;
+      Run_Build_Steps (Service, Steps, To_String (Changes.Path), Status, Executor);
 
       if not Executor.Is_Dry_Run then
          --  Save the resource usage in the build.

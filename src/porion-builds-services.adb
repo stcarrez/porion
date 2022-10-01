@@ -186,6 +186,9 @@ package body Porion.Builds.Services is
       return Configs.Get_Build_Log_Directory (Name, Branch_Name, Service.Build.Get_Number);
    end Get_Log_Directory;
 
+   --  ------------------------------
+   --  Get the source tag that was used by the last build
+   --  ------------------------------
    procedure Last_Build_Tag (Service : in out Context_Type;
                              Tag     : out UString) is
       Stmt : ADO.Statements.Query_Statement :=
@@ -237,6 +240,18 @@ package body Porion.Builds.Services is
       Last_Build_Tag (Service, Changes.Previous_Tag);
       Porion.Sources.Checkout (Service.Project.Get_Scm, Config, Changes, Executor);
 
+      --  Record the number of source changes since the previous build for the same recipe.
+      if not Executor.Is_Dry_Run and then Changes.Change_Count /= 0 then
+         declare
+            Updated : Boolean;
+         begin
+            Service.DB.Begin_Transaction;
+            Service.Build.Reload (Service.DB, Updated);
+            Service.Build.Set_Source_Changes (Changes.Change_Count);
+            Service.Build.Save (Service.DB);
+            Service.DB.Commit;
+         end;
+      end if;
       Run_Build_Steps (Service, Steps, To_String (Changes.Path), Status, Executor);
 
       if not Executor.Is_Dry_Run then
@@ -1592,7 +1607,8 @@ package body Porion.Builds.Services is
       declare
          Count_Statement : ADO.Statements.Query_Statement
             := Service.DB.Create_Statement ("SELECT COUNT(*) FROM porion_recipe AS r "
-                         & "WHERE r.name = :name AND project_id = :project_id AND branch_id = :branch_id");
+                         & "WHERE r.name = :name AND project_id = :project_id "
+                         & "AND branch_id = :branch_id");
       begin
          Count_Statement.Bind_Param ("name", Name);
          Count_Statement.Bind_Param ("project_id", Service.Project.Get_Id);

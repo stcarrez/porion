@@ -1,0 +1,66 @@
+<query-mapping package='Porion.Beans'>
+    <description>
+        Simple statistics about project changes
+    </description>
+
+    <class name="Porion.Beans.Project_Audit" bean="no">
+        <comment>Statistics about project changes</comment>
+        <property type='ADO.Identifier' name="project_id">
+            <comment>the project id.</comment>
+        </property>
+        <property type='ADO.Identifier' name="last_audit_id">
+            <comment>the last audit record id.</comment>
+        </property>
+        <property type='Natural' name="count">
+            <comment>the number of changes.</comment>
+        </property>
+    </class>
+
+    <query name='project-change-count'>
+        <comment>Number of configuration changes per project</comment>
+        <sql>
+          SELECT
+          audit.entity_id,
+          MAX(audit.id),
+          COUNT(audit.id)
+          FROM awa_audit AS audit
+          INNER JOIN awa_audit_field AS field ON audit.field = field.id
+          WHERE audit.id >= :last_audit AND audit.entity_type = :entity_type
+          AND (field.name = 'name' OR field.name = 'scm_url' OR field.name = 'scm' OR field.name = 'check_delay')
+          GROUP BY audit.entity_id
+        </sql>
+    </query>
+
+    <query name='recipe-change-count'>
+        <comment>Number of recipe changes per project</comment>
+        <sql>
+          SELECT
+          recipe.project_id,
+          MAX(audit.id),
+          COUNT(audit.id)
+          FROM awa_audit AS audit
+          INNER JOIN porion_recipe AS recipe ON recipe.id = audit.entity_id
+          INNER JOIN awa_audit_field AS field ON audit.field = field.id
+          WHERE audit.id >= :last_audit AND audit.entity_type = :entity_type
+          AND (field.name = 'name' OR field.name = 'description' OR field.name = 'rate_factor' OR field.name = 'filter_rules')
+          GROUP BY recipe.project_id
+        </sql>
+    </query>
+
+    <query name='build-count'>
+        <comment>Number of builds per project</comment>
+        <sql>
+          SELECT
+          build.project_id,
+          MAX(audit.id),
+          COUNT(audit.id)
+          FROM awa_audit AS audit
+          INNER JOIN porion_build AS build ON build.id = audit.entity_id
+          INNER JOIN awa_audit_field AS field ON audit.field = field.id
+          WHERE audit.id >= :last_audit AND audit.entity_type = :entity_type
+          AND (field.name = 'id')
+          GROUP BY build.project_id
+        </sql>
+    </query>
+
+</query-mapping>

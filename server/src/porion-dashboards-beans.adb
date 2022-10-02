@@ -23,6 +23,72 @@ package body Porion.Dashboards.Beans is
    package ASC renames AWA.Services.Contexts;
 
    --  ------------------------------
+   --  Get the value identified by the name.
+   --  ------------------------------
+   overriding
+   function Get_Value (From : in Project_Report_Bean;
+                       Name : in String) return Util.Beans.Objects.Object is
+   begin
+      if Name = "config_change" then
+         return UBO.To_Object (From.Config_Changes + From.Recipe_Changes);
+      elsif Name = "build_count" then
+         return UBO.To_Object (From.Build_Changes);
+      else
+         return Porion.Queries.Project_Info (From).Get_Value (Name);
+      end if;
+   end Get_Value;
+
+   --  ------------------------------
+   --  Get the value identified by the name.
+   --  ------------------------------
+   overriding
+   function Get_Value (From : in Project_Report_List_Bean;
+                       Name : in String) return UBO.Object is
+   begin
+      if Name = "projects" then
+         return Util.Beans.Objects.To_Object (Value   => From.Projects_Bean,
+                                              Storage => Util.Beans.Objects.STATIC);
+      else
+         return Util.Beans.Objects.Null_Object;
+      end if;
+   end Get_Value;
+
+   --  Set the value identified by the name.
+   overriding
+   procedure Set_Value (From  : in out Project_Report_List_Bean;
+                        Name  : in String;
+                        Value : in UBO.Object) is
+   begin
+      null;
+   end Set_Value;
+
+   --  Load the list of projects.
+   procedure Load (Bean    : in out Project_Report_List_Bean;
+                   Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
+      pragma Unreferenced (Outcome);
+
+      Ctx      : constant ASC.Service_Context_Access := ASC.Current;
+      Session  : ADO.Sessions.Session := ASC.Get_Session (Ctx);
+      Query    : ADO.Queries.Context;
+      Projects : aliased Porion.Queries.Project_Info_List_Bean;
+   begin
+      Query.Set_Query (Porion.Queries.Query_Project_Summary_List);
+      Porion.Queries.List (Projects, Session, Query);
+   end Load;
+
+   --  ------------------------------
+   --  Create the project list bean instance.
+   --  ------------------------------
+   function Create_Project_Report_List_Bean (Module : in Modules.Dashboard_Module_Access)
+      return Util.Beans.Basic.Readonly_Bean_Access is
+      Object : constant Project_Report_List_Bean_Access := new Project_Report_List_Bean;
+   begin
+      Object.Module := Module;
+      Object.Projects_Bean := Object.Projects'Access;
+      return Object.all'Access;
+   end Create_Project_Report_List_Bean;
+
+   --  ------------------------------
    --  Load the list of projects.
    --  ------------------------------
    procedure Load (Bean    : in out Project_List_Bean;
@@ -42,7 +108,7 @@ package body Porion.Dashboards.Beans is
    --  ------------------------------
    overriding
    function Get_Value (From : in Project_List_Bean;
-                       Name : in String) return Util.Beans.Objects.Object is
+                       Name : in String) return UBO.Object is
    begin
       if Name = "projects" then
          return Util.Beans.Objects.To_Object (Value   => From.Projects_Bean,
@@ -58,7 +124,7 @@ package body Porion.Dashboards.Beans is
    overriding
    procedure Set_Value (From  : in out Project_List_Bean;
                         Name  : in String;
-                        Value : in Util.Beans.Objects.Object) is
+                        Value : in UBO.Object) is
    begin
       null;
    end Set_Value;

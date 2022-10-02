@@ -20,6 +20,8 @@ CREATE TABLE IF NOT EXISTS porion_subscriber (
   `notify_build` TINYINT NOT NULL,
   /* notify when unit tests change */
   `notify_xunit` TINYINT NOT NULL,
+  /* the last build that was reported */
+  `last_reported_build_id` BIGINT ,
   /*  */
   `project_id` BIGINT NOT NULL,
   /* the last audit field that was reported. */

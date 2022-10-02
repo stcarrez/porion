@@ -4,6 +4,9 @@
     </description>
 
     <class name="Porion.Notifications.Models.Audit_Info" bean="no">
+        <property type='ADO.Identifier' name="audit_id">
+            <comment>the audit id.</comment>
+        </property>
         <property type='Date' name="date">
             <comment>the date when the change was made.</comment>
         </property>
@@ -28,16 +31,16 @@
         <comment>Get the list of changes made after some date</comment>
         <sql>
           SELECT
+          audit.id,
           audit.date,
-          e.id,
+          audit.entity_type,
           field.name,
           audit.entity_id,
           audit.old_value,
           audit.new_value
           FROM awa_audit AS audit
-          INNER JOIN ado_entity_type AS e ON audit.entity_type = e.id
           LEFT JOIN awa_audit_field AS field ON audit.field = field.id
-          WHERE audit.date >= :date
+          WHERE audit.id >= :last_audit
         </sql>
     </query>
 

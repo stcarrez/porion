@@ -709,12 +709,13 @@ package body Porion.Notifications.Models is
       Pos  : Positive := 1;
       procedure Read (Into : in out Audit_Info) is
       begin
-         Into.Date := Stmt.Get_Time (0);
-         Into.Kind := Stmt.Get_Entity_Type (1);
-         Into.Field := Stmt.Get_Unbounded_String (2);
-         Into.Id := Stmt.Get_Identifier (3);
-         Into.Old_Value := Stmt.Get_Nullable_String (4);
-         Into.New_Value := Stmt.Get_Nullable_String (5);
+         Into.Audit_Id := Stmt.Get_Identifier (0);
+         Into.Date := Stmt.Get_Time (1);
+         Into.Kind := Stmt.Get_Entity_Type (2);
+         Into.Field := Stmt.Get_Unbounded_String (3);
+         Into.Id := Stmt.Get_Identifier (4);
+         Into.Old_Value := Stmt.Get_Nullable_String (5);
+         Into.New_Value := Stmt.Get_Nullable_String (6);
       end Read;
    begin
       Stmt.Execute;

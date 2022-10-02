@@ -28,6 +28,39 @@ package body Porion.Beans is
 
    pragma Style_Checks ("-mrIu");
    pragma Warnings (Off, "formal parameter * is not referenced");
+   pragma Warnings (Off, "use clause for type *");
+   pragma Warnings (Off, "use clause for private type *");
+
+   use type ADO.Objects.Object_Record_Access;
+   use type ADO.Objects.Object_Ref;
+
+   --  --------------------
+   --  Statistics about project changes
+   --  --------------------
+   procedure List (Object  : in out Project_Audit_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+      procedure Read (Into : in out Project_Audit);
+
+      Stmt : ADO.Statements.Query_Statement
+          := Session.Create_Statement (Context);
+      Pos  : Positive := 1;
+      procedure Read (Into : in out Project_Audit) is
+      begin
+         Into.Project_Id := Stmt.Get_Identifier (0);
+         Into.Last_Audit_Id := Stmt.Get_Identifier (1);
+         Into.Count := Stmt.Get_Natural (2);
+      end Read;
+   begin
+      Stmt.Execute;
+      Project_Audit_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         Object.Insert_Space (Before => Pos);
+         Object.Update_Element (Index => Pos, Process => Read'Access);
+         Pos := Pos + 1;
+         Stmt.Next;
+      end loop;
+   end List;
 
 
    procedure Op_Load (Bean    : in out Project_Bean;

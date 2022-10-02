@@ -224,6 +224,9 @@ package Porion.Notifications.Models is
 
    type Audit_Info is record
 
+      --  the audit id.
+      Audit_Id : ADO.Identifier;
+
       --  the date when the change was made.
       Date : Ada.Calendar.Time;
 
@@ -435,7 +438,7 @@ private
 
    package File_1 is
       new ADO.Queries.Loaders.File (Path => "notifications-changes.xml",
-                                    Sha1 => "234BB980AC0B02961BED13DCA8A11575C5020073");
+                                    Sha1 => "22791F462B305268BDD92E8BFC0C39CE16A66300");
 
    package Def_Auditinfo_Audit_List is
       new ADO.Queries.Loaders.Query (Name => "audit-list",

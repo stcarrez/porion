@@ -748,6 +748,9 @@ package Porion.Queries is
    type Project_Info is
      new Util.Beans.Basic.Bean with  record
 
+      --  the project id.
+      Project_Id : ADO.Identifier;
+
       --  the project name.
       Name : Ada.Strings.Unbounded.Unbounded_String;
 
@@ -1292,7 +1295,7 @@ private
 
    package File_12 is
       new ADO.Queries.Loaders.File (Path => "report-projects.xml",
-                                    Sha1 => "1FFA4E073FB7C85C6EFFF6906DF1AAB2B71133F2");
+                                    Sha1 => "C69A3B129E0FFF94EAAB6A5291A48CD692E8462E");
 
    package Def_Projectinfo_Project_List is
       new ADO.Queries.Loaders.Query (Name => "project-list",

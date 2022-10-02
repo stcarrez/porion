@@ -21,6 +21,13 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 pragma Warnings (Off);
+with ADO.Sessions;
+with ADO.Objects;
+with ADO.Statements;
+with ADO.SQL;
+with ADO.Schemas;
+with ADO.Queries;
+with ADO.Queries.Loaders;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
 with Util.Beans.Objects;
@@ -31,6 +38,39 @@ package Porion.Beans is
 
    pragma Style_Checks ("-mrIu");
 
+
+   --  --------------------
+   --    Statistics about project changes
+   --  --------------------
+   type Project_Audit is record
+
+      --  the project id.
+      Project_Id : ADO.Identifier;
+
+      --  the last audit record id.
+      Last_Audit_Id : ADO.Identifier;
+
+      --  the number of changes.
+      Count : Natural;
+   end record;
+
+   package Project_Audit_Vectors is
+      new Ada.Containers.Vectors (Index_Type   => Positive,
+                                  Element_Type => Project_Audit,
+                                  "="          => "=");
+
+   subtype Project_Audit_Vector is Project_Audit_Vectors.Vector;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Project_Audit_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
+
+   Query_Project_Change_Count : constant ADO.Queries.Query_Definition_Access;
+
+   Query_Recipe_Change_Count : constant ADO.Queries.Query_Definition_Access;
+
+   Query_Build_Count : constant ADO.Queries.Query_Definition_Access;
 
 
    --  --------------------
@@ -208,4 +248,26 @@ package Porion.Beans is
 
 
 private
+
+   package File_1 is
+      new ADO.Queries.Loaders.File (Path => "project-stat-changes.xml",
+                                    Sha1 => "E10F18BAD3882A9E703BB3DE2228C9ABD106A783");
+
+   package Def_Projectaudit_Project_Change_Count is
+      new ADO.Queries.Loaders.Query (Name => "project-change-count",
+                                     File => File_1.File'Access);
+   Query_Project_Change_Count : constant ADO.Queries.Query_Definition_Access
+   := Def_Projectaudit_Project_Change_Count.Query'Access;
+
+   package Def_Projectaudit_Recipe_Change_Count is
+      new ADO.Queries.Loaders.Query (Name => "recipe-change-count",
+                                     File => File_1.File'Access);
+   Query_Recipe_Change_Count : constant ADO.Queries.Query_Definition_Access
+   := Def_Projectaudit_Recipe_Change_Count.Query'Access;
+
+   package Def_Projectaudit_Build_Count is
+      new ADO.Queries.Loaders.Query (Name => "build-count",
+                                     File => File_1.File'Access);
+   Query_Build_Count : constant ADO.Queries.Query_Definition_Access
+   := Def_Projectaudit_Build_Count.Query'Access;
 end Porion.Beans;

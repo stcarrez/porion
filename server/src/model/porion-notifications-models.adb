@@ -234,12 +234,29 @@ package body Porion.Notifications.Models is
    end Get_Notify_Xunit;
 
 
+   procedure Set_Last_Reported_Build (Object : in out Subscriber_Ref;
+                                      Value  : in Porion.Builds.Models.Build_Ref'Class) is
+      Impl : Subscriber_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Object (Impl.all, 10, Impl.Last_Reported_Build, Value);
+   end Set_Last_Reported_Build;
+
+   function Get_Last_Reported_Build (Object : in Subscriber_Ref)
+                  return Porion.Builds.Models.Build_Ref'Class is
+      Impl : constant Subscriber_Access
+         := Subscriber_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Last_Reported_Build;
+   end Get_Last_Reported_Build;
+
+
    procedure Set_Project (Object : in out Subscriber_Ref;
                           Value  : in Porion.Projects.Models.Project_Ref'Class) is
       Impl : Subscriber_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 10, Impl.Project, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 11, Impl.Project, Value);
    end Set_Project;
 
    function Get_Project (Object : in Subscriber_Ref)
@@ -256,7 +273,7 @@ package body Porion.Notifications.Models is
       Impl : Subscriber_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Identifier (Impl.all, 11, Impl.Last_Change, Value);
+      ADO.Objects.Set_Field_Identifier (Impl.all, 12, Impl.Last_Change, Value);
    end Set_Last_Change;
 
    function Get_Last_Change (Object : in Subscriber_Ref)
@@ -273,7 +290,7 @@ package body Porion.Notifications.Models is
       Impl : Subscriber_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 12, Impl.Email, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 13, Impl.Email, Value);
    end Set_Email;
 
    function Get_Email (Object : in Subscriber_Ref)
@@ -306,6 +323,7 @@ package body Porion.Notifications.Models is
             Copy.Notify_Config := Impl.Notify_Config;
             Copy.Notify_Build := Impl.Notify_Build;
             Copy.Notify_Xunit := Impl.Notify_Xunit;
+            Copy.Last_Reported_Build := Impl.Last_Reported_Build;
             Copy.Project := Impl.Project;
             Copy.Last_Change := Impl.Last_Change;
             Copy.Email := Impl.Email;
@@ -516,19 +534,24 @@ package body Porion.Notifications.Models is
          Object.Clear_Modified (9);
       end if;
       if Object.Is_Modified (10) then
-         Stmt.Save_Field (Name  => COL_9_1_NAME, --  project_id
-                          Value => Object.Project);
+         Stmt.Save_Field (Name  => COL_9_1_NAME, --  last_reported_build_id
+                          Value => Object.Last_Reported_Build);
          Object.Clear_Modified (10);
       end if;
       if Object.Is_Modified (11) then
-         Stmt.Save_Field (Name  => COL_10_1_NAME, --  last_change
-                          Value => Object.Last_Change);
+         Stmt.Save_Field (Name  => COL_10_1_NAME, --  project_id
+                          Value => Object.Project);
          Object.Clear_Modified (11);
       end if;
       if Object.Is_Modified (12) then
-         Stmt.Save_Field (Name  => COL_11_1_NAME, --  email_id
-                          Value => Object.Email);
+         Stmt.Save_Field (Name  => COL_11_1_NAME, --  last_change
+                          Value => Object.Last_Change);
          Object.Clear_Modified (12);
+      end if;
+      if Object.Is_Modified (13) then
+         Stmt.Save_Field (Name  => COL_12_1_NAME, --  email_id
+                          Value => Object.Email);
+         Object.Clear_Modified (13);
       end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
@@ -580,11 +603,13 @@ package body Porion.Notifications.Models is
                         Value => Object.Notify_Build);
       Query.Save_Field (Name  => COL_8_1_NAME, --  notify_xunit
                         Value => Object.Notify_Xunit);
-      Query.Save_Field (Name  => COL_9_1_NAME, --  project_id
+      Query.Save_Field (Name  => COL_9_1_NAME, --  last_reported_build_id
+                        Value => Object.Last_Reported_Build);
+      Query.Save_Field (Name  => COL_10_1_NAME, --  project_id
                         Value => Object.Project);
-      Query.Save_Field (Name  => COL_10_1_NAME, --  last_change
+      Query.Save_Field (Name  => COL_11_1_NAME, --  last_change
                         Value => Object.Last_Change);
-      Query.Save_Field (Name  => COL_11_1_NAME, --  email_id
+      Query.Save_Field (Name  => COL_12_1_NAME, --  email_id
                         Value => Object.Email);
       Query.Execute (Result);
       if Result /= 1 then
@@ -687,11 +712,14 @@ package body Porion.Notifications.Models is
       Object.Notify_Build := Stmt.Get_Boolean (7);
       Object.Notify_Xunit := Stmt.Get_Boolean (8);
       if not Stmt.Is_Null (9) then
-         Object.Project.Set_Key_Value (Stmt.Get_Identifier (9), Session);
+         Object.Last_Reported_Build.Set_Key_Value (Stmt.Get_Identifier (9), Session);
       end if;
-      Object.Last_Change := Stmt.Get_Identifier (10);
-      if not Stmt.Is_Null (11) then
-         Object.Email.Set_Key_Value (Stmt.Get_Identifier (11), Session);
+      if not Stmt.Is_Null (10) then
+         Object.Project.Set_Key_Value (Stmt.Get_Identifier (10), Session);
+      end if;
+      Object.Last_Change := Stmt.Get_Identifier (11);
+      if not Stmt.Is_Null (12) then
+         Object.Email.Set_Key_Value (Stmt.Get_Identifier (12), Session);
       end if;
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);

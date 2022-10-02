@@ -36,6 +36,7 @@ with Util.Beans.Objects.Enums;
 with Util.Beans.Basic.Lists;
 with ADO.Audits;
 with AWA.Users.Models;
+with Porion.Builds.Models;
 with Porion.Projects.Models;
 pragma Warnings (On);
 package Porion.Notifications.Models is
@@ -133,6 +134,14 @@ package Porion.Notifications.Models is
    --  Get notify when unit tests change
    function Get_Notify_Xunit (Object : in Subscriber_Ref)
                  return Boolean;
+
+   --  Set the last build that was reported
+   procedure Set_Last_Reported_Build (Object : in out Subscriber_Ref;
+                                      Value  : in Porion.Builds.Models.Build_Ref'Class);
+
+   --  Get the last build that was reported
+   function Get_Last_Reported_Build (Object : in Subscriber_Ref)
+                 return Porion.Builds.Models.Build_Ref'Class;
 
    --
    procedure Set_Project (Object : in out Subscriber_Ref;
@@ -346,12 +355,13 @@ private
    COL_6_1_NAME : aliased constant String := "notify_config";
    COL_7_1_NAME : aliased constant String := "notify_build";
    COL_8_1_NAME : aliased constant String := "notify_xunit";
-   COL_9_1_NAME : aliased constant String := "project_id";
-   COL_10_1_NAME : aliased constant String := "last_change";
-   COL_11_1_NAME : aliased constant String := "email_id";
+   COL_9_1_NAME : aliased constant String := "last_reported_build_id";
+   COL_10_1_NAME : aliased constant String := "project_id";
+   COL_11_1_NAME : aliased constant String := "last_change";
+   COL_12_1_NAME : aliased constant String := "email_id";
 
    SUBSCRIBER_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 12,
+     (Count   => 13,
       Table   => SUBSCRIBER_NAME'Access,
       Members => (
          1 => COL_0_1_NAME'Access,
@@ -365,7 +375,8 @@ private
          9 => COL_8_1_NAME'Access,
          10 => COL_9_1_NAME'Access,
          11 => COL_10_1_NAME'Access,
-         12 => COL_11_1_NAME'Access)
+         12 => COL_11_1_NAME'Access,
+         13 => COL_12_1_NAME'Access)
      );
    SUBSCRIBER_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := SUBSCRIBER_DEF'Access;
@@ -398,6 +409,7 @@ private
        Notify_Config : Boolean;
        Notify_Build : Boolean;
        Notify_Xunit : Boolean;
+       Last_Reported_Build : Porion.Builds.Models.Build_Ref;
        Project : Porion.Projects.Models.Project_Ref;
        Last_Change : ADO.Identifier;
        Email : AWA.Users.Models.Email_Ref;

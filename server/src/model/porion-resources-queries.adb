@@ -534,30 +534,32 @@ package body Porion.Resources.Queries is
        & "a_audit_field AS field ON audit.field = field.id" & ASCII.LF & "        "
        & "  WHERE audit.id >= :last_audit AND audit.entity_type = :entity_type" & ASCII.LF
        & "          AND (field.name = 'name' OR field.name = 'scm_url' OR field.na"
-       & "me = 'scm' OR field.name = 'check_delay')" & ASCII.LF & "        </sql>" & ASCII.LF
-       & "    </query>" & ASCII.LF & ASCII.LF & "    <query name='recipe-change-c"
-       & "ount'>" & ASCII.LF & "        <comment>Number of recipe changes per proj"
-       & "ect</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & "          SELE"
-       & "CT" & ASCII.LF & "          recipe.project_id," & ASCII.LF & "          "
-       & "MAX(audit.id)," & ASCII.LF & "          COUNT(audit.id)" & ASCII.LF & " "
-       & "         FROM awa_audit AS audit" & ASCII.LF & "          INNER JOIN por"
-       & "ion_recipe AS recipe ON recipe.id = audit.entity_id" & ASCII.LF & "     "
-       & "     INNER JOIN awa_audit_field AS field ON audit.field = field.id" & ASCII.LF
-       & "          WHERE audit.id >= :last_audit AND audit.entity_type = :entity_"
-       & "type" & ASCII.LF & "          AND (field.name = 'name' OR field.name = '"
-       & "description' OR field.name = 'rate_factor' OR field.name = 'filter_rules"
-       & "')" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF
-       & ASCII.LF & "    <query name='build-count'>" & ASCII.LF & "        <comme"
-       & "nt>Number of builds per project</comment>" & ASCII.LF & "        <sql>" & ASCII.LF
-       & "          SELECT" & ASCII.LF & "          build.project_id," & ASCII.LF
-       & "          MAX(audit.id)," & ASCII.LF & "          COUNT(audit.id)" & ASCII.LF
-       & "          FROM awa_audit AS audit" & ASCII.LF & "          INNER JOIN po"
-       & "rion_build AS build ON build.id = audit.entity_id" & ASCII.LF & "       "
-       & "   INNER JOIN awa_audit_field AS field ON audit.field = field.id" & ASCII.LF
-       & "          WHERE audit.id >= :last_audit AND audit.entity_type = :entity_"
-       & "type" & ASCII.LF & "          AND (field.name = 'id')" & ASCII.LF & "   "
-       & "     </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</que"
-       & "ry-mapping>" & ASCII.LF;
+       & "me = 'scm' OR field.name = 'check_delay')" & ASCII.LF & "          GROUP"
+       & " BY audit.entity_id" & ASCII.LF & "        </sql>" & ASCII.LF & "    </q"
+       & "uery>" & ASCII.LF & ASCII.LF & "    <query name='recipe-change-count'>" & ASCII.LF
+       & "        <comment>Number of recipe changes per project</comment>" & ASCII.LF
+       & "        <sql>" & ASCII.LF & "          SELECT" & ASCII.LF & "          r"
+       & "ecipe.project_id," & ASCII.LF & "          MAX(audit.id)," & ASCII.LF & " "
+       & "         COUNT(audit.id)" & ASCII.LF & "          FROM awa_audit AS audi"
+       & "t" & ASCII.LF & "          INNER JOIN porion_recipe AS recipe ON recipe."
+       & "id = audit.entity_id" & ASCII.LF & "          INNER JOIN awa_audit_field"
+       & " AS field ON audit.field = field.id" & ASCII.LF & "          WHERE audit"
+       & ".id >= :last_audit AND audit.entity_type = :entity_type" & ASCII.LF & " "
+       & "         AND (field.name = 'name' OR field.name = 'description' OR field"
+       & ".name = 'rate_factor' OR field.name = 'filter_rules')" & ASCII.LF & "   "
+       & "       GROUP BY recipe.project_id" & ASCII.LF & "        </sql>" & ASCII.LF
+       & "    </query>" & ASCII.LF & ASCII.LF & "    <query name='build-count'>" & ASCII.LF
+       & "        <comment>Number of builds per project</comment>" & ASCII.LF & " "
+       & "       <sql>" & ASCII.LF & "          SELECT" & ASCII.LF & "          bu"
+       & "ild.project_id," & ASCII.LF & "          MAX(audit.id)," & ASCII.LF & " "
+       & "         COUNT(audit.id)" & ASCII.LF & "          FROM awa_audit AS audi"
+       & "t" & ASCII.LF & "          INNER JOIN porion_build AS build ON build.id "
+       & "= audit.entity_id" & ASCII.LF & "          INNER JOIN awa_audit_field AS"
+       & " field ON audit.field = field.id" & ASCII.LF & "          WHERE audit.id"
+       & " >= :last_audit AND audit.entity_type = :entity_type" & ASCII.LF & "    "
+       & "      AND (field.name = 'id')" & ASCII.LF & "          GROUP BY build.pr"
+       & "oject_id" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF
+       & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
    C_16 : aliased constant String := "<query-mapping package='Porion.Builds.Mod"
        & "els'>" & ASCII.LF & "    <description>" & ASCII.LF & "        Provide pr"

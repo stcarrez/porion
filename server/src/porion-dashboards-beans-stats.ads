@@ -39,6 +39,7 @@ package Porion.Dashboards.Beans.Stats is
       Fail_Bean     : Build_Stat_Bean_Access;
       Total         : aliased Porion.Queries.Build_Stat;
       Total_Bean    : Build_Stat_Bean_Access;
+      Project_Count : Natural := 0;
    end record;
    type Last_Builds_Bean_Access is access all Last_Builds_Bean'Class;
 

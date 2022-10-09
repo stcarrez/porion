@@ -17,9 +17,12 @@
 -----------------------------------------------------------------------
 
 with Ada.Strings.Unbounded;
+with Ada.Calendar;
 
 with Util.Beans.Basic.Lists;
 with Util.Beans.Objects;
+with Util.Beans.Objects.Enums;
+with ADO.Sessions;
 with Porion.Queries;
 with Porion.Beans;
 with Porion.Dashboards.Modules;
@@ -27,10 +30,28 @@ package Porion.Dashboards.Beans is
 
    package UBO renames Util.Beans.Objects;
 
+   package Project_Audit_Vectors renames Porion.Beans.Project_Audit_Vectors;
+
+   --  Get the first audit after the given date.
+   function Get_First_Audit (Session : in ADO.Sessions.Session'Class;
+                             After   : in Ada.Calendar.Time) return ADO.Identifier;
+
+   --  Find the position of the given project id within the project audit vector.
+   function Find (List : in Project_Audit_Vectors.Vector;
+                  Id  : in ADO.Identifier) return Project_Audit_Vectors.Cursor;
+
+   type Report_Period_Type is (REPORT_DAY, REPORT_WEEK, REPORT_MONTH);
+   package Report_Period_Objects is
+      new UBO.Enums (Report_Period_Type);
+
+   --  Get the date for the begining of the period to report.
+   function Get_Period_Date (Period : in Report_Period_Type) return Ada.Calendar.Time;
+
    type Project_Report_Bean is new Porion.Queries.Project_Info with record
       Config_Changes : Natural := 0;
       Recipe_Changes : Natural := 0;
       Build_Changes  : Natural := 0;
+      Source_Changes : Natural := 0;
    end record;
 
    --  Get the value identified by the name.
@@ -48,6 +69,7 @@ package Porion.Dashboards.Beans is
       Module        : Porion.Dashboards.Modules.Dashboard_Module_Access := null;
       Projects      : aliased Project_Report_Beans.List_Bean;
       Projects_Bean : Project_Report_Beans_List_Access;
+      Period        : Report_Period_Type := REPORT_WEEK;
    end record;
    type Project_Report_List_Bean_Access is access all Project_Report_List_Bean'Class;
 

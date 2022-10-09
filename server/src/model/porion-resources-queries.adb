@@ -525,41 +525,53 @@ package body Porion.Resources.Queries is
        & "rd id.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "     "
        & "   <property type='Natural' name=""count"">" & ASCII.LF & "            <"
        & "comment>the number of changes.</comment>" & ASCII.LF & "        </proper"
-       & "ty>" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF & "    <query na"
-       & "me='project-change-count'>" & ASCII.LF & "        <comment>Number of con"
-       & "figuration changes per project</comment>" & ASCII.LF & "        <sql>" & ASCII.LF
-       & "          SELECT" & ASCII.LF & "          audit.entity_id," & ASCII.LF & " "
-       & "         MAX(audit.id)," & ASCII.LF & "          COUNT(audit.id)" & ASCII.LF
-       & "          FROM awa_audit AS audit" & ASCII.LF & "          INNER JOIN aw"
-       & "a_audit_field AS field ON audit.field = field.id" & ASCII.LF & "        "
-       & "  WHERE audit.id >= :last_audit AND audit.entity_type = :entity_type" & ASCII.LF
-       & "          AND (field.name = 'name' OR field.name = 'scm_url' OR field.na"
-       & "me = 'scm' OR field.name = 'check_delay')" & ASCII.LF & "          GROUP"
-       & " BY audit.entity_id" & ASCII.LF & "        </sql>" & ASCII.LF & "    </q"
-       & "uery>" & ASCII.LF & ASCII.LF & "    <query name='recipe-change-count'>" & ASCII.LF
-       & "        <comment>Number of recipe changes per project</comment>" & ASCII.LF
-       & "        <sql>" & ASCII.LF & "          SELECT" & ASCII.LF & "          r"
-       & "ecipe.project_id," & ASCII.LF & "          MAX(audit.id)," & ASCII.LF & " "
-       & "         COUNT(audit.id)" & ASCII.LF & "          FROM awa_audit AS audi"
-       & "t" & ASCII.LF & "          INNER JOIN porion_recipe AS recipe ON recipe."
-       & "id = audit.entity_id" & ASCII.LF & "          INNER JOIN awa_audit_field"
-       & " AS field ON audit.field = field.id" & ASCII.LF & "          WHERE audit"
-       & ".id >= :last_audit AND audit.entity_type = :entity_type" & ASCII.LF & " "
-       & "         AND (field.name = 'name' OR field.name = 'description' OR field"
-       & ".name = 'rate_factor' OR field.name = 'filter_rules')" & ASCII.LF & "   "
-       & "       GROUP BY recipe.project_id" & ASCII.LF & "        </sql>" & ASCII.LF
+       & "ty>" & ASCII.LF & "        <property type='Natural' name=""sum"">" & ASCII.LF
+       & "            <comment>the number of changes.</comment>" & ASCII.LF & "   "
+       & "     </property>" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF & " "
+       & "   <query name='project-change-count'>" & ASCII.LF & "        <comment>N"
+       & "umber of configuration changes per project</comment>" & ASCII.LF & "    "
+       & "    <sql>" & ASCII.LF & "          SELECT" & ASCII.LF & "          audit"
+       & ".entity_id," & ASCII.LF & "          MAX(audit.id)," & ASCII.LF & "     "
+       & "     COUNT(audit.id)," & ASCII.LF & "          0" & ASCII.LF & "        "
+       & "  FROM awa_audit AS audit" & ASCII.LF & "          INNER JOIN awa_audit_"
+       & "field AS field ON audit.field = field.id" & ASCII.LF & "          WHERE "
+       & "audit.id >= :last_audit AND audit.entity_type = $entity_type[porion_proj"
+       & "ect]" & ASCII.LF & "          AND (field.name = 'name' OR field.name = '"
+       & "scm_url' OR field.name = 'scm' OR field.name = 'check_delay')" & ASCII.LF
+       & "          GROUP BY audit.entity_id" & ASCII.LF & "          ORDER BY aud"
+       & "it.entity_id" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF
+       & ASCII.LF & "    <query name='recipe-change-count'>" & ASCII.LF & "      "
+       & "  <comment>Number of recipe changes per project</comment>" & ASCII.LF & " "
+       & "       <sql>" & ASCII.LF & "          SELECT" & ASCII.LF & "          re"
+       & "cipe.project_id," & ASCII.LF & "          MAX(audit.id)," & ASCII.LF & " "
+       & "         COUNT(audit.id)," & ASCII.LF & "          0" & ASCII.LF & "    "
+       & "      FROM awa_audit AS audit" & ASCII.LF & "          INNER JOIN porion"
+       & "_recipe AS recipe ON recipe.id = audit.entity_id" & ASCII.LF & "        "
+       & "  INNER JOIN awa_audit_field AS field ON audit.field = field.id" & ASCII.LF
+       & "          WHERE audit.id >= :last_audit AND audit.entity_type = $entity_"
+       & "type[porion_recipe]" & ASCII.LF & "          AND (field.name = 'name' OR"
+       & " field.name = 'description' OR field.name = 'rate_factor' OR field.name "
+       & "= 'filter_rules')" & ASCII.LF & "          GROUP BY recipe.project_id" & ASCII.LF
+       & "          ORDER BY recipe.project_id" & ASCII.LF & "        </sql>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "    <query name='build-count'>" & ASCII.LF
-       & "        <comment>Number of builds per project</comment>" & ASCII.LF & " "
-       & "       <sql>" & ASCII.LF & "          SELECT" & ASCII.LF & "          bu"
-       & "ild.project_id," & ASCII.LF & "          MAX(audit.id)," & ASCII.LF & " "
-       & "         COUNT(audit.id)" & ASCII.LF & "          FROM awa_audit AS audi"
-       & "t" & ASCII.LF & "          INNER JOIN porion_build AS build ON build.id "
-       & "= audit.entity_id" & ASCII.LF & "          INNER JOIN awa_audit_field AS"
-       & " field ON audit.field = field.id" & ASCII.LF & "          WHERE audit.id"
-       & " >= :last_audit AND audit.entity_type = :entity_type" & ASCII.LF & "    "
-       & "      AND (field.name = 'id')" & ASCII.LF & "          GROUP BY build.pr"
-       & "oject_id" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF
-       & ASCII.LF & "</query-mapping>" & ASCII.LF;
+       & "        <comment>Number of builds and source change per project</comment"
+       & ">" & ASCII.LF & "        <sql>" & ASCII.LF & "          SELECT" & ASCII.LF
+       & "          build.project_id," & ASCII.LF & "          MAX(audit.id)," & ASCII.LF
+       & "          COUNT(audit.id)," & ASCII.LF & "          SUM(build.source_cha"
+       & "nges)" & ASCII.LF & "          FROM awa_audit AS audit" & ASCII.LF & "  "
+       & "        INNER JOIN porion_build AS build ON build.id = audit.entity_id" & ASCII.LF
+       & "          INNER JOIN awa_audit_field AS field ON audit.field = field.id" & ASCII.LF
+       & "          WHERE audit.id >= :last_audit AND audit.entity_type = $entity_"
+       & "type[porion_build]" & ASCII.LF & "          AND (field.name = 'id')" & ASCII.LF
+       & "          GROUP BY build.project_id" & ASCII.LF & "          ORDER BY bu"
+       & "ild.project_id" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>"
+       & ASCII.LF & ASCII.LF & "    <query name='first-audit-after-date'>" & ASCII.LF
+       & "        <comment>Get the audit id of the first change that occured after"
+       & " a given date</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & "    "
+       & "      SELECT MIN(audit.id)" & ASCII.LF & "          FROM awa_audit AS au"
+       & "dit" & ASCII.LF & "          WHERE audit.date > :date" & ASCII.LF & "   "
+       & "     </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</que"
+       & "ry-mapping>" & ASCII.LF;
 
    C_16 : aliased constant String := "<query-mapping package='Porion.Builds.Mod"
        & "els'>" & ASCII.LF & "    <description>" & ASCII.LF & "        Provide pr"

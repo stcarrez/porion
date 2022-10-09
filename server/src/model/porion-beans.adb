@@ -50,6 +50,7 @@ package body Porion.Beans is
          Into.Project_Id := Stmt.Get_Identifier (0);
          Into.Last_Audit_Id := Stmt.Get_Identifier (1);
          Into.Count := Stmt.Get_Natural (2);
+         Into.Sum := Stmt.Get_Natural (3);
       end Read;
    begin
       Stmt.Execute;

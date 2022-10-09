@@ -52,6 +52,9 @@ package Porion.Beans is
 
       --  the number of changes.
       Count : Natural;
+
+      --  the number of changes.
+      Sum : Natural;
    end record;
 
    package Project_Audit_Vectors is
@@ -71,6 +74,8 @@ package Porion.Beans is
    Query_Recipe_Change_Count : constant ADO.Queries.Query_Definition_Access;
 
    Query_Build_Count : constant ADO.Queries.Query_Definition_Access;
+
+   Query_First_Audit_After_Date : constant ADO.Queries.Query_Definition_Access;
 
 
    --  --------------------
@@ -251,7 +256,7 @@ private
 
    package File_1 is
       new ADO.Queries.Loaders.File (Path => "project-stat-changes.xml",
-                                    Sha1 => "E10F18BAD3882A9E703BB3DE2228C9ABD106A783");
+                                    Sha1 => "29035197AA000FC57142927300257CD629D17304");
 
    package Def_Projectaudit_Project_Change_Count is
       new ADO.Queries.Loaders.Query (Name => "project-change-count",
@@ -270,4 +275,10 @@ private
                                      File => File_1.File'Access);
    Query_Build_Count : constant ADO.Queries.Query_Definition_Access
    := Def_Projectaudit_Build_Count.Query'Access;
+
+   package Def_Projectaudit_First_Audit_After_Date is
+      new ADO.Queries.Loaders.Query (Name => "first-audit-after-date",
+                                     File => File_1.File'Access);
+   Query_First_Audit_After_Date : constant ADO.Queries.Query_Definition_Access
+   := Def_Projectaudit_First_Audit_After_Date.Query'Access;
 end Porion.Beans;

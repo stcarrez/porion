@@ -1,7 +1,11 @@
-Version 0.11.0 - Under development
+Version 0.12.0 - Under development
+  - Add support for notification
+  - Add global activity dashboard
+  - Use Frappe Charts instead of jQuery Flot (remove jQuery)
+
+Version 0.11.0 - Sep 2022
   - Update for AWA development version (2.5.0)
   - Add support to user login with AWA
-  - Add support for notification
 
 Version 0.10.0 - Aug 2022
   - Update presentation of build results in the Web server

@@ -16,9 +16,11 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Directories;
+with Ada.Calendar;
 with ADO.Queries;
 with Util.Strings;
 with Util.Log.Loggers;
+with Util.Dates.ISO8601;
 with AWA.Services.Contexts;
 with Porion.Logs.Analysis;
 with Porion.Projects;
@@ -35,6 +37,9 @@ package body Porion.Builds.Rest is
 
    use type Porion.Builds.Models.Build_Status_Type;
    use type ADO.Identifier;
+
+   function To_String (Date : in Ada.Calendar.Time) return String
+     is (Util.Dates.ISO8601.Image (Date, Util.Dates.ISO8601.DAY));
 
    type Badge_Info is record
       Label   : UString;
@@ -566,7 +571,7 @@ package body Porion.Builds.Rest is
       Stream.Start_Array ("");
       for Node_Info of List loop
          Stream.Start_Entity ("node");
-         Stream.Write_Entity ("date", Node_Info.Day);
+         Stream.Write_Entity ("date", To_String (Node_Info.Day));
          Stream.Write_Entity ("build_status", Node_Info.Build_Status'Image);
          Stream.Write_Entity ("count", Node_Info.Count);
          Stream.Write_Entity ("test_duration", Node_Info.Test_Duration);

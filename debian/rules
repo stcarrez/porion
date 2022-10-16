@@ -27,12 +27,12 @@ override_dh_auto_configure:
 	dh_auto_configure --
 
 override_dh_auto_build:
-	$(MAKE) GNATMAKE="gprbuild -R -m -q"
+	$(MAKE) GNATMAKE="gprbuild -R -m -q" HAVE_DYNAMO=no
 
 override_dh_auto_test::
 
 override_dh_auto_install:
-	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp prefix=/usr install
+	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp prefix=/usr install HAVE_DYNAMO=no
 	dh_install debian/tmp/usr/bin/porion /usr/bin
 	dh_install -pporion-server bin/porion-server /usr/bin
 	dh_installman debian/tmp/usr/share/man/man1/porion.1
@@ -56,7 +56,7 @@ override_dh_auto_install:
 	  dh_install debian/tmp/usr/share/locale/$$i usr/share/locale/$$dir ; \
         done
 	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp/usr/share prefix=/usr DIST_DIR=/porion \
-	   PACKAGE_XML=$(CURDIR)/debian/package.xml server-package
+	   PACKAGE_XML=$(CURDIR)/debian/package.xml server-package HAVE_DYNAMO=no
 	files=`cd $(CURDIR)/debian/tmp/usr/share/porion/web && find . -type f`; \
         for i in $$files; do \
 	  dir=`dirname $$i`; \

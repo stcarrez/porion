@@ -1,3 +1,6 @@
+var Frappe;
+(function (Frappe) {
+
 function $(expr, con) {
 	return typeof expr === "string"? (con || document).querySelector(expr) : expr || null;
 }
@@ -799,7 +802,7 @@ function legendDot(x, y, size, fill='none', label, truncate=false) {
 function makeText(className, x, y, content, options = {}) {
 	let fontSize = options.fontSize || FONT_SIZE;
 	let dy = options.dy !== undefined ? options.dy : (fontSize / 2);
-	let fill = options.fill || FONT_FILL;
+	// let fill = options.fill || FONT_FILL;
 	let textAnchor = options.textAnchor || 'start';
 	return createSVG('text', {
 		className: className,
@@ -807,7 +810,7 @@ function makeText(className, x, y, content, options = {}) {
 		y: y,
 		dy: dy + 'px',
 		'font-size': fontSize + 'px',
-		fill: fill,
+		// fill: fill,
 		'text-anchor': textAnchor,
 		innerHTML: content
 	});
@@ -4081,4 +4084,6 @@ class Chart {
 	}
 }
 
-export { Chart, PercentageChart, PieChart, Heatmap, AxisChart };
+    Frappe.Chart = Chart
+// export { Chart, PercentageChart, PieChart, Heatmap, AxisChart };
+})(Frappe || (Frappe = {}));

@@ -70,6 +70,11 @@ package Porion.Builds.Rest is
       Reply   : in out OpenAPI.Servers.Response'Class;
       Stream  : in out OpenAPI.Servers.Output_Stream'Class);
 
+   procedure Get_Global_Activity
+     (Req     : in out OpenAPI.Servers.Request'Class;
+      Reply   : in out OpenAPI.Servers.Response'Class;
+      Stream  : in out OpenAPI.Servers.Output_Stream'Class);
+
    package API_Get_Build_Log is
      new Porion.Projects.Operation
         (Handler => Get_Build_Log,
@@ -118,5 +123,12 @@ package Porion.Builds.Rest is
          Method  => OpenAPI.Servers.GET,
          Permission => Security.Permissions.NONE,
          URI     => "/api/v1/nodes/{node}/usage");
+
+   package API_Get_Global_Activity is
+     new Servlet.REST.Operation
+        (Handler => Get_Global_Activity'Access,
+         Method  => OpenAPI.Servers.GET,
+         Permission => Security.Permissions.NONE,
+         URI     => "/api/v1/activity/global");
 
 end Porion.Builds.Rest;

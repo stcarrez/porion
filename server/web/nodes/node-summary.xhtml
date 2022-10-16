@@ -32,39 +32,13 @@
       </div>
 
     <u:script>
-      $(function() {
-    new Porion.NodeUsageChart({durationContainer: 'node-duration-graph', systemContainer: 'node-usage-graph'}, '#{node.name}');
-      });
+      new Porion.NodeUsageChart({durationContainer: 'node-duration-graph', systemContainer: 'node-usage-graph'}, '#{node.name}');
     </u:script>
      </div>
   </ui:define>
 
   <ui:define name="pageScript">
-<script type="text/javascript" src="#{jquery.path}"></script>
-<script type="text/javascript" src="#{jquery.uiPath}core.js"></script>
-<script type="text/javascript" src="#{jquery.uiPath}widget.js"></script>
-<script type="text/javascript" src="#{jquery.uiPath}position.js"></script>
-<script type="text/javascript" src="#{jquery.uiPath}mouse.js"></script>
-<script type="text/javascript" src="#{jquery.uiPath}autocomplete.js"></script>
-<script type="text/javascript" src="#{contextPath}/js/asf.js"></script>
-<script type="text/javascript" src="#{contextPath}/js/asf-editable.js"></script>
-<script type="text/javascript" src="#{contextPath}/js/asf-message.js"></script>
-<script type="text/javascript" src="#{contextPath}/js/asf-list.js"></script>
-<script type="text/javascript" src="#{contextPath}/js/asf-widgets.js"></script>
-<script type="text/javascript" src="#{contextPath}/js/awa.js"></script>
-    <script type="text/javascript" src="#{contextPath}/js/jquery.canvaswrapper.js"></script>
-    <script type="text/javascript" src="#{contextPath}/js/jquery.colorhelpers.js"></script>
-    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.js"></script>
-    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.saturated.js"></script>
-    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.browser.js"></script>
-    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.drawSeries.js"></script>
-    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.uiConstants.js"></script>
-    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.symbol.js"></script>
-    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.legend.js"></script>
-    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.time.js"></script>
-    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.stack.js"></script>
-    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.pie.js"></script>
-    <script type="text/javascript" src="#{contextPath}/js/jquery.flot.hover.js"></script>
+    <script type="text/javascript" src="#{contextPath}/js/frappe-charts.esm.js"></script> 
     <script type="text/javascript" src="#{contextPath}/js/nodes.js"></script>
   </ui:define>
 

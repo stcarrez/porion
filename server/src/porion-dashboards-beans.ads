@@ -40,7 +40,7 @@ package Porion.Dashboards.Beans is
    function Find (List : in Project_Audit_Vectors.Vector;
                   Id  : in ADO.Identifier) return Project_Audit_Vectors.Cursor;
 
-   type Report_Period_Type is (REPORT_DAY, REPORT_WEEK, REPORT_MONTH);
+   type Report_Period_Type is (REPORT_DAY, REPORT_WEEK, REPORT_MONTH, REPORT_4WEEK);
    package Report_Period_Objects is
       new UBO.Enums (Report_Period_Type);
 
@@ -53,6 +53,8 @@ package Porion.Dashboards.Beans is
       Build_Changes  : Natural := 0;
       Source_Changes : Natural := 0;
    end record;
+
+   function "<" (Left, Right : in Project_Report_Bean) return Boolean;
 
    --  Get the value identified by the name.
    overriding

@@ -64,6 +64,8 @@ package body Porion.Dashboards.Beans is
    --  Get the date for the begining of the period to report.
    --  ------------------------------
    function Get_Period_Date (Period : in Report_Period_Type) return Ada.Calendar.Time is
+      use type Ada.Calendar.Time;
+
       Now : constant Ada.Calendar.Time := Ada.Calendar.Clock;
    begin
       case Period is
@@ -75,6 +77,10 @@ package body Porion.Dashboards.Beans is
 
          when REPORT_MONTH =>
             return Util.Dates.Get_Month_Start (Now);
+
+         when REPORT_4WEEK =>
+            return Util.Dates.Get_Week_Start (Now) - 4.0 * 7.0 * 86400.0;
+
       end case;
    end Get_Period_Date;
 
@@ -124,9 +130,56 @@ package body Porion.Dashboards.Beans is
                         Value : in UBO.Object) is
    begin
       if Name = "period" then
-         From.Period := Report_Period_Objects.To_Value (Value);
+         declare
+            P : constant String := UBO.To_String (Value);
+         begin
+            if P = "week" then
+               From.Period := REPORT_WEEK;
+            elsif P = "month" then
+               From.Period := REPORT_MONTH;
+            elsif P = "day" then
+               From.Period := REPORT_DAY;
+            elsif P = "4week" then
+               From.Period := REPORT_4WEEK;
+            else
+               From.Period := REPORT_WEEK;
+            end if;
+         end;
       end if;
    end Set_Value;
+
+   function "<" (Left, Right : in Project_Report_Bean) return Boolean is
+      use Ada.Strings.Unbounded;
+   begin
+      if Left.Source_Changes < Right.Source_Changes then
+         return False;
+      elsif Left.Source_Changes > Right.Source_Changes then
+         return True;
+      end if;
+
+      if Left.Build_Changes < Right.Build_Changes then
+         return False;
+      elsif Left.Build_Changes > Right.Build_Changes then
+         return True;
+      end if;
+
+      if Left.Recipe_Changes < Right.Recipe_Changes then
+         return False;
+      elsif Left.Recipe_Changes > Right.Recipe_Changes then
+         return True;
+      end if;
+
+      if Left.Config_Changes < Right.Config_Changes then
+         return False;
+      elsif Left.Config_Changes > Right.Config_Changes then
+         return True;
+      end if;
+
+      return Left.Name < Right.Name;
+   end "<";
+
+   package Sort_Project is
+      new Project_Report_Beans.Vectors.Generic_Sorting ("<" => "<");
 
    --  ------------------------------
    --  Load the list of projects.
@@ -193,6 +246,7 @@ package body Porion.Dashboards.Beans is
             Bean.Projects.List.Append (Report);
          end;
       end loop;
+      Sort_Project.Sort (Bean.Projects.List);
    end Load;
 
    --  ------------------------------

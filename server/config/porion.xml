@@ -28,6 +28,7 @@
   <filter-mapping>
     <filter-name>service</filter-name>
     <url-pattern>/*.html</url-pattern>
+    <url-pattern>/activities/view/#{projectReportList.period}</url-pattern>
   </filter-mapping>
 
   <url-policy>
@@ -38,11 +39,24 @@
     <url-pattern>/index.html</url-pattern>
     <url-pattern>/nodes.html</url-pattern>
     <url-pattern>/queue.html</url-pattern>
+    <url-pattern>/activity.html</url-pattern>
+    <url-pattern>/activity/view/.*</url-pattern>
   </url-policy>
 
   <filter-mapping>
     <filter-name>service</filter-name>
-    <url-pattern>/api/v1/*</url-pattern>
+    <url-pattern>/api/*</url-pattern>
+    <url-pattern>/activity/view/#{projectReportList.period}</url-pattern>
   </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>auth-filter</filter-name>
+    <url-pattern>/activity/view/#{projectReportList.period}</url-pattern>
+  </filter-mapping>
+
+  <url-mapping>
+    <pattern>/activity/view/#{projectReportList.period}</pattern>
+    <view-id>/activity.html</view-id>
+  </url-mapping>
 
 </module>

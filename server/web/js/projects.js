@@ -18,32 +18,32 @@
 var Porion;
 (function (Porion) {
     var BarGraph = /** @class */ (function () {
-        function BarGraph(container, legend, series, ticks) {
+        function BarGraph(container, legend, labels, values) {
             var div = document.getElementById(container);
-            $.plot($(div), series, {
-                series: {
-                    bars: {
-                        show: true,
-                        horizontal: true,
-                        align: "center"
-                    }
+            var data = {
+                labels: labels,
+                datasets: [{
+                        name: "Language",
+                        type: "line",
+                        values: values
+                    }]
+            };
+            var chart = new Frappe.Chart(div, {
+                animate: 1,
+                data: data,
+                type: 'percentage',
+                height: 200,
+                valuesOverPoints: 0,
+                maxSlices: 7,
+                lineOptions: {
+                    regionFill: 0,
+                    dotSize: 1,
+                    hideDots: 1
                 },
-                legend: {
-                    show: false,
-                    backgroundOpacity: 0.5
+                axisOptions: {
+                    yAxisMode: "tick"
                 },
-                xaxis: {
-                    ticks: [],
-                    color: "#993D00"
-                },
-                yaxis: {
-                    ticks: ticks,
-                    tickSize: [10, "px"],
-                    font: { size: 18, style: "normal" },
-                    show: true,
-                    color: "#993D00",
-                    tickColor: "#00ff00"
-                }
+                colors: ['red', 'blue', 'green']
             });
         }
         return BarGraph;
@@ -77,6 +77,7 @@ var Porion;
             var fail = new Array();
             var timeout = new Array();
             var duration = new Array();
+            var labels = new Array();
             var first_build = 10000;
             var last_build = 0;
             for (var _i = 0, _a = content.tests; _i < _a.length; _i++) {
@@ -88,39 +89,50 @@ var Porion;
                     if (test.build_number > last_build) {
                         last_build = test.build_number;
                     }
-                    timeout.push([test.build_number, test.timeout_count]);
-                    fail.push([test.build_number, test.fail_count + test.timeout_count]);
-                    pass.push([test.build_number, test.pass_count + test.fail_count + test.timeout_count]);
-                    duration.push([test.build_number, test.test_duration]);
+                    timeout.push(test.timeout_count);
+                    fail.push(test.fail_count + test.timeout_count);
+                    pass.push(test.pass_count + test.fail_count + test.timeout_count);
+                    duration.push(test.test_duration / 1000);
+                    labels.push(String(test.build_number));
                 }
             }
-            $.plot($(this.container), [timeout, fail, pass], {
-                colors: ["red", "green", "blue"],
-                series: {
-                    lines: {
-                        show: true,
-                        fill: true
-                    },
-                    points: {
-                        show: true
-                    },
-                    clickable: true,
-                    hoverable: true
+            var data = {
+                labels: labels,
+                datasets: [{
+                        name: "Fail",
+                        type: "line",
+                        values: fail
+                    }, {
+                        name: "Timeout",
+                        type: "line",
+                        values: timeout
+                    }, {
+                        name: "Pass",
+                        type: "line",
+                        values: pass
+                    }]
+            };
+            var chart = new Frappe.Chart(this.container, {
+                animate: 1,
+                data: data,
+                type: 'line',
+                height: 250,
+                valuesOverPoints: 0,
+                lineOptions: {
+                    regionFill: 0,
+                    dotSize: 1,
+                    hideDots: 1
                 },
-                grid: {
-                    hoverable: true,
-                    clickable: true
+                axisOptions: {
+                    yAxisMode: "tick",
+                    xAxisMode: "tick"
                 },
-                xaxis: {
-                    color: "#993D00",
-                    show: true
+                tooltipOptions: {
+                    formatTooltipX: function (value) {
+                        return "Build " + value;
+                    }
                 },
-                yaxis: {
-                    show: true
-                },
-                legend: {
-                    show: false
-                }
+                colors: ['red', 'blue', 'green']
             });
         };
         return TestChart;
@@ -159,8 +171,12 @@ var Porion;
         CoverageChart.prototype.updateData = function (content) {
             var lines = new Array();
             var functions = new Array();
+            var labels = new Array();
             var first_build = 10000;
             var last_build = 0;
+            labels.push("");
+            lines.push(0);
+            functions.push(0);
             for (var _i = 0, _a = content.metrics; _i < _a.length; _i++) {
                 var build = _a[_i];
                 if (build.build_status == "BUILD_PASS") {
@@ -170,54 +186,47 @@ var Porion;
                     if (build.build_number > last_build) {
                         last_build = build.build_number;
                     }
-                    lines.push([build.build_number, build.lines / 10.0]);
-                    functions.push([build.build_number, build.functions / 10.0]);
+                    lines.push(build.lines / 10.0);
+                    functions.push(build.functions / 10.0);
+                    labels.push(String(build.build_number));
                 }
             }
-            $.plot($(this.graphContainer), [{ data: lines, label: "Lines" }, { data: functions, label: "Functions" }], {
-                colors: ["green", "blue"],
-                series: {
-                    lines: {
-                        show: true,
-                        fill: false
+            var data = {
+                labels: labels,
+                datasets: [{
+                        name: "Functions",
+                        type: "line",
+                        values: functions
+                    }, {
+                        name: "Lines",
+                        type: "line",
+                        values: lines
+                    }]
+            };
+            var chart = new Frappe.Chart(this.graphContainer, {
+                animate: 1,
+                data: data,
+                type: 'line',
+                height: 250,
+                valuesOverPoints: 0,
+                lineOptions: {
+                    regionFill: 0,
+                    dotSize: 1,
+                    hideDots: 1
+                },
+                axisOptions: {
+                    yAxisMode: "tick",
+                    xAxisMode: "tick"
+                },
+                tooltipOptions: {
+                    formatTooltipY: function (value) {
+                        return String(value) + "%";
                     },
-                    points: {
-                        show: true
-                    },
-                    clickable: true,
-                    hoverable: true
+                    formatTooltipX: function (value) {
+                        return "Build " + value;
+                    }
                 },
-                grid: {
-                    hoverable: true,
-                    clickable: true
-                },
-                xaxis: {
-                    color: "#993D00",
-                    show: true
-                },
-                yaxis: {
-                    show: true
-                },
-                legend: {
-                    show: true,
-                    margin: [-100, -50],
-                    backgroundOpacity: 0.5,
-                    container: this.legendContainer
-                }
-            });
-            var t = this;
-            $(this.graphContainer).bind("plothover", function (event, pos, item) {
-                if (!pos.x || !pos.y) {
-                    return;
-                }
-                if (item) {
-                    var build_number = item.datapoint[0];
-                    var cover = item.datapoint[1];
-                    $(t.tooltipContainer).html("Build " + build_number + " Coverage: " + cover).css({ top: item.pageY + 5, left: item.pageX + 5 }).fadeIn(200);
-                }
-                else {
-                    $(t.tooltipContainer).stop().hide();
-                }
+                colors: ['green', 'blue', 'red']
             });
         };
         return CoverageChart;

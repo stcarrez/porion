@@ -15,16 +15,24 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Ada.Containers.Hashed_Sets;
 with ADO.Sessions;
 with ADO.Queries;
+with ADO.Utils;
 with AWA.Services.Contexts;
 with Porion.Metrics;
 with Porion.Builds.Models;
 package body Porion.Dashboards.Beans.Stats is
 
+   use type ADO.Identifier;
    use type Porion.Builds.Models.Build_Status_Type;
 
    package ASC renames AWA.Services.Contexts;
+
+   package Identifier_Sets is
+      new Ada.Containers.Hashed_Sets (Element_Type        => ADO.Identifier,
+                                      Hash                => ADO.Utils.Hash,
+                                      Equivalent_Elements => "=");
 
    Empty_Metric : constant Porion.Queries.Metric_Stat := (Kind => Porion.Metrics.METRIC_SPACE,
                                                           Sum_Value => 0, Max_Value => 0,
@@ -41,6 +49,7 @@ package body Porion.Dashboards.Beans.Stats is
       Session : ADO.Sessions.Session := ASC.Get_Session (Ctx);
       Query   : ADO.Queries.Context;
       List    : Porion.Queries.Build_Stat_List_Bean;
+      Date    : constant Ada.Calendar.Time := Get_Period_Date (REPORT_WEEK);
    begin
       Query.Set_Query (Porion.Queries.Query_Stat_Builds);
       Porion.Queries.List (List, Session, Query);
@@ -59,6 +68,38 @@ package body Porion.Dashboards.Beans.Stats is
          Bean.Total.User_Time := Bean.Total.User_Time + Stat.User_Time;
          Bean.Total.Sys_Time := Bean.Total.Sys_Time + Stat.Sys_Time;
       end loop;
+
+      declare
+         Changes     : Project_Audit_Vectors.Vector;
+         First_Audit : constant ADO.Identifier := Get_First_Audit (Session, Date);
+         Projects    : Identifier_Sets.Set;
+      begin
+         --  Look for changes since the first audit change 1 day ago.
+         if First_Audit /= ADO.NO_IDENTIFIER then
+            Query.Set_Query (Porion.Beans.Query_Project_Change_Count);
+            Query.Bind_Param ("last_audit", First_Audit);
+            Porion.Beans.List (Changes, Session, Query);
+            for Project of Changes loop
+               Projects.Include (Project.Project_Id);
+            end loop;
+
+            Query.Set_Query (Porion.Beans.Query_Recipe_Change_Count);
+            Query.Bind_Param ("last_audit", First_Audit);
+            Porion.Beans.List (Changes, Session, Query);
+            for Project of Changes loop
+               Projects.Include (Project.Project_Id);
+            end loop;
+
+            Query.Set_Query (Porion.Beans.Query_Build_Count);
+            Query.Bind_Param ("last_audit", First_Audit);
+            Porion.Beans.List (Changes, Session, Query);
+            for Project of Changes loop
+               Projects.Include (Project.Project_Id);
+            end loop;
+
+         end if;
+         Bean.Project_Count := Natural (Projects.Length);
+      end;
    end Load;
 
    --  ------------------------------
@@ -74,6 +115,8 @@ package body Porion.Dashboards.Beans.Stats is
       elsif Name = "fail" then
          return Util.Beans.Objects.To_Object (Value   => From.Fail_Bean,
                                               Storage => Util.Beans.Objects.STATIC);
+      elsif Name = "project_changed" then
+         return UBO.To_Object (From.Project_Count);
       else
          return From.Total.Get_Value (Name);
       end if;
@@ -120,7 +163,6 @@ package body Porion.Dashboards.Beans.Stats is
    procedure Load (Bean    : in out Metrics_Bean;
                    Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
       pragma Unreferenced (Outcome);
-      use type ADO.Identifier;
 
       Ctx     : constant ASC.Service_Context_Access := ASC.Current;
       Session : ADO.Sessions.Session := ASC.Get_Session (Ctx);

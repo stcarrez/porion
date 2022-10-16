@@ -22,8 +22,8 @@ with ADO;
 with Util.Beans.Basic;
 with Util.Beans.Objects;
 with Porion.Queries;
+with Porion.Beans;
 with Porion.Dashboards.Modules;
-with Porion.Dashboards.Models;
 package Porion.Dashboards.Beans.Stats is
 
    package UBB renames Util.Beans.Basic;
@@ -31,7 +31,7 @@ package Porion.Dashboards.Beans.Stats is
 
    type Build_Stat_Bean_Access is access all Porion.Queries.Build_Stat;
 
-   type Last_Builds_Bean is new Porion.Dashboards.Models.Project_List_Bean with record
+   type Last_Builds_Bean is new Porion.Beans.Project_List_Bean with record
       Module        : Porion.Dashboards.Modules.Dashboard_Module_Access := null;
       Pass          : aliased Porion.Queries.Build_Stat;
       Pass_Bean     : Build_Stat_Bean_Access;
@@ -39,6 +39,7 @@ package Porion.Dashboards.Beans.Stats is
       Fail_Bean     : Build_Stat_Bean_Access;
       Total         : aliased Porion.Queries.Build_Stat;
       Total_Bean    : Build_Stat_Bean_Access;
+      Project_Count : Natural := 0;
    end record;
    type Last_Builds_Bean_Access is access all Last_Builds_Bean'Class;
 
@@ -57,7 +58,7 @@ package Porion.Dashboards.Beans.Stats is
 
    type Metrics_Stat_Bean_Access is access all Porion.Queries.Metric_Stat;
 
-   type Metrics_Bean is new Porion.Dashboards.Models.Project_List_Bean with record
+   type Metrics_Bean is new Porion.Beans.Project_List_Bean with record
       Project            : ADO.Identifier := ADO.NO_IDENTIFIER;
       Build              : ADO.Identifier := ADO.NO_IDENTIFIER;
       Func_Coverage      : aliased Porion.Queries.Metric_Stat;

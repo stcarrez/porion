@@ -25,6 +25,7 @@ private package Porion.Sources.Git is
      & "#{not empty branch ? '-b' : ''} #{branch} --recursive #{repository_url} #{build_dir}";
    GIT_GUESS_COMMAND       : constant String := "git -C #{path} config remote.origin.url";
    GIT_INIT_COMMAND        : constant String := "git init --bare #{git_tmp_dir}";
+   GIT_LOG_COMMAND         : constant String := "git -C #{build_dir} log #{previous_tag}..";
 
    type Controller_Type is limited new Porion.Sources.Controller_Type with private;
 
@@ -41,7 +42,8 @@ private package Porion.Sources.Git is
 
    overriding
    procedure Changes (Controller : in out Controller_Type;
-                      Result     : out Status_Type;
+                      Path       : in String;
+                      Extraction : in out Checkout_Type;
                       Executor   : in out Porion.Executors.Executor_Type'Class);
 
    --  Guess some information about the sources located in the given directory.
@@ -64,6 +66,7 @@ private
       Guess_Command       : EL.Expressions.Expression;
       Show_Remote_Command : EL.Expressions.Expression;
       Init_Command        : EL.Expressions.Expression;
+      Changes_Command     : EL.Expressions.Expression;
    end record;
 
    type Git_Controller_Access is access all Controller_Type'Class;

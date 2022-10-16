@@ -26,6 +26,8 @@ with ADO.Objects;
 with ADO.Statements;
 with ADO.SQL;
 with ADO.Schemas;
+with ADO.Queries;
+with ADO.Queries.Loaders;
 with Ada.Calendar;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
@@ -34,6 +36,7 @@ with Util.Beans.Objects.Enums;
 with Util.Beans.Basic.Lists;
 with ADO.Audits;
 with AWA.Users.Models;
+with Porion.Builds.Models;
 with Porion.Projects.Models;
 pragma Warnings (On);
 package Porion.Notifications.Models is
@@ -132,6 +135,14 @@ package Porion.Notifications.Models is
    function Get_Notify_Xunit (Object : in Subscriber_Ref)
                  return Boolean;
 
+   --  Set the last build that was reported
+   procedure Set_Last_Reported_Build (Object : in out Subscriber_Ref;
+                                      Value  : in Porion.Builds.Models.Build_Ref'Class);
+
+   --  Get the last build that was reported
+   function Get_Last_Reported_Build (Object : in Subscriber_Ref)
+                 return Porion.Builds.Models.Build_Ref'Class;
+
    --
    procedure Set_Project (Object : in out Subscriber_Ref;
                           Value  : in Porion.Projects.Models.Project_Ref'Class);
@@ -139,6 +150,14 @@ package Porion.Notifications.Models is
    --
    function Get_Project (Object : in Subscriber_Ref)
                  return Porion.Projects.Models.Project_Ref'Class;
+
+   --  Set the last audit field that was reported.
+   procedure Set_Last_Change (Object : in out Subscriber_Ref;
+                              Value  : in ADO.Identifier);
+
+   --  Get the last audit field that was reported.
+   function Get_Last_Change (Object : in Subscriber_Ref)
+                 return ADO.Identifier;
 
    --
    procedure Set_Email (Object : in out Subscriber_Ref;
@@ -212,6 +231,117 @@ package Porion.Notifications.Models is
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class);
 
+   type Audit_Info is record
+
+      --  the audit id.
+      Audit_Id : ADO.Identifier;
+
+      --  the date when the change was made.
+      Date : Ada.Calendar.Time;
+
+      --  the field name that was changed.
+      Kind : ADO.Entity_Type;
+
+      --  the field name that was changed.
+      Field : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the id that was changed.
+      Id : ADO.Identifier;
+
+      --  the old value.
+      Old_Value : ADO.Nullable_String;
+
+      --  the new value.
+      New_Value : ADO.Nullable_String;
+   end record;
+
+   package Audit_Info_Vectors is
+      new Ada.Containers.Vectors (Index_Type   => Positive,
+                                  Element_Type => Audit_Info,
+                                  "="          => "=");
+
+   subtype Audit_Info_Vector is Audit_Info_Vectors.Vector;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Audit_Info_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
+
+   Query_Audit_List : constant ADO.Queries.Query_Definition_Access;
+
+   --  --------------------
+   --    Information about a notification.
+   --  --------------------
+   type Notification_Info is
+     new Util.Beans.Basic.Bean with  record
+
+      --  the subscriber id.
+      Id : ADO.Identifier;
+
+      --  the project name.
+      Name : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the project status.
+      Project_Status : Porion.Projects.Models.Project_Status_Type;
+
+      --  the user email address.
+      Email : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the notification frequency.
+      Frequency : Frequency_Type;
+
+      --  the last notification date.
+      Last_Notification_Date : ADO.Nullable_Time;
+
+      --  the last check date.
+      Check_Date : ADO.Nullable_Time;
+
+      --  the number of notification sent.
+      Send_Count : Natural;
+
+      --  the notify config flag.
+      Notify_Config : Boolean;
+
+      --  the notify build flag.
+      Notify_Build : Boolean;
+
+      --  the notify xunit flag.
+      Notify_Xunit : Boolean;
+   end record;
+
+   --  Get the bean attribute identified by the name.
+   overriding
+   function Get_Value (From : in Notification_Info;
+                       Name : in String) return Util.Beans.Objects.Object;
+
+   --  Set the bean attribute identified by the name.
+   overriding
+   procedure Set_Value (Item  : in out Notification_Info;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object);
+
+
+   package Notification_Info_Beans is
+      new Util.Beans.Basic.Lists (Element_Type => Notification_Info);
+   package Notification_Info_Vectors renames Notification_Info_Beans.Vectors;
+   subtype Notification_Info_List_Bean is Notification_Info_Beans.List_Bean;
+
+   type Notification_Info_List_Bean_Access is access all Notification_Info_List_Bean;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Notification_Info_List_Bean'Class;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
+
+   subtype Notification_Info_Vector is Notification_Info_Vectors.Vector;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Notification_Info_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
+
+   Query_Notification_List : constant ADO.Queries.Query_Definition_Access;
+
 
 
 private
@@ -225,11 +355,13 @@ private
    COL_6_1_NAME : aliased constant String := "notify_config";
    COL_7_1_NAME : aliased constant String := "notify_build";
    COL_8_1_NAME : aliased constant String := "notify_xunit";
-   COL_9_1_NAME : aliased constant String := "project_id";
-   COL_10_1_NAME : aliased constant String := "email_id";
+   COL_9_1_NAME : aliased constant String := "last_reported_build_id";
+   COL_10_1_NAME : aliased constant String := "project_id";
+   COL_11_1_NAME : aliased constant String := "last_change";
+   COL_12_1_NAME : aliased constant String := "email_id";
 
    SUBSCRIBER_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 11,
+     (Count   => 13,
       Table   => SUBSCRIBER_NAME'Access,
       Members => (
          1 => COL_0_1_NAME'Access,
@@ -242,7 +374,9 @@ private
          8 => COL_7_1_NAME'Access,
          9 => COL_8_1_NAME'Access,
          10 => COL_9_1_NAME'Access,
-         11 => COL_10_1_NAME'Access)
+         11 => COL_10_1_NAME'Access,
+         12 => COL_11_1_NAME'Access,
+         13 => COL_12_1_NAME'Access)
      );
    SUBSCRIBER_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := SUBSCRIBER_DEF'Access;
@@ -275,7 +409,9 @@ private
        Notify_Config : Boolean;
        Notify_Build : Boolean;
        Notify_Xunit : Boolean;
+       Last_Reported_Build : Porion.Builds.Models.Build_Ref;
        Project : Porion.Projects.Models.Project_Ref;
+       Last_Change : ADO.Identifier;
        Email : AWA.Users.Models.Email_Ref;
    end record;
 
@@ -311,4 +447,24 @@ private
 
    procedure Set_Field (Object : in out Subscriber_Ref'Class;
                         Impl   : out Subscriber_Access);
+
+   package File_1 is
+      new ADO.Queries.Loaders.File (Path => "notifications-changes.xml",
+                                    Sha1 => "22791F462B305268BDD92E8BFC0C39CE16A66300");
+
+   package Def_Auditinfo_Audit_List is
+      new ADO.Queries.Loaders.Query (Name => "audit-list",
+                                     File => File_1.File'Access);
+   Query_Audit_List : constant ADO.Queries.Query_Definition_Access
+   := Def_Auditinfo_Audit_List.Query'Access;
+
+   package File_2 is
+      new ADO.Queries.Loaders.File (Path => "notifications.xml",
+                                    Sha1 => "1F7ABC2E691C3EEC40CCED9B1777BCD430145106");
+
+   package Def_Notificationinfo_Notification_List is
+      new ADO.Queries.Loaders.Query (Name => "notification-list",
+                                     File => File_2.File'Access);
+   Query_Notification_List : constant ADO.Queries.Query_Definition_Access
+   := Def_Notificationinfo_Notification_List.Query'Access;
 end Porion.Notifications.Models;

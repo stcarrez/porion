@@ -77,6 +77,7 @@ package body Porion.Notifications.Models is
       Impl.Notify_Config := False;
       Impl.Notify_Build := False;
       Impl.Notify_Xunit := False;
+      Impl.Last_Change := ADO.NO_IDENTIFIER;
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Allocate;
 
@@ -233,12 +234,29 @@ package body Porion.Notifications.Models is
    end Get_Notify_Xunit;
 
 
+   procedure Set_Last_Reported_Build (Object : in out Subscriber_Ref;
+                                      Value  : in Porion.Builds.Models.Build_Ref'Class) is
+      Impl : Subscriber_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Object (Impl.all, 10, Impl.Last_Reported_Build, Value);
+   end Set_Last_Reported_Build;
+
+   function Get_Last_Reported_Build (Object : in Subscriber_Ref)
+                  return Porion.Builds.Models.Build_Ref'Class is
+      Impl : constant Subscriber_Access
+         := Subscriber_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Last_Reported_Build;
+   end Get_Last_Reported_Build;
+
+
    procedure Set_Project (Object : in out Subscriber_Ref;
                           Value  : in Porion.Projects.Models.Project_Ref'Class) is
       Impl : Subscriber_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 10, Impl.Project, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 11, Impl.Project, Value);
    end Set_Project;
 
    function Get_Project (Object : in Subscriber_Ref)
@@ -250,12 +268,29 @@ package body Porion.Notifications.Models is
    end Get_Project;
 
 
+   procedure Set_Last_Change (Object : in out Subscriber_Ref;
+                              Value  : in ADO.Identifier) is
+      Impl : Subscriber_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_Identifier (Impl.all, 12, Impl.Last_Change, Value);
+   end Set_Last_Change;
+
+   function Get_Last_Change (Object : in Subscriber_Ref)
+                  return ADO.Identifier is
+      Impl : constant Subscriber_Access
+         := Subscriber_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Last_Change;
+   end Get_Last_Change;
+
+
    procedure Set_Email (Object : in out Subscriber_Ref;
                         Value  : in AWA.Users.Models.Email_Ref'Class) is
       Impl : Subscriber_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 11, Impl.Email, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 13, Impl.Email, Value);
    end Set_Email;
 
    function Get_Email (Object : in Subscriber_Ref)
@@ -288,7 +323,9 @@ package body Porion.Notifications.Models is
             Copy.Notify_Config := Impl.Notify_Config;
             Copy.Notify_Build := Impl.Notify_Build;
             Copy.Notify_Xunit := Impl.Notify_Xunit;
+            Copy.Last_Reported_Build := Impl.Last_Reported_Build;
             Copy.Project := Impl.Project;
+            Copy.Last_Change := Impl.Last_Change;
             Copy.Email := Impl.Email;
          end;
       end if;
@@ -497,14 +534,24 @@ package body Porion.Notifications.Models is
          Object.Clear_Modified (9);
       end if;
       if Object.Is_Modified (10) then
-         Stmt.Save_Field (Name  => COL_9_1_NAME, --  project_id
-                          Value => Object.Project);
+         Stmt.Save_Field (Name  => COL_9_1_NAME, --  last_reported_build_id
+                          Value => Object.Last_Reported_Build);
          Object.Clear_Modified (10);
       end if;
       if Object.Is_Modified (11) then
-         Stmt.Save_Field (Name  => COL_10_1_NAME, --  email_id
-                          Value => Object.Email);
+         Stmt.Save_Field (Name  => COL_10_1_NAME, --  project_id
+                          Value => Object.Project);
          Object.Clear_Modified (11);
+      end if;
+      if Object.Is_Modified (12) then
+         Stmt.Save_Field (Name  => COL_11_1_NAME, --  last_change
+                          Value => Object.Last_Change);
+         Object.Clear_Modified (12);
+      end if;
+      if Object.Is_Modified (13) then
+         Stmt.Save_Field (Name  => COL_12_1_NAME, --  email_id
+                          Value => Object.Email);
+         Object.Clear_Modified (13);
       end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
@@ -556,9 +603,13 @@ package body Porion.Notifications.Models is
                         Value => Object.Notify_Build);
       Query.Save_Field (Name  => COL_8_1_NAME, --  notify_xunit
                         Value => Object.Notify_Xunit);
-      Query.Save_Field (Name  => COL_9_1_NAME, --  project_id
+      Query.Save_Field (Name  => COL_9_1_NAME, --  last_reported_build_id
+                        Value => Object.Last_Reported_Build);
+      Query.Save_Field (Name  => COL_10_1_NAME, --  project_id
                         Value => Object.Project);
-      Query.Save_Field (Name  => COL_10_1_NAME, --  email_id
+      Query.Save_Field (Name  => COL_11_1_NAME, --  last_change
+                        Value => Object.Last_Change);
+      Query.Save_Field (Name  => COL_12_1_NAME, --  email_id
                         Value => Object.Email);
       Query.Execute (Result);
       if Result /= 1 then
@@ -617,6 +668,8 @@ package body Porion.Notifications.Models is
          return Util.Beans.Objects.To_Object (Impl.Notify_Build);
       elsif Name = "notify_xunit" then
          return Util.Beans.Objects.To_Object (Impl.Notify_Xunit);
+      elsif Name = "last_change" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Last_Change));
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -659,14 +712,180 @@ package body Porion.Notifications.Models is
       Object.Notify_Build := Stmt.Get_Boolean (7);
       Object.Notify_Xunit := Stmt.Get_Boolean (8);
       if not Stmt.Is_Null (9) then
-         Object.Project.Set_Key_Value (Stmt.Get_Identifier (9), Session);
+         Object.Last_Reported_Build.Set_Key_Value (Stmt.Get_Identifier (9), Session);
       end if;
       if not Stmt.Is_Null (10) then
-         Object.Email.Set_Key_Value (Stmt.Get_Identifier (10), Session);
+         Object.Project.Set_Key_Value (Stmt.Get_Identifier (10), Session);
+      end if;
+      Object.Last_Change := Stmt.Get_Identifier (11);
+      if not Stmt.Is_Null (12) then
+         Object.Email.Set_Key_Value (Stmt.Get_Identifier (12), Session);
       end if;
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);
    end Load;
+   --  --------------------
+   --  
+   --  --------------------
+   procedure List (Object  : in out Audit_Info_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+      procedure Read (Into : in out Audit_Info);
+
+      Stmt : ADO.Statements.Query_Statement
+          := Session.Create_Statement (Context);
+      Pos  : Positive := 1;
+      procedure Read (Into : in out Audit_Info) is
+      begin
+         Into.Audit_Id := Stmt.Get_Identifier (0);
+         Into.Date := Stmt.Get_Time (1);
+         Into.Kind := Stmt.Get_Entity_Type (2);
+         Into.Field := Stmt.Get_Unbounded_String (3);
+         Into.Id := Stmt.Get_Identifier (4);
+         Into.Old_Value := Stmt.Get_Nullable_String (5);
+         Into.New_Value := Stmt.Get_Nullable_String (6);
+      end Read;
+   begin
+      Stmt.Execute;
+      Audit_Info_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         Object.Insert_Space (Before => Pos);
+         Object.Update_Element (Index => Pos, Process => Read'Access);
+         Pos := Pos + 1;
+         Stmt.Next;
+      end loop;
+   end List;
+
+
+
+   --  ------------------------------
+   --  Get the bean attribute identified by the name.
+   --  ------------------------------
+   overriding
+   function Get_Value (From : in Notification_Info;
+                       Name : in String) return Util.Beans.Objects.Object is
+   begin
+      if Name = "id" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Id));
+      elsif Name = "name" then
+         return Util.Beans.Objects.To_Object (From.Name);
+      elsif Name = "project_status" then
+         return Porion.Projects.Models.Project_Status_Type_Objects.To_Object (From.Project_Status);
+      elsif Name = "email" then
+         return Util.Beans.Objects.To_Object (From.Email);
+      elsif Name = "frequency" then
+         return Frequency_Type_Objects.To_Object (From.Frequency);
+      elsif Name = "last_notification_date" then
+         if From.Last_Notification_Date.Is_Null then
+            return Util.Beans.Objects.Null_Object;
+         else
+            return Util.Beans.Objects.Time.To_Object (From.Last_Notification_Date.Value);
+         end if;
+      elsif Name = "check_date" then
+         if From.Check_Date.Is_Null then
+            return Util.Beans.Objects.Null_Object;
+         else
+            return Util.Beans.Objects.Time.To_Object (From.Check_Date.Value);
+         end if;
+      elsif Name = "send_count" then
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (From.Send_Count));
+      elsif Name = "notify_config" then
+         return Util.Beans.Objects.To_Object (From.Notify_Config);
+      elsif Name = "notify_build" then
+         return Util.Beans.Objects.To_Object (From.Notify_Build);
+      elsif Name = "notify_xunit" then
+         return Util.Beans.Objects.To_Object (From.Notify_Xunit);
+      end if;
+      return Util.Beans.Objects.Null_Object;
+   end Get_Value;
+
+
+   --  ------------------------------
+   --  Set the value identified by the name
+   --  ------------------------------
+   overriding
+   procedure Set_Value (Item  : in out Notification_Info;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object) is
+   begin
+      if Name = "id" then
+         Item.Id := ADO.Identifier (Util.Beans.Objects.To_Long_Long_Integer (Value));
+      elsif Name = "name" then
+         Item.Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "project_status" then
+         Item.Project_Status := Porion.Projects.Models.Project_Status_Type_Objects.To_Value (Value);
+      elsif Name = "email" then
+         Item.Email := Util.Beans.Objects.To_Unbounded_String (Value);
+      elsif Name = "frequency" then
+         Item.Frequency := Frequency_Type_Objects.To_Value (Value);
+      elsif Name = "last_notification_date" then
+         Item.Last_Notification_Date.Is_Null := Util.Beans.Objects.Is_Null (Value);
+         if not Item.Last_Notification_Date.Is_Null then
+            Item.Last_Notification_Date.Value := Util.Beans.Objects.Time.To_Time (Value);
+         end if;
+      elsif Name = "check_date" then
+         Item.Check_Date.Is_Null := Util.Beans.Objects.Is_Null (Value);
+         if not Item.Check_Date.Is_Null then
+            Item.Check_Date.Value := Util.Beans.Objects.Time.To_Time (Value);
+         end if;
+      elsif Name = "send_count" then
+         Item.Send_Count := Util.Beans.Objects.To_Integer (Value);
+      elsif Name = "notify_config" then
+         Item.Notify_Config := Util.Beans.Objects.To_Boolean (Value);
+      elsif Name = "notify_build" then
+         Item.Notify_Build := Util.Beans.Objects.To_Boolean (Value);
+      elsif Name = "notify_xunit" then
+         Item.Notify_Xunit := Util.Beans.Objects.To_Boolean (Value);
+      end if;
+   end Set_Value;
+
+
+   --  --------------------
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   --  --------------------
+   procedure List (Object  : in out Notification_Info_List_Bean'Class;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+   begin
+      List (Object.List, Session, Context);
+   end List;
+
+   --  --------------------
+   --  Information about a notification.
+   --  --------------------
+   procedure List (Object  : in out Notification_Info_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+      procedure Read (Into : in out Notification_Info);
+
+      Stmt : ADO.Statements.Query_Statement
+          := Session.Create_Statement (Context);
+      Pos  : Positive := 1;
+      procedure Read (Into : in out Notification_Info) is
+      begin
+         Into.Id := Stmt.Get_Identifier (0);
+         Into.Name := Stmt.Get_Unbounded_String (1);
+         Into.Project_Status := Porion.Projects.Models.Project_Status_Type'Enum_Val (Stmt.Get_Integer (2));
+         Into.Email := Stmt.Get_Unbounded_String (3);
+         Into.Frequency := Frequency_Type'Enum_Val (Stmt.Get_Integer (4));
+         Into.Last_Notification_Date := Stmt.Get_Nullable_Time (5);
+         Into.Check_Date := Stmt.Get_Nullable_Time (6);
+         Into.Send_Count := Stmt.Get_Natural (7);
+         Into.Notify_Config := Stmt.Get_Boolean (8);
+         Into.Notify_Build := Stmt.Get_Boolean (9);
+         Into.Notify_Xunit := Stmt.Get_Boolean (10);
+      end Read;
+   begin
+      Stmt.Execute;
+      Notification_Info_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         Object.Insert_Space (Before => Pos);
+         Object.Update_Element (Index => Pos, Process => Read'Access);
+         Pos := Pos + 1;
+         Stmt.Next;
+      end loop;
+   end List;
+
 
 
 end Porion.Notifications.Models;

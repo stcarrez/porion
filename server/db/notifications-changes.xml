@@ -1,0 +1,47 @@
+<query-mapping package='Porion.Notifications.Models'>
+    <description>
+        List of changes to report for notifications
+    </description>
+
+    <class name="Porion.Notifications.Models.Audit_Info" bean="no">
+        <property type='ADO.Identifier' name="audit_id">
+            <comment>the audit id.</comment>
+        </property>
+        <property type='Date' name="date">
+            <comment>the date when the change was made.</comment>
+        </property>
+        <property type='ADO.Entity_Type' name="kind">
+            <comment>the field name that was changed.</comment>
+        </property>
+        <property type='String' name="field">
+            <comment>the field name that was changed.</comment>
+        </property>
+        <property type='ADO.Identifier' name="id">
+            <comment>the id that was changed.</comment>
+        </property>
+        <property type='String' name="old_value" not-null="no">
+            <comment>the old value.</comment>
+        </property>
+        <property type='String' name="new_value" not-null="no">
+            <comment>the new value.</comment>
+        </property>
+    </class>
+
+    <query name='audit-list'>
+        <comment>Get the list of changes made after some date</comment>
+        <sql>
+          SELECT
+          audit.id,
+          audit.date,
+          audit.entity_type,
+          field.name,
+          audit.entity_id,
+          audit.old_value,
+          audit.new_value
+          FROM awa_audit AS audit
+          LEFT JOIN awa_audit_field AS field ON audit.field = field.id
+          WHERE audit.id >= :last_audit
+        </sql>
+    </query>
+
+</query-mapping>

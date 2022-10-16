@@ -1,9 +1,9 @@
 # Porion
 
 [![License](http://img.shields.io/badge/license-APACHE2-blue.svg)](LICENSE)
-[![Build Status](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/porion/badges/build.json)](https://porion.vacs.fr/porion/projects/view/porion)
-[![Test Status](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/porion/badges/tests.json)](https://porion.vacs.fr/porion/projects/view/porion)
-[![Coverage](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/porion/badges/coverage.json)](https://porion.vacs.fr/porion/projects/view/porion)
+[![Build Status](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/porion/badges/build.json)](https://porion.vacs.fr/porion/projects/view/porion/summary)
+[![Test Status](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/porion/badges/tests.json)](https://porion.vacs.fr/porion/projects/view/porion/xunits)
+[![Coverage](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/porion/badges/coverage.json)](https://porion.vacs.fr/porion/projects/view/porion/summary)
 [![semver](https://img.shields.io/badge/semver-2.0.0-blue.svg?cacheSeconds=2592000)]()
 
 # TL;DR

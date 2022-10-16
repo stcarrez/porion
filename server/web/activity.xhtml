@@ -1,0 +1,35 @@
+<ui:composition xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:u="http://code.google.com/p/ada-asf/util"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:c="http://java.sun.com/jstl/core"
+                template="/WEB-INF/layouts/layout.xhtml">
+  <ui:param name="title" value="Project activity" />
+  <ui:param name="pageStyle" value="page-activity"/>
+  <ui:param name="top_nav" value="page-#{projectReportList.period}"/>
+
+  <!-- Main page body -->
+  <ui:define name="pageBody">
+    <f:metadata>
+      <f:viewParam required='false' id='period' value='#{projectReportList.period}'/>
+      <f:viewAction action='#{projectReportList.load}'/>
+    </f:metadata>
+    <div id='awa-content'>
+
+      <div class='activity-chart'>
+        <div id='activity-chart'/>
+      </div>
+
+      <u:script>
+        new Porion.ActivityChart({container: 'activity-chart'});
+      </u:script>
+      <ui:include src="/WEB-INF/layouts/activity-header.xhtml"/>
+      <ui:include src="dashboards/lists/project-activity.xhtml"/>
+     </div>
+  </ui:define>
+
+  <ui:define name="pageScript">
+    <script type="text/javascript" src="#{contextPath}/js/frappe-charts.esm.js"></script> 
+    <script type="text/javascript" src="#{contextPath}/js/activity.js"></script>
+  </ui:define>
+</ui:composition>

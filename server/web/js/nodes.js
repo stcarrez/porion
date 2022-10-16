@@ -78,6 +78,7 @@ var Porion;
             var build_duration_fail = new Array();
             var user_time = new Array();
             var sys_time = new Array();
+            var labels = new Array();
             var prevDate;
             var build_pass;
             var build_fail;
@@ -90,18 +91,19 @@ var Porion;
                         var day_sys_time = 0;
                         var day = Math.floor(new Date(prevDate).getTime() / 1000);
                         if (build_fail) {
-                            build_duration_fail.push([day, build_fail.build_duration]);
+                            build_duration_fail.push(build_fail.build_duration / 1000);
                             offset = build_fail.build_duration;
                             day_user_time = build_fail.user_time;
                             day_sys_time = build_fail.sys_time;
                         }
                         if (build_pass) {
-                            build_duration_pass.push([day, build_pass.build_duration + offset]);
+                            build_duration_pass.push((build_pass.build_duration + offset) / 1000);
                             day_user_time += build_pass.user_time;
                             day_sys_time += build_pass.sys_time;
                         }
-                        sys_time.push([day, day_sys_time]);
-                        user_time.push([day, day_sys_time + day_user_time]);
+                        sys_time.push(day_sys_time / 1000);
+                        user_time.push((day_sys_time + day_user_time) / 1000);
+                        labels.push(prevDate);
                     }
                     prevDate = usage.date;
                     build_pass = null;
@@ -120,115 +122,54 @@ var Porion;
                 var day_sys_time = 0;
                 var day = Math.floor(new Date(prevDate).getTime() / 1000);
                 if (build_fail) {
-                    build_duration_fail.push([day, build_fail.build_duration]);
+                    build_duration_fail.push(build_fail.build_duration / 1000);
                     offset = build_fail.build_duration;
                     day_user_time = build_fail.user_time;
                     day_sys_time = build_fail.sys_time;
                 }
                 if (build_pass) {
-                    build_duration_pass.push([day, build_pass.build_duration + offset]);
+                    build_duration_pass.push((build_pass.build_duration + offset) / 1000);
                     day_user_time += build_pass.user_time;
                     day_sys_time += build_pass.sys_time;
                 }
-                sys_time.push([day, day_sys_time]);
-                user_time.push([day, day_sys_time + day_user_time]);
+                labels.push(prevDate);
+                sys_time.push(day_sys_time / 1000);
+                user_time.push((day_sys_time + day_user_time) / 1000);
             }
             if (this.durationContainer) {
-                $.plot($(this.durationContainer), [build_duration_fail, build_duration_pass], {
-                    colors: ["red", "green", "blue"],
-                    series: {
-                        lines: {
-                            show: true,
-                            fill: true
-                        },
-                        points: {
-                            show: false
-                        },
-                        clickable: true,
-                        hoverable: true
+                var data = {
+                    labels: labels,
+                    datasets: [{
+                            name: "User time",
+                            type: "line",
+                            values: user_time
+                        }, {
+                            name: "System time",
+                            type: "line",
+                            values: sys_time
+                        }]
+                };
+                var chart = new Frappe.Chart(this.durationContainer, {
+                    // title: "CPU Usage",
+                    animate: 0,
+                    data: data,
+                    type: 'axis-mixed',
+                    height: 250,
+                    valuesOverPoints: 0,
+                    lineOptions: {
+                        regionFill: 1
                     },
-                    grid: {
-                        hoverable: true,
-                        clickable: true
+                    tooltipOptions: {
+                        formatTooltipY: function (value) {
+                            var min = value / 60;
+                            var sec = value % 60;
+                            if (min > 0) {
+                                return String(min.toFixed(0)) + ":" + ('00' + sec).slice(-2);
+                            }
+                            return sec;
+                        }
                     },
-                    xaxis: {
-                        mode: "time",
-                        color: "#993D00",
-                        show: true
-                    },
-                    yaxis: {
-                        show: true,
-                        tickFormatter: durationFormatter
-                    },
-                    legend: {
-                        show: true,
-                        margin: [-100, -50],
-                        backgroundOpacity: 0.5,
-                        container: this.durationLegendContainer
-                    }
-                });
-                var t = this;
-                $(this.durationGraphContainer).bind("plothover", function (event, pos, item) {
-                    if (!pos.x || !pos.y) {
-                        return;
-                    }
-                    if (item) {
-                        var build_number = item.datapoint[0];
-                        var cover = item.datapoint[1];
-                        $(t.tooltipContainer).html("Build " + build_number + " Coverage: " + cover).css({ top: item.pageY + 5, left: item.pageX + 5 }).fadeIn(200);
-                    }
-                    else {
-                        $(t.tooltipContainer).stop().hide();
-                    }
-                });
-            }
-            if (this.systemContainer) {
-                $.plot($(this.systemContainer), [sys_time, user_time], {
-                    colors: ["red", "green", "blue"],
-                    series: {
-                        lines: {
-                            show: true,
-                            fill: true
-                        },
-                        points: {
-                            show: false
-                        },
-                        clickable: true,
-                        hoverable: true
-                    },
-                    grid: {
-                        hoverable: true,
-                        clickable: true
-                    },
-                    xaxis: {
-                        mode: "time",
-                        color: "#993D00",
-                        show: true
-                    },
-                    yaxis: {
-                        show: true,
-                        tickFormatter: durationFormatter
-                    },
-                    legend: {
-                        show: true,
-                        margin: [-100, -50],
-                        backgroundOpacity: 0.5,
-                        container: this.systemLegendContainer
-                    }
-                });
-                var t = this;
-                $(this.systemGraphContainer).bind("plothover", function (event, pos, item) {
-                    if (!pos.x || !pos.y) {
-                        return;
-                    }
-                    if (item) {
-                        var build_number = item.datapoint[0];
-                        var cover = item.datapoint[1];
-                        $(t.tooltipContainer).html("Build " + build_number + " Coverage: " + cover).css({ top: item.pageY + 5, left: item.pageX + 5 }).fadeIn(200);
-                    }
-                    else {
-                        $(t.tooltipContainer).stop().hide();
-                    }
+                    colors: ['#7cd6fd', '#743ee2']
                 });
             }
         };

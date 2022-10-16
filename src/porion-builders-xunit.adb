@@ -54,10 +54,12 @@ package body Porion.Builders.XUnit is
                Sep  : constant Natural := Util.Strings.Rindex (Include, '/');
             begin
                if Sep > 0 then
-                  Executor.Scan_Directory (Util.Files.Compose (Path, Include (Include'First .. Sep - 1)),
-                                           Include (Sep + 1 .. Include'Last), Controller.Excludes, Files);
+                  Executor.Scan_Directory
+                    (Util.Files.Compose (Path, Include (Include'First .. Sep - 1)),
+                     Include (Sep + 1 .. Include'Last), Controller.Excludes, Files);
                else
-                  Executor.Scan_Directory (Path, Include, Controller.Excludes, Files);
+                  Executor.Scan_Directory
+                    (Path, Include, Controller.Excludes, Files);
                end if;
             end;
          end if;
@@ -68,6 +70,8 @@ package body Porion.Builders.XUnit is
       if not Executor.Is_Dry_Run then
          for File of Files loop
             declare
+               procedure Scan (Stream : in out Input_Buffer_Stream'Class);
+
                procedure Scan (Stream : in out Input_Buffer_Stream'Class) is
                begin
                   Porion.XUnit.Parsers.Scan (File, Stream, Results);

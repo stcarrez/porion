@@ -28,51 +28,85 @@ package body Porion.Beans is
 
    pragma Style_Checks ("-mrIu");
    pragma Warnings (Off, "formal parameter * is not referenced");
+   pragma Warnings (Off, "use clause for type *");
+   pragma Warnings (Off, "use clause for private type *");
+
+   use type ADO.Objects.Object_Record_Access;
+   use type ADO.Objects.Object_Ref;
+
+   --  --------------------
+   --  Statistics about project changes
+   --  --------------------
+   procedure List (Object  : in out Project_Audit_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+      procedure Read (Into : in out Project_Audit);
+
+      Stmt : ADO.Statements.Query_Statement
+          := Session.Create_Statement (Context);
+      Pos  : Positive := 1;
+      procedure Read (Into : in out Project_Audit) is
+      begin
+         Into.Project_Id := Stmt.Get_Identifier (0);
+         Into.Last_Audit_Id := Stmt.Get_Identifier (1);
+         Into.Count := Stmt.Get_Natural (2);
+         Into.Sum := Stmt.Get_Natural (3);
+      end Read;
+   begin
+      Stmt.Execute;
+      Project_Audit_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         Object.Insert_Space (Before => Pos);
+         Object.Update_Element (Index => Pos, Process => Read'Access);
+         Pos := Pos + 1;
+         Stmt.Next;
+      end loop;
+   end List;
 
 
-   procedure Op_Load (Bean    : in out Project_List_Bean;
+   procedure Op_Load (Bean    : in out Project_Bean;
                       Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
-   procedure Op_Load (Bean    : in out Project_List_Bean;
+   procedure Op_Load (Bean    : in out Project_Bean;
                       Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
    begin
-      Project_List_Bean'Class (Bean).Load (Outcome);
+      Project_Bean'Class (Bean).Load (Outcome);
    end Op_Load;
-   package Binding_Project_List_Bean_1 is
-     new ASF.Events.Faces.Actions.Action_Method.Bind (Bean   => Project_List_Bean,
+   package Binding_Project_Bean_1 is
+     new ASF.Events.Faces.Actions.Action_Method.Bind (Bean   => Project_Bean,
                                                       Method => Op_Load,
                                                       Name   => "load");
-   procedure Op_Load_Builds (Bean    : in out Project_List_Bean;
+   procedure Op_Load_Builds (Bean    : in out Project_Bean;
                              Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
-   procedure Op_Load_Builds (Bean    : in out Project_List_Bean;
+   procedure Op_Load_Builds (Bean    : in out Project_Bean;
                              Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
    begin
-      Project_List_Bean'Class (Bean).Load_Builds (Outcome);
+      Project_Bean'Class (Bean).Load_Builds (Outcome);
    end Op_Load_Builds;
-   package Binding_Project_List_Bean_2 is
-     new ASF.Events.Faces.Actions.Action_Method.Bind (Bean   => Project_List_Bean,
+   package Binding_Project_Bean_2 is
+     new ASF.Events.Faces.Actions.Action_Method.Bind (Bean   => Project_Bean,
                                                       Method => Op_Load_Builds,
                                                       Name   => "load_builds");
 
-   Binding_Project_List_Bean_Array : aliased constant Util.Beans.Methods.Method_Binding_Array
-     := (1 => Binding_Project_List_Bean_1.Proxy'Access,
-         2 => Binding_Project_List_Bean_2.Proxy'Access
+   Binding_Project_Bean_Array : aliased constant Util.Beans.Methods.Method_Binding_Array
+     := (1 => Binding_Project_Bean_1.Proxy'Access,
+         2 => Binding_Project_Bean_2.Proxy'Access
      );
 
    --  ------------------------------
    --  This bean provides some methods that can be used in a Method_Expression.
    --  ------------------------------
    overriding
-   function Get_Method_Bindings (From : in Project_List_Bean)
+   function Get_Method_Bindings (From : in Project_Bean)
                                  return Util.Beans.Methods.Method_Binding_Array_Access is
       pragma Unreferenced (From);
    begin
-      return Binding_Project_List_Bean_Array'Access;
+      return Binding_Project_Bean_Array'Access;
    end Get_Method_Bindings;
    --  ------------------------------
    --  Get the bean attribute identified by the name.
    --  ------------------------------
    overriding
-   function Get_Value (From : in Project_List_Bean;
+   function Get_Value (From : in Project_Bean;
                        Name : in String) return Util.Beans.Objects.Object is
    begin
       return Util.Beans.Objects.Null_Object;
@@ -83,7 +117,7 @@ package body Porion.Beans is
    --  Set the value identified by the name
    --  ------------------------------
    overriding
-   procedure Set_Value (Item  : in out Project_List_Bean;
+   procedure Set_Value (Item  : in out Project_Bean;
                         Name  : in String;
                         Value : in Util.Beans.Objects.Object) is
    begin
@@ -288,6 +322,102 @@ package body Porion.Beans is
    --  ------------------------------
    overriding
    procedure Set_Value (Item  : in out Queue_List_Bean;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object) is
+   begin
+      null;
+   end Set_Value;
+
+   procedure Op_Load (Bean    : in out Notification_List_Bean;
+                      Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
+   procedure Op_Load (Bean    : in out Notification_List_Bean;
+                      Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
+   begin
+      Notification_List_Bean'Class (Bean).Load (Outcome);
+   end Op_Load;
+   package Binding_Notification_List_Bean_1 is
+     new ASF.Events.Faces.Actions.Action_Method.Bind (Bean   => Notification_List_Bean,
+                                                      Method => Op_Load,
+                                                      Name   => "load");
+
+   Binding_Notification_List_Bean_Array : aliased constant Util.Beans.Methods.Method_Binding_Array
+     := (1 => Binding_Notification_List_Bean_1.Proxy'Access
+     );
+
+   --  ------------------------------
+   --  This bean provides some methods that can be used in a Method_Expression.
+   --  ------------------------------
+   overriding
+   function Get_Method_Bindings (From : in Notification_List_Bean)
+                                 return Util.Beans.Methods.Method_Binding_Array_Access is
+      pragma Unreferenced (From);
+   begin
+      return Binding_Notification_List_Bean_Array'Access;
+   end Get_Method_Bindings;
+   --  ------------------------------
+   --  Get the bean attribute identified by the name.
+   --  ------------------------------
+   overriding
+   function Get_Value (From : in Notification_List_Bean;
+                       Name : in String) return Util.Beans.Objects.Object is
+   begin
+      return Util.Beans.Objects.Null_Object;
+   end Get_Value;
+
+
+   --  ------------------------------
+   --  Set the value identified by the name
+   --  ------------------------------
+   overriding
+   procedure Set_Value (Item  : in out Notification_List_Bean;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object) is
+   begin
+      null;
+   end Set_Value;
+
+   procedure Op_Load (Bean    : in out Project_List_Bean;
+                      Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
+   procedure Op_Load (Bean    : in out Project_List_Bean;
+                      Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
+   begin
+      Project_List_Bean'Class (Bean).Load (Outcome);
+   end Op_Load;
+   package Binding_Project_List_Bean_1 is
+     new ASF.Events.Faces.Actions.Action_Method.Bind (Bean   => Project_List_Bean,
+                                                      Method => Op_Load,
+                                                      Name   => "load");
+
+   Binding_Project_List_Bean_Array : aliased constant Util.Beans.Methods.Method_Binding_Array
+     := (1 => Binding_Project_List_Bean_1.Proxy'Access
+     );
+
+   --  ------------------------------
+   --  This bean provides some methods that can be used in a Method_Expression.
+   --  ------------------------------
+   overriding
+   function Get_Method_Bindings (From : in Project_List_Bean)
+                                 return Util.Beans.Methods.Method_Binding_Array_Access is
+      pragma Unreferenced (From);
+   begin
+      return Binding_Project_List_Bean_Array'Access;
+   end Get_Method_Bindings;
+   --  ------------------------------
+   --  Get the bean attribute identified by the name.
+   --  ------------------------------
+   overriding
+   function Get_Value (From : in Project_List_Bean;
+                       Name : in String) return Util.Beans.Objects.Object is
+   begin
+      return Util.Beans.Objects.Null_Object;
+   end Get_Value;
+
+
+   --  ------------------------------
+   --  Set the value identified by the name
+   --  ------------------------------
+   overriding
+   procedure Set_Value (Item  : in out Project_List_Bean;
                         Name  : in String;
                         Value : in Util.Beans.Objects.Object) is
    begin

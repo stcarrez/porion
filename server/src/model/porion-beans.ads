@@ -21,6 +21,13 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 pragma Warnings (Off);
+with ADO.Sessions;
+with ADO.Objects;
+with ADO.Statements;
+with ADO.SQL;
+with ADO.Schemas;
+with ADO.Queries;
+with ADO.Queries.Loaders;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
 with Util.Beans.Objects;
@@ -32,34 +39,74 @@ package Porion.Beans is
    pragma Style_Checks ("-mrIu");
 
 
+   --  --------------------
+   --    Statistics about project changes
+   --  --------------------
+   type Project_Audit is record
+
+      --  the project id.
+      Project_Id : ADO.Identifier;
+
+      --  the last audit record id.
+      Last_Audit_Id : ADO.Identifier;
+
+      --  the number of changes.
+      Count : Natural;
+
+      --  the number of changes.
+      Sum : Natural;
+   end record;
+
+   package Project_Audit_Vectors is
+      new Ada.Containers.Vectors (Index_Type   => Positive,
+                                  Element_Type => Project_Audit,
+                                  "="          => "=");
+
+   subtype Project_Audit_Vector is Project_Audit_Vectors.Vector;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Project_Audit_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
+
+   Query_Project_Change_Count : constant ADO.Queries.Query_Definition_Access;
+
+   Query_Recipe_Change_Count : constant ADO.Queries.Query_Definition_Access;
+
+   Query_Build_Count : constant ADO.Queries.Query_Definition_Access;
+
+   Query_First_Audit_After_Date : constant ADO.Queries.Query_Definition_Access;
+
+   Query_Audit_Day_Activity : constant ADO.Queries.Query_Definition_Access;
+
 
    --  --------------------
    --    Load the project from the database as well as other information
    --  --------------------
-   type Project_List_Bean is abstract
+   type Project_Bean is abstract
      new Util.Beans.Basic.Bean and Util.Beans.Methods.Method_Bean with null record;
 
 
    --  This bean provides some methods that can be used in a Method_Expression.
    overriding
-   function Get_Method_Bindings (From : in Project_List_Bean)
+   function Get_Method_Bindings (From : in Project_Bean)
                                  return Util.Beans.Methods.Method_Binding_Array_Access;
 
    --  Get the bean attribute identified by the name.
    overriding
-   function Get_Value (From : in Project_List_Bean;
+   function Get_Value (From : in Project_Bean;
                        Name : in String) return Util.Beans.Objects.Object;
 
    --  Set the bean attribute identified by the name.
    overriding
-   procedure Set_Value (Item  : in out Project_List_Bean;
+   procedure Set_Value (Item  : in out Project_Bean;
                         Name  : in String;
                         Value : in Util.Beans.Objects.Object);
 
-   procedure Load (Bean : in out Project_List_Bean;
+   procedure Load (Bean : in out Project_Bean;
                   Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is abstract;
 
-   procedure Load_Builds (Bean : in out Project_List_Bean;
+   procedure Load_Builds (Bean : in out Project_Bean;
                          Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is abstract;
 
    --  --------------------
@@ -160,6 +207,86 @@ package Porion.Beans is
    procedure Load (Bean : in out Queue_List_Bean;
                   Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is abstract;
 
+   type Notification_List_Bean is abstract
+     new Util.Beans.Basic.Bean and Util.Beans.Methods.Method_Bean with null record;
+
+
+   --  This bean provides some methods that can be used in a Method_Expression.
+   overriding
+   function Get_Method_Bindings (From : in Notification_List_Bean)
+                                 return Util.Beans.Methods.Method_Binding_Array_Access;
+
+   --  Get the bean attribute identified by the name.
+   overriding
+   function Get_Value (From : in Notification_List_Bean;
+                       Name : in String) return Util.Beans.Objects.Object;
+
+   --  Set the bean attribute identified by the name.
+   overriding
+   procedure Set_Value (Item  : in out Notification_List_Bean;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object);
+
+   procedure Load (Bean : in out Notification_List_Bean;
+                  Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is abstract;
+
+   type Project_List_Bean is abstract
+     new Util.Beans.Basic.Bean and Util.Beans.Methods.Method_Bean with null record;
+
+
+   --  This bean provides some methods that can be used in a Method_Expression.
+   overriding
+   function Get_Method_Bindings (From : in Project_List_Bean)
+                                 return Util.Beans.Methods.Method_Binding_Array_Access;
+
+   --  Get the bean attribute identified by the name.
+   overriding
+   function Get_Value (From : in Project_List_Bean;
+                       Name : in String) return Util.Beans.Objects.Object;
+
+   --  Set the bean attribute identified by the name.
+   overriding
+   procedure Set_Value (Item  : in out Project_List_Bean;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object);
+
+   procedure Load (Bean : in out Project_List_Bean;
+                  Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is abstract;
+
 
 private
+
+   package File_1 is
+      new ADO.Queries.Loaders.File (Path => "project-stat-changes.xml",
+                                    Sha1 => "29035197AA000FC57142927300257CD629D17304");
+
+   package Def_Projectaudit_Project_Change_Count is
+      new ADO.Queries.Loaders.Query (Name => "project-change-count",
+                                     File => File_1.File'Access);
+   Query_Project_Change_Count : constant ADO.Queries.Query_Definition_Access
+   := Def_Projectaudit_Project_Change_Count.Query'Access;
+
+   package Def_Projectaudit_Recipe_Change_Count is
+      new ADO.Queries.Loaders.Query (Name => "recipe-change-count",
+                                     File => File_1.File'Access);
+   Query_Recipe_Change_Count : constant ADO.Queries.Query_Definition_Access
+   := Def_Projectaudit_Recipe_Change_Count.Query'Access;
+
+   package Def_Projectaudit_Build_Count is
+      new ADO.Queries.Loaders.Query (Name => "build-count",
+                                     File => File_1.File'Access);
+   Query_Build_Count : constant ADO.Queries.Query_Definition_Access
+   := Def_Projectaudit_Build_Count.Query'Access;
+
+   package Def_Projectaudit_First_Audit_After_Date is
+      new ADO.Queries.Loaders.Query (Name => "first-audit-after-date",
+                                     File => File_1.File'Access);
+   Query_First_Audit_After_Date : constant ADO.Queries.Query_Definition_Access
+   := Def_Projectaudit_First_Audit_After_Date.Query'Access;
+
+   package Def_Projectaudit_Audit_Day_Activity is
+      new ADO.Queries.Loaders.Query (Name => "audit-day-activity",
+                                     File => File_1.File'Access);
+   Query_Audit_Day_Activity : constant ADO.Queries.Query_Definition_Access
+   := Def_Projectaudit_Audit_Day_Activity.Query'Access;
 end Porion.Beans;

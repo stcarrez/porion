@@ -222,6 +222,12 @@ package body Porion.Executors is
                                  Status      => Status);
       end if;
 
+      --  Close the command specific logger if it was active.
+      if Executor.Use_Cmd_Logger then
+         Executor.Cmd_Logger.Close;
+         Executor.Use_Cmd_Logger := False;
+      end if;
+
       if Status /= 0 then
          Executor.Log (Porion.Logs.LOG_FAILURE, "exit status:" & Integer'Image (Status));
          Executor.Status := Status;
@@ -274,10 +280,23 @@ package body Porion.Executors is
                             Dir      : in String;
                             Name     : in String) is
    begin
+      Executor.Log_Dir := To_UString (Dir);
       if not Executor.Dry_Run then
          Executor.Logger.Create (Dir, Name);
       end if;
    end Create_Logger;
+
+   --  ------------------------------
+   --  Create a specific logger to record the next command in a separate file.
+   --  ------------------------------
+   procedure Command_Logger (Executor : in out Executor_Type;
+                             Name     : in String) is
+   begin
+      if not Executor.Dry_Run then
+         Executor.Cmd_Logger.Create (To_String (Executor.Log_Dir), Name);
+         Executor.Use_Cmd_Logger := True;
+      end if;
+   end Command_Logger;
 
    --  ------------------------------
    --  Clear and reset the executor.
@@ -320,7 +339,11 @@ package body Porion.Executors is
       use type Porion.Builds.Step_Type;
       use type Porion.Logs.Source_Type;
    begin
-      Executor.Logger.Write (Source, Line);
+      if Source = Logs.LOG_EXECUTION and then Executor.Use_Cmd_Logger then
+         Executor.Cmd_Logger.Write (Source, Line);
+      else
+         Executor.Logger.Write (Source, Line);
+      end if;
       if Source /= Logs.LOG_RESULT and Executor.Output_Log
         and Executor.Step /= Porion.Builds.STEP_CHECKOUT
       then

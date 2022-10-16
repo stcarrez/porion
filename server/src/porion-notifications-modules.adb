@@ -51,8 +51,8 @@ package body Porion.Notifications.Modules is
 
       --  Register here any bean class, servlet, filter.
       Register.Register (Plugin => Plugin,
-                         Name   => "Porion.Notifications.Beans.Notifications_Bean",
-                         Handler => Porion.Notifications.Beans.Create_Notification_Bean'Access);
+                         Name   => "Porion.Notifications.Beans.Notification_List_Bean",
+                         Handler => Porion.Notifications.Beans.Create_Notification_List_Bean'Access);
 
       AWA.Modules.Module (Plugin).Initialize (App, Props);
 

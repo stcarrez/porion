@@ -186,6 +186,27 @@ package body Porion.Builds.Services is
       return Configs.Get_Build_Log_Directory (Name, Branch_Name, Service.Build.Get_Number);
    end Get_Log_Directory;
 
+   --  ------------------------------
+   --  Get the source tag that was used by the last build
+   --  ------------------------------
+   procedure Last_Build_Tag (Service : in out Context_Type;
+                             Tag     : out UString) is
+      Stmt : ADO.Statements.Query_Statement :=
+         Service.DB.Create_Statement ("SELECT build.tag FROM porion_last_build AS lb "
+                                      & "INNER JOIN porion_build AS build ON "
+                                      & "lb.build_id = build.id AND last_build = 1 "
+                                      & "WHERE lb.recipe_id = :recipe AND lb.branch_id = :branch");
+   begin
+      Stmt.Bind_Param ("recipe", Service.Recipe.Get_Id);
+      Stmt.Bind_Param ("branch", Service.Branch.Get_Id);
+      Stmt.Execute;
+      if not Stmt.Has_Elements then
+         Tag := To_UString ("");
+         return;
+      end if;
+      Tag := Stmt.Get_Unbounded_String (0);
+   end Last_Build_Tag;
+
    procedure Build (Service     : in out Context_Type;
                     Steps       : in Build_Step_Vector;
                     Executor    : in out Porion.Executors.Executor_Type'Class) is
@@ -193,10 +214,10 @@ package body Porion.Builds.Services is
       Branch_Name : constant String := Service.Branch.Get_Name;
       Path        : constant String := Get_Build_Directory (Service);
       Log_Dir     : constant String := Get_Log_Directory (Service);
-      Dir         : UString;
       Config      : Util.Properties.Manager;
       Status      : Builds.Models.Build_Status_Type := Builds.Models.BUILD_RUNNING;
       Env         : Util.Strings.Maps.Map;
+      Changes     : Porion.Sources.Checkout_Type;
    begin
       Log.Info ("Build {0} in {1}", Ident, Path);
 
@@ -215,14 +236,23 @@ package body Porion.Builds.Services is
 
       Executor.Create_Logger (Log_Dir, "build.log");
       Executor.Log (Porion.Logs.LOG_INFO, "Build '" & Ident & "' in " & Path);
-      Porion.Sources.Checkout (Service.Project.Get_Scm, Config, Path, Dir, Executor);
+      Changes.Path := To_UString (Path);
+      Last_Build_Tag (Service, Changes.Previous_Tag);
+      Porion.Sources.Checkout (Service.Project.Get_Scm, Config, Changes, Executor);
 
-      if Length (Dir) > 0 then
-         Run_Build_Steps (Service, Steps,
-                          Util.Files.Compose (Path, To_String (Dir)), Status, Executor);
-      else
-         Run_Build_Steps (Service, Steps, Path, Status, Executor);
+      --  Record the number of source changes since the previous build for the same recipe.
+      if not Executor.Is_Dry_Run and then Changes.Change_Count /= 0 then
+         declare
+            Updated : Boolean;
+         begin
+            Service.DB.Begin_Transaction;
+            Service.Build.Reload (Service.DB, Updated);
+            Service.Build.Set_Source_Changes (Changes.Change_Count);
+            Service.Build.Save (Service.DB);
+            Service.DB.Commit;
+         end;
       end if;
+      Run_Build_Steps (Service, Steps, To_String (Changes.Path), Status, Executor);
 
       if not Executor.Is_Dry_Run then
          --  Save the resource usage in the build.
@@ -1505,7 +1535,7 @@ package body Porion.Builds.Services is
       Service.Recipe.Set_Name ("main");
       Service.Recipe.Save (Service.DB);
       if Length (Dir) > 0 then
-         Guess (Service, Util.Files.Compose (Path, To_String (Dir)), Executor);
+         Guess (Service, To_String (Dir), Executor);
       else
          Guess (Service, Path, Executor);
       end if;
@@ -1577,7 +1607,8 @@ package body Porion.Builds.Services is
       declare
          Count_Statement : ADO.Statements.Query_Statement
             := Service.DB.Create_Statement ("SELECT COUNT(*) FROM porion_recipe AS r "
-                         & "WHERE r.name = :name AND project_id = :project_id AND branch_id = :branch_id");
+                         & "WHERE r.name = :name AND project_id = :project_id "
+                         & "AND branch_id = :branch_id");
       begin
          Count_Statement.Bind_Param ("name", Name);
          Count_Statement.Bind_Param ("project_id", Service.Project.Get_Id);

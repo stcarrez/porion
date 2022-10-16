@@ -216,6 +216,10 @@ private
    procedure Cancel_Building (Service : in out Context_Type;
                               Node    : in String);
 
+   --  Get the source tag that was used by the last build
+   procedure Last_Build_Tag (Service : in out Context_Type;
+                             Tag     : out UString);
+
    procedure Build (Service     : in out Context_Type;
                     Steps       : in Build_Step_Vector;
                     Executor    : in out Porion.Executors.Executor_Type'Class);

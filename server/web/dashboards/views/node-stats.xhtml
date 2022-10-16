@@ -51,6 +51,20 @@
         </div>
       </li>
 
+      <li>
+        <div class='dashboard-title'>
+	  <a href="#{contextPath}/activity/view/week">
+            Week activity
+	  </a>
+        </div>
+        <div class='dashboard-value'>
+          #{statLastBuilds.project_changed} projects
+        </div>
+        <div class='dashboard-value'>
+          <w:progress value="#{statLastBuilds.project_changed}" maxValue="#{statLastBuilds.count}"/>
+        </div>
+      </li>
+
     </ul>
   </div>
 </ui:composition>

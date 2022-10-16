@@ -126,6 +126,11 @@ package Porion.Executors is
                             Dir      : in String;
                             Name     : in String);
 
+   --  Create a specific logger to record the next command in a separate file.
+   procedure Command_Logger (Executor : in out Executor_Type;
+                             Name     : in String) with
+      Pre => Executor.Is_Configured;
+
    --  Write the line on the logger.
    procedure Log (Executor : in out Executor_Type;
                   Source   : in Porion.Logs.Source_Type;
@@ -166,6 +171,9 @@ private
       Logger     : Porion.Logs.Logger_Type;
       Controller : Porion.Nodes.Controller_Access;
       Local      : Porion.Nodes.Controller_Access;
+      Log_Dir    : UString;
+      Cmd_Logger : Porion.Logs.Logger_Type;
+      Use_Cmd_Logger : Boolean := False;
    end record;
 
 end Porion.Executors;

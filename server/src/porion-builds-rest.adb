@@ -16,13 +16,17 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Directories;
+with Ada.Calendar.Conversions;
 with ADO.Queries;
 with ADO.Sessions;
+with ADO.Statements;
 with Util.Strings;
 with Util.Log.Loggers;
+with Util.Dates.ISO8601;
 with AWA.Services.Contexts;
 with Porion.Logs.Analysis;
 with Porion.Projects;
+with Porion.Beans;
 with Porion.Queries;
 with Porion.Metrics;
 with Porion.Nodes.Services;
@@ -36,6 +40,12 @@ package body Porion.Builds.Rest is
 
    use type Porion.Builds.Models.Build_Status_Type;
    use type ADO.Identifier;
+
+   function To_String (Date : in Ada.Calendar.Time) return String
+     is (Util.Dates.ISO8601.Image (Date, Util.Dates.ISO8601.DAY));
+
+   function To_Timestamp (Date : in Ada.Calendar.Time) return Long_Long_Integer
+     is (Long_Long_Integer (Ada.Calendar.Conversions.To_Unix_Time (Date)));
 
    type Badge_Info is record
       Label   : UString;
@@ -60,7 +70,6 @@ package body Porion.Builds.Rest is
       pragma Unreferenced (Req, Reply);
 
       use Porion.Logs.Analysis;
-      use type ADO.Identifier;
       procedure Finish_Log_Stats;
 
       Rules  : constant String := Context.Recipe.Get_Filter_Rules;
@@ -184,6 +193,8 @@ package body Porion.Builds.Rest is
       Reply   : in out OpenAPI.Servers.Response'Class;
       Stream  : in out OpenAPI.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type) is
+      pragma Unreferenced (Reply);
+
       Query     : ADO.Queries.Context;
       List      : Porion.Queries.Test_Info_Vector;
       Current_Group : ADO.Identifier := ADO.NO_IDENTIFIER;
@@ -547,8 +558,6 @@ package body Porion.Builds.Rest is
      (Req     : in out OpenAPI.Servers.Request'Class;
       Reply   : in out OpenAPI.Servers.Response'Class;
       Stream  : in out OpenAPI.Servers.Output_Stream'Class) is
-      pragma Unreferenced (Reply);
-
       API_Ctx   : OpenAPI.Servers.Context_Type;
       Ctx       : constant ASC.Service_Context_Access := ASC.Current;
       Prj_Ctx   : Porion.Services.Context_Type;
@@ -568,7 +577,7 @@ package body Porion.Builds.Rest is
       Stream.Start_Array ("");
       for Node_Info of List loop
          Stream.Start_Entity ("node");
-         Stream.Write_Entity ("date", Node_Info.Day);
+         Stream.Write_Entity ("date", To_String (Node_Info.Day));
          Stream.Write_Entity ("build_status", Node_Info.Build_Status'Image);
          Stream.Write_Entity ("count", Node_Info.Count);
          Stream.Write_Entity ("test_duration", Node_Info.Test_Duration);
@@ -584,5 +593,44 @@ package body Porion.Builds.Rest is
       when Porion.Services.Not_Found =>
          API_Ctx.Set_Error (404, "node not found");
    end Get_Node_Usage;
+
+   procedure Get_Global_Activity
+     (Req     : in out OpenAPI.Servers.Request'Class;
+      Reply   : in out OpenAPI.Servers.Response'Class;
+      Stream  : in out OpenAPI.Servers.Output_Stream'Class) is
+      API_Ctx   : OpenAPI.Servers.Context_Type;
+      Ctx       : constant ASC.Service_Context_Access := ASC.Current;
+      Query     : ADO.Queries.Context;
+      DB        : ADO.Sessions.Session;
+      Stmt      : ADO.Statements.Query_Statement;
+   begin
+      API_Ctx.Initialize (Req, Reply, Stream);
+      DB := ASC.Get_Session (Ctx);
+
+      Query.Set_Query (Porion.Beans.Query_Audit_Day_Activity);
+      Stmt := DB.Create_Statement (Query);
+      Stmt.Execute;
+
+      Stream.Start_Document;
+      Stream.Start_Array ("");
+      while Stmt.Has_Elements loop
+         declare
+            Cnt : Natural := Stmt.Get_Integer (0);
+            Day : Ada.Calendar.Time := Stmt.Get_Time (1);
+         begin
+            Stream.Start_Entity ("stat");
+            Stream.Write_Long_Entity ("timestamp", To_Timestamp (Day));
+            Stream.Write_Long_Entity ("count", Long_Long_Integer (Cnt));
+            Stream.End_Entity ("node");
+         end;
+         Stmt.Next;
+      end loop;
+      Stream.End_Array ("");
+      Stream.End_Document;
+
+   exception
+      when Porion.Services.Not_Found =>
+         API_Ctx.Set_Error (404, "node not found");
+   end Get_Global_Activity;
 
 end Porion.Builds.Rest;

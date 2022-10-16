@@ -16,35 +16,23 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with ASF.Events.Faces.Actions;
+with ADO.Sessions;
+with ADO.Queries;
+with AWA.Services.Contexts;
 package body Porion.Notifications.Beans is
 
-   --  ------------------------------
-   --  Example of action method.
-   --  ------------------------------
-   procedure Action (Bean    : in out Notification_Bean;
-                     Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
-   begin
-      null;
-   end Action;
-
-   package Action_Binding is
-     new ASF.Events.Faces.Actions.Action_Method.Bind (Bean   => Notification_Bean,
-                                                      Method => Action,
-                                                      Name   => "action");
-
-   Notification_Bean_Binding : aliased constant Util.Beans.Methods.Method_Binding_Array
-     := (Action_Binding.Proxy'Access, null);
+   package ASC renames AWA.Services.Contexts;
 
    --  ------------------------------
    --  Get the value identified by the name.
    --  ------------------------------
    overriding
-   function Get_Value (From : in Notification_Bean;
+   function Get_Value (From : in Notification_List_Bean;
                        Name : in String) return Util.Beans.Objects.Object is
    begin
-      if Name = "count" then
-         return Util.Beans.Objects.To_Object (From.Count);
+      if Name = "notifications" then
+         return Util.Beans.Objects.To_Object (Value   => From.Notifications_Bean,
+                                              Storage => Util.Beans.Objects.STATIC);
       else
          return Util.Beans.Objects.Null_Object;
       end if;
@@ -54,35 +42,40 @@ package body Porion.Notifications.Beans is
    --  Set the value identified by the name.
    --  ------------------------------
    overriding
-   procedure Set_Value (From  : in out Notification_Bean;
+   procedure Set_Value (From  : in out Notification_List_Bean;
                         Name  : in String;
                         Value : in Util.Beans.Objects.Object) is
    begin
-      if Name = "count" then
-         From.Count := Util.Beans.Objects.To_Integer (Value);
-      end if;
+      null;
    end Set_Value;
 
    --  ------------------------------
-   --  This bean provides some methods that can be used in a Method_Expression
+   --  Load the list of notifications.
    --  ------------------------------
    overriding
-   function Get_Method_Bindings (From : in Notification_Bean)
-                                 return Util.Beans.Methods.Method_Binding_Array_Access is
-      pragma Unreferenced (From);
+   procedure Load (Bean    : in out Notification_List_Bean;
+                   Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
+      pragma Unreferenced (Outcome);
+
+      Ctx     : constant ASC.Service_Context_Access := ASC.Current;
+      Session : ADO.Sessions.Session := ASC.Get_Session (Ctx);
+      Query   : ADO.Queries.Context;
    begin
-      return Notification_Bean_Binding'Access;
-   end Get_Method_Bindings;
+      Query.Set_Query (Porion.Notifications.Models.Query_Notification_List);
+      Porion.Notifications.Models.List (Bean.Notifications, Session, Query);
+   end Load;
 
    --  ------------------------------
-   --  Create the Notification_Bean bean instance.
+   --  Create the Notification_List_Bean bean instance.
    --  ------------------------------
-   function Create_Notification_Bean (Module : in Porion.Notifications.Modules.Notification_Module_Access)
+   function Create_Notification_List_Bean
+     (Module : in Porion.Notifications.Modules.Notification_Module_Access)
       return Util.Beans.Basic.Readonly_Bean_Access is
-      Object : constant Notification_Bean_Access := new Notification_Bean;
+      Object : constant Notification_List_Bean_Access := new Notification_List_Bean;
    begin
       Object.Module := Module;
+      Object.Notifications_Bean := Object.Notifications'Access;
       return Object.all'Access;
-   end Create_Notification_Bean;
+   end Create_Notification_List_Bean;
 
 end Porion.Notifications.Beans;

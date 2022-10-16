@@ -156,21 +156,16 @@ package body Porion.Sources.Files is
                                   Excludes => Empty,
                                   List => List);
          if List.Length = 1 then
-            declare
-               New_Path : constant String := Util.Strings.Sets.Element (List.First);
-            begin
-               if New_Path'Length > Path'Length then
-                  Result := To_UString (New_Path (New_Path'First + Path'Length .. New_Path'Last));
-                  Log.Info ("Using sources stored in {0}", Result);
-               end if;
-            end;
+            Result := To_UString (Util.Strings.Sets.Element (List.First));
+            Log.Info ("Using sources stored in {0}", Result);
          end if;
       end if;
    end Checkout;
 
    overriding
    procedure Changes (Controller : in out Controller_Type;
-                      Result     : out Status_Type;
+                      Path       : in String;
+                      Extraction : in out Checkout_Type;
                       Executor   : in out Porion.Executors.Executor_Type'Class) is
    begin
       null;

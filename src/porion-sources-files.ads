@@ -62,7 +62,8 @@ private package Porion.Sources.Files is
 
    overriding
    procedure Changes (Controller : in out Controller_Type;
-                      Result     : out Status_Type;
+                      Path       : in String;
+                      Extraction : in out Checkout_Type;
                       Executor   : in out Porion.Executors.Executor_Type'Class);
 
    --  Guess some information about the sources located in the given directory.

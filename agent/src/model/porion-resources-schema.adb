@@ -24,9 +24,10 @@ package body Porion.Resources.Schema is
        & "unt` INTEGER NOT NULL, `fail_count` INTEGER NOT NULL, `timeout_count` IN"
        & "TEGER NOT NULL, `test_duration` INTEGER NOT NULL, `status` TINYINT NOT N"
        & "ULL, `tag` VARCHAR(255) NOT NULL, `build_duration` INTEGER NOT NULL, `sy"
-       & "s_time` INTEGER NOT NULL, `user_time` INTEGER NOT NULL, `branch_id` BIGI"
-       & "NT NOT NULL, `recipe_id` BIGINT NOT NULL, `node_id` BIGINT NOT NULL, `pr"
-       & "oject_id` BIGINT NOT NULL, PRIMARY KEY (`id`))";
+       & "s_time` INTEGER NOT NULL, `user_time` INTEGER NOT NULL, `source_changes`"
+       & " INTEGER NOT NULL, `branch_id` BIGINT NOT NULL, `recipe_id` BIGINT NOT N"
+       & "ULL, `node_id` BIGINT NOT NULL, `project_id` BIGINT NOT NULL, PRIMARY KE"
+       & "Y (`id`))";
    L_10  : aliased constant String := "CREATE TABLE IF NOT EXISTS porion_build_e"
        & "xecutor ( `id` BIGINT NOT NULL, `version` INTEGER NOT NULL, `pid` INTEGE"
        & "R NOT NULL, `start_date` DATETIME NOT NULL, `port` INTEGER NOT NULL, `no"
@@ -292,7 +293,7 @@ package body Porion.Resources.Schema is
        & "tity_type, name) VALUES ((SELECT id FROM ado_entity_type WHERE name = """
        & "porion_project""), ""build_progress"")";
    L_88  : aliased constant String := "INSERT OR IGNORE INTO ado_version (name, "
-       & "version) VALUES (""porion_lib"", 2)";
+       & "version) VALUES (""porion_lib"", 3)";
    L_89  : aliased constant String := "CREATE TABLE IF NOT EXISTS awa_audit ( `i"
        & "d` BIGINT NOT NULL, `date` DATETIME NOT NULL, `old_value` VARCHAR(255) ,"
        & " `new_value` VARCHAR(255) , `entity_id` BIGINT NOT NULL, `session_id` BI"

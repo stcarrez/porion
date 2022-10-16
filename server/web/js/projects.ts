@@ -16,35 +16,35 @@
  *  limitations under the License.
  */
 namespace Porion {
-    export class BarGraph {
+   export class BarGraph {
 
-        constructor(container: string, legend: string, series: jquery.flot.dataSeries[], ticks: any) {
-            var div : HTMLElement = document.getElementById(container);
-            $.plot($(div), series, {
-                series: {
-                    bars: {
-                        show: true,
-                        horizontal: true,
-                        align: "center"
-                    }
-                },
-                legend: {
-                    show: false,
-                    backgroundOpacity: 0.5
-                },
-                xaxis: {
-                    ticks: [],
-                    color: "#993D00"
-                },
-                yaxis: {
-                    ticks: ticks,
-                    tickSize: [ 10, "px" ],
-                    font: { size: 18, style: "normal" },
-                    show: true,
-                    color: "#993D00",
-                    tickColor: "#00ff00"
-                }
-            });
+      constructor(container: string, legend: string, labels: string[], values: number[]) {
+         var div : HTMLElement = document.getElementById(container);
+         const data : Frappe.ChartData = {
+            labels: labels,
+            datasets: [{
+                 name: "Language",
+                 type: "line",
+                 values: values
+              }]
+           };
+           const chart : Frappe.Chart = new Frappe.Chart(div, {
+              animate: 1,
+              data: data,
+              type: 'percentage',
+              height: 200,
+              valuesOverPoints: 0,
+              maxSlices: 7,
+              lineOptions: {
+                 regionFill: 0,
+                 dotSize: 1,
+                 hideDots: 1
+              },
+              axisOptions: {
+                 yAxisMode: "tick"
+              },
+              colors: ['red', 'blue', 'green']
+           })
         }
     }
 
@@ -111,10 +111,11 @@ namespace Porion {
             }
         }
 	updateData(content : BuildTests) {
-	   var pass : number[][] = new Array();
-	   var fail : number[][] = new Array();
-	   var timeout : number[][] = new Array();
-	   var duration : number[][] = new Array();
+	   var pass : number[] = new Array();
+	   var fail : number[] = new Array();
+	   var timeout : number[] = new Array();
+	   var duration : number[] = new Array();
+           var labels : string[] = new Array();
 	   var first_build : number = 10000;
 	   var last_build : number = 0;
            for (var test of content.tests) {
@@ -125,40 +126,51 @@ namespace Porion {
 	      	 if (test.build_number > last_build) {
                     last_build = test.build_number;
 	      	 }
-	      	 timeout.push([test.build_number, test.timeout_count]);
-	      	 fail.push([test.build_number, test.fail_count + test.timeout_count]);
-	      	 pass.push([test.build_number, test.pass_count + test.fail_count + test.timeout_count]);
-	      	 duration.push([test.build_number, test.test_duration]);
+	      	 timeout.push(test.timeout_count);
+	      	 fail.push(test.fail_count + test.timeout_count);
+	      	 pass.push(test.pass_count + test.fail_count + test.timeout_count);
+	      	 duration.push(test.test_duration / 1000);
+                 labels.push(String(test.build_number));
 	      }
 	   }
-           $.plot($(this.container), [ timeout, fail, pass ], {
-                colors: [ "red", "green", "blue"],
-                series: {
-                    lines: {
-                        show: true,
-			fill: true
-                    },
-		    points: {
-		        show: true
-		    },
-		    clickable: true,
-		    hoverable: true
-                },
-		grid: {
-		   hoverable: true,
-		   clickable: true
-		},
-                xaxis: {
-                    color: "#993D00",
-		    show: true
-                },
-		yaxis: {
-		    show: true
-		},
-                legend: {
-                    show: false
-                }
-            });
+           const data : Frappe.ChartData = {
+              labels: labels,
+              datasets: [{
+                 name: "Fail",
+                 type: "line",
+                 values: fail
+              }, {
+                 name: "Timeout",
+                 type: "line",
+                 values: timeout
+              }, {
+                 name: "Pass",
+                 type: "line",
+                 values: pass
+              }]
+           };
+           const chart : Frappe.Chart = new Frappe.Chart(this.container, {
+              animate: 1,
+              data: data,
+              type: 'line',
+              height: 250,
+              valuesOverPoints: 0,
+              lineOptions: {
+                 regionFill: 0,
+                 dotSize: 1,
+                 hideDots: 1
+              },
+              axisOptions: {
+                 yAxisMode: "tick",
+                 xAxisMode: "tick"
+              },
+              tooltipOptions: {
+                 formatTooltipX: (value : number) => {
+                    return "Build " + value
+                 }
+              },
+              colors: ['red', 'blue', 'green']
+           })
 	}
     }
 
@@ -196,10 +208,14 @@ namespace Porion {
             }
         }
 	updateData(content : BuildCoverage) {
-	   var lines : number[][] = new Array();
-	   var functions : number[][] = new Array();
+	   var lines : number[] = new Array();
+	   var functions : number[] = new Array();
+           var labels : string[] = new Array();
 	   var first_build : number = 10000;
 	   var last_build : number = 0;
+           labels.push("");
+           lines.push(0);
+           functions.push(0);
            for (var build of content.metrics) {
 	      if (build.build_status == "BUILD_PASS") {
 	      	 if (build.build_number < first_build) {
@@ -208,54 +224,48 @@ namespace Porion {
 	      	 if (build.build_number > last_build) {
                     last_build = build.build_number;
 	      	 }
-	      	 lines.push([build.build_number, build.lines / 10.0]);
-	      	 functions.push([build.build_number, build.functions / 10.0]);
+	      	 lines.push(build.lines / 10.0);
+	      	 functions.push(build.functions / 10.0);
+                 labels.push(String(build.build_number));
 	      }
 	   }
-           $.plot($(this.graphContainer), [ { data: lines, label: "Lines" }, { data: functions, label: "Functions" }], {
-                colors: [ "green", "blue"],
-                series: {
-                    lines: {
-                        show: true,
-			fill: false
-                    },
-		    points: {
-		        show: true
-		    },
-		    clickable: true,
-		    hoverable: true
-                },
-		grid: {
-		   hoverable: true,
-		   clickable: true
-		},
-                xaxis: {
-                    color: "#993D00",
-		    show: true
-                },
-		yaxis: {
-		    show: true
-		},
-                legend: {
-                    show: true,
-		    margin: [-100, -50],
-		    backgroundOpacity: 0.5,
-		    container: this.legendContainer
-                }
-            });
-	    var t = this;
-	    $(this.graphContainer).bind("plothover", function (event, pos, item) {
-	       if (!pos.x || !pos.y) {
-	          return;
-	       }
-	       if (item) {
-	          var build_number : number = item.datapoint[0];
-		  var cover : number = item.datapoint[1];
-	          $(t.tooltipContainer).html("Build " + build_number + " Coverage: " + cover).css({top: item.pageY+5, left: item.pageX+5}).fadeIn(200);
-	       } else {
-	          $(t.tooltipContainer).stop().hide();
-	       }
-	    });
+           const data : Frappe.ChartData = {
+              labels: labels,
+              datasets: [{
+                 name: "Functions",
+                 type: "line",
+                 values: functions
+              }, {
+                 name: "Lines",
+                 type: "line",
+                 values: lines
+              }]
+           };
+           const chart : Frappe.Chart = new Frappe.Chart(this.graphContainer, {
+              animate: 1,
+              data: data,
+              type: 'line',
+              height: 250,
+              valuesOverPoints: 0,
+              lineOptions: {
+                 regionFill: 0,
+                 dotSize: 1,
+                 hideDots: 1
+              },
+              axisOptions: {
+                 yAxisMode: "tick",
+                 xAxisMode: "tick"
+              },
+              tooltipOptions: {
+                 formatTooltipY: (value : number) => {
+                    return String(value) + "%"
+                 },
+                 formatTooltipX: (value : number) => {
+                    return "Build " + value
+                 }
+              },
+              colors: ['green', 'blue', 'red']
+           })
 	}
     }
 }

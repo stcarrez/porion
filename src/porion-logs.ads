@@ -38,6 +38,9 @@ package Porion.Logs is
                      Dir    : in String;
                      Name   : in String);
 
+   --  Close the logger file.
+   procedure Close (Logger : in out Logger_Type);
+
    --  Write the line on the logger with the source to identify the producer.
    procedure Write (Logger : in out Logger_Type;
                     Source : in Source_Type;

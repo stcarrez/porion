@@ -1,0 +1,55 @@
+<ui:composition
+  xmlns:awa="http://code.google.com/p/ada-awa/jsf"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+  xmlns:c="http://java.sun.com/jstl/core"
+  xmlns:u="http://code.google.com/p/ada-asf/util"
+  xmlns:w="http://code.google.com/p/ada-asf/widget"
+  xmlns:h="http://java.sun.com/jsf/html">
+
+  <div class='activity-list'>
+      <div class='awa-list-header activity-list-header'>
+        <div class='awa-header-col activity-name'>
+          Project
+        </div>
+        <div class='awa-header-col activity-build'>
+          Last build
+        </div>
+	<div class="awa-header-col activity-info">
+	  Activity
+	</div>
+      </div>
+
+    <div class='awa-list'>
+      <h:list var="project" value="#{projectReportList.projects}">
+	<div class='awa-list-item build-node #{project.status}'>
+          <div class='awa-col activity-name'>
+            <a href="#{contextPath}/projects/view/#{project.name}/summary" title="#{project.name}">
+              <span class="project-page-title">#{project.name}</span>
+            </a>
+          </div>
+          <div class='activity-build'>
+            <a href="#{contextPath}/builds/view/#{project.name}:#{project.build_number}/summary" title="Build #{project.build_number}">
+              #{project.build_number}
+            </a>
+          </div>
+          <div class='acivity-info'>
+            <h:panelGroup rendered="#{project.build_count ne 0}">
+              #{project.build_count} build#{project.source_change + project.recipe_change + project.config_change ne 0 ? ',' : ''}
+            </h:panelGroup>
+            <h:panelGroup rendered="#{project.source_change ne 0}">
+              #{project.source_change} source change#{project.recipe_change + project.config_change ne 0 ? ',' : ''}
+            </h:panelGroup>
+            <h:panelGroup rendered="#{project.recipe_change ne 0}">
+              #{project.recipe_change} recipe change#{project.config_change ne 0 ? ',' : ''}
+            </h:panelGroup>
+            <h:panelGroup rendered="#{project.config_change ne 0}">
+              #{project.config_change} config change
+            </h:panelGroup>
+          </div>
+        </div>
+      </h:list>
+    </div>
+  </div>
+</ui:composition>

@@ -348,6 +348,8 @@ CREATE TABLE IF NOT EXISTS porion_build (
   `sys_time` INTEGER NOT NULL,
   /* the user time of cumulated processes in milliseconds. */
   `user_time` INTEGER NOT NULL,
+  /*  */
+  `source_changes` INTEGER NOT NULL,
   /* the branch associated with the build. */
   `branch_id` BIGINT NOT NULL,
   /* the recipe used for the build. */
@@ -891,7 +893,7 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_project"), "check_delay");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_project"), "build_progress");
-INSERT OR IGNORE INTO ado_version (name, version) VALUES ("porion_lib", 2);
+INSERT OR IGNORE INTO ado_version (name, version) VALUES ("porion_lib", 3);
 /* Copied from porion-sqlite.sql*/
 /* File generated automatically by dynamo */
 /* The subscriber table indicates a user that is interested to be notified by changes
@@ -915,8 +917,12 @@ CREATE TABLE IF NOT EXISTS porion_subscriber (
   `notify_build` TINYINT NOT NULL,
   /* notify when unit tests change */
   `notify_xunit` TINYINT NOT NULL,
+  /* the last build that was reported */
+  `last_reported_build_id` BIGINT ,
   /*  */
   `project_id` BIGINT NOT NULL,
+  /* the last audit field that was reported. */
+  `last_change` BIGINT ,
   /*  */
   `email_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`)
@@ -930,4 +936,4 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_subscriber"), "notify_build");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_subscriber"), "notify_xunit");
-INSERT OR IGNORE INTO ado_version (name, version) VALUES ("porion", 2);
+INSERT OR IGNORE INTO ado_version (name, version) VALUES ("porion", 3);

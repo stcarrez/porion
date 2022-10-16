@@ -35,98 +35,58 @@
           Notification frequency
         </div>
         <div class='awa-header-col notification-kind'>
-	  <div class='notification-kind-title'>Notification</div>
-	  <div class='notification-kind-config'>Config</div>
-	  <div class='notification-kind-build'>Build</div>
-	  <div class='notification-kind-xunit'>Tests</div>
+	      <div class='notification-kind-title'>Notification</div>
+	      <div class='notification-kind-config'>Config</div>
+	      <div class='notification-kind-build'>Build</div>
+	      <div class='notification-kind-xunit'>Tests</div>
         </div>
-	<div class="awa-header-col notification-date">
-	  Last notification date
-	</div>
-	<div class="awa-header-col notification-count">
-	  # sent
-	</div>
+	      <div class="awa-header-col notification-date">
+	        Last notification date
+	      </div>
+	      <div class="awa-header-col notification-count">
+	      # sent
+	      </div>
       </div>
 
     <div class='awa-list'>
       <div class='awa-list-item notification'>
         <div class='notification-project'>
-	  <h:selectOneMenu id='project-selector'>
+	        <h:selectOneMenu id='project-selector'>
             <f:selectItem itemLabel="Add notification" itemValue=""/>
-	    <f:selectItems value="#{projectSelector.list}"/>
-	  </h:selectOneMenu>
+	          <f:selectItems value="#{projectSelector.list}"/>
+	        </h:selectOneMenu>
         </div>
       </div>
-
-	<div class='awa-list-item notification'>
+      <h:list var="notification" value="#{notifications.notifications}">
+        <div class='awa-list-item notification'>
           <div class='notification-project'>
-            <a href="">ada-util</a>
+            <a href="">#{notification.name}</a>
           </div>
           <div class='notification-email'>
-            John.Cusak@nowhere.com
+            #{notification.email}
           </div>
           <div class='notification-frequency'>
-            Daily
+            #{notification.frequency}
           </div>
           <div class="notification-kind">
-	    <div class='notification-kind-config'><input type="checkbox" checked="true"/></div>
-	    <div class='notification-kind-build'><input type="checkbox"/></div>
-	    <div class='notification-kind-xunit'><input type="checkbox" checked="true"/></div>
+	          <div class='notification-kind-config'>
+              <h:selectBooleanCheckbox value="#{notification.notify_config}"/>
+            </div>
+	          <div class='notification-kind-build'>
+              <h:selectBooleanCheckbox value="#{notification.notify_build}"/>
+            </div>
+	          <div class='notification-kind-xunit'>
+              <h:selectBooleanCheckbox value="#{notification.notify_xunit}"/>
+            </div>
           </div>
-	  <div class="notification-date">
-	    2022-04-03
-	  </div>
+	        <div class="notification-date">
+	          #{notification.last_notification_date}
+	        </div>
           <div class="notification-count">
-            23
+            #{notification.send_count}
           </div>
-	</div>
-
-	<div class='awa-list-item notification'>
-          <div class='notification-project'>
-            <a href="">ada-el</a>
-          </div>
-          <div class='notification-email'>
-            John.Cusak@nowhere.com
-          </div>
-          <div class='notification-frequency'>
-            Immediate
-          </div>
-          <div class="notification-kind">
-	    <div class='notification-kind-config'><input type="checkbox" checked="true"/></div>
-	    <div class='notification-kind-build'><input type="checkbox"/></div>
-	    <div class='notification-kind-xunit'><input type="checkbox" checked="true"/></div>
-          </div>
-	  <div class="notification-date">
-	    2022-04-03
-	  </div>
-          <div class="notification-count">
-            23
-          </div>
-	</div>
-
-	<div class='awa-list-item notification'>
-          <div class='notification-project'>
-            <a href="">ada-el</a>
-          </div>
-          <div class='notification-email'>
-            John.Cusak@nowhere.com
-          </div>
-          <div class='notification-frequency'>
-            Immediate
-          </div>
-          <div class="notification-kind">
-	    <div class='notification-kind-config'><input type="checkbox" checked="true"/></div>
-	    <div class='notification-kind-build'><input type="checkbox"/></div>
-	    <div class='notification-kind-xunit'><input type="checkbox" checked="true"/></div>
-          </div>
-	  <div class="notification-date">
-	    2022-04-03
-	  </div>
-          <div class="notification-count">
-            23
-          </div>
-	</div>
-
+	      </div>
+      </h:list>
     </div>
   </div>
 </ui:composition>

@@ -5,6 +5,9 @@
 
     <class name="Porion.Queries.Project_Info" bean="yes">
         <comment>Information about a project.</comment>
+        <property type='ADO.Identifier' name="project_id">
+            <comment>the project id.</comment>
+        </property>
         <property type='String' name="name">
             <comment>the project name.</comment>
         </property>
@@ -61,7 +64,8 @@
     <query name='project-list'>
         <comment>Get the list of projects</comment>
         <sql>
-            SELECT
+          SELECT
+            project.id AS id,
             project.name AS name,
             project.status AS status,
             project.build_progress AS build_progress,
@@ -94,7 +98,8 @@
     <query name='project-summary-list'>
         <comment>Get the list of projects (summary)</comment>
         <sql>
-            SELECT
+          SELECT
+            project.id AS id,
             project.name AS name,
             project.status AS status,
             project.build_progress AS build_progress,
@@ -128,7 +133,8 @@
     <query name='project-dependency-list'>
         <comment>Get the list of projects that another project depend on</comment>
         <sql>
-            SELECT
+          SELECT
+            project.id AS id,
             project.name AS name,
             project.status AS status,
             project.build_progress AS build_progress,

@@ -90,6 +90,7 @@ server-package:
 build-ts:
 	tsc server/web/js/projects.ts server/web/js/builds.ts server/web/js/xunits.ts \
             server/web/js/nodes.ts \
+            server/web/js/activity.ts \
             server/web/js/notifications.ts
 
 setup:: src/porion-configs-setup.ads

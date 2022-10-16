@@ -107,10 +107,33 @@ package body Porion.Sources.Git is
 
    overriding
    procedure Changes (Controller : in out Controller_Type;
-                      Result     : out Status_Type;
+                      Path       : in String;
+                      Extraction : in out Checkout_Type;
                       Executor   : in out Porion.Executors.Executor_Type'Class) is
+      procedure Process_Commit_Log (Line : in String);
+
+      Status : Integer;
+      Count  : Natural := 0;
+
+      procedure Process_Commit_Log (Line : in String) is
+      begin
+         if Util.Strings.Starts_With (Line, "commit ") then
+            Count := Count + 1;
+         end if;
+      end Process_Commit_Log;
    begin
-      null;
+      Extraction.Change_Count := 0;
+      if Length (Extraction.Previous_Tag) = 0 then
+         return;
+      end if;
+
+      Controller.Config.Set ("build_dir", Path);
+      Controller.Config.Set ("previous_tag", Extraction.Previous_Tag);
+      Executor.Command_Logger ("changes.log");
+      Executor.Execute (Controller.Changes_Command, Controller.Config,
+                        Process_Commit_Log'Access,
+                        Strip_Crlf => False, Status => Status);
+      Extraction.Change_Count := Count;
    end Changes;
 
    --  ------------------------------
@@ -194,6 +217,7 @@ package body Porion.Sources.Git is
       Controller.Show_Remote_Command := PCR.Get_Command (Git_Rule, "show_remote",
                                                          GIT_SHOW_REMOTE_COMMAND);
       Controller.Init_Command := PCR.Get_Command (Git_Rule, "init", GIT_GUESS_COMMAND);
+      Controller.Changes_Command := PCR.Get_Command (Git_Rule, "changes", GIT_LOG_COMMAND);
       Controller.Config := Config;
       return Controller.all'Access;
    end Create;

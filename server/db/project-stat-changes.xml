@@ -81,4 +81,16 @@
         </sql>
     </query>
 
+    <query name='audit-day-activity'>
+        <comment>Get the audit stat changes per day</comment>
+        <sql>
+          SELECT
+          COUNT(audit.id),
+          strftime("%Y-%m-%d", audit.date) AS day
+          FROM awa_audit AS audit
+          WHERE audit.id >= 1 
+          GROUP BY day
+        </sql>
+    </query>
+
 </query-mapping>

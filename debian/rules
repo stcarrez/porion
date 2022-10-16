@@ -24,7 +24,7 @@ ADAFLAGS += -gnatafno -gnatVa -gnatwa
 	dh $@
 
 override_dh_auto_configure:
-	dh_auto_configure --
+	dh_auto_configure -- --disable-distrib
 
 override_dh_auto_build:
 	$(MAKE) GNATMAKE="gprbuild -R -m -q" HAVE_DYNAMO=no
@@ -38,7 +38,7 @@ override_dh_auto_install:
 	dh_installman debian/tmp/usr/share/man/man1/porion.1
 	dh_installman --package=porion-server debian/tmp/usr/share/man/man8/porion-server.8
 	dh_installsystemd --package=porion-server
-	dh_strip
+	# dh_strip
 	files=`cd $(CURDIR)/debian/tmp/usr/share/porion/resources && find . -type f`; \
         for i in $$files; do \
 	  dir=`dirname $$i`; \

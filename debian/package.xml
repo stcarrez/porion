@@ -56,6 +56,8 @@
          <exclude name="js/jquery-3.4.1.js"/>
          <exclude name="js/jquery-ui-1.11.4/**"/>
          <exclude name="js/jquery-1.11.3.js"/>
+         <exclude name="js/jquery.flot.*"/>
+         <exclude name="js/jquery*"/>
        </fileset>
      </install>
      <install mode='copy' dir='web'>

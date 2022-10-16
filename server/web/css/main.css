@@ -54,13 +54,16 @@ div.awa-title dd {
 }
 
 /* Project page */
-.project-header, .node-header, .nodes-header, .notification-header {
+.project-header, .node-header, .nodes-header, .notification-header, .activity-header {
     float: left;
     width: 100%;
 }
-.project-header .awa-page-tab, .node-header .awa-page-tab, .nodes-header .awa-page-tab {
+.project-header .awa-page-tab, .node-header .awa-page-tab, .nodes-header .awa-page-tab, .activity-header .awa-page-tab {
     background: #eee;
 }
+.page-REPORT_WEEK .activity-header .activity-tab-week,
+.page-REPORT_MONTH .activity-header .activity-tab-month,
+.page-REPORT_4WEEK .activity-header .activity-tab-4week,
 .page-summary .nodes-header .nodes-tab-summary,
 .page-queue .nodes-header .nodes-tab-queue,
 .page-summary .node-header .node-tab-summary,
@@ -669,6 +672,26 @@ div.awa-title dd {
     width: 5%;
     text-align: right;
     margin-right: 8px; /* Use px for alignment with xunit-group-name which uses different font size */
+}
+
+/* Global activity */
+.activity-header {
+    float: left;
+    width: 100%;
+}
+.activity-list, .activity-chart {
+    float: left;
+    width: 100%;
+}
+
+.activity-list .activity-name {
+    width: 30%;
+}
+.activity-list .activity-build {
+    width: 20%;
+}
+.activity-list .activity-info {
+    width: 48%;
 }
 
 /* Node information */

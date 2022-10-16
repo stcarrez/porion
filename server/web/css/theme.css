@@ -42,9 +42,12 @@
   .project-header .project-title {
       color: #ccc;
   }
-  .project-header .awa-page-tab, .node-header .awa-page-tab, .nodes-header .awa-page-tab {
+  .project-header .awa-page-tab, .node-header .awa-page-tab, .nodes-header .awa-page-tab, .activity-header .awa-page-tab  {
       background-color: #444546;
   }
+  .page-REPORT_WEEK .activity-header .activity-tab-week,
+  .page-REPORT_MONTH .activity-header .activity-tab-month,
+  .page-REPORT_4WEEK .activity-header .activity-tab-4week,
   .page-summary .nodes-header .nodes-tab-summary,
   .page-queue .nodes-header .nodes-tab-queue,
   .page-summary .node-header .node-tab-summary,
@@ -56,6 +59,9 @@
   .page-coverage .project-header .project-tab-coverage {
       background: #ddd;
   }
+  .page-REPORT_WEEK .activity-header .activity-tab-week a,
+  .page-REPORT_MONTH .activity-header .activity-tab-month a,
+  .page-REPORT_4WEEK .activity-header .activity-tab-4week a,
   .page-summary .nodes-header .nodes-tab-summary a,
   .page-queue .nodes-header .nodes-tab-queue a,
   .page-summary .node-header .node-tab-summary a,

@@ -570,8 +570,14 @@ package body Porion.Resources.Queries is
        & " a given date</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & "    "
        & "      SELECT MIN(audit.id)" & ASCII.LF & "          FROM awa_audit AS au"
        & "dit" & ASCII.LF & "          WHERE audit.date > :date" & ASCII.LF & "   "
-       & "     </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</que"
-       & "ry-mapping>" & ASCII.LF;
+       & "     </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "    <"
+       & "query name='audit-day-activity'>" & ASCII.LF & "        <comment>Get the"
+       & " audit stat changes per day</comment>" & ASCII.LF & "        <sql>" & ASCII.LF
+       & "          SELECT" & ASCII.LF & "          COUNT(audit.id)," & ASCII.LF & " "
+       & "         strftime(""%Y-%m-%d"", audit.date) AS day" & ASCII.LF & "      "
+       & "    FROM awa_audit AS audit" & ASCII.LF & "          WHERE audit.id >= 1"
+       & " " & ASCII.LF & "          GROUP BY day" & ASCII.LF & "        </sql>" & ASCII.LF
+       & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
    C_16 : aliased constant String := "<query-mapping package='Porion.Builds.Mod"
        & "els'>" & ASCII.LF & "    <description>" & ASCII.LF & "        Provide pr"

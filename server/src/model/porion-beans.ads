@@ -77,6 +77,8 @@ package Porion.Beans is
 
    Query_First_Audit_After_Date : constant ADO.Queries.Query_Definition_Access;
 
+   Query_Audit_Day_Activity : constant ADO.Queries.Query_Definition_Access;
+
 
    --  --------------------
    --    Load the project from the database as well as other information
@@ -281,4 +283,10 @@ private
                                      File => File_1.File'Access);
    Query_First_Audit_After_Date : constant ADO.Queries.Query_Definition_Access
    := Def_Projectaudit_First_Audit_After_Date.Query'Access;
+
+   package Def_Projectaudit_Audit_Day_Activity is
+      new ADO.Queries.Loaders.Query (Name => "audit-day-activity",
+                                     File => File_1.File'Access);
+   Query_Audit_Day_Activity : constant ADO.Queries.Query_Definition_Access
+   := Def_Projectaudit_Audit_Day_Activity.Query'Access;
 end Porion.Beans;

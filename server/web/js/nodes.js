@@ -150,40 +150,26 @@ var Porion;
                         }]
                 };
                 var chart = new Frappe.Chart(this.durationContainer, {
-                    title: "CPU Usage",
+                    // title: "CPU Usage",
                     animate: 0,
                     data: data,
                     type: 'axis-mixed',
                     height: 250,
-                    valuesOverPoints: 1,
+                    valuesOverPoints: 0,
                     lineOptions: {
                         regionFill: 1
                     },
+                    tooltipOptions: {
+                        formatTooltipY: function (value) {
+                            var min = value / 60;
+                            var sec = value % 60;
+                            if (min > 0) {
+                                return String(min.toFixed(0)) + ":" + ('00' + sec).slice(-2);
+                            }
+                            return sec;
+                        }
+                    },
                     colors: ['#7cd6fd', '#743ee2']
-                });
-            }
-            if (this.systemContainer) {
-                var data = {
-                    dataPoints: {
-                        "1665009609": 10,
-                        "1665509609": 10,
-                        "1665609609": 10,
-                        "1665709609": 10,
-                        "1665809609": 10,
-                        "1665909609": 100
-                    }
-                    // start: new Date(1665009609), // a JS date object
-                    // end: new Date()
-                };
-                var chart = new Frappe.Chart(this.systemContainer, {
-                    title: "Heatmap",
-                    animate: 0,
-                    data: data,
-                    type: 'heatmap',
-                    height: 250,
-                    valuesOverPoints: 1,
-                    discreteDomains: 0,
-                    colors: ['#535253', '#c0ddf9', '#73b3f3', '#3886e1', '#17459e']
                 });
             }
         };

@@ -558,7 +558,7 @@ div.awa-title dd {
 #project-xunits-graph, #project-coverage-graph .graph-view {
     float: left;
     width: 340px;
-    height: 200px;
+    height: 256px;
 }
 .graph-legend {
     float: right;
@@ -758,4 +758,25 @@ div.awa-title dd {
     width: 33%;
     float: left;
     text-align: center;
+}
+.graph-svg-tip {
+    color: #959da5;
+}
+.chart-container {
+    fill: white;
+    font-size: 20px;
+}
+.title {
+    fill: white;
+}
+.chart-container .legend-dataset-text {
+    fill: #ccc;
+    font-size: 14px;
+}
+.chart-container .dataset-units {
+    fill: #ccc;
+}
+.chart-container .axis {
+    fill: #ccc;
+    font-size: 20px;
 }

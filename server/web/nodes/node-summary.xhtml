@@ -17,7 +17,7 @@
     <div id='awa-content'>
       <ui:include src="/WEB-INF/layouts/node-header.xhtml">
 	<ui:param name="nodeName" value="#{node.name}"/>
-	<ui:param name="projectBuildStatus" value="#{project.build_status}"/>
+	<ui:param name="nodeStatus" value="#{node.status}"/>
       </ui:include>
       <ui:include src="views/info.xhtml"/>
 

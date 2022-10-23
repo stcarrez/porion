@@ -27,16 +27,14 @@
     <div class='build-top-info'>
       <div class='build-info'>
         <span>
+          Files:
           #{project.metrics.files.sum_value}
         </span>
         <span>
-          Files
-        </span>
-        <span>
-	  Disk space
-	</span>
-        <span>
-          #{project.metrics.sizes.max_value}
+	  Disk space:
+          <h:outputText value="#{(project.metrics.sizes.max_value * 1024)}">
+            <f:converter converterId="sizeConverter"/>
+          </h:outputText>
         </span>
       </div>
     </div>

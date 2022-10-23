@@ -54,6 +54,9 @@ package body Porion.Sources.Files is
          if Path (Sep .. Path'Last) = ".tar.gz" then
             return TAR_GZ;
          end if;
+         if Path (Sep .. Path'Last) = ".tgz" then
+            return TAR_GZ;
+         end if;
          if Path (Sep .. Path'Last) = ".tar.xz" then
             return TAR_XZ;
          end if;
@@ -97,8 +100,15 @@ package body Porion.Sources.Files is
             return Path (First .. Last - 1);
 
          when TAR_GZ | TAR_BZ2 | TAR_XZ =>
-            Last := Util.Strings.Rindex (Path, '.', Last - 1);
-            return Path (First .. Last - 1);
+            declare
+               Sep : constant Natural := Util.Strings.Rindex (Path, '.', Last - 1);
+            begin
+               if Sep = 0 then
+                  return Path (First .. Last - 1);
+               else
+                  return Path (First .. Last - 1);
+               end if;
+            end;
 
          when others =>
             return Path (First .. Last - 1);

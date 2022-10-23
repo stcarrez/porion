@@ -16,10 +16,13 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Util.Strings.Vectors;
+with Porion.Sources;
 with Porion.Services;
 with Porion.Projects;
 with Porion.Builds.Services;
 package body Porion.Commands.Steps is
+
+   use type Porion.Sources.Source_Control_Type;
 
    procedure Add_Step (Command : in out Command_Type;
                        Recipe  : in out Porion.Builds.Models.Recipe_Ref;
@@ -49,7 +52,14 @@ package body Porion.Commands.Steps is
       end loop;
 
       if Command.Insert_Pos > 0 then
+         if Context.Project_Service.Project.Get_Scm = Porion.Sources.SRC_GIT then
+            Command.Insert_Pos := Command.Insert_Pos - 1;
+         end if;
          Command.Insert_Pos := Command.Insert_Pos - 1;
+         if Command.Insert_Pos <= 0 then
+            Porion.Commands.Error (-("cannot insert before or at the checkout commands"));
+            return;
+         end if;
       end if;
       Builds.Services.Insert_Step (Context.Project_Service, Recipe,
                                    Command.Insert_Pos, Kind, Step, Params);
@@ -74,6 +84,9 @@ package body Porion.Commands.Steps is
       end Update;
 
    begin
+      if Context.Project_Service.Project.Get_Scm = Porion.Sources.SRC_GIT then
+         Command.Update_Pos := Command.Update_Pos - 1;
+      end if;
       if Command.Update_Pos = 1 then
          Porion.Commands.Error (-("cannot update the first step"));
          return;
@@ -121,7 +134,10 @@ package body Porion.Commands.Steps is
                           Recipe  : in out Porion.Builds.Models.Recipe_Ref;
                           Context : in out Context_Type) is
    begin
-      if Command.Delete_Pos = 1 then
+      if Context.Project_Service.Project.Get_Scm = Porion.Sources.SRC_GIT then
+         Command.Delete_Pos := Command.Delete_Pos - 1;
+      end if;
+      if Command.Delete_Pos <= 1 then
          Porion.Commands.Error (-("cannot delete the first step"));
          return;
       end if;

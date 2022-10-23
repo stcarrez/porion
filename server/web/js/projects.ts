@@ -32,7 +32,7 @@ namespace Porion {
               animate: 1,
               data: data,
               type: 'percentage',
-              height: 200,
+              height: 150,
               valuesOverPoints: 0,
               maxSlices: 7,
               lineOptions: {

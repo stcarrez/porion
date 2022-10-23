@@ -9,6 +9,9 @@ body.awa {
     padding-left: 0.5em;
     display: inline-block;
 }
+#awa-footer_content {
+    margin-top: 0;
+}
 .awa-title {
   margin: 1em;
   float: left;
@@ -60,6 +63,9 @@ div.awa-title dd {
 }
 .project-header .awa-page-tab, .node-header .awa-page-tab, .nodes-header .awa-page-tab, .activity-header .awa-page-tab {
     background: #eee;
+}
+nav select {
+    display: none;
 }
 .page-REPORT_WEEK .activity-header .activity-tab-week,
 .page-REPORT_MONTH .activity-header .activity-tab-month,
@@ -242,6 +248,7 @@ div.awa-title dd {
     padding-left: 1%;
     padding-right: 1%;
     padding-bottom: 1em;
+    width: 98%;
 }
 .build-top-title .build-project-name {
     font-size: 2em;
@@ -285,6 +292,9 @@ div.awa-title dd {
 .build-info-line .dashboard-title, .build-info-line .dashboard-value {
     float: left;
     width: 50%;
+    height: 1em;
+    overflow: hidden;
+    white-space: nowrap;
 }
 .build-info-line .dashboard-value {
     text-align: right;
@@ -691,7 +701,7 @@ div.awa-title dd {
     width: 20%;
 }
 .activity-list .activity-info {
-    width: 48%;
+    width: 40%;
 }
 
 /* Node information */

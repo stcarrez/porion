@@ -229,8 +229,18 @@
     body{
         font-size:100%;
     }
+    #awa-hdr h2 {
+        font-size: 1.5em;
+    }
+    nav ul {
+        display: none;
+    }
+    nav select {
+        display: inline-block;
+        width: 100%;
+    }
     div.awa-modal {
-	    top: 5%;
+	top: 5%;
     	left: 5%;
     	width: 90%;
     	max-width: 530px;

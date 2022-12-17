@@ -20,17 +20,17 @@ namespace Porion {
 
     function durationFormatter(v, axis) {
         let secs = v / 1000;
-	let min = Math.floor(secs / 60);
-	let hour = Math.floor(min / 60);
-	if (hour > 0) {
-	   min = min % 60;
-	   secs = secs % 60;
-	   return hour.toFixed(0) + ":" + min.toFixed(0) + ":" + secs.toFixed(0);
-	}
-	if (min > 0) {
-	   secs = secs % 60;
-	   return min.toFixed(0) + ":" + secs.toFixed(0);
-	}
+             let min = Math.floor(secs / 60);
+             let hour = Math.floor(min / 60);
+             if (hour > 0) {
+                 min = min % 60;
+                 secs = secs % 60;
+                 return hour.toFixed(0) + ":" + min.toFixed(0) + ":" + secs.toFixed(0);
+             }
+             if (min > 0) {
+                 secs = secs % 60;
+                 return min.toFixed(0) + ":" + secs.toFixed(0);
+             }
         return secs.toFixed(axis.tickDecimals) + " s";
     }
 
@@ -60,25 +60,25 @@ namespace Porion {
 
         constructor(options : Options, node: string) {
             this.durationContainer = document.getElementById(options.durationContainer);
-	    if (this.durationContainer) {
+            if (this.durationContainer) {
                this.durationContainer.appendChild(this.durationGraphContainer);
                this.durationContainer.appendChild(this.durationLegendContainer);
-	       this.durationLegendContainer.className = 'graph-legend';
-	       this.durationGraphContainer.className = 'graph-view';
-	    }
+               this.durationLegendContainer.className = 'graph-legend';
+               this.durationGraphContainer.className = 'graph-view';
+            }
             this.systemContainer = document.getElementById(options.systemContainer);
-	    if (this.systemContainer) {
+            if (this.systemContainer) {
                this.systemContainer.appendChild(this.systemGraphContainer);
                this.systemContainer.appendChild(this.systemLegendContainer);
-	       this.systemLegendContainer.className = 'graph-legend';
-	       this.systemGraphContainer.className = 'graph-view';
-	    }
-	    this.node = node;
-	    this.tooltipContainer.className = 'graph-tooltip';
-	    document.body.appendChild(this.tooltipContainer);
+               this.systemLegendContainer.className = 'graph-legend';
+               this.systemGraphContainer.className = 'graph-view';
+            }
+            this.node = node;
+            this.tooltipContainer.className = 'graph-tooltip';
+            document.body.appendChild(this.tooltipContainer);
             this.getData(null)
-	}
-        getData(event : Event) {
+        }
+        getData(event : Event | null) {
             if (this.node) {
                 const node : string = this.node;
                 const xmlhttp : XMLHttpRequest = new XMLHttpRequest();
@@ -92,78 +92,78 @@ namespace Porion {
                 xmlhttp.send();
             }
         }
-	updateData(content : NodeUsage[]) {
-	   var build_duration_pass : number[] = new Array();
-	   var build_duration_fail : number[] = new Array();
-	   var user_time : number[] = new Array();
+        updateData(content : NodeUsage[]) {
+           var build_duration_pass : number[] = new Array();
+           var build_duration_fail : number[] = new Array();
+           var user_time : number[] = new Array();
            var sys_time : number[] = new Array();
            var labels : string[] = new Array();
-           var prevDate : string | null;
-	   var build_pass : NodeUsage | null;
-	   var build_fail : NodeUsage | null;
+           var prevDate : string | null = null;
+           var build_pass : NodeUsage | null = null;
+           var build_fail : NodeUsage | null = null;
            for (var usage of content) {
-	      if (usage.date != prevDate) {
-	         if (prevDate) {
-		    var offset : number = 0;
-		    var day_user_time : number = 0;
-		    var day_sys_time : number = 0;
-		    var day = Math.floor(new Date(prevDate).getTime() / 1000);
-		    if (build_fail) {
+              if (usage.date != prevDate) {
+                 if (prevDate) {
+                    var offset : number = 0;
+                    var day_user_time : number = 0;
+                    var day_sys_time : number = 0;
+                    var day = Math.floor(new Date(prevDate).getTime() / 1000);
+                    if (build_fail) {
                        build_duration_fail.push(build_fail.build_duration / 1000);
-		       offset = build_fail.build_duration;
-		       day_user_time = build_fail.user_time;
-		       day_sys_time = build_fail.sys_time;
-		    }
-		    if (build_pass) {
+                       offset = build_fail.build_duration;
+                       day_user_time = build_fail.user_time;
+                       day_sys_time = build_fail.sys_time;
+                    }
+                    if (build_pass) {
                        build_duration_pass.push((build_pass.build_duration + offset) / 1000);
-		       day_user_time += build_pass.user_time;
-		       day_sys_time += build_pass.sys_time;
-		    }
-		    sys_time.push(day_sys_time / 1000);
-		    user_time.push((day_sys_time + day_user_time) / 1000);
+                       day_user_time += build_pass.user_time;
+                       day_sys_time += build_pass.sys_time;
+                    }
+                    sys_time.push(day_sys_time / 1000);
+                    user_time.push((day_sys_time + day_user_time) / 1000);
                     labels.push(prevDate);
-		 }
+                 }
                  prevDate = usage.date;
-		 build_pass = null;
-		 build_fail = null;
-	      }
-	      if (usage.build_status == "BUILD_PASS") {
-	         build_pass = usage;
-	      } else {
-	         build_fail = usage;
-	      }
-	   }
-	   if (prevDate) {
-	      var offset : number = 0;
-	      var day_user_time : number = 0;
-	      var day_sys_time : number = 0;
-   	      var day = Math.floor(new Date(prevDate).getTime() / 1000);
-	      if (build_fail) {
+                 build_pass = null;
+                 build_fail = null;
+              }
+              if (usage.build_status == "BUILD_PASS") {
+                 build_pass = usage;
+              } else {
+                 build_fail = usage;
+              }
+           }
+           if (prevDate) {
+              var offset : number = 0;
+              var day_user_time : number = 0;
+              var day_sys_time : number = 0;
+              var day = Math.floor(new Date(prevDate).getTime() / 1000);
+              if (build_fail) {
                  build_duration_fail.push(build_fail.build_duration / 1000);
-	         offset = build_fail.build_duration;
-		 day_user_time = build_fail.user_time;
-		 day_sys_time = build_fail.sys_time;
-	      }
-	      if (build_pass) {
-	         build_duration_pass.push((build_pass.build_duration + offset) / 1000);
-		 day_user_time += build_pass.user_time;
-		 day_sys_time += build_pass.sys_time;
-	      }
+                 offset = build_fail.build_duration;
+                 day_user_time = build_fail.user_time;
+                 day_sys_time = build_fail.sys_time;
+              }
+              if (build_pass) {
+                 build_duration_pass.push((build_pass.build_duration + offset) / 1000);
+                 day_user_time += build_pass.user_time;
+                 day_sys_time += build_pass.sys_time;
+              }
               labels.push(prevDate);
-	      sys_time.push(day_sys_time / 1000);
-	      user_time.push((day_sys_time + day_user_time) / 1000);
-	   }
-	   if (this.durationContainer) {
+              sys_time.push(day_sys_time / 1000);
+              user_time.push((day_sys_time + day_user_time) / 1000);
+           }
+           if (this.durationContainer) {
                const data : Frappe.ChartData = {
                    labels: labels,
                    datasets: [{
-                       name: "User time",
+                       name: "Build duration (PASS)",
                        type: "line",
-                       values: user_time
+                       values: build_duration_pass
                    }, {
-                       name: "System time",
+                       name: "Build duration (FAIL)",
                        type: "line",
-                       values: sys_time
+                       values: build_duration_fail
                    }]
                };
                const chart : Frappe.Chart = new Frappe.Chart(this.durationContainer, {
@@ -189,6 +189,42 @@ namespace Porion {
                   colors: ['#7cd6fd', '#743ee2']
                })
            }
-	}
+           if (this.systemContainer) {
+               const data : Frappe.ChartData = {
+                  labels: labels,
+                  datasets: [{
+                     name: "User time",
+                     type: "line",
+                     values: user_time
+                  }, {
+                     name: "System time",
+                     type: "line",
+                     values: sys_time
+                  }]
+               };
+               const chart : Frappe.Chart = new Frappe.Chart(this.systemContainer, {
+                  // title: "CPU Usage",
+                  animate: 0,
+                  data: data,
+                  type: 'axis-mixed', // or 'bar', 'line', 'scatter', 'pie', 'percentage'
+                  height: 250,
+                  valuesOverPoints: 0,
+                  lineOptions: {
+                     regionFill: 1
+                  },
+                  tooltipOptions: {
+                     formatTooltipY: (value : number) => {
+                        let min = value / 60;
+                        let sec = value % 60;
+                        if (min > 0) {
+                           return String(min.toFixed(0)) + ":" + ('00'+sec).slice(-2);
+                        }
+                        return sec;
+                     }
+                  },
+                  colors: ['#7cd6fd', '#743ee2']
+               })
+         }
+      }
     }
 }

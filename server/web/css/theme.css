@@ -2,7 +2,7 @@
  * Dark mode support
  */
 @media (prefers-color-scheme: dark) {
-  body, #awa-page, .wiki-page-container,
+  body, main, #awa-page, .wiki-page-container,
   #wiki-page-list, #document-list-editor, #wiki-page-create {
     background-color: #2b2b2b;
     color: #ccc;

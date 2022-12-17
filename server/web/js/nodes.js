@@ -79,9 +79,9 @@ var Porion;
             var user_time = new Array();
             var sys_time = new Array();
             var labels = new Array();
-            var prevDate;
-            var build_pass;
-            var build_fail;
+            var prevDate = null;
+            var build_pass = null;
+            var build_fail = null;
             for (var _i = 0, content_1 = content; _i < content_1.length; _i++) {
                 var usage = content_1[_i];
                 if (usage.date != prevDate) {
@@ -140,6 +140,42 @@ var Porion;
                 var data = {
                     labels: labels,
                     datasets: [{
+                            name: "Build duration (PASS)",
+                            type: "line",
+                            values: build_duration_pass
+                        }, {
+                            name: "Build duration (FAIL)",
+                            type: "line",
+                            values: build_duration_fail
+                        }]
+                };
+                var chart = new Frappe.Chart(this.durationContainer, {
+                    // title: "CPU Usage",
+                    animate: 0,
+                    data: data,
+                    type: 'axis-mixed',
+                    height: 250,
+                    valuesOverPoints: 0,
+                    lineOptions: {
+                        regionFill: 1
+                    },
+                    tooltipOptions: {
+                        formatTooltipY: function (value) {
+                            var min = value / 60;
+                            var sec = value % 60;
+                            if (min > 0) {
+                                return String(min.toFixed(0)) + ":" + ('00' + sec).slice(-2);
+                            }
+                            return sec;
+                        }
+                    },
+                    colors: ['#7cd6fd', '#743ee2']
+                });
+            }
+            if (this.systemContainer) {
+                var data = {
+                    labels: labels,
+                    datasets: [{
                             name: "User time",
                             type: "line",
                             values: user_time
@@ -149,7 +185,7 @@ var Porion;
                             values: sys_time
                         }]
                 };
-                var chart = new Frappe.Chart(this.durationContainer, {
+                var chart = new Frappe.Chart(this.systemContainer, {
                     // title: "CPU Usage",
                     animate: 0,
                     data: data,

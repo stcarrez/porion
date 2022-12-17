@@ -920,7 +920,7 @@ div.awa-title dd {
 }
 #node-usage-graph, #node-duration-graph {
     width: 800px;
-    height: 400px;
+    height: 300px;
 }
 
 /* List of build nodes */

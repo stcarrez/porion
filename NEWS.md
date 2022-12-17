@@ -1,4 +1,7 @@
-Version 0.12.0 - Under development
+Version 0.13.0 - Under development
+
+
+Version 0.12.0 - Oct 2022
   - Add support for notification
   - Add global activity dashboard
   - Use Frappe Charts instead of jQuery Flot (remove jQuery)

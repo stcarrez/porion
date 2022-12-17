@@ -32,12 +32,12 @@ namespace Porion {
 
         constructor(options : Options) {
             this.heatmapContainer = document.getElementById(options.container);
-	    if (this.heatmapContainer) {
+            if (this.heatmapContainer) {
                this.heatmapContainer.appendChild(this.heatmapGraphContainer);
-	       this.heatmapGraphContainer.className = 'graph-view';
+               this.heatmapGraphContainer.className = 'graph-view';
                this.getData(null)
-	    }
-	}
+            }
+        }
         getData(event : Event) {
            const xmlhttp : XMLHttpRequest = new XMLHttpRequest();
                 
@@ -49,11 +49,11 @@ namespace Porion {
            xmlhttp.open("GET", "/porion/api/v1/activity/global");
            xmlhttp.send();
         }
-	updateData(content : ActivityUsage[]) {
-	   var datapoints = {};
+        updateData(content : ActivityUsage[]) {
+           var datapoints = {};
            for (var usage of content) {
               datapoints[String(usage.timestamp)] = usage.count;
-	   }
+           }
            const data : Frappe.ChartData = {
               dataPoints: datapoints
            };
@@ -66,6 +66,6 @@ namespace Porion {
               discreteDomains: 0,
               colors: ['#535253', '#c0ddf9', '#73b3f3', '#3886e1', '#17459e']
            })
-	}
+        }
     }
 }

@@ -54,7 +54,9 @@ var Porion;
             this.graphContainer = document.createElement('div');
             this.project = "";
             this.container = document.getElementById(options.container);
-            this.container.appendChild(this.graphContainer);
+            if (this.container) {
+                this.container.appendChild(this.graphContainer);
+            }
             this.project = project;
             this.getData(null);
         }

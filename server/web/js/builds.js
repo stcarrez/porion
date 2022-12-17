@@ -24,7 +24,9 @@ var Porion;
             this.build = "";
             this.build = build;
             this.container = document.getElementById(options.container);
-            this.container.appendChild(this.logContainer);
+            if (this.container) {
+                this.container.appendChild(this.logContainer);
+            }
             this.showAll = document.getElementById(options.btnShowAll);
             this.showInfo = document.getElementById(options.btnShowInfo);
             this.showWarn = document.getElementById(options.btnShowWarning);
@@ -102,8 +104,10 @@ var Porion;
             }
         };
         BuildLog.prototype.setMode = function (event, mode) {
-            this.container.classList.remove('build-show-all', 'build-show-info', 'build-show-warning');
-            this.container.classList.add(mode);
+            if (this.container) {
+                this.container.classList.remove('build-show-all', 'build-show-info', 'build-show-warning');
+                this.container.classList.add(mode);
+            }
         };
         return BuildLog;
     }());

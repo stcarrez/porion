@@ -19,7 +19,7 @@ namespace Porion {
    export class BarGraph {
 
       constructor(container: string, legend: string, labels: string[], values: number[]) {
-         var div : HTMLElement = document.getElementById(container);
+         var div : HTMLElement | null = document.getElementById(container);
          const data : Frappe.ChartData = {
             labels: labels,
             datasets: [{
@@ -81,9 +81,9 @@ namespace Porion {
         btnShowAll: string,
         btnShowInfo: string,
         btnShowWarning: string,
-	countAll: string,
-	countInfo: string,
-	countWarn: string
+        countAll: string,
+        countInfo: string,
+        countWarn: string
     }
     export class TestChart {
         readonly graphContainer : HTMLDivElement = <HTMLDivElement>document.createElement('div');
@@ -92,11 +92,13 @@ namespace Porion {
 
         constructor(options : Options, project: string) {
             this.container = document.getElementById(options.container);
-            this.container.appendChild(this.graphContainer);
-	    this.project = project;
+            if (this.container) {
+               this.container.appendChild(this.graphContainer);
+            }
+            this.project = project;
             this.getData(null)
-	}
-        getData(event : Event) {
+        }
+        getData(event : Event | null) {
             if (this.project) {
                 const project : string = this.project;
                 const xmlhttp : XMLHttpRequest = new XMLHttpRequest();
@@ -110,29 +112,29 @@ namespace Porion {
                 xmlhttp.send();
             }
         }
-	updateData(content : BuildTests) {
-	   var pass : number[] = new Array();
-	   var fail : number[] = new Array();
-	   var timeout : number[] = new Array();
-	   var duration : number[] = new Array();
+        updateData(content : BuildTests) {
+           var pass : number[] = new Array();
+           var fail : number[] = new Array();
+           var timeout : number[] = new Array();
+           var duration : number[] = new Array();
            var labels : string[] = new Array();
-	   var first_build : number = 10000;
-	   var last_build : number = 0;
+           var first_build : number = 10000;
+           var last_build : number = 0;
            for (var test of content.tests) {
-	      if (test.build_status == "BUILD_PASS") {
-	      	 if (test.build_number < first_build) {
-	            first_build = test.build_number;
-	      	 }
-	      	 if (test.build_number > last_build) {
+              if (test.build_status == "BUILD_PASS") {
+                 if (test.build_number < first_build) {
+                    first_build = test.build_number;
+                 }
+                 if (test.build_number > last_build) {
                     last_build = test.build_number;
-	      	 }
-	      	 timeout.push(test.timeout_count);
-	      	 fail.push(test.fail_count + test.timeout_count);
-	      	 pass.push(test.pass_count + test.fail_count + test.timeout_count);
-	      	 duration.push(test.test_duration / 1000);
+                 }
+                 timeout.push(test.timeout_count);
+                 fail.push(test.fail_count + test.timeout_count);
+                 pass.push(test.pass_count + test.fail_count + test.timeout_count);
+                 duration.push(test.test_duration / 1000);
                  labels.push(String(test.build_number));
-	      }
-	   }
+              }
+           }
            const data : Frappe.ChartData = {
               labels: labels,
               datasets: [{
@@ -171,7 +173,7 @@ namespace Porion {
               },
               colors: ['red', 'blue', 'green']
            })
-	}
+        }
     }
 
     export class CoverageChart {
@@ -183,16 +185,16 @@ namespace Porion {
 
         constructor(options : Options, project: string) {
             this.container = document.getElementById(options.container);
-	    
+            
             this.container.appendChild(this.graphContainer);
-	    this.container.appendChild(this.legendContainer);
-	    this.project = project;
-	    this.legendContainer.className = 'graph-legend';
-	    this.graphContainer.className = 'graph-view';
-	    this.tooltipContainer.className = 'graph-tooltip';
-	    document.body.appendChild(this.tooltipContainer);
+            this.container.appendChild(this.legendContainer);
+            this.project = project;
+            this.legendContainer.className = 'graph-legend';
+            this.graphContainer.className = 'graph-view';
+            this.tooltipContainer.className = 'graph-tooltip';
+            document.body.appendChild(this.tooltipContainer);
             this.getData(null)
-	}
+        }
         getData(event : Event) {
             if (this.project) {
                 const project : string = this.project;
@@ -207,28 +209,28 @@ namespace Porion {
                 xmlhttp.send();
             }
         }
-	updateData(content : BuildCoverage) {
-	   var lines : number[] = new Array();
-	   var functions : number[] = new Array();
+        updateData(content : BuildCoverage) {
+           var lines : number[] = new Array();
+           var functions : number[] = new Array();
            var labels : string[] = new Array();
-	   var first_build : number = 10000;
-	   var last_build : number = 0;
+           var first_build : number = 10000;
+           var last_build : number = 0;
            labels.push("");
            lines.push(0);
            functions.push(0);
            for (var build of content.metrics) {
-	      if (build.build_status == "BUILD_PASS") {
-	      	 if (build.build_number < first_build) {
-	            first_build = build.build_number;
-	      	 }
-	      	 if (build.build_number > last_build) {
+              if (build.build_status == "BUILD_PASS") {
+                 if (build.build_number < first_build) {
+                    first_build = build.build_number;
+                 }
+                 if (build.build_number > last_build) {
                     last_build = build.build_number;
-	      	 }
-	      	 lines.push(build.lines / 10.0);
-	      	 functions.push(build.functions / 10.0);
+                 }
+                 lines.push(build.lines / 10.0);
+                 functions.push(build.functions / 10.0);
                  labels.push(String(build.build_number));
-	      }
-	   }
+              }
+           }
            const data : Frappe.ChartData = {
               labels: labels,
               datasets: [{
@@ -266,6 +268,6 @@ namespace Porion {
               },
               colors: ['green', 'blue', 'red']
            })
-	}
+        }
     }
 }

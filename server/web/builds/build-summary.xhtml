@@ -9,34 +9,36 @@
   <ui:param name="pageStyle" value="page-project"/>
   <ui:param name="top_nav" value="page-builds"/>
 
+  <ui:define name="pageNav">
+    <ui:include src="/WEB-INF/layouts/build-header.xhtml">
+      <ui:param name="projectName" value="#{build.project.name}"/>
+    </ui:include>
+  </ui:define>
+
   <!-- Main page body -->
   <ui:define name="pageBody">
     <f:metadata>
       <f:viewAction action='#{build.load}'/>
     </f:metadata>
-    <div id='awa-content'>
-      <ui:include src="/WEB-INF/layouts/build-header.xhtml">
-	<ui:param name="projectName" value="#{build.project.name}"/>
-      </ui:include>
-      <ui:include src="views/info.xhtml"/>
-      <ui:include src="lists/build-steps.xhtml"/>
-      <div id='build-log' class='build-log build-show-warning'>
-        <div class='build-log-header'>
-          <ul>
-            <li id='build-log-show-all'>
-              Show all
-	      <span id='build-log-all-count'/>
-            </li>
-            <li id='build-log-show-info'>
-              Info
-	      <span id='build-log-info-count'/>
-            </li>
-            <li id='build-log-show-warning'>
-              Warnings
-	      <span id='build-log-warn-count'/>
-            </li>
-          </ul>
-        </div>
+
+    <ui:include src="views/info.xhtml"/>
+    <ui:include src="lists/build-steps.xhtml"/>
+    <div id='build-log' class='build-log build-show-warning'>
+      <div class='build-log-header'>
+        <ul>
+          <li id='build-log-show-all'>
+            Show all
+            <span id='build-log-all-count' />
+          </li>
+          <li id='build-log-show-info'>
+            Info
+            <span id='build-log-info-count' />
+          </li>
+          <li id='build-log-show-warning'>
+            Warnings
+            <span id='build-log-warn-count' />
+          </li>
+        </ul>
       </div>
     </div>
 

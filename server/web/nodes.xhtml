@@ -7,14 +7,15 @@
   <ui:param name="pageStyle" value="page-nodes"/>
   <ui:param name="top_nav" value="page-summary"/>
 
+  <ui:define name="pageNav">
+    <ui:include src="/WEB-INF/layouts/nodes-header.xhtml"/>
+  </ui:define>
+
   <!-- Main page body -->
   <ui:define name="pageBody">
     <f:metadata>
       <f:viewAction action='#{nodeList.load}'/>
     </f:metadata>
-    <div id='awa-content'>
-        <ui:include src="/WEB-INF/layouts/nodes-header.xhtml"/>
-        <ui:include src="nodes/lists/nodes.xhtml"/>
-     </div>
+    <ui:include src="nodes/lists/nodes.xhtml"/>
   </ui:define>
 </ui:composition>

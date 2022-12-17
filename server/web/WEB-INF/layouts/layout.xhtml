@@ -26,12 +26,14 @@
 <body class="#{not empty pageStyle ? pageStyle : ''} #{top_nav}">
 
 <!-- Top header with user account -->
-<ui:include src="top-bar.xhtml"/>
+<header>
+    <ui:include src="top-bar.xhtml"/>
+    <ui:insert name="pageNav"/>
+</header>
 
-<div id='awa-page' class='container_12'>
+<main>
     <ui:insert name="pageBody"/>
-    <div id="awa-clfooter"></div>
-</div>
+</main>
 <ui:include src="footer.xhtml"/>
 
 <ui:insert name="pageScript"/>

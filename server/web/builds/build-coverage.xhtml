@@ -9,19 +9,20 @@
   <ui:param name="pageStyle" value="page-project"/>
   <ui:param name="top_nav" value="page-coverage"/>
 
+  <ui:define name="pageNav">
+    <ui:include src="/WEB-INF/layouts/build-header.xhtml">
+      <ui:param name="projectName" value="#{build.project.name}"/>
+    </ui:include>
+  </ui:define>
+
   <!-- Main page body -->
   <ui:define name="pageBody">
     <f:metadata>
       <f:viewAction action='#{build.load}'/>
     </f:metadata>
-    <div id='awa-content'>
-      <ui:include src="/WEB-INF/layouts/build-header.xhtml">
-	<ui:param name="projectName" value="#{build.project.name}"/>
-      </ui:include>
-      <ui:include src="views/info.xhtml"/>
-    </div>
-
+    <ui:include src="views/info.xhtml"/>
   </ui:define>
+
   <ui:define name="pageScript">
     <script type="text/javascript" src="#{contextPath}/js/builds.js"></script>
   </ui:define>

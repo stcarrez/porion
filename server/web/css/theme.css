@@ -42,7 +42,7 @@
   .project-header .project-title {
       color: #ccc;
   }
-  .project-header .awa-page-tab, .node-header .awa-page-tab, .nodes-header .awa-page-tab, .activity-header .awa-page-tab  {
+  .project-header .awa-page-nav, .node-header .awa-page-nav, .nodes-header .awa-page-nav, .activity-header .awa-page-nav  {
       background-color: #444546;
   }
   .page-REPORT_WEEK .activity-header .activity-tab-week,
@@ -176,7 +176,45 @@
   .day.light-scheme   { background: white; color:  #555; }
   .night.light-scheme { background:  #eee; color: black; }
 }
+@media screen and (min-width: 768px) {
+    .awa-page-nav {
+        max-height: none;
+        top: 0;
+        position: relative;
+        /* float: right; */
+        /* width: fit-content; */
+        width: 100%;
+    }
+    .awa-page-nav li {
+        display: block;
+    }
+    .awa-page-menu li {
+        float: left;
+    }
+    .awa-page-menu a:hover {
+        background-color: transparent;
+        /* color: var(--gray);*/
+    }
+
+    .hamb{
+        display: none;
+    }
+}
 @media screen and (max-width: 768px) {
+    .page-REPORT_WEEK .activity-header .activity-tab-week,
+  .page-REPORT_MONTH .activity-header .activity-tab-month,
+  .page-REPORT_4WEEK .activity-header .activity-tab-4week,
+  .page-summary .nodes-header .nodes-tab-summary,
+  .page-queue .nodes-header .nodes-tab-queue,
+  .page-summary .node-header .node-tab-summary,
+  .page-builds .node-header .node-tab-builds,
+  .page-queue .node-header .node-tab-queue,
+  .page-summary .project-header .project-tab-summary,
+  .page-xunits .project-header .project-tab-xunits,
+  .page-builds .project-header .project-tab-builds,
+  .page-coverage .project-header .project-tab-coverage {
+       display: block;
+    }
     #awa-top-nav li a {
         font-size: 100%;
         padding-left: 5px;
@@ -231,13 +269,6 @@
     }
     #awa-hdr h2 {
         font-size: 1.5em;
-    }
-    nav ul {
-        display: none;
-    }
-    nav select {
-        display: inline-block;
-        width: 100%;
     }
     div.awa-modal {
 	top: 5%;

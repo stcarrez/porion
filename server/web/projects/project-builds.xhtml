@@ -9,37 +9,36 @@
   <ui:param name="pageStyle" value="page-project"/>
   <ui:param name="top_nav" value="page-builds"/>
 
+  <ui:define name="pageNav">
+    <ui:include src="/WEB-INF/layouts/project-header.xhtml">
+      <ui:param name="projectName" value="#{project.name}"/>
+      <ui:param name="projectBuildStatus" value="#{project.build_status}"/>
+    </ui:include>
+  </ui:define>
+
   <!-- Main page body -->
   <ui:define name="pageBody">
     <f:metadata>
       <f:viewAction action='#{project.load_builds}'/>
     </f:metadata>
-    <div id='awa-content'>
-      <ui:include src="/WEB-INF/layouts/project-header.xhtml">
-	<ui:param name="projectName" value="#{project.name}"/>
-	<ui:param name="projectBuildStatus" value="#{project.build_status}"/>
-      </ui:include>
+    <ui:composition template="/projects/lists/builds.xhtml">
+	    <ui:param name="builds" value="#{project.builds}"/>
 
-      <ui:composition template="/projects/lists/builds.xhtml">
-	<ui:param name="builds" value="#{project.builds}"/>
-
-	<ui:define name="list-header">
-          <div class='build-node'>
+	    <ui:define name="list-header">
+        <div class='build-node'>
             Build node
-          </div>
-	</ui:define>
+        </div>
+	    </ui:define>
 	
-	<ui:define name="list-item">
-          <div class='build-node'>
-	    <a href="#{contextPath}/nodes/view/#{build.node_name}/summary" title="Build node #{build.node_name}">
-              #{build.node_name}
-	    </a>
-          </div>
-	</ui:define>
+	    <ui:define name="list-item">
+        <div class='build-node'>
+	        <a href="#{contextPath}/nodes/view/#{build.node_name}/summary" title="Build node #{build.node_name}">
+            #{build.node_name}
+	        </a>
+        </div>
+	    </ui:define>
 
-      </ui:composition>
-
-     </div>
+    </ui:composition>
   </ui:define>
 
   <ui:define name="pageScript">

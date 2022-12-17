@@ -9,32 +9,32 @@
   <ui:param name="pageStyle" value="page-node"/>
   <ui:param name="top_nav" value="page-summary"/>
 
+  <ui:define name="pageNav">
+    <ui:include src="/WEB-INF/layouts/node-header.xhtml">
+      <ui:param name="nodeName" value="#{node.name}"/>
+      <ui:param name="nodeStatus" value="#{node.status}"/>
+    </ui:include>
+  </ui:define>
+
   <!-- Main page body -->
   <ui:define name="pageBody">
     <f:metadata>
       <f:viewAction action='#{node.load}'/>
     </f:metadata>
-    <div id='awa-content'>
-      <ui:include src="/WEB-INF/layouts/node-header.xhtml">
-	<ui:param name="nodeName" value="#{node.name}"/>
-	<ui:param name="nodeStatus" value="#{node.status}"/>
-      </ui:include>
-      <ui:include src="views/info.xhtml"/>
+    <ui:include src="views/info.xhtml"/>
+    <div class='project-graph-view'>
+	    <div class='project-graph-title'>Build duration</div>
+	    <div id='node-duration-graph' class='project-graph'/>
+    </div>
 
-      <div class='project-graph-view'>
-	<div class='project-graph-title'>Build duration</div>
-	<div id='node-duration-graph' class='project-graph'/>
-      </div>
-
-      <div class='project-graph-view'>
-	<div class='project-graph-title'>User and system time usage</div>
-	<div id='node-usage-graph' class='project-graph'/>
-      </div>
+    <div class='project-graph-view'>
+	    <div class='project-graph-title'>User and system time usage</div>
+	    <div id='node-usage-graph' class='project-graph'/>
+    </div>
 
     <u:script>
-      new Porion.NodeUsageChart({durationContainer: 'node-duration-graph', systemContainer: 'node-usage-graph'}, '#{node.name}');
+        new Porion.NodeUsageChart({durationContainer: 'node-duration-graph', systemContainer: 'node-usage-graph'}, '#{node.name}');
     </u:script>
-     </div>
   </ui:define>
 
   <ui:define name="pageScript">

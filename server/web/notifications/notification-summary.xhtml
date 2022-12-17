@@ -15,13 +15,11 @@
       <f:viewAction action='#{notifications.load}'/>
     </f:metadata>
 
-    <div id='awa-content'>
-      <ui:include src="lists/notifications.xhtml"/>
-      <div id='notif'/>
-      <util:script>
+    <ui:include src="lists/notifications.xhtml"/>
+    <div id='notif'/>
+    <util:script>
 	new Porion.Notifications({container: 'notif', projectSelector: 'project-selector'});
-      </util:script>
-    </div>
+    </util:script>
   </ui:define>
 
   <ui:define name="pageScript">

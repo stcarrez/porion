@@ -8,13 +8,15 @@
   <ui:param name="pageStyle" value="page-activity"/>
   <ui:param name="top_nav" value="page-#{projectReportList.period}"/>
 
+  <ui:define name="pageNav">
+  </ui:define>
+
   <!-- Main page body -->
   <ui:define name="pageBody">
     <f:metadata>
       <f:viewParam required='false' id='period' value='#{projectReportList.period}'/>
       <f:viewAction action='#{projectReportList.load}'/>
     </f:metadata>
-    <div id='awa-content'>
 
       <div class='activity-chart'>
         <div id='activity-chart'/>
@@ -25,7 +27,6 @@
       </u:script>
       <ui:include src="/WEB-INF/layouts/activity-header.xhtml"/>
       <ui:include src="dashboards/lists/project-activity.xhtml"/>
-     </div>
   </ui:define>
 
   <ui:define name="pageScript">

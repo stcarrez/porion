@@ -1,8 +1,39 @@
+:root{
+    --white: #36383F;
+    --black: #f9f9f9;
+    --grey: #85888C;
+}
+body {
+    position: relative;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
 body.awa {
   background-color: #81CFB7;
 }
+#awa-page {
+    position: inherit;
+    height: auto;
+}
 #awa-hdr {
     height: 3em;
+}
+main {
+    flex-grow: 1;
+}
+footer {
+    width: 100%;
+    bottom: 0;
+    height: 30px;
+    clear: both;
+}
+footer ul {
+    list-style-type: none;
+}
+footer li {
+    float: right;
+    padding-right: 0.5em;
 }
 #awa-hdr h2 {
     font-size: 2em;
@@ -58,15 +89,184 @@ div.awa-title dd {
 
 /* Project page */
 .project-header, .node-header, .nodes-header, .notification-header, .activity-header {
-    float: left;
+    /* float: left;*/
     width: 100%;
 }
-.project-header .awa-page-tab, .node-header .awa-page-tab, .nodes-header .awa-page-tab, .activity-header .awa-page-tab {
+.project-header .awa-page-nav, .node-header .awa-page-nav, .nodes-header .awa-page-nav, .activity-header .awa-page-nav {
     background: #eee;
 }
-nav select {
+
+.side-menu {
     display: none;
 }
+
+/* Nav menu */
+.awa-page-nav {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    background-color: var(--black);
+    overflow: hidden;
+    background: #eee;
+}
+.awa-page-nav li {
+    padding: 0.25em;
+    display: none;
+}
+.awa-page-nav span {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    font-size: 1.2em;
+}
+.awa-page-nav a {
+    text-decoration: none;
+}
+.awa-page-nav {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+.awa-page-menu a {
+    display: block;
+}
+.awa-page-menu a:hover {
+    background-color: var(--gray);
+    color: var(--black);
+}
+.awa-page-nav {
+    /* max-height: 0; */
+    transition: max-height .5s ease-out;
+}
+/* Menu Icon */
+.hamb{
+    cursor: pointer;
+    float: right;
+    padding: 20px 20px;
+}/* Style label tag */
+
+.hamb-line {
+    background: var(--white);
+    background: black;
+    display: block;
+    height: 2px;
+    position: relative;
+    width: 24px;
+
+} /* Style span tag */
+
+.hamb-line::before,
+.hamb-line::after{
+    background: var(--white);
+    /* background: black; */
+    content: '';
+    display: block;
+    height: 100%;
+    position: absolute;
+    transition: all .2s ease-out;
+    width: 100%;
+}
+.hamb-line::before{
+    top: 5px;
+}
+.hamb-line::after{
+    top: -5px;
+}
+
+.awa-page-nav ul {
+    list-style-type: none;
+    width: 100%;
+    height: 32px;
+}
+.side-menu {
+    display: none;
+} /* Hide checkbox */
+/* Toggle menu icon */
+.side-menu:checked ~ nav{
+    max-height: 100%;
+}
+.side-menu:checked ~ .hamb .hamb-line {
+    background: transparent;
+}
+.side-menu:checked ~ .hamb .hamb-line::before {
+    transform: rotate(-45deg);
+    top:0;
+}
+.side-menu:checked ~ .hamb .hamb-line::after {
+    transform: rotate(45deg);
+    top:0;
+}
+
+
+
+/* Menu Icon */
+
+.hamb{
+    position: absolute;
+    cursor: pointer;
+    /* float: right; */
+    /* padding: 40px 20px; */
+    top: 0;
+    width: 40px;
+    right: 0;
+    padding: 0 0;
+}
+
+
+.hamb-line {
+    background: var(--white);
+    display: block;
+    height: 2px;
+    position: relative;
+    width: 24px;
+    
+}
+
+.hamb-line::before,
+.hamb-line::after{
+    background: var(--white);
+    content: '';
+    display: block;
+    height: 100%;
+    position: absolute;
+    transition: all .2s ease-out;
+    width: 100%;
+}
+
+.hamb-line::before{
+    top: 5px;
+}
+
+.hamb-line::after{
+    top: -5px;
+}
+
+
+.side-menu {
+    display: none;
+}
+
+/* Toggle menu icon */
+
+.side-menu:checked ~ nav{
+    max-height: 100%;
+}
+
+.side-menu:checked ~ .hamb .hamb-line {
+    background: transparent;
+}
+
+.side-menu:checked ~ .hamb .hamb-line::before {
+    transform: rotate(-45deg);
+    top:0;
+
+}
+
+.side-menu:checked ~ .hamb .hamb-line::after {
+    transform: rotate(45deg);
+    top:0;
+}
+
 .page-REPORT_WEEK .activity-header .activity-tab-week,
 .page-REPORT_MONTH .activity-header .activity-tab-month,
 .page-REPORT_4WEEK .activity-header .activity-tab-4week,
@@ -84,7 +284,7 @@ nav select {
     border-top-right-radius: 0.5em;
 }
 .project-header .project-title, .node-header .node-title, .nodes-header .node-title {
-    float: left;
+    /* float: left;*/
     padding-left: 0.5em;
     font-size: 2em;
     color: #626263;

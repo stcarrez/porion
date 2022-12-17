@@ -9,26 +9,26 @@
   <ui:param name="pageStyle" value="page-node"/>
   <ui:param name="top_nav" value="page-queue"/>
 
+  <ui:define name="pageNav">
+    <ui:include src="/WEB-INF/layouts/node-header.xhtml">
+      <ui:param name="nodeName" value="#{queueList.name}"/>
+    </ui:include>
+  </ui:define>
+
   <!-- Main page body -->
   <ui:define name="pageBody">
     <f:metadata>
       <f:viewAction action='#{queueList.load}'/>
     </f:metadata>
-    <div id='awa-content'>
-      <ui:include src="/WEB-INF/layouts/node-header.xhtml">
-	<ui:param name="nodeName" value="#{queueList.name}"/>
-      </ui:include>
-      <ui:composition template="/nodes/lists/queue.xhtml">
-	<ui:param name="queue" value="#{queueList.queue}"/>
-
-	<ui:define name="list-header">
-	</ui:define>
+    <ui:composition template="/nodes/lists/queue.xhtml">
+	    <ui:param name="queue" value="#{queueList.queue}"/>
+	      <ui:define name="list-header">
+	      </ui:define>
 	
-	<ui:define name="list-item">
-	</ui:define>
+	      <ui:define name="list-item">
+	      </ui:define>
 
-      </ui:composition>
-     </div>
+    </ui:composition>
   </ui:define>
 
   <ui:define name="pageScript">

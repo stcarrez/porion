@@ -3,26 +3,30 @@
         <span class="project-build-status"/>
         <h2>#{projectName}</h2>
     </div>
-    <ul class="awa-page-tab">
+    <nav class="awa-page-nav">
+      <ul class="awa-page-menu">
         <li class="project-tab-summary">
-            <a href="#{contextPath}/projects/view/#{projectName}/summary">
-                <span>Summary</span>
-            </a>
+          <a href="#{contextPath}/projects/view/#{projectName}/summary">
+            <span>Summary</span>
+          </a>
         </li>
         <li class="project-tab-builds">
-            <a href="#{contextPath}/projects/view/#{projectName}/builds">
-                <span>Builds</span>
-            </a>
+          <a href="#{contextPath}/projects/view/#{projectName}/builds">
+            <span>Builds</span>
+          </a>
         </li>
         <li class="project-tab-xunits">
-            <a href="#{contextPath}/projects/view/#{projectName}/xunits">
-                <span>Tests</span>
-            </a>
+          <a href="#{contextPath}/projects/view/#{projectName}/xunits">
+            <span>Tests</span>
+          </a>
         </li>
         <li class="project-tab-coverage">
-            <a href="#{contextPath}/projects/view/#{projectName}/coverage">
-                <span>Coverage</span>
-            </a>
+          <a href="#{contextPath}/projects/view/#{projectName}/coverage">
+            <span>Coverage</span>
+          </a>
         </li>
-    </ul>
+      </ul>
+      <input type='checkbox' id='side-menu' class='side-menu' />
+      <label class="hamb" for="side-menu"><span class="hamb-line"></span></label>
+    </nav>
 </div>

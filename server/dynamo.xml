@@ -7,7 +7,7 @@
     <property name="is_gtk">FALSE</property>
     <property name="use_postgresql">false</property>
     <property name="use_mysql">false</property>
-    <property name="build">113</property>
+    <property name="build">115</property>
     <property name="is_lib">FALSE</property>
     <property name="author">Stephane Carrez</property>
     <property name="is_web">FALSE</property>

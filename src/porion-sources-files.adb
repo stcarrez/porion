@@ -106,7 +106,7 @@ package body Porion.Sources.Files is
                if Sep = 0 then
                   return Path (First .. Last - 1);
                else
-                  return Path (First .. Last - 1);
+                  return Path (First .. Sep - 1);
                end if;
             end;
 

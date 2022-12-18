@@ -193,7 +193,7 @@ package body Porion.Builds.Rest is
       Reply   : in out OpenAPI.Servers.Response'Class;
       Stream  : in out OpenAPI.Servers.Output_Stream'Class;
       Context : in out Porion.Services.Context_Type) is
-      pragma Unreferenced (Reply);
+      pragma Unreferenced (Req, Reply);
 
       Query     : ADO.Queries.Context;
       List      : Porion.Queries.Test_Info_Vector;
@@ -615,8 +615,8 @@ package body Porion.Builds.Rest is
       Stream.Start_Array ("");
       while Stmt.Has_Elements loop
          declare
-            Cnt : Natural := Stmt.Get_Integer (0);
-            Day : Ada.Calendar.Time := Stmt.Get_Time (1);
+            Cnt : constant Natural := Stmt.Get_Integer (0);
+            Day : constant Ada.Calendar.Time := Stmt.Get_Time (1);
          begin
             Stream.Start_Entity ("stat");
             Stream.Write_Long_Entity ("timestamp", To_Timestamp (Day));

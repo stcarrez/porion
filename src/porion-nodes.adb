@@ -65,7 +65,7 @@ package body Porion.Nodes is
       end if;
 
       declare
-         Path : String := Ada.Environment_Variables.Value ("PATH");
+         Path : constant String := Ada.Environment_Variables.Value ("PATH");
       begin
          return Util.Files.Find_File_Path (Command, Path, ':');
       end;
@@ -81,6 +81,7 @@ package body Porion.Nodes is
                       Process     : not null access procedure (Line : in String);
                       Strip_Crlf  : in Boolean := False;
                       Status      : out Integer) is
+      procedure Read_Input (Stream : in out Input_Buffer_Stream'Class);
 
       procedure Read_Input (Stream : in out Input_Buffer_Stream'Class) is
          Reader  : Util.Streams.Texts.Reader_Stream;
@@ -122,6 +123,7 @@ package body Porion.Nodes is
                      Working_Dir : in String;
                      Ignore_Working_Dir : out Boolean;
                      Args        : in out Util.Strings.Vectors.Vector) is
+      pragma Unreferenced (Controller, Working_Dir);
 
       function Is_Space (C : in Character) return Boolean renames
         Ada.Characters.Handling.Is_Space;

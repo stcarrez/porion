@@ -81,9 +81,10 @@ package body Porion.Reports is
    begin
       if Secs > 60 then
          declare
-            Ss : constant Natural := Secs mod 60;
+            Ss  : constant Natural := Secs mod 60;
+            Img : constant String := ":" & To_Digit (Ss / 10) & To_Digit (Ss mod 10);
          begin
-            return Util.Strings.Image (Secs / 60) & ":" & To_Digit (Ss / 10) & To_Digit (Ss mod 10);
+            return Util.Strings.Image (Secs / 60) & Img;
          end;
       else
          declare

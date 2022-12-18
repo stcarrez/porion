@@ -56,7 +56,8 @@ package body Porion.Nodes.SSH is
          Cmd   : constant UBO.Object := Controller.Command.Get_Value (Ctx);
          Ssh   : constant String := UBO.To_String (Cmd);
       begin
-         Porion.Nodes.Controller_Type (Controller).Expand (Ssh, Working_Dir, Ignore_Working_Dir, Args);
+         Porion.Nodes.Controller_Type (Controller).Expand (Ssh, Working_Dir,
+                                                           Ignore_Working_Dir, Args);
 
          --  cd <working_dir> && <command>
          if Working_Dir'Length > 0 then
@@ -120,6 +121,7 @@ package body Porion.Nodes.SSH is
                              Path       : in String;
                              Pattern    : in String;
                              List       : in out Util.Strings.Sets.Set) is
+      procedure Process (Line : in String);
 
       procedure Process (Line : in String) is
       begin

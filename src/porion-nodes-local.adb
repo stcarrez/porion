@@ -85,6 +85,7 @@ package body Porion.Nodes.Local is
                      Working_Dir : in String;
                      Ignore_Working_Dir : out Boolean;
                      Args        : in out Util.Strings.Vectors.Vector) is
+      pragma Unreferenced (Controller, Working_Dir);
    begin
       Args.Append (Find_Command_Path ("sh"));
       Args.Append ("-c");
@@ -179,6 +180,8 @@ package body Porion.Nodes.Local is
                         Path       : in String;
                         Process    : not null access
                            procedure (Stream : in out Input_Buffer_Stream'Class)) is
+      pragma Unreferenced (Controller);
+
       Stream     : aliased Util.Streams.Files.File_Stream;
       Buffer     : Util.Streams.Buffered.Input_Buffer_Stream;
    begin
@@ -196,6 +199,7 @@ package body Porion.Nodes.Local is
                              Path       : in String;
                              Pattern    : in String;
                              List       : in out Util.Strings.Sets.Set) is
+      pragma Unreferenced (Controller);
       use Ada.Directories;
 
       Filter  : constant Filter_Type := (Ordinary_File => True,

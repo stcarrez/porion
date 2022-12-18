@@ -140,11 +140,11 @@ var Porion;
                 var data = {
                     labels: labels,
                     datasets: [{
-                            name: "Build duration (PASS)",
+                            name: "Pass build duration",
                             type: "line",
                             values: build_duration_pass
                         }, {
-                            name: "Build duration (FAIL)",
+                            name: "Failed build duration",
                             type: "line",
                             values: build_duration_fail
                         }]
@@ -157,7 +157,8 @@ var Porion;
                     height: 250,
                     valuesOverPoints: 0,
                     lineOptions: {
-                        regionFill: 1
+                        regionFill: 1,
+                        dotSize: 2
                     },
                     tooltipOptions: {
                         formatTooltipY: function (value) {
@@ -193,7 +194,8 @@ var Porion;
                     height: 250,
                     valuesOverPoints: 0,
                     lineOptions: {
-                        regionFill: 1
+                        regionFill: 1,
+                        dotSize: 2
                     },
                     tooltipOptions: {
                         formatTooltipY: function (value) {

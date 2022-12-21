@@ -171,6 +171,10 @@
    .xunits {
        color: #bbbd;
    }
+
+   .chart-container .legend-dataset-text, .chart-container .dataset-units, .chart-container .axis  {
+        fill: #ccc;
+    }
 }
 @media (prefers-color-scheme: light) {
   .day.light-scheme   { background: white; color:  #555; }

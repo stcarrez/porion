@@ -1002,14 +1002,10 @@ div.awa-title dd {
 .title {
     fill: white;
 }
+
 .chart-container .legend-dataset-text {
-    fill: #ccc;
     font-size: 14px;
 }
-.chart-container .dataset-units {
-    fill: #ccc;
-}
 .chart-container .axis {
-    fill: #ccc;
     font-size: 20px;
 }

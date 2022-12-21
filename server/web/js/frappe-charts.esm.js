@@ -755,7 +755,8 @@ function legendBar(x, y, size, fill='none', label, truncate=false) {
 		dy: (FONT_SIZE * 2) + 'px',
 		'font-size': (FONT_SIZE * 1.2) + 'px',
 		'text-anchor': 'start',
-		fill: FONT_FILL,
+		// SCz: don't set the fill so that we can customize through CSS
+		// fill: FONT_FILL,
 		innerHTML: label
 	});
 
@@ -786,7 +787,8 @@ function legendDot(x, y, size, fill='none', label, truncate=false) {
 		dy: (FONT_SIZE/3) + 'px',
 		'font-size': (FONT_SIZE * 1.2) + 'px',
 		'text-anchor': 'start',
-		fill: FONT_FILL,
+		// SCz: don't set the fill so that we can customize through CSS
+		// fill: FONT_FILL,
 		innerHTML: label
 	});
 
@@ -810,6 +812,7 @@ function makeText(className, x, y, content, options = {}) {
 		y: y,
 		dy: dy + 'px',
 		'font-size': fontSize + 'px',
+		// SCz: don't set the fill so that we can customize through CSS
 		// fill: fill,
 		'text-anchor': textAnchor,
 		innerHTML: content

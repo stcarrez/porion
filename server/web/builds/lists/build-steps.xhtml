@@ -53,7 +53,9 @@
           </h:outputText>
         </div>
         <div class="build-step-command">
-          #{step.parameters}
+          <h:outputText rendered="#{step.kind eq 'STEP_MAKE'}" value="#{u:parseJSON(step.parameters).command}"/>
+          <h:outputText rendered="#{step.kind eq 'STEP_METRIC'}" value="#{u:parseJSON(step.parameters).metric} #{u:parseJSON(step.parameters).params}"/>
+          <h:outputText rendered="#{step.kind eq 'STEP_TEST'}" value="#{u:parseJSON(step.parameters).includes[1]}"/>
         </div>
       </div>
     </h:list>

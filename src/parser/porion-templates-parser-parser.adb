@@ -16,7 +16,10 @@ package body Porion.Templates.Parser.Parser is
                       Error_Count : out Natural);
 
 
-   procedure YYParse (Repository : in out Repository_Type; Context : in out Parser_Context_Type; Scanner : in out Lexer_IO.Context_Type; Error_Count : out Natural) is
+   procedure YYParse (Repository : in out Repository_Type;
+                      Context : in out Parser_Context_Type;
+                      Scanner : in out Lexer_IO.Context_Type;
+                      Error_Count : out Natural) is
 
       YYLVal : YYSType renames Scanner.YYLVal;
       YYVal  : YYSType renames Scanner.YYVal;

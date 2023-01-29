@@ -1,7 +1,6 @@
 
 with Ada.Text_IO;
 with Porion.Templates.Parser.Lexer_DFA;
-with Porion.Templates.Parser.Lexer_IO;
 package body Porion.Templates.Parser.Lexer is
 
    use Ada.Text_IO;
@@ -12,7 +11,8 @@ package body Porion.Templates.Parser.Lexer is
    pragma Style_Checks (Off);
    pragma Warnings (Off);
 
-   function YYLex (Ctx : in out Lexer_IO.Context_Type; Context : in out Parser_Context_Type) return Token is
+   function YYLex (Ctx : in out Lexer_IO.Context_Type;
+                   Context : in out Parser_Context_Type) return Token is
       subtype Short is Integer range -32768 .. 32767;
       yy_act : Integer;
       yy_c   : Short;

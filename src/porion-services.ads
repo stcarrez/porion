@@ -24,6 +24,7 @@ with Porion.Nodes.Models;
 with Porion.Projects.Models;
 with Porion.Builds.Models;
 with Porion.Resources;
+with Porion.Templates;
 package Porion.Services is
 
    Not_Found : exception;
@@ -42,6 +43,7 @@ package Porion.Services is
       Ident             : Porion.Projects.Ident_Type;
       Dry_Run           : Boolean := False;
       Wallet            : Keystore.Files.Wallet_File;
+      Templates         : Porion.Templates.Repository_Type;
    end record;
 
    --  Returns True if the service is opened.

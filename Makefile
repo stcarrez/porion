@@ -5,6 +5,9 @@ UTIL_OS=linux64
 PACKAGE_XML=package.xml
 #GPRPATH_AGENT=porion_agent.gpr
 
+AYACC=ayacc
+AFLEX=aflex
+
 -include Makefile.conf
 
 include Makefile.defaults
@@ -153,3 +156,19 @@ HTML_OPTIONS=-f markdown
 HTML_OPTIONS+= --listings --number-sections --toc --css docs/pandoc.css
 
 $(eval $(call pandoc_build,porion-book,$(PORION_DOC)))
+
+# Development targets that requires ayacc and aflex to be installed.
+# Do not call these unless you modify the lex/yacc grammar.
+parser:	
+	cd src/parser && \
+	   $(AYACC) -n 256 -v -k -P -s -e .ada porion-templates-parser-parser.y && \
+	   gnatchop -w porion-templates-parser-parser.ada && \
+	   rm -f porion-templates-parser-parser.ada
+	# -rm -f src/parser/porion-templates-parser-parser.verbose
+
+lexer:
+	cd src/parser; \
+	  $(AFLEX) -ms -P -L porion-templates-parser-lexer.l
+	cd src/parser && \
+	  gnatchop -w porion-templates-parser-lexer.ada && \
+	  rm -f porion-templates-parser-lexer.ada

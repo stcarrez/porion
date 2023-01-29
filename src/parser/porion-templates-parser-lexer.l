@@ -91,7 +91,6 @@ end Porion.Templates.Parser.Lexer;
 
 with Ada.Text_IO;
 with Porion.Templates.Parser.Lexer_DFA;
-with Porion.Templates.Parser.Lexer_IO;
 package body Porion.Templates.Parser.Lexer is
 
    use Ada.Text_IO;

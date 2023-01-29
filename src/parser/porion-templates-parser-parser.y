@@ -387,7 +387,7 @@ package body Porion.Templates.Parser.Parser is
                       Scanner     : in out Lexer_IO.Context_Type;
                       Error_Count : out Natural);
 
-##%procedure YYParse (Repository : in out Repository_Type; Context : in out Parser_Context_Type)
+##
 
    procedure Parse (Path       : in String;
                     Repository : in out Repository_Type;

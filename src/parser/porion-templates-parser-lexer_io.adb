@@ -107,7 +107,9 @@ package body Porion.Templates.Parser.Lexer_IO is
          end if;
 
          --  read in more data
-         YY_INPUT (Context, Context.dfa.yy_ch_buf (number_to_move .. Context.dfa.yy_ch_buf'Last), Context.yy_n_chars, num_to_read);
+         YY_INPUT (Context,
+                   Context.dfa.yy_ch_buf (number_to_move .. Context.dfa.yy_ch_buf'Last),
+                   Context.yy_n_chars, num_to_read);
       end if;
       if Context.yy_n_chars = 0 then
          if number_to_move = 1 then

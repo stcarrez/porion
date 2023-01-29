@@ -83,7 +83,8 @@ private package Porion.Templates.Parser.Lexer is
 
    use Porion.Templates.Parser.Parser_Tokens;
 
-   function YYLex (Ctx : in out Lexer_IO.Context_Type; Context : in out Parser_Context_Type) return Token;
+   function YYLex (Ctx : in out Lexer_IO.Context_Type;
+                   Context : in out Parser_Context_Type) return Token;
 
    Current_Comment : UString;
 

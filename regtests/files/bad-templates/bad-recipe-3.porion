@@ -1,0 +1,18 @@
+template bad is
+  recipe first-recipe is
+    run "test";
+  end second-recipe;
+
+  recipe second-recipe is
+     run test;
+  end last-recipe;
+
+  recipe ( is
+     run test;
+  end
+
+  )))
+
+  ;
+
+end bad;

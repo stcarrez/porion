@@ -1,0 +1,6 @@
+template bad is
+  step empty is
+    set ignore on;
+    run "make";
+  end;
+end bad;

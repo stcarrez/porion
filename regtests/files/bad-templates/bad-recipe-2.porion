@@ -1,0 +1,12 @@
+template bad is
+  Recipe empty is
+    set timeout 10;
+    run "asdfasdfas
+asdfasfs";
+  End empty;
+
+  recipe wrong is
+     run test;
+  end;
+
+end bad;

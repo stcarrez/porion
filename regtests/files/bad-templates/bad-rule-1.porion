@@ -1,0 +1,4 @@
+template bad is
+  step empty is
+  end empty;
+end bad;

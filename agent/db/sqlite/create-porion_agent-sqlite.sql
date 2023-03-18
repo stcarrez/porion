@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS ado_version (
 INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("ado_entity_type");
 INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("ado_sequence");
 INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("ado_version");
+INSERT OR IGNORE INTO ado_version (name, version) VALUES ("ado", 2);
 /* Copied from porion_lib-sqlite.sql*/
 /* File generated automatically by dynamo */
 /*  */

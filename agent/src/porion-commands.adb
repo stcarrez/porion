@@ -46,6 +46,8 @@ with Porion.Commands.Check;
 with Porion.Commands.Logs;
 with Porion.Commands.Set;
 with Porion.Commands.Env;
+with Porion.Commands.Template;
+with Porion.Templates.Parser;
 private with Util.Systems.Constants;
 package body Porion.Commands is
 
@@ -66,6 +68,7 @@ package body Porion.Commands is
    Logs_Command            : aliased Porion.Commands.Logs.Command_Type;
    Set_Command             : aliased Porion.Commands.Set.Command_Type;
    Env_Command             : aliased Porion.Commands.Env.Command_Type;
+   Template_Command        : aliased Porion.Commands.Template.Command_Type;
    Driver                  : Drivers.Driver_Type;
 
    Text_Printer            : aliased PT.Drivers.Texts.Printer_Type;
@@ -209,6 +212,9 @@ package body Porion.Commands is
       Driver.Add_Command ("env",
                           -("set or unset build environment variables"),
                            Env_Command'Access);
+      Driver.Add_Command ("template",
+                          -("template operation"),
+                          Template_Command'Access);
    end Initialize;
 
    --  ------------------------------

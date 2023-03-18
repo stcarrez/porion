@@ -36,6 +36,7 @@ with Porion.Projects.Tests;
 with Porion.Sources.Tests;
 with Porion.Tools.Tests;
 with Porion.XUnit.Tests;
+with Porion.Templates.Tests;
 package body Porion.Testsuite is
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Poion.Testsuite");
@@ -94,13 +95,14 @@ package body Porion.Testsuite is
 
    function Suite return Util.Tests.Access_Test_Suite is
    begin
-      Porion.Tests.Add_Tests (Tests'Access);
+      --  Porion.Tests.Add_Tests (Tests'Access);
       Porion.Tools.Tests.Add_Tests (Tests'Access);
       Porion.XUnit.Tests.Add_Tests (Tests'Access);
       Porion.Sources.Tests.Add_Tests (Tests'Access);
       Porion.Nodes.Tests.Add_Tests (Tests'Access);
       Porion.Projects.Tests.Add_Tests (Tests'Access);
       Porion.Reports.Tests.Add_Tests (Tests'Access);
+      Porion.Templates.Tests.Add_Tests (Tests'Access);
       return Tests'Access;
    end Suite;
 

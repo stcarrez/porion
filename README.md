@@ -50,7 +50,12 @@ Get information about a project or a build number:
    porion info ada-util:2
 ```
 
-Version 0.13.0 - Under development
+Version 0.13.0 - Mar 2023
+  - Update to use last AWA version
+  - Improvement to display on mobile phones
+  - Support to collect standard error as separate streams to identify these
+    messages as errors
+  - Prototype for build templates
 
 Version 0.12.0 - Oct 2022
   - Add support for notification

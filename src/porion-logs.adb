@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-logs -- Log build execution
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -91,6 +91,9 @@ package body Porion.Logs is
 
             when LOG_EXECUTION =>
                null;
+
+            when LOG_EXECUTION_ERROR =>
+               Ada.Text_IO.Put (Logger.File, "porion:error: ");
 
          end case;
          Ada.Text_IO.Put_Line (Logger.File, Line);

@@ -1,4 +1,4 @@
---  Advanced Resource Embedder 1.2.0
+--  Advanced Resource Embedder 1.3.0
 package Porion.Resources.Schema is
 
    Names : constant Name_Array;

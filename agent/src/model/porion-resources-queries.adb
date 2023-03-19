@@ -1,4 +1,4 @@
---  Advanced Resource Embedder 1.2.0
+--  Advanced Resource Embedder 1.3.0
 with Interfaces; use Interfaces;
 
 package body Porion.Resources.Queries is

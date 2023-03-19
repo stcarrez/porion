@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-executors -- Execute commands for builders or source controllers
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +27,9 @@ package body Porion.Executors is
    use type ADO.Identifier;
 
    Glog : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Executors");
+
+   function Get_Log_Level (Kind : in Output_Type) return Porion.Logs.Source_Type is
+      (if Kind = STDERR then Logs.LOG_EXECUTION_ERROR else Logs.LOG_EXECUTION);
 
    --  ------------------------------
    --  Returns true if commands are not executed but collected.
@@ -134,11 +137,13 @@ package body Porion.Executors is
    procedure Create_Directory (Executor : in out Executor_Type;
                                Path     : in String;
                                Clean    : in Boolean) is
-      procedure Process (Line : in String);
+      procedure Process (Kind : in Output_Type;
+                         Line : in String);
 
-      procedure Process (Line : in String) is
+      procedure Process (Kind : in Output_Type;
+                         Line : in String) is
       begin
-         Executor_Type'Class (Executor).Log (Porion.Logs.LOG_EXECUTION,
+         Executor_Type'Class (Executor).Log (Get_Log_Level (Kind),
                                              Line (Line'First .. Line'Last - 1));
       end Process;
 
@@ -157,7 +162,9 @@ package body Porion.Executors is
    procedure Execute (Executor    : in out Executor_Type;
                       Command     : in EL.Expressions.Expression;
                       Parameters  : in Util.Properties.Manager;
-                      Process     : not null access procedure (Line : in String);
+                      Process     : not null access
+                        procedure (Kind : in Output_Type;
+                                   Line : in String);
                       Working_Dir : in String := "";
                       Strip_Crlf  : in Boolean := False;
                       Status      : out Integer) is
@@ -182,14 +189,20 @@ package body Porion.Executors is
                       Working_Dir : in String := "";
                       Strip_Crlf  : in Boolean := False;
                       Status      : out Integer) is
-      procedure Process (Line : in String);
+      procedure Process (Kind : in Output_Type;
+                         Line : in String);
 
-      procedure Process (Line : in String) is
+      procedure Process (Kind : in Output_Type;
+                         Line : in String) is
       begin
          if Line'First + 1 < Line'Last then
-            Glog.Info ("{0}", Line (Line'First .. Line'Last - 1));
+            if Kind = STDERR then
+               Glog.Error ("{0}", Line (Line'First .. Line'Last - 1));
+            else
+               Glog.Info ("{0}", Line (Line'First .. Line'Last - 1));
+            end if;
          end if;
-         Executor_Type'Class (Executor).Log (Logs.LOG_EXECUTION,
+         Executor_Type'Class (Executor).Log (Get_Log_Level (Kind),
                                              Line (Line'First .. Line'Last - 1));
       end Process;
 
@@ -200,7 +213,9 @@ package body Porion.Executors is
 
    procedure Execute (Executor    : in out Executor_Type;
                       Command     : in String;
-                      Process     : not null access procedure (Line : in String);
+                      Process     : not null access
+                        procedure (Kind : in Output_Type;
+                                   Line : in String);
                       Working_Dir : in String := "";
                       Strip_Crlf  : in Boolean := False;
                       Status      : out Integer) is

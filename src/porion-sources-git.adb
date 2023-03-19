@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-sources-git -- Source management with git
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,18 +19,26 @@ with Ada.Directories;
 
 with GNAT.Regpat;
 with Util.Strings;
+with Util.Log.Loggers;
 with Porion.Configs.Rules;
 with Porion.Logs;
+with Porion.Nodes;
 package body Porion.Sources.Git is
 
    use Ada.Directories;
+   subtype Output_Type is Porion.Nodes.Output_Type;
+   use type Porion.Nodes.Output_Type;
+
+   Log   : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Sources.Git");
 
    overriding
    procedure Check (Controller : in out Controller_Type;
                     Status     : out Status_Type;
                     Executor   : in out Porion.Executors.Executor_Type'Class) is
-      procedure Process (Line : in String);
-      procedure Process_Show (Line : in String);
+      procedure Process (Kind : in Output_Type;
+                         Line : in String);
+      procedure Process_Show (Kind : in Output_Type;
+                              Line : in String);
 
       REGEX1 : constant String := "^([0-9a-fA-F]+)\srefs/heads/(.*)";
       REGEX2 : constant String := "^ +HEAD branch: (.*)";
@@ -38,9 +46,14 @@ package body Porion.Sources.Git is
       Pattern1 : constant GNAT.Regpat.Pattern_Matcher := GNAT.Regpat.Compile (REGEX1);
       Pattern2 : constant GNAT.Regpat.Pattern_Matcher := GNAT.Regpat.Compile (REGEX2);
 
-      procedure Process (Line : in String) is
+      procedure Process (Kind : in Output_Type;
+                         Line : in String) is
          Matches : GNAT.Regpat.Match_Array (0 .. 2);
       begin
+         if Kind = Porion.Nodes.STDERR then
+            Executor.Log (Porion.Logs.LOG_EXECUTION_ERROR, Line);
+            return;
+         end if;
          Executor.Log (Porion.Logs.LOG_EXECUTION, Line);
          if GNAT.Regpat.Match (Pattern1, Line) then
             GNAT.Regpat.Match (Pattern1, Line, Matches);
@@ -53,9 +66,14 @@ package body Porion.Sources.Git is
          end if;
       end Process;
 
-      procedure Process_Show (Line : in String) is
+      procedure Process_Show (Kind : in Output_Type;
+                              Line : in String) is
          Matches : GNAT.Regpat.Match_Array (0 .. 1);
       begin
+         if Kind = Porion.Nodes.STDERR then
+            Executor.Log (Porion.Logs.LOG_EXECUTION_ERROR, Line);
+            return;
+         end if;
          Executor.Log (Porion.Logs.LOG_EXECUTION, Line);
          if GNAT.Regpat.Match (Pattern2, Line) then
             GNAT.Regpat.Match (Pattern2, Line, Matches);
@@ -110,13 +128,19 @@ package body Porion.Sources.Git is
                       Path       : in String;
                       Extraction : in out Checkout_Type;
                       Executor   : in out Porion.Executors.Executor_Type'Class) is
-      procedure Process_Commit_Log (Line : in String);
+      procedure Process_Commit_Log (Kind : in Output_Type;
+                                    Line : in String);
 
       Status : Integer;
       Count  : Natural := 0;
 
-      procedure Process_Commit_Log (Line : in String) is
+      procedure Process_Commit_Log (Kind : in Output_Type;
+                                    Line : in String) is
       begin
+         if Kind = Porion.Nodes.STDERR then
+            Log.Error ("{0}", Line);
+            return;
+         end if;
          if Util.Strings.Starts_With (Line, "commit ") then
             Count := Count + 1;
          end if;
@@ -147,7 +171,8 @@ package body Porion.Sources.Git is
                     Result     : out Source_Info_Type;
                     Executor   : in out Porion.Executors.Executor_Type'Class) is
       function Make_Project_Name (URI : in String) return String;
-      procedure Process (Line : in String);
+      procedure Process (Kind : in Output_Type;
+                         Line : in String);
 
       function Make_Project_Name (URI : in String) return String is
          Last : Natural := Util.Strings.Rindex (URI, '/');
@@ -168,8 +193,13 @@ package body Porion.Sources.Git is
          return URI;
       end Make_Project_Name;
 
-      procedure Process (Line : in String) is
+      procedure Process (Kind : in Output_Type;
+                         Line : in String) is
       begin
+         if Kind = Porion.Nodes.STDERR then
+            Executor.Log (Porion.Logs.LOG_EXECUTION_ERROR, Line);
+            return;
+         end if;
          if Line'Length > 0 then
             Result.URI := To_UString (Line);
             Result.Name := To_UString (Make_Project_Name (Line));

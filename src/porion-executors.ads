@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-executors -- Execute commands for builders or source controllers
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,6 +30,8 @@ with Porion.Nodes.Models;
 package Porion.Executors is
 
    subtype Input_Buffer_Stream is Util.Streams.Buffered.Input_Buffer_Stream;
+   subtype Output_Type is Porion.Nodes.Output_Type;
+   use all type Porion.Nodes.Output_Type;
 
    type Command_Type (Len : Positive) is record
       Step    : Porion.Builds.Step_Type;
@@ -92,7 +94,9 @@ package Porion.Executors is
    procedure Execute (Executor    : in out Executor_Type;
                       Command     : in EL.Expressions.Expression;
                       Parameters  : in Util.Properties.Manager;
-                      Process     : not null access procedure (Line : in String);
+                      Process     : not null access
+                        procedure (Kind : in Output_Type;
+                                   Line : in String);
                       Working_Dir : in String := "";
                       Strip_Crlf  : in Boolean := False;
                       Status      : out Integer) with
@@ -145,7 +149,9 @@ package Porion.Executors is
 
    procedure Execute (Executor    : in out Executor_Type;
                       Command     : in String;
-                      Process     : not null access procedure (Line : in String);
+                      Process     : not null access
+                        procedure (Kind : in Output_Type;
+                                   Line : in String);
                       Working_Dir : in String := "";
                       Strip_Crlf  : in Boolean := False;
                       Status      : out Integer) with

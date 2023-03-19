@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-metrics-cloc -- Run cloc(1) and get various source code metrics
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,7 @@ with Util.Serialize.Mappers.Record_Mapper;
 with Util.Serialize.IO.XML;
 with PT.Colors;
 with Porion.Logs;
+with Porion.Nodes;
 with Porion.Configs.Rules;
 package body Porion.Metrics.Cloc is
 
@@ -175,7 +176,8 @@ package body Porion.Metrics.Cloc is
    procedure Collect (Controller : in out Controller_Type;
                       Path       : in String;
                       Executor   : in out Porion.Executors.Executor_Type'Class) is
-      procedure Process (Line : in String);
+      procedure Process (Kind : in Porion.Nodes.Output_Type;
+                         Line : in String);
       procedure Process_Metric (Language      : in String;
                                 Files_Count   : in Natural;
                                 Blank_Count   : in Natural;
@@ -184,8 +186,14 @@ package body Porion.Metrics.Cloc is
 
       Content : UString;
 
-      procedure Process (Line : in String) is
+      procedure Process (Kind : in Porion.Nodes.Output_Type;
+                         Line : in String) is
+         use type Porion.Nodes.Output_Type;
       begin
+         if Kind = Porion.Nodes.STDERR then
+            Executor.Log (Porion.Logs.LOG_EXECUTION_ERROR, Line);
+            return;
+         end if;
          Executor.Log (Porion.Logs.LOG_EXECUTION, Line);
 
          Append (Content, Line);

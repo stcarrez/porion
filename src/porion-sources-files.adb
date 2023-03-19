@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-sources-files -- Source management with plain files
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,10 +23,13 @@ with Util.Strings.Vectors;
 with Util.Files;
 with EL.Contexts.Default;
 with Porion.Logs;
+with Porion.Nodes;
 package body Porion.Sources.Files is
 
    use Ada.Directories;
    use type Ada.Containers.Count_Type;
+   subtype Output_Type is Porion.Nodes.Output_Type;
+   use type Porion.Nodes.Output_Type;
 
    Log   : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Sources.Files");
 
@@ -192,10 +195,16 @@ package body Porion.Sources.Files is
                     Result     : out Source_Info_Type;
                     Executor   : in out Porion.Executors.Executor_Type'Class) is
 
-      procedure Process (Line : in String);
+      procedure Process (Kind : in Output_Type;
+                         Line : in String);
 
-      procedure Process (Line : in String) is
+      procedure Process (Kind : in Output_Type;
+                         Line : in String) is
       begin
+         if Kind = Porion.Nodes.STDERR then
+            Executor.Log (Porion.Logs.LOG_EXECUTION_ERROR, Line);
+            return;
+         end if;
          if Line'Length > 0 then
             Result.URI := To_UString (Line);
          end if;

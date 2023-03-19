@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-metrics-coverage -- Metric for code coverage using lcov
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,7 @@ with PT.Colors;
 with Porion.Logs;
 with Porion.Configs.Rules;
 with Porion.Reports;
+with Porion.Nodes;
 package body Porion.Metrics.Coverage is
 
    function Create (Session : in ADO.Sessions.Master_Session;
@@ -45,7 +46,8 @@ package body Porion.Metrics.Coverage is
    procedure Collect (Controller : in out Controller_Type;
                       Path       : in String;
                       Executor   : in out Porion.Executors.Executor_Type'Class) is
-      procedure Process (Line : in String);
+      procedure Process (Kind : in Porion.Nodes.Output_Type;
+                         Line : in String);
 
       --  The 'lcov --summary file.cov' produces the following output:
       --  Reading tracefile file.cov
@@ -66,9 +68,15 @@ package body Porion.Metrics.Coverage is
       Func_Covered_Count : Natural := 0;
       Func_Total_Count   : Natural := 0;
 
-      procedure Process (Line : in String) is
+      procedure Process (Kind : in Porion.Nodes.Output_Type;
+                         Line : in String) is
+         use type Porion.Nodes.Output_Type;
          Matches : GNAT.Regpat.Match_Array (0 .. 2);
       begin
+         if Kind = Porion.Nodes.STDERR then
+            Executor.Log (Porion.Logs.LOG_EXECUTION_ERROR, Line);
+            return;
+         end if;
          Executor.Log (Porion.Logs.LOG_EXECUTION, Line);
 
          if GNAT.Regpat.Match (Line_Pat, Line) then

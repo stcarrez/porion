@@ -15,6 +15,7 @@ $(foreach line,$(shell sed -n '\
 DH_VERBOSE=1
 export DH_OPTIONS=-v
 
+DEB_BUILD_OPTIONS=nostrip
 DEB_BUILD_MAINT_OPTIONS := hardening=+all
 include /usr/share/dpkg/buildflags.mk
 include /usr/share/ada/debian_packaging-$(GNAT_VERSION).mk

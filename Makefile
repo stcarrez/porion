@@ -23,7 +23,24 @@ ifeq (${HAVE_DYNAMO},yes)
 GPRFLAGS += -XBUILD_DYNAMO=no
 else
 GPRFLAGS += -XBUILD_DYNAMO=yes
-DYNAMO=$(ROOT_DIR)/bin/dynamo
+PRJ_PATH:=$(ROOT_DIR)/awa/ada-util/.alire:$(ROOT_DIR)/awa/ada-util/.alire/xml:$(ROOT_DIR)/awa/ada-util/.alire/aws
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-util/.alire/unit
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-util
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-el/.alire
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-el
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-keystore/.alire:$(ROOT_DIR)/awa/ada-keystore
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-ado/.alire/sqlite:$(ROOT_DIR)/awa/ada-ado/.alire/mysql
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-ado/.alire/postgresql:$(ROOT_DIR)/awa/ada-ado/.alire/all
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-ado/.alire:$(ROOT_DIR)/awa/ada-ado
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-security/.alire:$(ROOT_DIR)/awa/ada-security
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-servlet/.alire:$(ROOT_DIR)/awa/ada-servlet/.alire/aws
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-servlet:$(ROOT_DIR)/awa/ada-asf/.alire
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-asf:$(ROOT_DIR)/awa/ada-wiki/.alire
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-wiki:$(ROOT_DIR)/awa/ada-wiki/.alire
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/openapi-ada/.alire:$(ROOT_DIR)/awa/dynamo
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/.alire:$(ROOT_DIR)/awa/awa
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/resource-embedder
+DYNAMO=env ADA_PROJECT_PATH="$(PRJ_PATH)" DYNAMO_SEARCH_PATH="$(ROOT_DIR)/awa/plugins" DYNAMO_UML_PATH="$(ROOT_DIR)/awa/uml" $(ROOT_DIR)/bin/dynamo
 endif
 
 ifeq (${HAVE_ARE},yes)
@@ -172,3 +189,7 @@ lexer:
 	cd src/parser && \
 	  gnatchop -w porion-templates-parser-lexer.ada && \
 	  rm -f porion-templates-parser-lexer.ada
+
+info:
+	$(DYNAMO) info
+	cd server && $(DYNAMO) info

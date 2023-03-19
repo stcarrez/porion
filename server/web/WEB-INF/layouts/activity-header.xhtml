@@ -1,19 +1,23 @@
 <div class="activity-header" xmlns:h="http://java.sun.com/jsf/html">
-  <ul class="awa-page-tab">
-    <li class="activity-tab-week">
-      <a href="#{contextPath}/activity/view/week">
-        <span>Week summary</span>
-      </a>
-    </li>
-    <li class="activity-tab-month">
-      <a href="#{contextPath}/activity/view/month">
-        <span>Month summary</span>
-      </a>
-    </li>
-    <li class="activity-tab-4week">
-      <a href="#{contextPath}/activity/view/4week">
-        <span>4 week summary</span>
-      </a>
-    </li> 
- </ul>
+  <input type='checkbox' id='porion-activity-nav' class='awa-side-menu' />
+  <label for='porion-activity-nav' class='awa-hamb-menu'><span class='awa-hamb-line'></span></label>
+  <nav class="awa-side-nav">
+    <ul class="awa-menu">
+      <li class="activity-tab-week">
+        <a href="#{contextPath}/activity/view/week">
+          <span>Week summary</span>
+        </a>
+      </li>
+      <li class="activity-tab-month">
+        <a href="#{contextPath}/activity/view/month">
+          <span>Month summary</span>
+        </a>
+      </li>
+      <li class="activity-tab-4week">
+        <a href="#{contextPath}/activity/view/4week">
+          <span>4 week summary</span>
+        </a>
+      </li> 
+    </ul>
+  </nav>
 </div>

@@ -39,10 +39,20 @@
   .build-log {
       background-color: #4b4b4b;
   }
+  .awa-menu a:hover{
+      background-color: #bbb;
+      color: #4b4b4b;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      -webkit-border-top-left-radius: 8px;
+      -webkit-border-top-right-radius: 8px;
+      -moz-border-radius-topleft: 8px;
+      -moz-border-radius-topright: 8px;
+  }
   .project-header .project-title {
       color: #ccc;
   }
-  .project-header .awa-page-nav, .node-header .awa-page-nav, .nodes-header .awa-page-nav, .activity-header .awa-page-nav  {
+  .awa-side-nav, .project-header .awa-menu, .node-header .awa-page-nav, .nodes-header .awa-size-nav, .activity-header .awa-page-nav  {
       background-color: #444546;
   }
   .page-REPORT_WEEK .activity-header .activity-tab-week,

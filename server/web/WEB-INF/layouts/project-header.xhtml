@@ -3,8 +3,10 @@
         <span class="project-build-status"/>
         <h2>#{projectName}</h2>
     </div>
-    <nav class="awa-page-nav">
-      <ul class="awa-page-menu">
+    <input type='checkbox' id='porion-project-nav' class='awa-side-menu' />
+    <label for='porion-project-nav' class='awa-hamb-menu'><span class='awa-hamb-line'></span></label>
+    <nav class="awa-side-nav">
+      <ul class="awa-menu">
         <li class="project-tab-summary">
           <a href="#{contextPath}/projects/view/#{projectName}/summary">
             <span>Summary</span>
@@ -26,7 +28,5 @@
           </a>
         </li>
       </ul>
-      <input type='checkbox' id='side-menu' class='side-menu' />
-      <label class="hamb" for="side-menu"><span class="hamb-line"></span></label>
     </nav>
 </div>

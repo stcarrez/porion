@@ -1,9 +1,12 @@
 <div class="project-header" xmlns:h="http://java.sun.com/jsf/html">
-    <div class="project-title build-status-#{build.status}">
-        <span class="project-build-status"/>
-        <h2>#{projectName} - Build ##{build.number}</h2>
-    </div>
-    <ul class="awa-page-tab">
+  <div class="project-title build-status-#{build.status}">
+    <span class="project-build-status"/>
+    <h2>#{projectName} - Build ##{build.number}</h2>
+  </div>
+  <input type='checkbox' id='porion-build-nav' class='awa-side-menu' />
+  <label for='porion-build-nav' class='awa-hamb-menu'><span class='awa-hamb-line'></span></label>
+  <nav class="awa-side-nav">
+    <ul class="awa-menu">
         <li class="project-tab-summary">
             <a href="#{contextPath}/projects/view/#{build.project.name}/summary">
                 <span>Summary</span>
@@ -25,4 +28,5 @@
             </a>
         </li>
     </ul>
+  </nav>
 </div>

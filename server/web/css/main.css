@@ -9,9 +9,6 @@ body {
     display: flex;
     flex-direction: column;
 }
-body.awa {
-  background-color: #81CFB7;
-}
 #awa-page {
     position: inherit;
     height: auto;
@@ -87,6 +84,21 @@ div.awa-title dd {
     text-decoration: none;
 }
 
+@media (min-width:768px) {
+    .awa-side-nav {
+        float: left;
+        width: 100%;
+    }
+    .awa-side-nav {
+        position: relative;
+    }
+}
+@media (max-width: 768px) {
+    .awa-menu li {
+        display: none;
+    }
+}
+
 /* Project page */
 .project-header, .node-header, .nodes-header, .notification-header, .activity-header {
     /* float: left;*/
@@ -94,10 +106,6 @@ div.awa-title dd {
 }
 .project-header .awa-page-nav, .node-header .awa-page-nav, .nodes-header .awa-page-nav, .activity-header .awa-page-nav {
     background: #eee;
-}
-
-.side-menu {
-    display: none;
 }
 
 /* Nav menu */
@@ -138,134 +146,50 @@ div.awa-title dd {
     /* max-height: 0; */
     transition: max-height .5s ease-out;
 }
-/* Menu Icon */
-.hamb{
-    cursor: pointer;
-    float: right;
-    padding: 20px 20px;
-}/* Style label tag */
-
-.hamb-line {
-    background: var(--white);
-    background: black;
-    display: block;
-    height: 2px;
-    position: relative;
-    width: 24px;
-
-} /* Style span tag */
-
-.hamb-line::before,
-.hamb-line::after{
-    background: var(--white);
-    /* background: black; */
-    content: '';
-    display: block;
-    height: 100%;
-    position: absolute;
-    transition: all .2s ease-out;
-    width: 100%;
-}
-.hamb-line::before{
-    top: 5px;
-}
-.hamb-line::after{
-    top: -5px;
-}
-
 .awa-page-nav ul {
     list-style-type: none;
     width: 100%;
     height: 32px;
 }
-.side-menu {
-    display: none;
-} /* Hide checkbox */
-/* Toggle menu icon */
-.side-menu:checked ~ nav{
-    max-height: 100%;
+.awa-menu span {
+    font-size: 1.2em;
 }
-.side-menu:checked ~ .hamb .hamb-line {
-    background: transparent;
+.awa-menu a {
+    padding-top: 3px;
 }
-.side-menu:checked ~ .hamb .hamb-line::before {
-    transform: rotate(-45deg);
-    top:0;
+.page-summary .project-header .project-tab-summary,
+.page-xunits .project-header .project-tab-xunits,
+.page-builds .project-header .project-tab-builds {
+    border-color: #eee;
+    display: block;    
 }
-.side-menu:checked ~ .hamb .hamb-line::after {
-    transform: rotate(45deg);
-    top:0;
-}
-
-
-
-/* Menu Icon */
-
-.hamb{
-    position: absolute;
-    cursor: pointer;
-    /* float: right; */
-    /* padding: 40px 20px; */
-    top: 0;
-    width: 40px;
-    right: 0;
-    padding: 0 0;
-}
-
-
-.hamb-line {
-    background: var(--white);
+.awa-side-menu:checked ~ nav li {
     display: block;
-    height: 2px;
-    position: relative;
-    width: 24px;
-    
 }
 
-.hamb-line::before,
-.hamb-line::after{
-    background: var(--white);
-    content: '';
-    display: block;
-    height: 100%;
-    position: absolute;
-    transition: all .2s ease-out;
-    width: 100%;
+.page-summary #awa-top-nav #nav-tools a,
+.page-tutorials #awa-top-nav #nav-tutorials a,
+.page-wiki #awa-top-nav #nav-wiki a,
+.page-download #awa-top-nav #nav-download a,
+.page-news #awa-top-nav #nav-news a {
+    background: #eee;
+    color: #333;
+    border-color: #eee;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    -webkit-border-top-left-radius: 8px;
+    -webkit-border-top-right-radius: 8px;
+    -moz-border-radius-topleft: 8px;
+    -moz-border-radius-topright: 8px;
+    /* padding-bottom: 10px;*/
 }
-
-.hamb-line::before{
-    top: 5px;
+.awa-menu a:hover{
+    border-color: transparent;
 }
-
-.hamb-line::after{
-    top: -5px;
-}
-
-
-.side-menu {
-    display: none;
-}
-
-/* Toggle menu icon */
-
-.side-menu:checked ~ nav{
-    max-height: 100%;
-}
-
-.side-menu:checked ~ .hamb .hamb-line {
-    background: transparent;
-}
-
-.side-menu:checked ~ .hamb .hamb-line::before {
-    transform: rotate(-45deg);
-    top:0;
-
-}
-
-.side-menu:checked ~ .hamb .hamb-line::after {
-    transform: rotate(45deg);
-    top:0;
-}
+/* .awa-menu a:hover {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}*/
 
 .page-REPORT_WEEK .activity-header .activity-tab-week,
 .page-REPORT_MONTH .activity-header .activity-tab-month,
@@ -284,7 +208,6 @@ div.awa-title dd {
     border-top-right-radius: 0.5em;
 }
 .project-header .project-title, .node-header .node-title, .nodes-header .node-title {
-    /* float: left;*/
     padding-left: 0.5em;
     font-size: 2em;
     color: #626263;

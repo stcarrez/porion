@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-nodes -- Build node information and management
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -71,6 +71,40 @@ package body Porion.Nodes is
       end;
    end Find_Command_Path;
 
+   protected body Report_Output is
+
+      procedure Print (Kind : in Output_Type;
+                       Line : in String;
+                       Process : not null access
+                         procedure (Kind : in Output_Type;
+                                    Line : in String)) is
+      begin
+         Process (Kind, Line);
+      end Print;
+
+   end Report_Output;
+
+   procedure Read_Input (Report  : in out Report_Output;
+                         Stream  : in out Input_Buffer_Stream'Class;
+                         Strip_Crlf : in Boolean := False;
+                         Kind    : in Output_Type;
+                         Process : not null access
+                           procedure (Kind : in Output_Type;
+                                      Line : in String)) is
+      Reader  : Util.Streams.Texts.Reader_Stream;
+   begin
+      Reader.Initialize (Stream'Unchecked_Access);
+      while not Reader.Is_Eof loop
+         declare
+            Line : Ada.Strings.Unbounded.Unbounded_String;
+         begin
+            Reader.Read_Line (Line, Strip_Crlf);
+            exit when Reader.Is_Eof and then Length (Line) = 0;
+            Report.Print (Kind, Ada.Strings.Unbounded.To_String (Line), Process);
+         end;
+      end loop;
+   end Read_Input;
+
    --  ------------------------------
    --  Execute the command in the working directory and for each output
    --  line produced by the command call the Process procedure.
@@ -78,23 +112,25 @@ package body Porion.Nodes is
    procedure Execute (Controller  : in out Controller_Type'Class;
                       Command     : in String;
                       Working_Dir : in String := "";
-                      Process     : not null access procedure (Line : in String);
+                      Process     : not null access
+                        procedure (Kind : in Output_Type;
+                                   Line : in String);
                       Strip_Crlf  : in Boolean := False;
                       Status      : out Integer) is
-      procedure Read_Input (Stream : in out Input_Buffer_Stream'Class);
+      procedure Read_Input (Out_Stream : in out Input_Buffer_Stream'Class;
+                            Err_Stream : in out Input_Buffer_Stream'Class);
 
-      procedure Read_Input (Stream : in out Input_Buffer_Stream'Class) is
-         Reader  : Util.Streams.Texts.Reader_Stream;
+      procedure Read_Input (Out_Stream : in out Input_Buffer_Stream'Class;
+                            Err_Stream : in out Input_Buffer_Stream'Class) is
+         Report : Report_Output;
+         task Reader is
+         end Reader;
+         task body Reader is
+         begin
+            Read_Input (Report, Err_Stream, Strip_Crlf, STDERR, Process);
+         end Reader;
       begin
-         Reader.Initialize (Stream'Unchecked_Access);
-         while not Reader.Is_Eof loop
-            declare
-               Line : Ada.Strings.Unbounded.Unbounded_String;
-            begin
-               Reader.Read_Line (Line, Strip_Crlf);
-               Process (Ada.Strings.Unbounded.To_String (Line));
-            end;
-         end loop;
+         Read_Input (Report, Out_Stream, Strip_Crlf, STDOUT, Process);
       end Read_Input;
 
    begin

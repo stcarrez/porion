@@ -102,7 +102,8 @@ package body Porion.Nodes.Local is
                       Args        : in Util.Strings.Vectors.Vector;
                       Working_Dir : in String := "";
                       Process     : not null access
-                           procedure (Stream : in out Input_Buffer_Stream'Class);
+                        procedure (Out_Stream : in out Input_Buffer_Stream'Class;
+                                   Err_Stream : in out Input_Buffer_Stream'Class);
                       Status      : out Integer) is
 
       Command : constant String := Porion.Tools.To_String (Args);
@@ -114,12 +115,14 @@ package body Porion.Nodes.Local is
       end if;
 
       declare
-         Proc    : Util.Processes.Process;
-         Output  : Util.Streams.Input_Stream_Access;
-         Input   : Util.Streams.Output_Stream_Access;
-         Reader  : Util.Streams.Texts.Reader_Stream;
-         Start   : Usage_Type;
-         Usage   : Usage_Type;
+         Proc       : Util.Processes.Process;
+         Error      : Util.Streams.Input_Stream_Access;
+         Output     : Util.Streams.Input_Stream_Access;
+         Input      : Util.Streams.Output_Stream_Access;
+         Out_Reader : Util.Streams.Texts.Reader_Stream;
+         Err_Reader : Util.Streams.Texts.Reader_Stream;
+         Start      : Usage_Type;
+         Usage      : Usage_Type;
       begin
          if Working_Dir'Length > 0 then
             Log.Info ("Running '{0}' in '{1}'", Command, Working_Dir);
@@ -132,12 +135,14 @@ package body Porion.Nodes.Local is
          Sys_Rusage (Start);
          Util.Processes.Spawn (Proc      => Proc,
                                Arguments => Args,
-                               Mode      => Util.Processes.READ_WRITE_ALL);
+                               Mode      => Util.Processes.READ_WRITE_ALL_SEPARATE);
          Input := Util.Processes.Get_Input_Stream (Proc);
          Output := Util.Processes.Get_Output_Stream (Proc);
-         Reader.Initialize (Output, 4096);
+         Error := Util.Processes.Get_Error_Stream (Proc);
+         Out_Reader.Initialize (Output, 4096);
+         Err_Reader.Initialize (Error, 4096);
          Input.Close;
-         Process (Reader);
+         Process (Out_Reader, Err_Reader);
          Util.Processes.Wait (Proc);
 
          Sys_Rusage (Usage);
@@ -159,7 +164,8 @@ package body Porion.Nodes.Local is
                                Path       : in String;
                                Clean      : in Boolean;
                                Process    : not null access
-                                 procedure (Line : in String)) is
+                                 procedure (Kind : in Output_Type;
+                                            Line : in String)) is
       pragma Unreferenced (Controller, Process);
    begin
       if Clean and then Ada.Directories.Exists (Path) then

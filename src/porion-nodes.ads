@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-nodes -- Build node information and management
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -69,6 +69,8 @@ package Porion.Nodes is
 
    package Node_Status_Type_Objects is new Util.Beans.Objects.Enums (Node_Status_Type);
 
+   type Output_Type is (STDOUT, STDERR);
+
    type Listener_Type is limited interface;
    type Listener_Access is access all Listener_Type'Class;
 
@@ -109,13 +111,16 @@ package Porion.Nodes is
                       Args        : in Util.Strings.Vectors.Vector;
                       Working_Dir : in String := "";
                       Process     : not null access
-                           procedure (Stream : in out Input_Buffer_Stream'Class);
+                        procedure (Out_Stream : in out Input_Buffer_Stream'Class;
+                                   Err_Stream : in out Input_Buffer_Stream'Class);
                       Status      : out Integer) is abstract;
 
    procedure Execute (Controller  : in out Controller_Type'Class;
                       Command     : in String;
                       Working_Dir : in String := "";
-                      Process     : not null access procedure (Line : in String);
+                      Process     : not null access
+                        procedure (Kind : in Output_Type;
+                                   Line : in String);
                       Strip_Crlf  : in Boolean := False;
                       Status      : out Integer);
 
@@ -124,7 +129,8 @@ package Porion.Nodes is
                                Path       : in String;
                                Clean      : in Boolean;
                                Process    : not null access
-                                 procedure (Line : in String)) is abstract;
+                                 procedure (Kind : in Output_Type;
+                                            Line : in String)) is abstract;
 
    --  Read the file with the controller and execute the `Process` procedure with the
    --  input buffer stream that gives access to the file content.
@@ -140,6 +146,14 @@ package Porion.Nodes is
                              List       : in out Util.Strings.Sets.Set) is null;
 
 private
+
+   protected type Report_Output is
+      procedure Print (Kind : in Output_Type;
+                       Line : in String;
+                       Process : not null access
+                         procedure (Kind : in Output_Type;
+                                    Line : in String));
+   end Report_Output;
 
    type Controller_Type is abstract limited new Ada.Finalization.Limited_Controlled with record
       Listener : Listener_Access;
@@ -159,5 +173,13 @@ private
                            Listener   : in Listener_Access);
 
    function Find_Command_Path (Command : in String) return String;
+
+   procedure Read_Input (Report  : in out Report_Output;
+                         Stream  : in out Input_Buffer_Stream'Class;
+                         Strip_Crlf : in Boolean := False;
+                         Kind    : in Output_Type;
+                         Process : not null access
+                           procedure (Kind : in Output_Type;
+                                      Line : in String));
 
 end Porion.Nodes;

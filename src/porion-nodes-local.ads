@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-nodes-local -- Local build node management
---  Copyright (C) 2021-2022 Stephane Carrez
+--  Copyright (C) 2021-2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,7 +44,8 @@ private package Porion.Nodes.Local is
                       Args        : in Util.Strings.Vectors.Vector;
                       Working_Dir : in String := "";
                       Process     : not null access
-                           procedure (Stream : in out Input_Buffer_Stream'Class);
+                        procedure (Out_Stream : in out Input_Buffer_Stream'Class;
+                                   Err_Stream : in out Input_Buffer_Stream'Class);
                       Status      : out Integer);
 
    --  Create the directory and optionally make sure it is cleaned.
@@ -53,7 +54,8 @@ private package Porion.Nodes.Local is
                                Path       : in String;
                                Clean      : in Boolean;
                                Process    : not null access
-                                 procedure (Line : in String));
+                                 procedure (Kind : in Output_Type;
+                                            Line : in String));
 
    --  Read the file with the controller and execute the `Process` procedure with the
    --  input buffer stream that gives access to the file content.

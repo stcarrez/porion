@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-nodes-services -- Build node management operations
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -117,7 +117,8 @@ package body Porion.Nodes.Services is
 
          use type Ada.Containers.Count_Type;
 
-         procedure Process (Line : in String);
+         procedure Process (Kind : in Output_Type;
+                            Line : in String);
          procedure New_Token (Token : in String;
                               Done  : out Boolean);
 
@@ -132,8 +133,13 @@ package body Porion.Nodes.Services is
             Done := False;
          end New_Token;
 
-         procedure Process (Line : in String) is
+         procedure Process (Kind : in Output_Type;
+                            Line : in String) is
          begin
+            if Kind = STDERR then
+               Log.Error ("{0}", Line);
+               return;
+            end if;
             Util.Strings.Tokenizers.Iterate_Tokens (Line, " ", New_Token'Access);
          end Process;
 
@@ -181,19 +187,25 @@ package body Porion.Nodes.Services is
       --  OS_NAME and OS_VERSION_ID if provided give more reliable information than uname.
       procedure Probe_Os_Release (Controller : in Controller_Access) is
 
-         procedure Process (Line : in String);
+         procedure Process (Kind : in Output_Type;
+                            Line : in String);
 
          Release_Cmd : constant String := Configs.Get (RELEASE_COMMAND_NAME, RELEASE_COMMAND);
          Status      : Natural;
          Os_Name     : UString;
          Os_Version  : UString;
 
-         procedure Process (Line : in String) is
+         procedure Process (Kind : in Output_Type;
+                            Line : in String) is
             Pos   : constant Natural := Util.Strings.Index (Line, '=');
             First : Natural;
             Last  : Natural;
          begin
-            if Pos = 0 or Pos = Line'Last then
+            if Kind = STDERR then
+               Log.Error ("{0}", Line);
+               return;
+            end if;
+            if Pos = 0 or else Pos = Line'Last then
                return;
             end if;
             if Line (Line'Last) = '"' or Line (Line'Last) = ''' then
@@ -240,13 +252,20 @@ package body Porion.Nodes.Services is
       procedure Probe_Rule (Controller : in Controller_Access;
                             Rule       : in out Rule_Status_Type) is
 
-         procedure Process_Availability (Line : in String);
-         procedure Process_Version (Line : in String);
+         procedure Process_Availability (Kind : in Output_Type;
+                                         Line : in String);
+         procedure Process_Version (Kind : in Output_Type;
+                                    Line : in String);
 
          Status      : Natural;
 
-         procedure Process_Availability (Line : in String) is
+         procedure Process_Availability (Kind : in Output_Type;
+                                         Line : in String) is
          begin
+            if Kind = STDERR then
+               Log.Error ("{0}", Line);
+               return;
+            end if;
             if Line'Length > 0 then
                Log.Info ("{0}", Line);
 
@@ -254,8 +273,13 @@ package body Porion.Nodes.Services is
             end if;
          end Process_Availability;
 
-         procedure Process_Version (Line : in String) is
+         procedure Process_Version (Kind : in Output_Type;
+                                    Line : in String) is
          begin
+            if Kind = STDERR then
+               Log.Error ("{0}", Line);
+               return;
+            end if;
             if Line'Length > 0 then
                Log.Info ("{0}", Line);
 

@@ -17,11 +17,14 @@
 -----------------------------------------------------------------------
 with Util.Strings.Vectors;
 with Util.Files;
+with Util.Log.Loggers;
 with Porion.Configs;
 with EL.Contexts.Default;
 package body Porion.Nodes.SSH is
 
    package UBO renames Util.Beans.Objects;
+
+   Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Nodes.SSH");
 
    --  ------------------------------
    --  Create the controller for the management of the given build node.
@@ -77,7 +80,8 @@ package body Porion.Nodes.SSH is
                                Path       : in String;
                                Clean      : in Boolean;
                                Process    : not null access
-                                 procedure (Line : in String)) is
+                                 procedure (Kind : in Output_Type;
+                                            Line : in String)) is
       Status : Integer;
    begin
       if Clean then
@@ -102,6 +106,31 @@ package body Porion.Nodes.SSH is
                         Path       : in String;
                         Process    : not null access
                            procedure (Stream : in out Input_Buffer_Stream'Class)) is
+      procedure Read_Input (Out_Stream : in out Input_Buffer_Stream'Class;
+                            Err_Stream : in out Input_Buffer_Stream'Class);
+
+      procedure Print (Kind : in Output_Type;
+                       Line : in String);
+      procedure Print (Kind : in Output_Type;
+                       Line : in String) is
+      begin
+         Log.Error ("{0}", Line);
+      end Print;
+
+      procedure Read_Input (Out_Stream : in out Input_Buffer_Stream'Class;
+                            Err_Stream : in out Input_Buffer_Stream'Class) is
+         Report : Report_Output;
+         task Reader is
+         end Reader;
+         task body Reader is
+         begin
+            Read_Input (Report, Err_Stream, True, STDERR, Print'Access);
+         end Reader;
+
+      begin
+         Process (Out_Stream);
+      end Read_Input;
+
       Status : Integer;
       Args   : Util.Strings.Vectors.Vector;
       Ignore_Working_Dir : Boolean;
@@ -109,7 +138,7 @@ package body Porion.Nodes.SSH is
       Controller.Expand ("cat " & Path, "", Ignore_Working_Dir, Args);
       Controller.Execute (Args => Args,
                           Working_Dir => "",
-                          Process => Process,
+                          Process => Read_Input'Access,
                           Status => Status);
    end Read_File;
 
@@ -121,10 +150,16 @@ package body Porion.Nodes.SSH is
                              Path       : in String;
                              Pattern    : in String;
                              List       : in out Util.Strings.Sets.Set) is
-      procedure Process (Line : in String);
+      procedure Process (Kind : in Output_Type;
+                         Line : in String);
 
-      procedure Process (Line : in String) is
+      procedure Process (Kind : in Output_Type;
+                         Line : in String) is
       begin
+         if Kind = STDERR then
+            Log.Error ("{0}", Line);
+            return;
+         end if;
          if Line'Length > 0 then
             List.Include (Util.Files.Compose (Path, Line));
          end if;

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-nodes-ssh -- SSH build node management
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,7 +50,8 @@ private package Porion.Nodes.SSH is
                                Path       : in String;
                                Clean      : in Boolean;
                                Process    : not null access
-                                 procedure (Line : in String));
+                                 procedure (Kind : in Output_Type;
+                                            Line : in String));
 
    --  Read the file with the controller and execute the `Process` procedure with the
    --  input buffer stream that gives access to the file content.

@@ -11,7 +11,7 @@ git ls-remote -h -- #{repository_url}
 git remote show #{repository_url}
 
 [checkout]
-git clone #{not empty branch ? '-b' : ''} #{branch} --recursive #{repository_url} #{build_dir}
+git clone -q #{not empty branch ? '-b' : ''} #{branch} --recursive #{repository_url} #{build_dir}
 
 [guess]
 git -C #{path} config remote.origin.url

@@ -6,3 +6,6 @@ lcov --version
 
 [command]
 lcov --summary #{path}
+
+[log-warning]
+.*: WARNING:

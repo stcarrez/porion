@@ -227,6 +227,7 @@ package body Porion.XUnit.Parsers is
       Parser.Add_Mapping ("testsuite", Mapper'Unchecked_Access);
       Parser.Add_Mapping ("testsuites", Mapper'Unchecked_Access);
       Reader.Set_Logger (Log'Access);
+      Reader.Set_Filename (Path);
       Reader.Parse (Stream, Parser);
    end Scan;
 

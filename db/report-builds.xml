@@ -80,7 +80,7 @@
             INNER JOIN porion_branch AS branch ON branch.id = build.branch_id
             INNER JOIN porion_recipe AS recipe ON build.recipe_id = recipe.id
             INNER JOIN porion_node AS node ON build.node_id = node.id
-            ORDER BY finish_date DESC
+            ORDER BY CASE WHEN finish_date IS NULL THEN build_date ELSE finish_date END DESC
         </sql>
         <sql-count>
             SELECT
@@ -116,7 +116,7 @@
             INNER JOIN porion_recipe AS recipe ON build.recipe_id = recipe.id
             INNER JOIN porion_node AS node ON build.node_id = node.id
             WHERE project.id = :project_id
-            ORDER BY finish_date DESC
+            ORDER BY CASE WHEN finish_date IS NULL THEN build_date ELSE finish_date END DESC
         </sql>
     </query>
 

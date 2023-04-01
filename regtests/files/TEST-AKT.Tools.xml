@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<testsuite errors="0" failures="0" skips="0" tests="47" time="6.986752000" name="AKT.Tools">
+<testcase classname="AKT.Tools" name="Test AKT.Commands.Help" time="0.020805000">
+<testcase classname="AKT.Tools" name="Test AKT.Commands.Get" time="0.025849000">
+<system-out></system-out>
+</testcase>
+<testcase classname="AKT.Tools" name="Test AKT.Commands.Open (Corrupted data)" time="0.185500000">
+<system-out><![CDATA[akt: Data fragment hmac does not match in block 0.3
+W&#x17;þßR=&#x17;y&#x11;4&#x1E;&#x1B;tF&ÖÞ4À°ËÅíÉÚV&#x15;¶-·Ný-XŸêšMä¼&#2;&#x1B;&#2;… Â¯v¡—lí°ý9MF…‡r,+VFs‰’KØ&#6;_&#x1E;}IŒ&#7;„w&#x19;^,WÕQÕPVúØ”ã–”Ñnr¥Ê=í&#x13;Ùyj¨&#3;1nÅ	90’žBŸ‹U‰)q³x‚³ì&#xF;x&#8;]^}H{†=úë­‚¯&#x16;(Y¦&#x1E;>é²&#x1A;†©+ÖOä˜GVLG(þ&#x1E;ÛˆœkFìœ¸ŸÈO?à`eoH­®]Üwi&#xB;ÎÞ<›ñŒQ×$¼0÷™&#x10;÷¸u&#x10;]aî&#xB;Î&#0;1Þ=­:°X{nen$„šâJ2úžjA¹-xu&#1;e=W‡DÁæ¤.&#xB;lrGíÀÿ1&#1;F}ßÑ”Ô&#0;hô˜D+¿u‰mþ	;È=,’ëãc&#8;&#x10;&#x1C;_ÇÝœª÷>$=Ä•HùzmŸjÿ²Ê[W‘7&#8;"&#x1B;­’µ—7„¹Ý‚F1¦¬vþ&#x1C;³Qº¼â&#x16;S¹¶3^oÞ(gÛÂÒ&#3;&#xB;&#1;G|ÖL—&#x17;îŠ‘&#x18;@4G&#0;.e(&#x11;|&#x15;d+)Ý&#6;¾S—M&#x1B;D$vªJ&#0;û&#x13;7&#x12;O»Êx¨¥¦›Ò¤~v&#x15;2&#8;Ãâj(÷¼”5&#5;¢9=ú°L‡EÛC¶ž$Å`&#x13;°ƒ¬G&#1; b•±8ÿºÉì~Ü&#xB;3Íà$O&#6;E&#x12;Ö&#4;š&#3;²ª:ƒ&#x17;7ÑÍFaCÃ!éÃì´þ¢jNd®	V¤&#x14;ªC&#7;äVÊGszm‹"tQŸÊ·?&#x18;ï£,¯&#x10;õÈB&#2;Öž°µF_d³øt}ô™ÿ'1.&#x13;•G!âÏ¦RpÝÖôÀÄŠK'õ¿3&#xE;&#x1C;ÿ(4”&#x1B;T…‰±Ü&#8;Í®¶h™êâ¢ÚBWrª:ï—?B&#8;ÕÇïe9ÜV‡Ø©!r&#x11;)&#8;&#x10;!ž(Ô&#x14;c‡Bë¦ß™íÒ³©ÝmÉ"&#x1A;Â:xòÃ&#5;Ž&òÓfËþÅ¥Ô&#x16;Þ‚ÍH&#x10;Ý*¼&#x1B;Ö7Î›&#xE;ˆ÷¦Íö6&#4;í6îª4Ü&#5;‰¦?¯:$…3e&#x1C;À!%&#x14;­ð$µ'éèyù
+I°H”YÏ0Ù+cSC&#1;¢^9U)üâ½_,xòÛFš¤ç&#7;¢1'XŒO&#6;®ELØO†—&#5;ŸåÑ&#x11;5&#x17;öN;&#x19;ð¯]¥%¡&#x1C;&#x1B;xŽwÊØ,Ö.:4×{¶Ô?˜+û¼5Œ1ÐRH(¾‚ôØùƒD&#2;ä&#6;›&#x16;J,|eA&#x13;&#x1E;˜màž.&#x1E;¯€ÊÅî”›¸&#6;Ó&#x1F;\&#x12;#1K02&#x11;ºèŠÛôå&#xB;ý&#x1C;æ×N&#2;&d&#x1E;ªv‡&#xB;6§ZMþO…Øÿ&#3;<¶ÌÅmFÅ&#7;&#xE;S9PÖ8&#x10;&#5;oji@:‹–¥&#x16;Å†°Ÿa	é
+6¬¤å{$øÉÖŽóÛ í2¥Ž9Ns‹ë›Ì&#x1E;Ž&#x10;‹D&#7;{{DâÊ	mlrÙòpÐoÓð½6ÖAæÑ&#x18;Öîþ(ÝÙHêñA:º9ÿ®éæùw&#x17;à·&#x15;×.Û;Žº&#x14;Qž
+Â&#x16;¾3-Òz0/[i¼Õp&#x1A;2úV[A&#0;¹Ÿœqøë&#xE;C&#5;.[Ûµ¥®µ[&#x1E;Ü ^FüË"&#x1C;&#x14;jª&&#x18;N÷½öm&#x1E;³.j	hó°ƒ/&#xF;Ý ZfæxXýŽ­Y&#6;z„d;Àj&#x1A;é4ø&#0;E¾ã~cÙ$q9¯Ÿ_ä“”6”—n%¤&#xE;@Å¼ÔxLîšÀ¼­ÚP(9}Ž„à&#x1D;&#x13;é[§Œàû£V&#x1D;rú&#x12;sÔ‚&#7;Õß…o&#x14;&#x1F;zŒ8±¤‘…&#x1E;¥ÙóÕTyj­éI·~·;&#x1A;5®ôÅ©jeÌ©qxÒübÆÌç2¡›Å&#x1D;i‰x&#8;Û&jc¹¬&#x13;®å½&#x1C;xí&#8;¼±>½Ð¢ÔS&#xB;zO÷5å&#5;{žc€)¯K’,ö¤Ê$íÝñâì&#x19; ë;¸•Ø‰s&#5;8NžøÿÚ™(&#x19;
+Ô
+þ³éS&#x12;:ò&#0;âkC²Ø¹I/¨9*»Jm&#x13;iFŠ¥;ý‰&#xB;}w&#x17;Õç†à&#3;þÛé&#x17;Ÿ&#xE;p^Ëé./&#4;àãÛ„&
+&#x17;82¶™ö´4SøŒæTÂáÑb1ümY»HT.ŒÚ4÷›¡r\&#8;(N‘ArG(„	,0&#xB;›g4‘q&#x19;>/&#x1E;ï(ŒCXöÍßmÌ&#1;Wî&#x1B;ëš¨[ÎÏÈ´ZÛÅËª&#x1A;Ð*²nô&#x13;&#1;'¥F#&#4;SGtsŠ7&#x16;›V}QÚlŠ•pÚ‘Twì&#x15;­‹‚²&kqè©©q2ÑY10&#xB;ûIP &#x1A;jô;-&#4;YÖ4KIm0àùõSp&#x15;d7P÷-µ&#x13;d&#x15;ÂîO&#x18;Aó¡òëî9’&#xE;bâÈÉ™™à}Ì
+l†=I	í©®:ø-&#4;¦¬sX&#x10;¶&#xE;sˆOÚòkzU6É*0‚K&#x1E;Ÿ—&#x1C;µ&#7;&#x13;¦&#xB;£ä	<Øl«,‹y~LS&#0;ßT·a	¿£I÷&#x13;t&#x18;$ÕK$ç¥‚(Ð…&#8;@ÑXÐ$&#x1C;&#7;®G1—•ßŒ¥dQ²:Ü	é*D&#xE;\áO&#0;hë&#x1B;&#x1F;&#3;¬</&#x13;Í™º÷–ýLYü\„Ü&#1;Lé &#xB;®+&#x1C;ƒ¹˜aY’7&#6;	&#5;E@þG+&#6;®[@™7JhtÎÆâÞv}0”§úÐ¬Mt#~pq&#x15;Bh±<ê1ürs&#x1F;—&#4;Têö&#5;æÕ;é‡óÔfX¬nsÃÏƒ*ÌvxO,&#xF;¶…€]}œ²kp&#x16;[X&#2;ª
+Öðíž&#x10;&#x18;|N_ÞT¹&#4;1\¯-L Ã&#x19;É™MòâGVÙ&#5;&#7;Ça&#xE;Ð
+×¤b±~–fÁ·Pÿ¿Ã–Vß#"µ[½Ššo€–ä&#x1D;¤z¢&/QA&#8;û¨¡#ò&#xF;&#x19;ÖŽaÈ`åjÇÒõEO&#x1D;ó®^fSÊ®(7Rà#•Z'†jS/¥’ã&#x1F;yÊÂ8À&#x1B;Ì¦‡ &#x16;½”uåIlö™ùø&#x19;miêC»™&#x19;Æ&#x1F;‡ïå&#xB;²YYž“ŠÈAlá³Z˜—ý÷„Ù&#x10;DNW—dLÅ©BK©Ñin¥&&#x1E;í“ž± 6ÂqwP‰N&#x14;£âmæEvÑþàó`—«æ6&#0;Š›°¯êòµCà„&#3;1_‰†/&#0;‘&#xB;ƒÇÐKÖ±øŠÿR-?ÀçñÎ€uæNØ‡&#x13;ì &#x11;hÐÝ@éÂýŠ"Ø¨&#3;RÚC‰	—HÉ°~^&#x1A;Á¾¤7Ó³2û—;•"9€–¹`ì•&#x10;„&#x10;ƒjD"–J¨`aQ\ýËÖ0ò“˜A¦éÅ_|oü*&#x13;Rª<ìQhõ&#x10;ª;À«ÚÃxqÒŒM¼ØÈµ`í£RBýFE6VWê ?ÆÄ·üÝêÂIo&#0;ÒrÇa¢Š¥§õš-ß&#3;îzw&#x11;ó‡^ÏTÏMø&#x1C;ùjî0›&#x1A;4÷FÊÉB
+&#xB;¨b§]?èª&#x17;X¤ÆÞÇ&#8;oå&#x15;Á;í¦ Uûd|ò&#x1D;g¾&#x13;G¾&#x14;Y&#3;W˜&#x1A;q:i&#x11;(É,&#8;qÜ†&#x1F;"&#xB;&#x1C;è&#x1F;±&#5;&#x1E;&#lb)˜tê$â&#x10;:‚&#x12;ÑkzYA¥º&#5;®1
+¿áˆüšé‹"âÒí¥Ö1u&#x14;&#6;âÂ$ä5Äò“`3&#3;6ìHñB¢hÞQ^³¹¨&#0;  ºÇxº^ª£]0ôX¶½DIõ/x&#4;æ¯Ï2n#K
+&#7;á>&#2;@&#x10;ü¿¤0&#x18;&#x1F;6Ûßóå"¬T¿zZFBú5DK.Cd H±„	$sßGÆPÆ&#x1B;%]ÆÔù®¿Ùóp|j&#x17;É&#x1E;[ò\'=iÈ–’³8Ðd_€Þ-&#x13;ñßmW&#xE;àõŒÍ¿HéÑj&#1;úŸ'»ßc&#x12;b#zÖàoÁß·•>MÕÌl;)›C ÑoE€Î §eŒL™<g«aé‘,S=X;ŽÒºÒsåÙ“c·D@Ýb%y[e¢ø
+&#xF;p&#6;æ&#x13;Ÿ«bQIE¥ÇI§ôø´[ax&#xF;)=]7ñÉÓH&#x14;&#x10;&#x1F;&#1;åKHøe–Aá'¬&#0;µœÍæ&#x19;ô&#3;ë”œaYxÁí³P##/jÈÊ­*¡•Yd¬ð|-_t&#x18;(éƒ=L&#x19;êÀ&#x1B;&#x1C;Ä&#x13;ØS]]&#x10;ŒBcÉ&#x14;é§ß°âÎ5 Š&#x1A;DŠœN		´Ä§“‘Î<brÄ®˜þ“–&ºiíº/k@]¿øE&#x18;òôì›LA»XëègO½Â&#x16;l½£ÍkM7ºþ‰[rÔ&#x1C;#“&#x1A;é’sÞp¤1Ø`&#xE;C‡€ŸC&#x12;"Þ&#x1C;NgêÞUÖj+eýh,ÈaÚ&#x1B;ËÐ	”ÿ&#x14;Þ&#7;ƒÎ•¿±Ä5$~[“!dÏ¼p7ZÝAJ&#x19;þ–^€ù&#x15;~Ue&#x1B;Ú^ &#x12;:q(®ÜÙ»	 £&#x16;²&#x16;¸É!ø).{™<`ô²Æñæ$lòápÀ“±¶‰õ'¾[ôè–°Ö°e&#x16;TÒÌxbèÁäAÜÞ7¶#¢¼å|1>„wÙ‘Ô¶ˆ&#x1A;BÃ&#6;n{µÙ[|yW&#x1D;Ú{&#5;£@ô_±&#x10;&#xE;¸ÅEo•Å®a-‰&#x15;ìåŸ¯y0¨
+	\&#x15;¦[Í¿SÃóÉË–&F±Ó‰~q1Ö¬‚ÛíðE„ô¬.’ÐE&#x16;×^šÊ“&#x16;ûE&#x13;[tàq&#3;Dålj1C3r¼í›ÉÂ²‘‰á&#x1F;Rãn&#0;àÞ&#x15;ç<»º50Ô¿Ùã…ý|ó&#x11;†yywU&#2;ô†Ø&#x15;–6LÀ¢ï&#x15;&#xF;&#5;H@]©Zú&#6;•ØÙ_Ö†'&#0;&#x1D;\™&#1;#®Þ&#x1B;”¥£Ò3§&#xE;h¶ºV¢ªº&#x18;{]"©d ;&#x17;a[‡Õ&#7;fÝ&#x16;ûÛÙ¤ÇGr/
+ÍDÒ|nìÄ°òŸO&#xF;»‘/Q&#x10;]e¬Ò&#x11;&#6;!&#x1E;]ù2˜ˆÜâIý&#8;BT÷•&#x18;¡õ	‚´&#2;Ãþ3Ýå©,aTìµ\&#x14;&#4;`&#6;y•uË«ÈÉÓPÖ&#2;+\&#x18;Z9†6€±šÇ·@ŒPX¹ð—+&#x19;&#1;Ç&#x13;z¿¢»ØªIÁv&#4;r=s«H1¿&#x1F;š&#5;‡b‘yê¦lŠB&#xF;Ð½#&#xF;4÷Å|Œ­&#xB;&#4;›ìˆgó¿Å0§Ë1V~“C&#x19;_œÈÉæÍø*ˆ&#xB;À¡ÎyÞ&#x12;Þz²‡âÑKàÊç&#x1C;K&#3;\&#x19;J–W&#x1A;9
+2±yÿ&#x17;œ†ÜßÄT„É˜NÊ§Zkž Pb×’Ù&#x15;ßÂ¢w¹ö=*cÊ~ÚÙÓ&&#7;#B„Ý“öÎÄ2W¨¤XÒXÅ/Ñò«Å¯ÀL&#3;ÝqRq²Íòi¼Ïµh†.z&#x1D;Ô­* ½é{1VÜÄ2±rò±¶1·0æ&#x1D;O•NÿD×J¡yå&#xB;…ÜF+@&#x14;®§yZ‚Ã&#x13;È¼Ôù~ReêF{&#7;O­–²±%¿éÕ{WëÕ&#x1E;U@9HQŒ&#4;7S ICÓè&#x1C;&#8;ŸÑƒµ')7!°<æ+&#x11;A	bÇŽÒ‚I£¥
+£ÊÒ¡êÎPlìyÂ·–kM&#x1D;#&#3;‘åX0®C3â rÄ'’høÿÙry žœ_&#x14;½à&#x16;²pR&#2;/E
+4k¥+²ç&#6;!"îÚ‰&#x15;ºÇÞ]t&#x1B;&#xF;©h&#2;eö]¹ï¨&#7;E&#x13;	É§…í©WWwMj&#xB;&#x1F;[Á®E%OE(úÔIzDÌÀk0vZ²T²Ss[øš~qñ&#1;’\&#4;F™À#MâçªY&#x1A;4P¿Gô{+Åö&#x14;ž–0&#4;ðŸ\Ì8ïÌî{-+ˆî(OæÇ°í'BÊ8Zkž|²TËÀµJš2¬ø‰o&#x19;±xÏˆ;³é|¸ÅóŠæAÙ-UHüÒ–ŒtÙ½qTÆÂ„ûý¨~""‚dËÉÛ&#x10;ùQ&#2;˜5×Zß&#x1D;Ò@b‚``FBn.·UË‚&#x1A;µR5Òè&#x11;É÷û£ýÓŽr§VæÝ»ìÒ&#x1C;1ÎÙG¿VºÇ&#8;Ç¢ëåŒŽ&#x17;Ô4&#0;è¿ôÍj&#x10;þ&#8;Üž·&#3;LÍ&#1;µa>7îñ?¨²!Îj
+M6ÙÜ‹Ô &#x1D;K˜_øWa~&#7;¯ðj°¤æã| ¿ì´”L¡h¹Ò&#xB;?:_/¾wˆ&#2;¶P­KŸ[öþÓŒ`ò&#x1A;&#x1C;&#x1A;ŸÿBŒQBtà³¬›&#x16;ã¡°q*€Q3&#x17;fõÕaöê¨Â•D=£—3ÔÞÌª"šÄÁBeî´khÃ¾&#8;&#x14;öý&#x1B;ÚzÿfÜ¢Êlè¾Xo‰|&#x15;Ÿhç&#6;ç\†&#x13;—ÌÈX×¤w>Á¸Ä&#x1B;m]ýãï(akt: Exception while decrypting data: : Exception KEYSTORE.CORRUPTED: keystore-repository-workers.adb:42
+akt: the keystore file is corrupted: invalid meta data content
+]]>
+</system-out>
+</testcase>
+<testcase classname="AKT.Tools" name="Test AKT.Commands.Open (Missing Storage)" time="0.081155000">
+<system-out><![CDATA[akt: the keystore file is corrupted: invalid or missing storage file
+]]>
+</system-out>
+</testcase>
+<testcase classname="AKT.Tools" name="Test AKT.Commands (-V)" time="0.023183000">
+<system-out><![CDATA[Ada Keystore Tool 1.4.0
+]]>
+</system-out>
+</testcase>
+<testcase classname="AKT.Tools" name="Test AKT.Commands (Invalid file)" time="0.022995000">
+<system-out><![CDATA[akt: Invalid or truncated keystore file 'Makefile': size is incorrect
+akt: the file is not a keystore
+]]>
+</system-out>
+</testcase>
+<testcase classname="AKT.Tools" name="Test AKT.Commands.List (Nested wallet)" time="0.560074000">
+<system-out><![CDATA[Name                                                     Size  Block Date
+property                                                    5      1 2020-02-07 20:58:04
+wallet                                                      0      1 2020-02-07 20:58:04
+akt: no content for an item of type wallet
+]]>
+</system-out>
+</testcase>
+<testcase classname="AKT.Tools" name="Test AKT.Commands.OTP" time="0.167836000">
+<system-out><![CDATA[GitHub:bob
+Gitlab:harry
+GitHub:bob: code: 714307
+Gitlab:harry: code: 14307
+Code: 209861
+Code: 205465
+Test:bob
+Unit:harry
+]]>
+</system-out>
+</testcase>
+<testcase classname="AKT.Tools" name="Test AKT.Commands.Genkey" time="0.186596000">
+<system-out><![CDATA[secret-data
+akt: invalid password to unlock the keystore file
+akt: invalid password to unlock the keystore file
+]]>
+</system-out>
+</testcase>
+</testsuite>

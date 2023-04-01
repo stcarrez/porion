@@ -45,6 +45,7 @@ package body Porion.XUnit.Tests is
       Results   : Analysis.Test_Results;
       Path      : constant String := "regtests/files/TEST-SQLite-Users.Tests.xml";
       Path2     : constant String := "regtests/files/TEST-Dynamo.xml";
+      Path3     : constant String := "regtests/files/TEST-AKT.Tools.xml";
       Service   : Porion.Services.Context_Type;
       Builder   : Porion.Builds.Services.Context_Type;
       Info      : Porion.Sources.Source_Info_Type;
@@ -86,6 +87,7 @@ package body Porion.XUnit.Tests is
                                    Executor => Executor);
       Porion.XUnit.Parsers.Scan (Path, Results);
       Porion.XUnit.Parsers.Scan (Path2, Results);
+      Porion.XUnit.Parsers.Scan (Path3, Results);
       --  Porion.XUnit.Parsers.Scan ("regtests/files/many", "*.xml", Results);
       Porion.XUnit.Analysis.Save (Results => Results,
                                   Build   => Service.Build,

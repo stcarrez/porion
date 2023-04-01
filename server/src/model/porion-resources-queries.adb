@@ -951,10 +951,11 @@ package body Porion.Resources.Queries is
        & "ON branch.id = build.branch_id" & ASCII.LF & "            INNER JOIN por"
        & "ion_recipe AS recipe ON build.recipe_id = recipe.id" & ASCII.LF & "     "
        & "       INNER JOIN porion_node AS node ON build.node_id = node.id" & ASCII.LF
-       & "            ORDER BY finish_date DESC" & ASCII.LF & "        </sql>" & ASCII.LF
-       & "        <sql-count>" & ASCII.LF & "            SELECT" & ASCII.LF & "   "
-       & "         count(build.id)" & ASCII.LF & "            FROM porion_build AS"
-       & " build" & ASCII.LF & "        </sql-count>" & ASCII.LF & "    </query>" & ASCII.LF
+       & "            ORDER BY CASE WHEN finish_date IS NULL THEN build_date ELSE "
+       & "finish_date END DESC" & ASCII.LF & "        </sql>" & ASCII.LF & "      "
+       & "  <sql-count>" & ASCII.LF & "            SELECT" & ASCII.LF & "         "
+       & "   count(build.id)" & ASCII.LF & "            FROM porion_build AS build"
+       & ASCII.LF & "        </sql-count>" & ASCII.LF & "    </query>" & ASCII.LF
        & ASCII.LF & "   <query name='project-last-build-list'>" & ASCII.LF & "   "
        & "     <comment>Get the list of builds</comment>" & ASCII.LF & "        <s"
        & "ql>" & ASCII.LF & "            SELECT" & ASCII.LF & "            project"

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-configs -- Configuration
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -99,6 +99,9 @@ package Porion.Configs is
 
    --  Get a working directory.
    function Get_Work_Directory (Name : in String) return String;
+
+   --  Get the directory holding local template files.
+   function Get_Templates_Directory return String;
 
    --  Get the default path of the local database.
    function Get_Default_Database_Path return String;

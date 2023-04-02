@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-configs -- Configuration
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -322,6 +322,15 @@ package body Porion.Configs is
    begin
       return Util.Files.Compose (Dir, Name);
    end Get_Work_Directory;
+
+   --  ------------------------------
+   --  Get the directory holding local template files.
+   --  ------------------------------
+   function Get_Templates_Directory return String is
+      Dir : constant String := Util.Files.Compose (Get_Porion_Directory, "templates");
+   begin
+      return Util.Files.Compose (Dir, Name);
+   end Get_Templates_Directory;
 
    --  ------------------------------
    --  Get the default path of the local database.

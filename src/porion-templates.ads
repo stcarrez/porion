@@ -19,6 +19,7 @@ with Util.Refs;
 with Util.Log.Locations;
 with Util.Nullables;
 with Util.Strings.Vectors;
+with Util.Strings.Maps;
 with Ada.Containers.Vectors;
 with Ada.Containers.Ordered_Maps;
 with Porion.Builds;
@@ -36,6 +37,8 @@ package Porion.Templates is
                                Name       : in String) return String;
 
 private
+
+   function Get_Template_Name (Path : in String) return String;
 
    subtype Location_Type is Util.Log.Locations.Line_Info;
 
@@ -155,8 +158,9 @@ private
                                       "<"          => Ada.Strings.Unbounded."<");
 
    type Repository_Type is limited record
-      Templates    : Template_Maps.Map;
-      Search_Paths : UString;
+      Templates      : Template_Maps.Map;
+      Search_Paths   : UString;
+      Template_Paths : Util.Strings.Maps.Map;
    end record;
 
 end Porion.Templates;

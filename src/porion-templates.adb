@@ -16,16 +16,55 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Unchecked_Deallocation;
+with Ada.Directories;
+with Ada.Characters.Handling;
 with Util.Files;
+with Util.Strings;
 package body Porion.Templates is
+
+   function To_Lower (S : in String) return String
+                      renames Ada.Characters.Handling.To_Lower;
+
+   function Get_Template_Name (Path : in String) return String is
+   begin
+      return To_Lower (Ada.Directories.Base_Name (Path));
+   end Get_Template_Name;
 
    --  ------------------------------
    --  Set the search path to find and load templates.
    --  ------------------------------
    procedure Set_Search_Paths (Repository : in out Repository_Type;
                                Path       : in String) is
+
+      procedure Process (Dir : in String; Done : out Boolean);
+
+      procedure Process (Dir : in String; Done : out Boolean) is
+         use Ada.Directories;
+
+         Filter  : constant Filter_Type := (Ordinary_File => True,
+                                            Directory     => False,
+                                            others        => False);
+         Search  : Search_Type;
+         Ent     : Ada.Directories.Directory_Entry_Type;
+      begin
+         Start_Search (Search, Path, "*.porion", Filter);
+         while More_Entries (Search) loop
+            Get_Next_Entry (Search, Ent);
+            declare
+               Full_Path : constant String := Full_Name (Ent);
+               Name      : constant String := Get_Template_Name (Full_Path);
+            begin
+               if not Repository.Template_Paths.Contains (Name) then
+                  Repository.Template_Paths.Insert (Name, Full_Path);
+               end if;
+            end;
+         end loop;
+         Done := False;
+      end Process;
+
    begin
       Repository.Search_Paths := To_UString (Path);
+      Util.Files.Iterate_Path (Path, Process'Access);
    end Set_Search_Paths;
 
    --  ------------------------------
@@ -34,10 +73,15 @@ package body Porion.Templates is
    --  ------------------------------
    function Get_Template_Path (Repository : in Repository_Type;
                                Name       : in String) return String is
-      Path     : constant String := To_String (Repository.Search_Paths);
-      Filename : constant String := Name & ".porion";
+      Lower_Name : constant String := To_Lower (Name);
+      Pos        : constant Util.Strings.Maps.Cursor
+        := Repository.Template_Paths.Find (Lower_Name);
    begin
-      return Util.Files.Find_File_Path (Filename, Path, ':');
+      if Util.Strings.Maps.Has_Element (Pos) then
+         return Util.Strings.Maps.Element (Pos);
+      else
+         return "";
+      end if;
    end Get_Template_Path;
 
    function "=" (Left, Right : in Variable_Refs.Ref) return Boolean is

@@ -1,6 +1,6 @@
 with GNU;
 with AWA;
-template local extends GNU is
+build local extends GNU is
 
   recipe netbsd extends GNU.main on netbsd is
     MAKE := "gmake";

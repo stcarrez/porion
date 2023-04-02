@@ -39,6 +39,7 @@ package body Porion.Templates.Tests is
       Path     : constant String := Util.Tests.Get_Path ("regtests/files/templates");
       Repository : Porion.Templates.Repository_Type;
    begin
+      Porion.Templates.Set_Search_Paths (Repository, Path);
       Parser.Load (Path & "/gnu.porion", Repository);
       Parser.Load (Path & "/local.porion", Repository);
       Parser.Load (Path & "/ado.porion", Repository);

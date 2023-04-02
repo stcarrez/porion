@@ -1,5 +1,5 @@
 with GNU;
-template ado extends GNU is
+build ado extends GNU is
 
    step test_results xunit
        "regtests/results/MySQL-*.xml"

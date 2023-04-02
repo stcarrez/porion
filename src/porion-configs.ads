@@ -25,6 +25,7 @@ package Porion.Configs is
    PROJECT_DIR_NAME       : constant String := "project_dir";
    RULES_DIR_NAME         : constant String := "rules_dir";
    RULES_SEARCH_PATH_NAME : constant String := "rules_search_path";
+   TEMPL_SEARCH_PATH_NAME : constant String := "templates_search_path";
    DATABASE_NAME          : constant String := "database";
    DEFAUL_LOG_DIR_NAME    : constant String := "log_dir";
    KEYSTORE_PATH          : constant String := "keystore-path";
@@ -102,6 +103,9 @@ package Porion.Configs is
 
    --  Get the directory holding local template files.
    function Get_Templates_Directory return String;
+
+   --  Get the search path to find templates.
+   function Get_Templates_Search_Path return String;
 
    --  Get the default path of the local database.
    function Get_Default_Database_Path return String;

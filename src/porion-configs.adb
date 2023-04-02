@@ -327,10 +327,22 @@ package body Porion.Configs is
    --  Get the directory holding local template files.
    --  ------------------------------
    function Get_Templates_Directory return String is
-      Dir : constant String := Util.Files.Compose (Get_Porion_Directory, "templates");
    begin
-      return Util.Files.Compose (Dir, Name);
+      return Util.Files.Compose (Get_Porion_Directory, "templates");
    end Get_Templates_Directory;
+
+   --  ------------------------------
+   --  Get the search path to find templates.
+   --  ------------------------------
+   function Get_Templates_Search_Path return String is
+   begin
+      if Exists (TEMPL_SEARCH_PATH_NAME) then
+         return Get (TEMPL_SEARCH_PATH_NAME);
+      else
+         return Get_Templates_Directory & ";"
+            & Util.Files.Compose (Get_Share_Directory, "templates");
+      end if;
+   end Get_Templates_Search_Path;
 
    --  ------------------------------
    --  Get the default path of the local database.

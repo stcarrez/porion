@@ -47,18 +47,20 @@ package body Porion.Templates is
          Search  : Search_Type;
          Ent     : Ada.Directories.Directory_Entry_Type;
       begin
-         Start_Search (Search, Path, "*.porion", Filter);
-         while More_Entries (Search) loop
-            Get_Next_Entry (Search, Ent);
-            declare
-               Full_Path : constant String := Full_Name (Ent);
-               Name      : constant String := Get_Template_Name (Full_Path);
-            begin
-               if not Repository.Template_Paths.Contains (Name) then
-                  Repository.Template_Paths.Insert (Name, Full_Path);
-               end if;
-            end;
-         end loop;
+         if Ada.Directories.Exists (Dir) then
+            Start_Search (Search, Dir, "*.porion", Filter);
+            while More_Entries (Search) loop
+               Get_Next_Entry (Search, Ent);
+               declare
+                  Full_Path : constant String := Full_Name (Ent);
+                  Name      : constant String := Get_Template_Name (Full_Path);
+               begin
+                  if not Repository.Template_Paths.Contains (Name) then
+                     Repository.Template_Paths.Insert (Name, Full_Path);
+                  end if;
+               end;
+            end loop;
+         end if;
          Done := False;
       end Process;
 

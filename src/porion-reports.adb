@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-reports -- Report generation
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -314,6 +314,9 @@ package body Porion.Reports is
          elsif Build.Build_Status = Builds.Models.BUILD_PASS then
             Writer.Copy_Style (To => Style1, From => Styles.Success);
             Writer.Copy_Style (To => Style2, From => Styles.Success);
+         elsif Build.Build_Status = Builds.Models.BUILD_RUNNING then
+            Writer.Copy_Style (To => Style1, From => Styles.Warning);
+            Writer.Copy_Style (To => Style2, From => Styles.Warning);
          else
             Writer.Copy_Style (To => Style1, From => Styles.Error);
             Writer.Copy_Style (To => Style2, From => Styles.Error);

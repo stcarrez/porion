@@ -37,7 +37,8 @@ package body Porion.Templates.Parser is
       Result  : Integer;
       Context : Parser_Context_Type;
    begin
-      Repository.Templates.Insert (To_UString (Path), Context.Template);
+      Log.Info ("Loading template {0}", Path);
+
       Context.File := Util.Log.Locations.Create_File_Info (Path, Path'First);
       begin
          Porion.Templates.Parser.Parser.Parse (Path, Repository, Context, Result);
@@ -50,13 +51,17 @@ package body Porion.Templates.Parser is
 
       if Result = 0 then
          Finish_Template (Repository, Context.Template);
+         Repository.Templates.Insert (To_UString (Path), Context.Template);
       end if;
    end Load;
 
    procedure Finish_Template (Repository : in out Repository_Type;
                               Template   : in Template_Refs.Ref) is
+      Name : constant UString := To_UString (To_Lower (To_String (Template.Value.Name)));
    begin
-      Repository.Templates.Insert (Template.Value.Name, Template);
+      if not Repository.Templates.Contains (Name) then
+         Repository.Templates.Insert (Name, Template);
+      end if;
    end Finish_Template;
 
    function To_String (Val : in Parser_Node_Access) return String is
@@ -296,16 +301,21 @@ package body Porion.Templates.Parser is
    begin
       Log.Debug ("Add with {0}", With_Name);
 
-      if not Ada.Directories.Exists (Path) then
+      if Path'Length = 0 or else not Ada.Directories.Exists (Path) then
          Error (Context, Value, "template '{0}' not found", With_Name);
          return;
       end if;
 
-      if Repository.Templates.Contains (To_UString (Path)) then
-         Error (Context, Value, "circular with '{0}' clause", With_Name);
-         return;
-      end if;
-      Load (Path, Repository);
+      declare
+         Name : constant UString := To_UString (To_Lower (To_String (With_Name)));
+         Pos  : constant Template_Maps.Cursor := Repository.Templates.Find (Name);
+      begin
+         if Template_Maps.Has_Element (Pos) then
+            --  Error (Context, Value, "circular with '{0}' clause", With_Name);
+            return;
+         end if;
+         Load (Path, Repository);
+      end;
    end Add_With;
 
    procedure Error (Context : in out Parser_Context_Type;

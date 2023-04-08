@@ -283,10 +283,12 @@ package body Porion.Builds.Services is
                Step_Status : Integer;
             begin
                if not Executor.Is_Dry_Run then
+                  Service.DB.Begin_Transaction;
                   Exec_Step.Set_Start_Date (Ada.Calendar.Clock);
                   Exec_Step.Set_Build (Service.Build);
                   Exec_Step.Set_Recipe_Step (Step.Step);
                   Exec_Step.Save (Service.DB);
+                  Service.DB.Commit;
                end if;
                Executor.Set_Step (Step.Step.Get_Step, Step.Step.Get_Execution, Step.Step.Get_Id);
                Executor.Set_Status (0);
@@ -302,12 +304,14 @@ package body Porion.Builds.Services is
                   begin
                      Usage := New_Usage;
                      Step_Status := Executor.Get_Status;
+                     Service.DB.Begin_Transaction;
                      Exec_Step.Set_Exit_Status (Step_Status);
                      Exec_Step.Set_End_Date ((Is_Null => False, Value => Finish));
                      Exec_Step.Set_Step_Duration (Millisecond_Type (Time * 1_000.0));
                      Exec_Step.Set_User_Time (Millisecond_Type (Step_Usage.User_Time));
                      Exec_Step.Set_Sys_Time (Millisecond_Type (Step_Usage.Sys_Time));
                      Exec_Step.Save (Service.DB);
+                     Service.DB.Commit;
                   end;
                   if Step_Status /= 0
                     and Step.Step.Get_Execution = Builds.EXEC_NO_ERROR
@@ -364,12 +368,14 @@ package body Porion.Builds.Services is
 
       --  First, cancel the building status because we know there is no executor
       --  running for this build node.
+      Service.DB.Begin_Transaction;
       Cancel_Building (Service, Node);
 
       Build_Executor.Set_Pid (Util.Systems.Os.Sys_Getpid);
       Build_Executor.Set_Node (Service.Build_Node);
       Build_Executor.Set_Start_Date (Ada.Calendar.Clock);
       Build_Executor.Save (Service.DB);
+      Service.DB.Commit;
 
       loop
          Service.Project := Projects.Models.Null_Project;
@@ -377,7 +383,9 @@ package body Porion.Builds.Services is
          exit when not Found;
       end loop;
 
+      Service.DB.Begin_Transaction;
       Build_Executor.Delete (Service.DB);
+      Service.DB.Commit;
    end Build_Queue;
 
    --  ------------------------------

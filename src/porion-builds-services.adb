@@ -1552,10 +1552,12 @@ package body Porion.Builds.Services is
                            List    : in out Porion.Builds.Models.Recipe_Vector) is
       Query : ADO.Queries.Context;
       Found : Boolean;
+      Has_Branch : Boolean;
    begin
       Service.Load_Project (To_String (Ident.Name));
 
-      if Length (Ident.Branch) > 0 then
+      Has_Branch := Length (Ident.Branch) > 0;
+      if Has_Branch then
          Query.Set_Filter ("o.project_id = :project_id and o.name = :branch");
          Query.Bind_Param ("project_id", Service.Project.Get_Id);
          Query.Bind_Param ("branch", Ident.Branch);
@@ -1577,7 +1579,10 @@ package body Porion.Builds.Services is
       Query.Clear;
       Query.Bind_Param ("project_id", Service.Project.Get_Id);
       Query.Bind_Param ("node_id", Service.Build_Node.Get_Id);
-      if not Service.Branch.Is_Null and not Service.Build_Node.Is_Null then
+      if Has_Branch
+        and then not Service.Branch.Is_Null
+        and then not Service.Build_Node.Is_Null
+      then
          Query.Set_Filter ("o.project_id = :project_id AND o.node_id = :node_id "
                            & " AND o.branch_id = :branch_id");
          Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
@@ -1597,6 +1602,7 @@ package body Porion.Builds.Services is
 
       Ident   : constant String := Service.Get_Recipe_Name (From);
       Steps   : Build_Step_Vector;
+      Branch  : Porion.Projects.Models.Branch_Ref := Service.Branch;
    begin
       Log.Info ("Copy build recipe {0} to {1}", Ident, Name);
 
@@ -1612,7 +1618,7 @@ package body Porion.Builds.Services is
       begin
          Count_Statement.Bind_Param ("name", Name);
          Count_Statement.Bind_Param ("project_id", Service.Project.Get_Id);
-         Count_Statement.Bind_Param ("branch_id", Service.Branch.Get_Id);
+         Count_Statement.Bind_Param ("branch_id", Branch.Get_Id);
          Count_Statement.Execute;
          if Count_Statement.Get_Result_Integer /= 0 then
             Log.Warn ("Recipe name {0} is already used", Name);
@@ -1633,7 +1639,7 @@ package body Porion.Builds.Services is
          New_Recipe.Set_Status (Builds.Models.CONFIG_BUILD_REQUIRED);
          New_Recipe.Set_Node (Service.Build_Node);
          New_Recipe.Set_Project (Service.Project);
-         New_Recipe.Set_Branch (Service.Branch);
+         New_Recipe.Set_Branch (Branch);
          New_Recipe.Set_Filter_Rules (String '(From.Get_Filter_Rules));
          New_Recipe.Save (Service.DB);
 
@@ -1659,6 +1665,14 @@ package body Porion.Builds.Services is
          end loop;
 
          Service.Recipe := New_Recipe;
+         Service.Branch := Branch;
+
+         --  If the branch was disabled, enable it for the new recipe.
+         if Branch.Get_Status = Porion.Projects.Models.BUILD_DISABLED then
+            Branch.Set_Status (Porion.Projects.Models.BUILD_REQUIRED);
+            Branch.Save (Service.DB);
+         end if;
+
          Add_Build_Queue (Service, Models.REASON_CONFIG, Added);
          if Added then
             Update_Build_Queue (Service, Trigger_Builds => False);

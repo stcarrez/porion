@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-commands-add -- Add command
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -143,6 +143,10 @@ package body Porion.Commands.Add is
          if Recipe.Is_Null then
             Ident.Node := To_UString ("");
             Porion.Builds.Services.Load_Recipes (Context.Project_Service, Ident, Recipes);
+            if Recipes.Is_Empty and then Porion.Projects.Has_Branch (Ident) then
+               Ident.Branch := To_UString ("");
+               Porion.Builds.Services.Load_Recipes (Context.Project_Service, Ident, Recipes);
+            end if;
             for Existing_Recipe of Recipes loop
                if Existing_Recipe.Get_Main_Recipe then
                   Recipe := Existing_Recipe;
@@ -152,6 +156,7 @@ package body Porion.Commands.Add is
          end if;
 
          Ident.Node := Target_Ident.Node;
+         Ident.Branch := Target_Ident.Branch;
          Context.Project_Service.Load (Ident);
 
       exception
@@ -215,11 +220,18 @@ package body Porion.Commands.Add is
       Context.Open;
 
       if Command.Recipe then
-         if Args.Get_Count = 2 then
-            Command.Add_Recipe (Args.Get_Argument (1), Args.Get_Argument (2), Context);
-         else
-            Command.Add_Recipe (Args.Get_Argument (1), "", Context);
-         end if;
+         case Args.Get_Count is
+            when 1 =>
+               Command.Add_Recipe (Args.Get_Argument (1), "", Context);
+
+            when 2 =>
+               Command.Add_Recipe (Args.Get_Argument (1), Args.Get_Argument (2), Context);
+
+            when others =>
+               Porion.Commands.Error (-("too many arguments"));
+               return;
+
+         end case;
       else
          Command.Add_Project (Args.Get_Argument (1), Context);
       end if;

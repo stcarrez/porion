@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-commands-info -- Info command
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -384,6 +384,7 @@ package body Porion.Commands.Info is
       if Command.List_Recipes then
          Printer.Layout_Fields (Fields (3 .. 3));
          Executor.Enable_Dry_Run;
+         Context.Project_Service.Branch := Porion.Projects.Models.Null_Branch;
          Builds.Services.Find_Build_Configs (Context.Project_Service, True, Recipes);
          for Recipe of Recipes loop
             Porion.Builds.Services.Build (Context.Project_Service, Recipe, Executor);

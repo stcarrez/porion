@@ -50,17 +50,16 @@ Get information about a project or a build number:
    porion info ada-util:2
 ```
 
+Version 0.14.0 - Under development
+  - Fix adding a recipe on a new branch
+  - Fix displaying the project recipes on all branches
+
 Version 0.13.0 - Mar 2023
   - Update to use last AWA version
   - Improvement to display on mobile phones
   - Support to collect standard error as separate streams to identify these
     messages as errors
   - Prototype for build templates
-
-Version 0.12.0 - Oct 2022
-  - Add support for notification
-  - Add global activity dashboard
-  - Use Frappe Charts instead of jQuery Flot (remove jQuery)
 
 [List all versions](https://gitlab.com/stcarrez/porion/blob/master/NEWS.md)
 

@@ -1,7 +1,11 @@
+Version 0.14.0 - Under development
+  - Fix adding a recipe on a new branch
+  - Fix displaying the project recipes on all branches
+
 Version 0.13.0 - Mar 2023
   - Update to use last AWA version
   - Improvement to display on mobile phones
-  - Support to collect standard error as separate streams to identify these
+  - Support to collect standard error as separate streams to identify
     messages as errors
   - Prototype for build templates
 

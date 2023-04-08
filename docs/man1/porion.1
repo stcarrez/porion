@@ -1,6 +1,6 @@
 .\"
 .\"
-.TH PORION 1 "Jun 12, 2022" "Continuous build system"
+.TH PORION 1 "Apr 8, 2023" "Continuous build system"
 .SH NAME
 porion - Continuous build system
 .SH SYNOPSIS
@@ -115,7 +115,7 @@ the project directories where projects are built
 porion \fBadd\fP \fIurl\fR
 .RE
 .RS 0
-porion \fBadd\fP \fI--recipe\fR {\fIname\fR} {\fIident\fR} [\fIsource-ident\fR]
+porion \fBadd\fP \fI--recipe\fR {\fIident\fR} [\fIsource-ident\fR]
 .RE
 .PP
 The \fIporion add\fR command is used to add a new project or a new recipe to an existing project.
@@ -365,6 +365,11 @@ are stored.  The default is
 This property defines the path of the rules directory which contains
 description of filtering rules that can be configured in a project recipe.
 .\"
+.SS templates_search_path
+This property defines a list of directories to search for build templates.
+Each directory must be separated by
+.IR ';' .
+.\"
 .SH SEE ALSO
 \fIeditor(1)\fR, \fIupdate-alternative(1)\fR, \fImake(1)\fR,
 \fImvn(1)\fR,
@@ -375,4 +380,3 @@ description of filtering rules that can be configured in a project recipe.
 .SH AUTHOR
 Written by Stephane Carrez.
 .\"
-

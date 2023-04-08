@@ -9,7 +9,7 @@ Usage: porion add {<git|tar>}
   A default project name is created from the source scheme name
   and a set of build recipes are guessed by analysing the sources.
 
-Usage: porion add --recipe {name} {<ident>} [<source-ident>]
+Usage: porion add --recipe {<ident>} [<source-ident>]
 
   Add a new recipe with the given identification and initialize
   it from either the main project recipe or from the given source

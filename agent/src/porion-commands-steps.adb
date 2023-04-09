@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-commands-steps -- Command to add, update remove build steps
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -183,6 +183,10 @@ package body Porion.Commands.Steps is
       begin
          Ident := Porion.Projects.Parse (Name);
          Context.Project_Service.Load (Ident);
+         if Context.Project_Service.Recipe.Is_Null then
+            Porion.Commands.Error (-("missing source recipe identification to update"));
+            return;
+         end if;
 
          if Command.Delete_Pos > 0 then
             Command.Delete_Step (Context.Project_Service.Recipe, Context);

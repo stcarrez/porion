@@ -19,6 +19,7 @@ with Porion.Projects.Services;
 with Porion.Configs;
 with Porion.Executors;
 with Porion.Services;
+with Porion.Projects.Models;
 with Porion.Nodes.Services;
 with Porion.Builds.Models;
 with Porion.Builds.Services;
@@ -88,6 +89,8 @@ package body Porion.Commands.Add is
                          Target  : in String;
                          Source  : in String;
                          Context : in out Context_Type) is
+      use Porion.Projects.Models;
+
       Ident        : Porion.Projects.Ident_Type;
       Target_Ident : Porion.Projects.Ident_Type;
       Recipes      : Porion.Builds.Models.Recipe_Vector;
@@ -172,7 +175,11 @@ package body Porion.Commands.Add is
       end if;
 
       if not Porion.Projects.Has_Recipe (Target_Ident) then
-         Target_Ident.Recipe := Target_Ident.Node;
+         if Context.Project_Service.Branch /= Branch_Ref (Recipe.Get_Branch) then
+            Target_Ident.Recipe := Recipe.Get_Name;
+         else
+            Target_Ident.Recipe := Target_Ident.Node;
+         end if;
       end if;
 
       Builds.Services.Copy_Recipe (Context.Project_Service,

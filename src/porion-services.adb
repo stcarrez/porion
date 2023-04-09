@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-services -- Project information
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -221,9 +221,8 @@ package body Porion.Services is
                    Schema   : in Resources.Content_Access) is
       use type Resources.Content_Access;
 
-      Create : constant Boolean := Schema /= null;
-      Path   : constant String := Porion.Configs.Get_Database_Path
-        & (if Create then "?create=true" else "");
+      Create  : constant Boolean := Schema /= null;
+      Path    : constant String := Porion.Configs.Get_Database_Config (Create);
       Config : Util.Properties.Manager;
    begin
       Config.Set (ADO.Configs.QUERY_PATHS_CONFIG, "db");

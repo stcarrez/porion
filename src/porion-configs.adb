@@ -349,7 +349,8 @@ package body Porion.Configs is
    --  ------------------------------
    function Get_Default_Database_Path return String is
    begin
-      return "sqlite:///" & Util.Files.Compose (Get_Config_Directory, "porion.db");
+      return "sqlite:///" & Util.Files.Compose (Get_Config_Directory, "porion.db")
+        & "?encoding='UTF-8'&journal_mode=WAL";
    end Get_Default_Database_Path;
 
    --  ------------------------------
@@ -363,6 +364,21 @@ package body Porion.Configs is
          return Get_Default_Database_Path;
       end if;
    end Get_Database_Path;
+
+   --  ------------------------------
+   --  Get the database configuration string.
+   --  ------------------------------
+   function Get_Database_Config (Create : in Boolean) return String is
+      Path : constant String := Porion.Configs.Get_Database_Path;
+   begin
+      if not Create then
+         return Path;
+      elsif Util.Strings.Index (Path, '?') > 0 then
+         return Path & "&create=true";
+      else
+         return Path & "?create=true";
+      end if;
+   end Get_Database_Config;
 
    function Null_Config return Config_Type is
    begin

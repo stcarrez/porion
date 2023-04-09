@@ -19,10 +19,35 @@ with Util.Strings.Vectors;
 with Porion.Sources;
 with Porion.Services;
 with Porion.Projects;
+with Porion.Executors;
 with Porion.Builds.Services;
 package body Porion.Commands.Steps is
 
    use type Porion.Sources.Source_Control_Type;
+
+   procedure Get_Recipe_Step_Offset (Context : in out Context_Type;
+                                     Count   : out Natural);
+
+   procedure Get_Recipe_Step_Offset (Context : in out Context_Type;
+                                     Count   : out Natural) is
+      use type Porion.Builds.Step_Type;
+
+      Executor : Porion.Executors.Executor_Type;
+      Commands : Porion.Executors.Command_Vector;
+   begin
+      Executor.Enable_Dry_Run;
+
+      Porion.Builds.Services.Build (Context.Project_Service,
+                                    Context.Project_Service.Recipe,
+                                    Executor);
+
+      Executor.Fetch_Commands (Commands);
+      Count := 0;
+      for Command of Commands loop
+         exit when Command.Step /= Porion.Builds.STEP_CHECKOUT;
+         Count := Count + 1;
+      end loop;
+   end Get_Recipe_Step_Offset;
 
    procedure Add_Step (Command : in out Command_Type;
                        Recipe  : in out Porion.Builds.Models.Recipe_Ref;
@@ -33,6 +58,7 @@ package body Porion.Commands.Steps is
       Step   : Porion.Builds.Step_Type;
       Params : Util.Strings.Vectors.Vector;
       Pos    : Positive := 2;
+      Offset : Natural;
    begin
       if First = "xunit" then
          Kind := Porion.Builds.Models.BUILDER_XUNIT;
@@ -52,14 +78,12 @@ package body Porion.Commands.Steps is
       end loop;
 
       if Command.Insert_Pos > 0 then
-         if Context.Project_Service.Project.Get_Scm = Porion.Sources.SRC_GIT then
-            Command.Insert_Pos := Command.Insert_Pos - 1;
-         end if;
-         Command.Insert_Pos := Command.Insert_Pos - 1;
-         if Command.Insert_Pos <= 0 then
+         Get_Recipe_Step_Offset (Context, Offset);
+         if Command.Insert_Pos <= Offset then
             Porion.Commands.Error (-("cannot insert before or at the checkout commands"));
             return;
          end if;
+         Command.Insert_Pos := Command.Insert_Pos - Offset;
       end if;
       Builds.Services.Insert_Step (Context.Project_Service, Recipe,
                                    Command.Insert_Pos, Kind, Step, Params);
@@ -83,11 +107,13 @@ package body Porion.Commands.Steps is
          end if;
       end Update;
 
+      Offset : Natural;
    begin
       if Context.Project_Service.Project.Get_Scm = Porion.Sources.SRC_GIT then
          Command.Update_Pos := Command.Update_Pos - 1;
       end if;
-      if Command.Update_Pos = 1 then
+      Get_Recipe_Step_Offset (Context, Offset);
+      if Command.Update_Pos <= Offset then
          Porion.Commands.Error (-("cannot update the first step"));
          return;
       end if;
@@ -98,7 +124,7 @@ package body Porion.Commands.Steps is
 
       if Args.Get_Count = 1 then
          Builds.Services.Update_Step (Context.Project_Service, Recipe,
-                                      Command.Update_Pos - 1, Update'Access);
+                                      Command.Update_Pos - Offset, Update'Access);
       else
          declare
             First  : constant String := Args.Get_Argument (2);
@@ -125,7 +151,7 @@ package body Porion.Commands.Steps is
             end loop;
 
             Builds.Services.Update_Step (Context.Project_Service, Recipe,
-                                         Command.Update_Pos - 1, Kind, Step, Params);
+                                         Command.Update_Pos - Offset, Kind, Step, Params);
          end;
       end if;
    end Update_Step;

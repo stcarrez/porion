@@ -207,8 +207,9 @@ package body Porion.Services is
       end if;
       Service.Recipe.Find (Service.DB, Query, Found);
       if not Found then
-         Log.Error ("Recipe not found");
-         --  raise Not_Found;
+         --  Don't treat this as an error because we may want to get the project+branch
+         --  when it does not have any recipe yet.
+         Log.Info ("Recipe not found");
          return;
       end if;
       if Service.Branch.Is_Null then

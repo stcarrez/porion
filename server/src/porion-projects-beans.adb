@@ -146,13 +146,24 @@ package body Porion.Projects.Beans is
       Porion.Queries.List (Bean.Builds, Context.DB, Query);
 
       if not Bean.Builds.List.Is_Empty then
-         Bean.Build_Status := Porion.Builds.Models.BUILD_PASS;
-         for Build of Bean.Builds.List loop
-            if Build.Build_Status = Porion.Builds.Models.BUILD_FAIL then
-               Bean.Build_Status := Porion.Builds.Models.BUILD_FAIL;
-               exit;
-            end if;
-         end loop;
+         declare
+            Branch_List : Util.Strings.Sets.Set;
+         begin
+            Bean.Build_Status := Porion.Builds.Models.BUILD_PASS;
+            for Build of Bean.Builds.List loop
+               declare
+                  Branch_Name : constant String := To_String (Build.Branch_Name);
+               begin
+                  if not Branch_List.Contains (Branch_Name) then
+                     if Build.Build_Status = Porion.Builds.Models.BUILD_FAIL then
+                        Bean.Build_Status := Porion.Builds.Models.BUILD_FAIL;
+                        exit;
+                     end if;
+                     Branch_List.Include (Branch_Name);
+                  end if;
+               end;
+            end loop;
+         end;
       else
          Bean.Build_Status := Porion.Builds.Models.BUILD_FAIL;
       end if;

@@ -294,7 +294,10 @@ package body Porion.Commands.Info is
 
          Printer.Put (Fields (3), -("Last builds"));
          Printer.New_Line;
+         Printer.Create_Field (Fields (3), Context.Styles.Default, 30.0);
+         Printer.Create_Field (Fields (5), Context.Styles.Default, 60.0);
          Printer.Set_Bottom_Right_Padding (Fields (3), (2, 0));
+         Printer.Set_Max_Dimension (Fields (4), (5, 0));
          Printer.Set_Bottom_Right_Padding (Fields (4), (2, 0));
          Printer.Layout_Fields (Fields (3 .. 5));
          for Build of Last_Builds loop

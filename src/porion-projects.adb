@@ -127,7 +127,7 @@ package body Porion.Projects is
    begin
       Append (Result, Ident.Name);
       if Length (Ident.Branch) > 0 then
-         Append (Result, "#");
+         Append (Result, (if Ident.Build > 0 then ':' else '#'));
          Append (Result, Ident.Branch);
       end if;
 

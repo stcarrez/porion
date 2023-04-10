@@ -979,32 +979,10 @@ package body Porion.Resources.Queries is
        & "ipe AS recipe ON build.recipe_id = recipe.id" & ASCII.LF & "            "
        & "INNER JOIN porion_node AS node ON build.node_id = node.id" & ASCII.LF & " "
        & "           WHERE project.id = :project_id" & ASCII.LF & "            ORD"
-       & "ER BY finish_date DESC" & ASCII.LF & "        </sql>" & ASCII.LF & "    "
-       & "</query>" & ASCII.LF & ASCII.LF & "   <query name='project-build-list'>"
-       & ASCII.LF & "        <comment>Get the list of builds for a project</comme"
-       & "nt>" & ASCII.LF & "        <sql>" & ASCII.LF & "            SELECT" & ASCII.LF
-       & "            project.name AS name," & ASCII.LF & "            project.sta"
-       & "tus AS status," & ASCII.LF & "            branch.name AS branch_name," & ASCII.LF
-       & "            branch.status AS branch_status," & ASCII.LF & "            n"
-       & "ode.name AS node_name," & ASCII.LF & "            recipe.name AS recipe_"
-       & "name," & ASCII.LF & "            build.id AS build_id," & ASCII.LF & "  "
-       & "          build.number AS number," & ASCII.LF & "            build.tag A"
-       & "S tag," & ASCII.LF & "            build.status AS build_status," & ASCII.LF
-       & "            build.create_date AS build_date," & ASCII.LF & "            "
-       & "build.finish_date AS finish_date," & ASCII.LF & "            build.build"
-       & "_duration AS build_duration," & ASCII.LF & "            build.pass_count"
-       & " AS pass_count," & ASCII.LF & "            build.fail_count AS fail_coun"
-       & "t," & ASCII.LF & "            build.timeout_count AS timeout_count" & ASCII.LF
-       & "            FROM porion_build AS build" & ASCII.LF & "            INNER "
-       & "JOIN porion_project AS project ON build.project_id = project.id" & ASCII.LF
-       & "            INNER JOIN porion_branch AS branch ON branch.id = build.bran"
-       & "ch_id" & ASCII.LF & "            INNER JOIN porion_recipe AS recipe ON b"
-       & "uild.recipe_id = recipe.id" & ASCII.LF & "            INNER JOIN porion_"
-       & "node AS node ON build.node_id = node.id" & ASCII.LF & "            WHERE"
-       & " project.id = :project_id" & ASCII.LF & "            ORDER BY number DES"
-       & "C" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF
-       & ASCII.LF & "   <query name='node-build-list'>" & ASCII.LF & "        <co"
-       & "mment>Get the list of builds for a build node</comment>" & ASCII.LF & " "
+       & "ER BY CASE WHEN finish_date IS NULL THEN build_date ELSE finish_date END"
+       & " DESC" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF
+       & ASCII.LF & "   <query name='project-build-list'>" & ASCII.LF & "        "
+       & "<comment>Get the list of builds for a project</comment>" & ASCII.LF & " "
        & "       <sql>" & ASCII.LF & "            SELECT" & ASCII.LF & "          "
        & "  project.name AS name," & ASCII.LF & "            project.status AS sta"
        & "tus," & ASCII.LF & "            branch.name AS branch_name," & ASCII.LF
@@ -1024,8 +1002,32 @@ package body Porion.Resources.Queries is
        & "ch_id" & ASCII.LF & "            INNER JOIN porion_recipe AS recipe ON b"
        & "uild.recipe_id = recipe.id" & ASCII.LF & "            INNER JOIN porion_"
        & "node AS node ON build.node_id = node.id" & ASCII.LF & "            WHERE"
-       & " build.node_id = :node_id" & ASCII.LF & "            ORDER BY build.crea"
-       & "te_date DESC" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF
+       & " project.id = :project_id" & ASCII.LF & "            ORDER BY CASE WHEN "
+       & "finish_date IS NULL THEN build_date ELSE finish_date END DESC" & ASCII.LF
+       & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "  "
+       & " <query name='node-build-list'>" & ASCII.LF & "        <comment>Get the "
+       & "list of builds for a build node</comment>" & ASCII.LF & "        <sql>" & ASCII.LF
+       & "            SELECT" & ASCII.LF & "            project.name AS name," & ASCII.LF
+       & "            project.status AS status," & ASCII.LF & "            branch."
+       & "name AS branch_name," & ASCII.LF & "            branch.status AS branch_"
+       & "status," & ASCII.LF & "            node.name AS node_name," & ASCII.LF & " "
+       & "           recipe.name AS recipe_name," & ASCII.LF & "            build."
+       & "id AS build_id," & ASCII.LF & "            build.number AS number," & ASCII.LF
+       & "            build.tag AS tag," & ASCII.LF & "            build.status AS"
+       & " build_status," & ASCII.LF & "            build.create_date AS build_dat"
+       & "e," & ASCII.LF & "            build.finish_date AS finish_date," & ASCII.LF
+       & "            build.build_duration AS build_duration," & ASCII.LF & "     "
+       & "       build.pass_count AS pass_count," & ASCII.LF & "            build."
+       & "fail_count AS fail_count," & ASCII.LF & "            build.timeout_count"
+       & " AS timeout_count" & ASCII.LF & "            FROM porion_build AS build" & ASCII.LF
+       & "            INNER JOIN porion_project AS project ON build.project_id = p"
+       & "roject.id" & ASCII.LF & "            INNER JOIN porion_branch AS branch "
+       & "ON branch.id = build.branch_id" & ASCII.LF & "            INNER JOIN por"
+       & "ion_recipe AS recipe ON build.recipe_id = recipe.id" & ASCII.LF & "     "
+       & "       INNER JOIN porion_node AS node ON build.node_id = node.id" & ASCII.LF
+       & "            WHERE build.node_id = :node_id" & ASCII.LF & "            OR"
+       & "DER BY CASE WHEN finish_date IS NULL THEN build_date ELSE finish_date EN"
+       & "D DESC" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF
        & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
    C_23 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF

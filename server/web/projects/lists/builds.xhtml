@@ -66,7 +66,7 @@
 	<div class='awa-list-item project-build #{build.build_status}'>
 	  <div class='build-status'/>
           <div class='build-number'>
-            <a href="#{contextPath}/builds/view/#{build.name}:#{build.build_number}/summary" title="Build #{build.build_number}">
+            <a href="#{contextPath}/builds/view/#{build.name}:${build.branch_name}:#{build.build_number}/summary" title="Build #{build.build_number}">
               #{build.build_number}
             </a>
           </div>

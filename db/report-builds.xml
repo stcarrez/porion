@@ -146,7 +146,7 @@
             INNER JOIN porion_recipe AS recipe ON build.recipe_id = recipe.id
             INNER JOIN porion_node AS node ON build.node_id = node.id
             WHERE project.id = :project_id
-            ORDER BY number DESC
+            ORDER BY CASE WHEN finish_date IS NULL THEN build_date ELSE finish_date END DESC
         </sql>
     </query>
 
@@ -176,7 +176,7 @@
             INNER JOIN porion_recipe AS recipe ON build.recipe_id = recipe.id
             INNER JOIN porion_node AS node ON build.node_id = node.id
             WHERE build.node_id = :node_id
-            ORDER BY build.create_date DESC
+            ORDER BY CASE WHEN finish_date IS NULL THEN build_date ELSE finish_date END DESC
         </sql>
     </query>
 

@@ -1269,7 +1269,7 @@ package body Porion.Builds.Services is
          Append (Filter, " AND o.branch_id IS NULL");
       end if;
       if not Service.Project.Is_Null then
-         Append (Filter, "AND o.project_id = :project_id");
+         Append (Filter, " AND o.project_id = :project_id");
          Query.Bind_Param ("project_id", Service.Project.Get_Id);
       else
          Append (Filter, " AND o.project_id IS NULL");
@@ -1616,6 +1616,11 @@ package body Porion.Builds.Services is
 
       --  Load the recipe steps.
       Load_Recipe (Service, From, Steps);
+
+      --  Use the source recipe branch if there is no branch defined for the new recipe.
+      if Branch.Is_Null then
+         Branch := Service.Branch;
+      end if;
 
       --  Make sure the new recipe name is not used for the project+branch.
       declare

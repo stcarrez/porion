@@ -39,7 +39,7 @@ private package Porion.Sources.Files is
    TAR_XZ_EXTRACT_COMMAND  : constant String := "tar xzf #{repository_url}";
    TAR_XZ_GUESS_COMMAND    : constant String := "tar tzvf #{path}";
 
-   ZIP_EXTRACT_COMMAND     : constant String := "unzip #{repository_url}";
+   ZIP_EXTRACT_COMMAND     : constant String := "unzip -u #{repository_url}";
    ZIP_GUESS_COMMAND       : constant String := "zipinfo #{path}";
 
    type File_Type is (UNKNOWN, PLAIN, TAR, TAR_GZ, TAR_BZ2, TAR_XZ, ZIP);

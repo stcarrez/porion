@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-projects-tests -- Tests for projects package
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +27,8 @@ package body Porion.Projects.Tests is
    begin
       Caller.Add_Test (Suite, "Test Porion.Projects.Parse",
                        Test_Parse'Access);
+      Caller.Add_Test (Suite, "Test Porion.Projects.Parse (Error)",
+                       Test_Parse_Error'Access);
       Caller.Add_Test (Suite, "Test Porion.Projects.To_String",
                        Test_To_String'Access);
    end Add_Tests;
@@ -64,7 +66,36 @@ package body Porion.Projects.Tests is
 
       Check ("prj~3@host", "prj", "", "3", "host");
 
+      Check ("prj:main:44", "prj", "main", "", "");
+
+      Check ("prj:main@host", "prj", "main", "", "host");
+
    end Test_Parse;
+
+   --  ------------------------------
+   --  Test parsing invalid project identification string.
+   --  ------------------------------
+   procedure Test_Parse_Error (T : in out Test) is
+      procedure Check (Ident : in String);
+
+      procedure Check (Ident : in String) is
+         Result : Ident_Type;
+      begin
+         Result := Parse (Ident);
+         Fail (T, "No exception raised for " & Ident);
+
+      exception
+         when Invalid_Ident =>
+            null;
+      end Check;
+
+   begin
+      Check ("");
+      Check ("a#:b");
+      Check ("a~m#p");
+      Check ("a:b:23:4");
+      Check ("ab@cd#ef:4");
+   end Test_Parse_Error;
 
    --  ------------------------------
    --  Test converting the Ident_Type back to a string.

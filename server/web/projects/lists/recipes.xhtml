@@ -69,14 +69,14 @@
         </div>
         <div class='recipe-build-number'>
           <h:panelGroup rendered="#{recipe.last_success_build gt 0}">
-            <a href="#{contextPath}/builds/view/#{project.name}:{recipe.branch_name}:#{recipe.last_success_build}/summary" title="Build #{recipe.last_success_build}">
+            <a href="#{contextPath}/builds/view/#{project.name}:#{recipe.branch_name}:#{recipe.last_success_build}/summary" title="Build #{recipe.last_success_build}">
               #{recipe.last_success_build}
             </a>
           </h:panelGroup>
         </div>
         <div class='recipe-build-number'>
           <h:panelGroup rendered="#{recipe.last_fail_build gt 0}">
-            <a href="#{contextPath}/builds/view/#{project.name}:{recipe.branch_name}:#{recipe.last_fail_build}/summary" title="Build #{recipe.last_fail_build}">
+            <a href="#{contextPath}/builds/view/#{project.name}:#{recipe.branch_name}:#{recipe.last_fail_build}/summary" title="Build #{recipe.last_fail_build}">
               #{recipe.last_fail_build}
             </a>
           </h:panelGroup>

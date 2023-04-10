@@ -105,12 +105,13 @@ package body Porion.Services is
 
    procedure Load (Service : in out Context_Type;
                    Ident   : in Porion.Projects.Ident_Type) is
-      Query : ADO.Queries.Context;
-      Found : Boolean;
+      Has_Branch : constant Boolean := Length (Ident.Branch) > 0;
+      Query      : ADO.Queries.Context;
+      Found      : Boolean;
    begin
       Service.Load_Project (To_String (Ident.Name));
 
-      if Length (Ident.Branch) > 0 then
+      if Has_Branch then
          Query.Set_Filter ("o.project_id = :project_id and o.name = :branch");
          Query.Bind_Param ("project_id", Service.Project.Get_Id);
          Query.Bind_Param ("branch", Ident.Branch);
@@ -125,9 +126,15 @@ package body Porion.Services is
 
       if Ident.Build > 0 then
          Query.Clear;
-         Query.Set_Filter ("o.project_id = :project_id AND o.number = :number");
          Query.Bind_Param ("project_id", Service.Project.Get_Id);
          Query.Bind_Param ("number", Ident.Build);
+         if Has_Branch then
+            Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
+            Query.Set_Filter ("o.project_id = :project_id AND o.number = :number"
+                              & " AND o.branch_id = :branch_id");
+         else
+            Query.Set_Filter ("o.project_id = :project_id AND o.number = :number");
+         end if;
          Service.Build.Find (Service.DB, Query, Found);
          if not Found then
             Log.Warn ("Build {0} not found for project {1}",

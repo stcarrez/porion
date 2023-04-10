@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-projects -- Project information
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,6 +31,9 @@ package body Porion.Projects is
    --  ------------------------------
    --  Parse an identification string with the format:
    --   <project>[#<branch>][~<recipe>][@<node][:<build>]
+   --  The following format is also recognized for URL compatibility and there must
+   --  be at least one `recipe`, `node` or `build-number` component:
+   --   <project>:<branch>{[~<recipe>][@<node][:<build-number>]}
    --  Raises the Invalid_Ident exception if the format is invalid.
    --  ------------------------------
    function Parse (Ident : in String) return Ident_Type is
@@ -41,10 +44,21 @@ package body Porion.Projects is
       Colon_Pos : Natural;
       Last      : Natural;
    begin
+      Colon_Pos := Util.Strings.Index (Ident, ':');
       Caret_Pos := Util.Strings.Index (Ident, '#');
       Tilde_Pos := Util.Strings.Index (Ident, '~');
       At_Pos := Util.Strings.Index (Ident, '@');
-      Colon_Pos := Util.Strings.Index (Ident, ':');
+
+      --  Look for the <project>:<branch>{...} form and treat the first ':'
+      --  as the '#' branch separator.
+      if Colon_Pos > 0 and then Caret_Pos = 0 then
+         Last := Util.Strings.Index (Ident, ':', Colon_Pos + 1);
+         if Last > 0 or else Tilde_Pos > Colon_Pos or else At_Pos > Colon_Pos then
+            Caret_Pos := Colon_Pos;
+            Colon_Pos := Last;
+         end if;
+      end if;
+
       if Colon_Pos > 0 then
          Last := Colon_Pos - 1;
          begin
@@ -97,8 +111,10 @@ package body Porion.Projects is
          Result.Name := To_UString (Ident (Ident'First .. Last));
       end if;
 
+      if Length (Result.Name) = 0 then
+         raise Invalid_Ident;
+      end if;
       return Result;
-
    end Parse;
 
    --  ------------------------------

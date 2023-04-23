@@ -18,6 +18,9 @@
 with Porion.Nodes.Local;
 with Porion.Nodes.Models;
 private with EL.Expressions;
+private with Util.Processes;
+private with Util.Streams.Texts;
+private with Util.Streams.Buffered.Parts;
 private package Porion.Nodes.SSH is
 
    SSH_COMMAND_NAME : constant String := "command_ssh";
@@ -44,6 +47,17 @@ private package Porion.Nodes.SSH is
                      Ignore_Working_Dir : out Boolean;
                      Args        : in out Util.Strings.Vectors.Vector);
 
+   --  Execute the command in the working directory and for each output
+   --  line produced by the command call the Process procedure.
+   overriding
+   procedure Execute (Controller  : in out Controller_Type;
+                      Args        : in Util.Strings.Vectors.Vector;
+                      Working_Dir : in String := "";
+                      Process     : not null access
+                        procedure (Out_Stream : in out Input_Buffer_Stream'Class;
+                                   Err_Stream : in out Input_Buffer_Stream'Class);
+                      Status      : out Integer);
+
    --  Create the directory and optionally make sure it is cleaned.
    overriding
    procedure Create_Directory (Controller : in out Controller_Type;
@@ -68,13 +82,42 @@ private package Porion.Nodes.SSH is
                              Pattern    : in String;
                              List       : in out Util.Strings.Sets.Set);
 
+   overriding
+   procedure Start (Controller : in out Controller_Type);
+
+   overriding
+   procedure Stop (Controller : in out Controller_Type);
+
 private
 
+   BOUNDARY_LENGTH : constant := 60;
+
+   type Shell_Type is (USE_SH, USE_CSH);
+
    type Controller_Type is limited new Local.Controller_Type with record
-      Hostname : Porion.UString;
-      Login    : Porion.UString;
-      Identity : Porion.UString;
-      Command  : EL.Expressions.Expression;
+      Hostname   : Porion.UString;
+      Login      : Porion.UString;
+      Identity   : Porion.UString;
+      Command    : EL.Expressions.Expression;
+      Shell      : Shell_Type := USE_SH;
+      Proc       : Util.Processes.Process;
+      Error      : Util.Streams.Input_Stream_Access;
+      Output     : Util.Streams.Input_Stream_Access;
+      Input      : Util.Streams.Output_Stream_Access;
+      Cmd_Writer : Util.Streams.Texts.Print_Stream;
+      Out_Reader : Util.Streams.Buffered.Parts.Input_Part_Stream;
+      Err_Reader : Util.Streams.Buffered.Parts.Input_Part_Stream;
+      Boundary   : String (1 .. BOUNDARY_LENGTH);
    end record;
+
+   --  Write the command on the ssh input stream for execution.
+   --  Two 'echo' statements are added for the standard output and standard error
+   --  with a boundary indication.  The 'echo' on standard error includes the execution
+   --  status of the command.
+   procedure Execute (Controller : in out Controller_Type;
+                      Command    : in String);
+
+   --  Send the environment variables to be used by the remote shell.
+   procedure Send_Environment (Controller : in out Controller_Type);
 
 end Porion.Nodes.SSH;

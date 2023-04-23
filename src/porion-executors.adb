@@ -162,6 +162,25 @@ package body Porion.Executors is
       end if;
    end Create_Directory;
 
+   --  ------------------------------
+   --  Export the file described by `Source_Path` to build in the directory
+   --  defined by `Build_Path`.  Update `Exported_Path` to indicate the path
+   --  of the exported file as seen from the build node.  If the build node
+   --  is local, the operation does nothing.  If the build node is remote,
+   --  it must be copied so that it is accessed from the build node.
+   --  ------------------------------
+   procedure Export_File (Executor      : in out Executor_Type;
+                          Source_Path   : in String;
+                          Build_Path    : in String;
+                          Exported_Path : out UString) is
+   begin
+      if Executor.Controller /= null then
+         Executor.Controller.Export_File (Source_Path, Build_Path, Exported_Path);
+      else
+         Exported_Path := To_UString ("");
+      end if;
+   end Export_File;
+
    procedure Execute (Executor    : in out Executor_Type;
                       Command     : in EL.Expressions.Expression;
                       Parameters  : in Util.Properties.Manager;

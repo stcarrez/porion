@@ -91,6 +91,16 @@ package Porion.Executors is
                                Path     : in String;
                                Clean    : in Boolean);
 
+   --  Export the file described by `Source_Path` to build in the directory
+   --  defined by `Build_Path`.  Update `Exported_Path` to indicate the path
+   --  of the exported file as seen from the build node.  If the build node
+   --  is local, the operation does nothing.  If the build node is remote,
+   --  it must be copied so that it is accessed from the build node.
+   procedure Export_File (Executor      : in out Executor_Type;
+                          Source_Path   : in String;
+                          Build_Path    : in String;
+                          Exported_Path : out UString);
+
    procedure Execute (Executor    : in out Executor_Type;
                       Command     : in EL.Expressions.Expression;
                       Parameters  : in Util.Properties.Manager;

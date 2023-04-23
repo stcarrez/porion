@@ -151,12 +151,19 @@ package body Porion.Sources.Files is
       Kind     : constant File_Type := Get_File_Type (Src_Path);
       List     : Util.Strings.Sets.Set;
       Empty    : Util.Strings.Vectors.Vector;
+      Exported_Path : UString;
    begin
       Log.Info ("Extracting files from '{0}' to '{1}'", Src_Path, Path);
 
       Result := To_UString ("");
       Controller.Setup (Kind);
       Controller.Config.Set ("build_dir", Path);
+      Executor.Export_File (Src_Path, Path, Exported_Path);
+      if Length (Exported_Path) = 0 then
+         Controller.Config.Set ("path", Src_Path);
+      else
+         Controller.Config.Set ("path", To_String (Exported_Path));
+      end if;
       Executor.Execute (Command     => Controller.Extract_Command,
                         Parameters  => Controller.Config,
                         Working_Dir => Path,
@@ -168,6 +175,19 @@ package body Porion.Sources.Files is
                                   Pattern => "*",
                                   Excludes => Empty,
                                   List => List);
+         if List.Length = 2 then
+            declare
+               Pos : Util.Strings.Sets.Cursor := List.First;
+            begin
+               while Util.Strings.Sets.Has_Element (Pos) loop
+                  if Get_File_Type (Util.Strings.Sets.Element (Pos)) /= UNKNOWN then
+                     List.Delete (Pos);
+                     exit;
+                  end if;
+                  Util.Strings.Sets.Next (Pos);
+               end loop;
+            end;
+         end if;
          if List.Length = 1 then
             Result := To_UString (Util.Strings.Sets.Element (List.First));
             Log.Info ("Using sources stored in {0}", Result);

@@ -16,6 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Streams;
+with Ada.Directories;
 with Util.Strings.Vectors;
 with Util.Files;
 with Util.Log.Loggers;
@@ -35,15 +36,82 @@ package body Porion.Nodes.SSH is
    function Create (Listener : in Listener_Access;
                     Node     : in Models.Node_Ref) return Nodes.Controller_Access is
       Controller : constant Controller_Access := new Controller_Type;
-      Cmd        : constant String := Configs.Get (SSH_COMMAND_NAME, SSH_COMMAND);
+      Ssh_Cmd    : constant String := Configs.Get (SSH_COMMAND_NAME, SSH_COMMAND);
+      Scp_Cmd    : constant String := Configs.Get (SCP_COMMAND_NAME, SCP_COMMAND);
       Ctx        : EL.Contexts.Default.Default_Context;
    begin
       Porion.Nodes.Set_Listener (Controller.all, Listener);
       Controller.Hostname := Node.Get_Name;
       Controller.Login := Node.Get_Login;
-      Controller.Command := EL.Expressions.Create_Expression (Cmd, Ctx);
+      Controller.Command := EL.Expressions.Create_Expression (Ssh_Cmd, Ctx);
+      Controller.Scp_Command := EL.Expressions.Create_Expression (Scp_Cmd, Ctx);
       return Controller.all'Access;
    end Create;
+
+   --  ------------------------------
+   --  Export the file described by `Source_Path` to build in the directory
+   --  defined by `Build_Path`.  Update `Exported_Path` to indicate the path
+   --  of the exported file as seen from the build node.  If the build node
+   --  is local, the operation does nothing.  If the build node is remote,
+   --  it must be copied so that it is accessed from the build node.
+   --  ------------------------------
+   overriding
+   procedure Export_File (Controller    : in out Controller_Type;
+                          Source_Path   : in String;
+                          Build_Path    : in String;
+                          Exported_Path : out UString) is
+      procedure Read_Input (Out_Stream : in out Input_Buffer_Stream'Class;
+                            Err_Stream : in out Input_Buffer_Stream'Class);
+
+      procedure Print (Kind : in Output_Type;
+                       Line : in String);
+      procedure Print (Kind : in Output_Type;
+                       Line : in String) is
+      begin
+         Log.Error ("{0}", Line);
+      end Print;
+
+      procedure Read_Input (Out_Stream : in out Input_Buffer_Stream'Class;
+                            Err_Stream : in out Input_Buffer_Stream'Class) is
+         Report : Report_Output;
+         task Reader is
+         end Reader;
+         task body Reader is
+         begin
+            Read_Input (Report, Err_Stream, True, STDERR, Print'Access);
+         end Reader;
+
+      begin
+         Read_Input (Report, Out_Stream, True, STDOUT, Print'Access);
+      end Read_Input;
+
+      Props            : aliased EL.Contexts.Default.Default_ELResolver;
+      Ctx              : EL.Contexts.Default.Default_Context;
+      Name             : constant String := Ada.Directories.Simple_Name (Source_Path);
+      Destination_Path : constant String := Util.Files.Compose (Build_Path, Name);
+   begin
+      Props.Register (To_UString ("login"), UBO.To_Object (Controller.Login));
+      Props.Register (To_UString ("hostname"), UBO.To_Object (Controller.Hostname));
+      Props.Register (To_UString ("identity"), UBO.To_Object (Controller.Identity));
+      Props.Register (To_UString ("srcPath"), UBO.To_Object (Source_Path));
+      Props.Register (To_UString ("dstPath"), UBO.To_Object (Destination_Path));
+      Ctx.Set_Resolver (Props'Unchecked_Access);
+      declare
+         Cmd   : constant UBO.Object := Controller.Scp_Command.Get_Value (Ctx);
+         Scp   : constant String := UBO.To_String (Cmd);
+         Args  : Util.Strings.Vectors.Vector;
+         Ignore_Working_Dir : Boolean;
+         Status : Integer;
+      begin
+         Porion.Nodes.Controller_Type (Controller).Expand (Scp, ".",
+                                                           Ignore_Working_Dir, Args);
+         Local.Controller_Type (Controller)
+           .Execute (Args    => Args,
+                     Process => Read_Input'Access,
+                     Status  => Status);
+         Exported_Path := To_UString (Destination_Path);
+      end;
+   end Export_File;
 
    overriding
    procedure Expand (Controller  : in out Controller_Type;
@@ -218,7 +286,7 @@ package body Porion.Nodes.SSH is
 
       Status : Integer;
    begin
-      Controller.Execute (Command => "ls -c " & Pattern,
+      Controller.Execute (Command => "ls -cd " & Pattern,
                           Working_Dir => Path,
                           Process => Process'Access,
                           Strip_Crlf => True,

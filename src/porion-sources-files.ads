@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-sources-files -- Source management with plain files
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,19 +27,19 @@ private package Porion.Sources.Files is
    GUESS_CONFIG_NAME       : constant String := "guess";
    EXTRACT_CONFIG_NAME     : constant String := "extract";
 
-   TAR_EXTRACT_COMMAND     : constant String := "tar xf #{repository_url}";
+   TAR_EXTRACT_COMMAND     : constant String := "tar xf #{path}";
    TAR_GUESS_COMMAND       : constant String := "tar tvf #{path}";
 
-   TAR_GZ_EXTRACT_COMMAND  : constant String := "tar xzf #{repository_url}";
+   TAR_GZ_EXTRACT_COMMAND  : constant String := "tar xzf #{path}";
    TAR_GZ_GUESS_COMMAND    : constant String := "tar tzvf #{path}";
 
-   TAR_BZ2_EXTRACT_COMMAND : constant String := "tar xzf #{repository_url}";
+   TAR_BZ2_EXTRACT_COMMAND : constant String := "tar xzf #{path}";
    TAR_BZ2_GUESS_COMMAND   : constant String := "tar tzvf #{path}";
 
-   TAR_XZ_EXTRACT_COMMAND  : constant String := "tar xzf #{repository_url}";
+   TAR_XZ_EXTRACT_COMMAND  : constant String := "tar xzf #{path}";
    TAR_XZ_GUESS_COMMAND    : constant String := "tar tzvf #{path}";
 
-   ZIP_EXTRACT_COMMAND     : constant String := "unzip -u #{repository_url}";
+   ZIP_EXTRACT_COMMAND     : constant String := "unzip -u #{path}";
    ZIP_GUESS_COMMAND       : constant String := "zipinfo #{path}";
 
    type File_Type is (UNKNOWN, PLAIN, TAR, TAR_GZ, TAR_BZ2, TAR_XZ, ZIP);

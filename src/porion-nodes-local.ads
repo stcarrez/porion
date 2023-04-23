@@ -40,6 +40,17 @@ private package Porion.Nodes.Local is
                      Ignore_Working_Dir : out Boolean;
                      Args        : in out Util.Strings.Vectors.Vector);
 
+   --  Export the file described by `Source_Path` to build in the directory
+   --  defined by `Build_Path`.  Update `Exported_Path` to indicate the path
+   --  of the exported file as seen from the build node.  If the build node
+   --  is local, the operation does nothing.  If the build node is remote,
+   --  it must be copied so that it is accessed from the build node.
+   overriding
+   procedure Export_File (Controller    : in out Controller_Type;
+                          Source_Path   : in String;
+                          Build_Path    : in String;
+                          Exported_Path : out UString);
+
    --  Execute the command in the working directory and for each output
    --  line produced by the command call the Process procedure.
    overriding

@@ -109,9 +109,6 @@ package body Porion.Commands.Steps is
 
       Offset : Natural;
    begin
-      if Context.Project_Service.Project.Get_Scm = Porion.Sources.SRC_GIT then
-         Command.Update_Pos := Command.Update_Pos - 1;
-      end if;
       Get_Recipe_Step_Offset (Context, Offset);
       if Command.Update_Pos <= Offset then
          Porion.Commands.Error (-("cannot update the first step"));

@@ -181,7 +181,7 @@ package body Porion.Nodes.SSH is
          exception
             when others =>
                Status := -1;
-               Log.Warn ("Remove execution failed, unkown output: '{0}'",
+               Log.Warn ("Remote execution failed, unkown output: '{0}'",
                          To_String (Status_Line));
          end;
          --  Util.Processes.Wait (Proc);

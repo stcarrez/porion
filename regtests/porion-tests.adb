@@ -149,7 +149,7 @@ package body Porion.Tests is
       Util.Tests.Assert_Matches (T, "fake-test-1.0#main~main@localhost:1", Result,
                                  "Invalid project build");
       Util.Tests.Assert_Matches
-       (T, "fake-test-1.0#main~main@localhost:1               .*main[ ]+OK[ ]+46[ ]+10", Result,
+       (T, "fake-test-1.0:main~main@localhost:1               .*main[ ]+OK[ ]+46[ ]+10", Result,
         "Invalid project build tests");
 
       T.Execute (Command => Tool & " -c " & Config & " list --projects",

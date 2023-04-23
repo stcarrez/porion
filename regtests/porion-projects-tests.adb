@@ -117,7 +117,7 @@ package body Porion.Projects.Tests is
       Check ("prj#branch@hostname");
       Check ("prj:20");
       Check ("prj~config:21");
-      Check ("prj#branch:213");
+      Check ("prj:branch:213");
    end Test_To_String;
 
 end Porion.Projects.Tests;

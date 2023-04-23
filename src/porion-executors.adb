@@ -112,6 +112,9 @@ package body Porion.Executors is
    begin
       Executor.Controller := Nodes.Services.Create_Controller (Executor'Unchecked_Access, Node);
       Executor.Controller.Set_Environment (Env);
+      if not Executor.Dry_Run then
+         Executor.Controller.Start;
+      end if;
    end Set_Build_Node;
 
    --  ------------------------------

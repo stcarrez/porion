@@ -19,7 +19,10 @@ with Ada.Characters.Handling;
 with Ada.Environment_Variables;
 with Util.Streams.Texts;
 with Util.Files;
+with Util.Log.Loggers;
 package body Porion.Nodes is
+
+   Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Nodes");
 
    --  ------------------------------
    --  Returns true if commands are not executed but collected.
@@ -93,6 +96,8 @@ package body Porion.Nodes is
                                       Line : in String)) is
       Reader  : Util.Streams.Texts.Reader_Stream;
    begin
+      Log.Debug ("Read input {0}", Kind'Image);
+
       Reader.Initialize (Stream'Unchecked_Access);
       while not Reader.Is_Eof loop
          declare

@@ -53,6 +53,8 @@ Get information about a project or a build number:
 Version 0.14.0 - Under development
   - Fix adding a recipe on a new branch
   - Fix displaying the project recipes on all branches
+  - Use single ssh connection for multiple commands when building on remote node
+  - Copy project files using scp on remote nodes
 
 Version 0.13.0 - Mar 2023
   - Update to use last AWA version

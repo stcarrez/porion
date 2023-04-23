@@ -19,7 +19,10 @@ with Util.Strings.Vectors;
 private with Util.Processes;
 private package Porion.Nodes.Local is
 
-   type Controller_Type is limited new Porion.Nodes.Controller_Type with private;
+   type Controller_Type is limited new Porion.Nodes.Controller_Type with record
+      Env : Util.Strings.Maps.Map;
+   end record;
+
    type Controller_Access is access all Controller_Type'Class;
 
    --  Create the controller for the management of the given build node.
@@ -73,10 +76,6 @@ private package Porion.Nodes.Local is
                              List       : in out Util.Strings.Sets.Set);
 
 private
-
-   type Controller_Type is limited new Porion.Nodes.Controller_Type with record
-      Env : Util.Strings.Maps.Map;
-   end record;
 
    --  Set the environment variables before launching the process.
    procedure Set_Environment (Controller : in out Controller_Type;

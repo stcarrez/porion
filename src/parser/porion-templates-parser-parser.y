@@ -44,7 +44,9 @@
       end yyerror;
 
 }
-
+%code init {
+      Error_Count := 0;  
+}
 {
    subtype YYSType is Porion.Templates.Parser.YYSType;
 }

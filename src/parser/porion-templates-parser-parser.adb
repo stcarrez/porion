@@ -232,6 +232,8 @@ package body Porion.Templates.Parser.Parser is
       --  initialize by pushing state 0 and getting the first input symbol
       yy.state_stack (yy.tos) := 0;
 
+      Error_Count := 0;  
+
       loop
          yy.index := Shift_Reduce_Offset (yy.state_stack (yy.tos));
          if Integer (Shift_Reduce_Matrix (yy.index).T) = yy.default then
@@ -286,20 +288,20 @@ package body Porion.Templates.Parser.Parser is
             case yy.rule_id is
                pragma Style_Checks (Off);
 
-when 6 => -- #line 69
+when 6 => -- #line 71
  Add_With (Repository, Context, yy.value_stack (yy.tos-1));
 
-when 7 => -- #line 72
+when 7 => -- #line 74
 
          Error (Context, yy.value_stack (yy.tos).Line, yy.value_stack (yy.tos).Column, "invalid with clause");
          yyerrok;
          yyclearin;
 
 
-when 8 => -- #line 81
+when 8 => -- #line 83
  Finish_Template (Context, yy.value_stack (yy.tos-1));
 
-when 9 => -- #line 84
+when 9 => -- #line 86
 
          Error (Context, yy.value_stack (yy.tos-2).Line, yy.value_stack (yy.tos-2).Column, "invalid build rule");
          yyerrok;
@@ -307,7 +309,7 @@ when 9 => -- #line 84
          Finish_Template (Context, yy.value_stack (yy.tos-1));
 
 
-when 11 => -- #line 96
+when 11 => -- #line 98
 
          if not Context.Step.Is_Null then
             Error (Context, yy.value_stack (yy.tos).Line, yy.value_stack (yy.tos).Column, "invalid step rule");
@@ -322,166 +324,166 @@ when 11 => -- #line 96
          yyclearin;
 
 
-when 12 => -- #line 111
+when 12 => -- #line 113
  Error (Context, yy.value_stack (yy.tos), "missing string termination character"); YYVal := EMPTY;
 
-when 13 => -- #line 114
+when 13 => -- #line 116
  Error (Context, yy.value_stack (yy.tos), "invalid input"); YYVal := EMPTY;
 
-when 14 => -- #line 119
+when 14 => -- #line 121
  Create_Template (Repository, Context, yy.value_stack (yy.tos-1), EMPTY);
 
-when 15 => -- #line 122
+when 15 => -- #line 124
  Create_Template (Repository, Context, yy.value_stack (yy.tos-3), yy.value_stack (yy.tos-1));
 
-when 16 => -- #line 125
+when 16 => -- #line 127
  Error (Context, yy.value_stack (yy.tos), "invalid build rule: missing 'build' keyword");
 
-when 25 => -- #line 150
+when 25 => -- #line 152
  Create_Step (Context, yy.value_stack (yy.tos-1), EMPTY);
 
-when 27 => -- #line 154
+when 27 => -- #line 156
  Create_Step (Context, yy.value_stack (yy.tos-3), yy.value_stack (yy.tos-1));
 
-when 30 => -- #line 160
+when 30 => -- #line 162
  Error (Context, yy.value_stack (yy.tos).Line, yy.value_stack (yy.tos).Column, "invalid step rule");
 
-when 31 => -- #line 165
+when 31 => -- #line 167
  Finish_Step (Context, yy.value_stack (yy.tos-1));
 
-when 32 => -- #line 168
+when 32 => -- #line 170
  Error (Context, yy.value_stack (yy.tos-2).Line, yy.value_stack (yy.tos-2).Column, "expecting step name after 'end' keyword");
          Finish_Step (Context, yy.value_stack (yy.tos-1));
 
-when 34 => -- #line 176
+when 34 => -- #line 178
  Create_Recipe (Context, yy.value_stack (yy.tos-5), yy.value_stack (yy.tos-3));
          Finish_Recipe (Context, yy.value_stack (yy.tos-5));
 
-when 35 => -- #line 180
+when 35 => -- #line 182
  Error (Context, yy.value_stack (yy.tos).Line, yy.value_stack (yy.tos).Column, "invalid recipe rule");
 
-when 36 => -- #line 185
+when 36 => -- #line 187
  Create_Recipe (Context, yy.value_stack (yy.tos-3), yy.value_stack (yy.tos-2));
 
-when 37 => -- #line 188
+when 37 => -- #line 190
  Create_Recipe (Context, yy.value_stack (yy.tos-1), EMPTY);
 
-when 38 => -- #line 191
+when 38 => -- #line 193
  Create_Recipe (Context, yy.value_stack (yy.tos-5), yy.value_stack (yy.tos-3));
 
-when 39 => -- #line 194
+when 39 => -- #line 196
  Create_Recipe (Context, yy.value_stack (yy.tos-3), yy.value_stack (yy.tos-1));
 
-when 40 => -- #line 199
+when 40 => -- #line 201
  Finish_Recipe (Context, yy.value_stack (yy.tos-1));
 
-when 41 => -- #line 202
+when 41 => -- #line 204
  Error (Context, yy.value_stack (yy.tos-2).Line, yy.value_stack (yy.tos-2).Column, "expecting recipe name after 'end' keyword");
          Finish_Step (Context, yy.value_stack (yy.tos-1));
 
-when 51 => -- #line 230
+when 51 => -- #line 232
  Add_Step (Context, Porion.Builds.STEP_METRIC, yy.value_stack (yy.tos-1));
 
-when 52 => -- #line 233
+when 52 => -- #line 235
  Add_Step (Context, yy.value_stack (yy.tos-3), yy.value_stack (yy.tos-1));
 
-when 53 => -- #line 236
+when 53 => -- #line 238
  Add_Step (Context, Porion.Builds.STEP_MAKE, yy.value_stack (yy.tos-1));
 
-when 54 => -- #line 239
+when 54 => -- #line 241
  Error (Context, yy.value_stack (yy.tos-2).Line, yy.value_stack (yy.tos-2).Column, "invalid run step"); yyerrok;
 
-when 55 => -- #line 244
+when 55 => -- #line 246
  Add_Step (Context, Porion.Builds.STEP_METRIC, yy.value_stack (yy.tos-1));
 
-when 56 => -- #line 247
+when 56 => -- #line 249
  Error (Context, yy.value_stack (yy.tos-2).Line, yy.value_stack (yy.tos-2).Column, "invalid metric step"); yyerrok;
 
-when 57 => -- #line 252
+when 57 => -- #line 254
  Add_Step (Context, Porion.Builds.STEP_TEST, yy.value_stack (yy.tos-3));
 
-when 58 => -- #line 255
+when 58 => -- #line 257
  Add_Step (Context, Porion.Builds.STEP_TEST, yy.value_stack (yy.tos-1));
 
-when 59 => -- #line 258
+when 59 => -- #line 260
  Error (Context, yy.value_stack (yy.tos-2).Line, yy.value_stack (yy.tos-2).Column, "invalid xunit step"); yyerrok;
 
-when 60 => -- #line 263
+when 60 => -- #line 265
  YYVal := yy.value_stack (yy.tos-1); YYVal.Kind := TYPE_RENAMES;
 
-when 61 => -- #line 266
+when 61 => -- #line 268
  YYVal := yy.value_stack (yy.tos-1); YYVal.Kind := TYPE_RENAMES;
 
-when 62 => -- #line 269
+when 62 => -- #line 271
  YYVal := yy.value_stack (yy.tos-1); YYVal.Kind := TYPE_RENAMES;
 
-when 66 => -- #line 280
+when 66 => -- #line 282
  Add_Variable (Context, Name => yy.value_stack (yy.tos-4), Of_Type => yy.value_stack (yy.tos-1), Secret => True, Value => EMPTY);
 
-when 67 => -- #line 283
+when 67 => -- #line 285
  Add_Variable (Context, Name => yy.value_stack (yy.tos-5), Of_Type => yy.value_stack (yy.tos-3), Secret => False, Value => yy.value_stack (yy.tos-1));
 
-when 68 => -- #line 286
+when 68 => -- #line 288
  Add_Variable (Context, Name => yy.value_stack (yy.tos-3), Of_Type => EMPTY, Secret => False, Value => yy.value_stack (yy.tos-1));
 
-when 69 => -- #line 289
+when 69 => -- #line 291
  Add_Variable (Context, Name => yy.value_stack (yy.tos-3), Of_Type => yy.value_stack (yy.tos-1), Secret => False, Value => EMPTY);
 
-when 70 => -- #line 292
+when 70 => -- #line 294
  Error (Context, yy.value_stack (yy.tos-2), "invalid variable declaration");
 
-when 71 => -- #line 297
+when 71 => -- #line 299
  Set_Config (Context, yy.value_stack (yy.tos-2), yy.value_stack (yy.tos-1));
 
-when 72 => -- #line 300
+when 72 => -- #line 302
  Set_Config (Context, yy.value_stack (yy.tos-2), yy.value_stack (yy.tos-1));
 
-when 73 => -- #line 303
+when 73 => -- #line 305
  Set_Config (Context, yy.value_stack (yy.tos-2), yy.value_stack (yy.tos-1));
 
-when 74 => -- #line 306
+when 74 => -- #line 308
  Set_Config (Context, yy.value_stack (yy.tos-2), yy.value_stack (yy.tos-1));
 
-when 75 => -- #line 309
+when 75 => -- #line 311
  Error (Context, yy.value_stack (yy.tos).Line, yy.value_stack (yy.tos).Column, "invalid set declaration");
 
-when 76 => -- #line 314
+when 76 => -- #line 316
  Delete_Recipe (Context, yy.value_stack (yy.tos-1));
 
-when 77 => -- #line 317
+when 77 => -- #line 319
  Delete_Recipe (Context, yy.value_stack (yy.tos-1));
 
-when 78 => -- #line 320
+when 78 => -- #line 322
  Error (Context, yy.value_stack (yy.tos).Line, yy.value_stack (yy.tos).Column, "invalid delete rule");
 
-when 79 => -- #line 325
+when 79 => -- #line 327
  Set_Names (YYVal, yy.value_stack (yy.tos-1), yy.value_stack (yy.tos));
 
-when 80 => -- #line 328
+when 80 => -- #line 330
  YYVal := yy.value_stack (yy.tos);
 
-when 81 => -- #line 333
+when 81 => -- #line 335
  YYVal := yy.value_stack (yy.tos);
 
-when 82 => -- #line 336
+when 82 => -- #line 338
  YYVal := yy.value_stack (yy.tos);
 
-when 83 => -- #line 339
+when 83 => -- #line 341
  YYVal := yy.value_stack (yy.tos);
 
-when 84 => -- #line 344
+when 84 => -- #line 346
  YYVal := yy.value_stack (yy.tos);
 
-when 85 => -- #line 347
+when 85 => -- #line 349
  YYVal := yy.value_stack (yy.tos);
 
-when 86 => -- #line 352
+when 86 => -- #line 354
  YYVal := yy.value_stack (yy.tos-2); Append_String (YYVal, yy.value_stack (yy.tos));
 
-when 87 => -- #line 355
+when 87 => -- #line 357
  YYVal := yy.value_stack (yy.tos);
 
-when 88 => -- #line 358
+when 88 => -- #line 360
  Error (Context, yy.value_stack (yy.tos), "missing string termination character"); YYVal := yy.value_stack (yy.tos);
                pragma Style_Checks (On);
 

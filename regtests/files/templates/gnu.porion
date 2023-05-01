@@ -8,9 +8,10 @@ build GNU is
    set timeout 60s;
    set timeout 30mn;
    step configure run "./configure --prefix ${PREFIX}";
+   step configure_coverage run "./configure --prefix ${PREFIX} --enable-coverage";
    step make is
       set timeout 1h;
-      run "$(MAKE) -s";
+      run "${MAKE} -s";
    end make;
    step test is
       set ignore on;
@@ -24,7 +25,7 @@ build GNU is
 
    recipe main is
      --  metric disk before;
-     run configure build test coverage test_results;
+     run configure make test coverage test_results;
      --  metric disk after;
    end main;
 

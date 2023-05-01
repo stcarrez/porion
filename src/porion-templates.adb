@@ -17,13 +17,9 @@
 -----------------------------------------------------------------------
 with Ada.Unchecked_Deallocation;
 with Ada.Directories;
-with Ada.Characters.Handling;
 with Util.Files;
 with Util.Strings;
 package body Porion.Templates is
-
-   function To_Lower (S : in String) return String
-                      renames Ada.Characters.Handling.To_Lower;
 
    function Get_Template_Name (Path : in String) return String is
    begin
@@ -161,6 +157,12 @@ package body Porion.Templates is
          end;
       end if;
    end "=";
+
+   function Null_Template return Template_Refs.Ref is
+      Null_Template_Instance : Template_Refs.Ref;
+   begin
+      return Null_Template_Instance;
+   end Null_Template;
 
    overriding
    procedure Finalize (Template : in out Template_Type) is

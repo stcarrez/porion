@@ -17,7 +17,6 @@
 -----------------------------------------------------------------------
 
 with Ada.Unchecked_Deallocation;
-with Ada.Characters.Handling;
 with Ada.Text_IO;
 with Ada.Directories;
 with Util.Strings.Formats;
@@ -27,8 +26,8 @@ with Porion.Templates.Parser.Parser_Tokens;
 package body Porion.Templates.Parser is
 
    use Ada.Strings.Unbounded;
-   use Ada.Characters.Handling;
    use Util.Concurrent.Counters;
+   use type Porion.Builds.Step_Type;
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Parser");
 
@@ -55,6 +54,60 @@ package body Porion.Templates.Parser is
       end if;
    end Load;
 
+   procedure Load (Path       : in String;
+                   Repository : in out Repository_Type;
+                   Template   : out Template_Refs.Ref) is
+      Result  : Integer;
+      Context : Parser_Context_Type;
+   begin
+      Log.Info ("Loading template {0}", Path);
+
+      Context.File := Util.Log.Locations.Create_File_Info (Path, Path'First);
+      begin
+         Porion.Templates.Parser.Parser.Parse (Path, Repository, Context, Result);
+
+      exception
+         when Parser_Tokens.Syntax_Error =>
+            Result := -1;
+            Log.Error ("syntax error while parsing template {0}", Path);
+      end;
+
+      if Result = 0 then
+         Finish_Template (Repository, Context.Template);
+         Repository.Templates.Insert (To_UString (Path), Context.Template);
+         Template := Context.Template;
+      else
+         Template := Null_Template;
+      end if;
+   end Load;
+
+   procedure Load (Path       : in String;
+                   Repository : in out Repository_Type;
+                   Template   : out Template_Ref) is
+      Result  : Integer;
+      Context : Parser_Context_Type;
+      Null_Tmpl : Template_Ref;
+   begin
+      Log.Info ("Loading template {0}", Path);
+
+      Context.File := Util.Log.Locations.Create_File_Info (Path, Path'First);
+      begin
+         Porion.Templates.Parser.Parser.Parse (Path, Repository, Context, Result);
+
+      exception
+         when Parser_Tokens.Syntax_Error =>
+            Result := -1;
+            Log.Error ("syntax error while parsing template {0}", Path);
+      end;
+
+      Template := Null_Tmpl;
+      if Result = 0 then
+         Finish_Template (Repository, Context.Template);
+         Repository.Templates.Insert (To_UString (Path), Context.Template);
+         Template_Refs.Ref (Template) := Context.Template;
+      end if;
+   end Load;
+
    procedure Finish_Template (Repository : in out Repository_Type;
                               Template   : in Template_Refs.Ref) is
       Name : constant UString := To_UString (To_Lower (To_String (Template.Value.Name)));
@@ -77,7 +130,21 @@ package body Porion.Templates.Parser is
             return Natural'Image (Val.Timeout);
 
          when TYPE_NAMES =>
-            return "Names";
+            declare
+               Result : UString;
+               Sep    : Boolean := False;
+            begin
+               Append (Result, "Names {");
+               for Name of Val.Names loop
+                  if Sep then
+                     Append (Result, ", ");
+                  end if;
+                  Append (Result, Name);
+                  Sep := True;
+               end loop;
+               Append (Result, "}");
+               return To_String (Result);
+            end;
 
          when TYPE_RULE =>
             return "Rule";
@@ -100,7 +167,10 @@ package body Porion.Templates.Parser is
          when TYPE_NULL =>
             return "null";
 
-         when TYPE_STRING | TYPE_IDENT | TYPE_TIMEOUT | TYPE_NAMES | TYPE_STEP | TYPE_RULE =>
+         when TYPE_STRING =>
+            return '"' & To_String (Val.Node) & '"';
+
+         when TYPE_IDENT | TYPE_TIMEOUT | TYPE_NAMES | TYPE_STEP | TYPE_RULE =>
             return To_String (Val.Node);
 
          when others =>
@@ -228,8 +298,8 @@ package body Porion.Templates.Parser is
       Var_Name : constant UString := Get_UString (Name);
       Var      : constant Variable_Refs.Ref := Variable_Refs.Create;
    begin
-      Log.Debug ("Add variable {0} type {1}", Var_Name,
-                 To_String (Of_Type));
+      Log.Debug ("Add variable {0} type {1} value {2}", Var_Name,
+                 To_String (Of_Type), To_String (Value));
 
       Var.Value.Name := Var_Name;
       Var.Value.Loc := Get_Location (Context, Name);
@@ -309,12 +379,16 @@ package body Porion.Templates.Parser is
       declare
          Name : constant UString := To_UString (To_Lower (To_String (With_Name)));
          Pos  : constant Template_Maps.Cursor := Repository.Templates.Find (Name);
+         Tmpl : Template_Refs.Ref;
       begin
          if Template_Maps.Has_Element (Pos) then
-            --  Error (Context, Value, "circular with '{0}' clause", With_Name);
-            return;
+            Tmpl := Template_Maps.Element (Pos);
+         else
+            Load (Path, Repository, Tmpl);
          end if;
-         Load (Path, Repository);
+         if not Tmpl.Is_Null then
+            Context.Withs.Include (Name, Tmpl);
+         end if;
       end;
    end Add_With;
 
@@ -417,7 +491,8 @@ package body Porion.Templates.Parser is
    --  ------------------------------
    procedure Create_Recipe (Context    : in out Parser_Context_Type;
                             Name       : in YYSType;
-                            Extends    : in YYSType) is
+                            Extends    : in YYSType;
+                            On         : in YYSType) is
       Recipe_Name : constant UString := Get_UString (Name);
    begin
       Log.Debug ("Create recipe {0}", Recipe_Name);
@@ -426,7 +501,19 @@ package body Porion.Templates.Parser is
       Context.Recipe.Value.Name := Recipe_Name;
       Context.Recipe.Value.Loc := Get_Location (Context, Name);
       if Extends.Kind in TYPE_STRING | TYPE_IDENT then
-         Context.Recipe.Value.Extends := Get_UString (Extends);
+         declare
+            Inherit : constant String := Get_String (Extends);
+            Recipe  : constant Recipe_Refs.Ref := Find_Recipe (Context, Inherit);
+         begin
+            if Recipe.Is_Null then
+               Error (Context, Extends, "recipe '{0}' not found", To_UString (Inherit));
+            else
+               Context.Recipe.Value.Extends := To_UString (Inherit);
+               Context.Recipe.Value.Steps := Recipe.Value.Steps;
+               Context.Recipe.Value.Vars := Recipe.Value.Vars;
+               Context.Recipe.Value.Filtering := Recipe.Value.Filtering;
+            end if;
+         end;
       end if;
 
       if not Context.Template.Is_Null then
@@ -437,6 +524,72 @@ package body Porion.Templates.Parser is
          end if;
       end if;
    end Create_Recipe;
+
+   --  ------------------------------
+   --  Find the template with the given name.
+   --  ------------------------------
+   function Find_Template (Context : in Parser_Context_Type;
+                           Name    : in String) return Template_Refs.Ref is
+      Ident : constant UString := To_UString (To_Lower (Name));
+      Pos   : constant Template_Maps.Cursor := Context.Withs.Find (Ident);
+   begin
+      if Template_Maps.Has_Element (Pos) then
+         return Template_Maps.Element (Pos);
+      end if;
+      return Null_Template;
+   end Find_Template;
+
+   --  ------------------------------
+   --  Find the step with the given name.  Look in the current template
+   --  or in a with'ed unit indicated in the name.
+   --  ------------------------------
+   function Find_Step (Context : in Parser_Context_Type;
+                       Name    : in String) return Step_Refs.Ref is
+      Sep  : Natural := Util.Strings.Index (Name, '.');
+      Tmpl : Template_Refs.Ref;
+      Pos  : Step_Maps.Cursor;
+   begin
+      if Sep > 0 then
+         Tmpl := Find_Template (Context, Name (Name'First .. Sep - 1));
+         Sep := Sep + 1;
+      else
+         Tmpl := Context.Template;
+         Sep := Name'First;
+      end if;
+      if not Tmpl.Is_Null then
+         Pos := Tmpl.Value.Steps.Find (To_UString (Name (Sep .. Name'Last)));
+         if Step_Maps.Has_Element (Pos) then
+            return Step_Maps.Element (Pos);
+         end if;
+      end if;
+      return Null_Step;
+   end Find_Step;
+
+   --  ------------------------------
+   --  Find the recipe with the given name.  Look in the current template
+   --  or in the with'ed unit indicated in the name.
+   --  ------------------------------
+   function Find_Recipe (Context : in Parser_Context_Type;
+                         Name    : in String) return Recipe_Refs.Ref is
+      Sep  : Natural := Util.Strings.Index (Name, '.');
+      Tmpl : Template_Refs.Ref;
+      Pos  : Recipe_Maps.Cursor;
+   begin
+      if Sep > 0 then
+         Tmpl := Find_Template (Context, Name (Name'First .. Sep - 1));
+         Sep := Sep + 1;
+      else
+         Tmpl := Context.Template;
+         Sep := Name'First;
+      end if;
+      if not Tmpl.Is_Null then
+         Pos := Tmpl.Value.Recipes.Find (To_UString (Name (Sep .. Name'Last)));
+         if Recipe_Maps.Has_Element (Pos) then
+            return Recipe_Maps.Element (Pos);
+         end if;
+      end if;
+      return Null_Recipe;
+   end Find_Recipe;
 
    --  ------------------------------
    --  Create a ste[ instance with the given name and that could
@@ -453,7 +606,16 @@ package body Porion.Templates.Parser is
       Context.Step.Value.Name := Step_Name;
       Context.Step.Value.Loc := Get_Location (Context, Name);
       if Extends.Kind in TYPE_STRING | TYPE_IDENT then
-         Context.Step.Value.Extends := Get_UString (Extends);
+         declare
+            Inherit : constant String := Get_String (Extends);
+            Step    : constant Step_Refs.Ref := Find_Step (Context, Inherit);
+         begin
+            if Step.Is_Null then
+               Error (Context, Extends, "step '{0}' not found", To_UString (Inherit));
+            else
+               Context.Step.Value.Extends := To_UString (Inherit);
+            end if;
+         end;
       end if;
 
       if not Context.Template.Is_Null then
@@ -502,10 +664,36 @@ package body Porion.Templates.Parser is
       Action.Ignore := Context.Ignore;
       Action.Timeout := Context.Timeout;
       Action.Kind := Kind;
+      if Content.Kind = TYPE_NAMES and then Kind = Porion.Builds.STEP_MAKE then
+         for Name of Content.Node.Names loop
+            declare
+               Step : constant Step_Refs.Ref := Find_Step (Context, Name);
+            begin
+               if Step.Is_Null then
+                  Error (Context, Content, "invalid step '" & Name & "'");
+               elsif not Context.Recipe.Is_Null then
+                  Context.Step := Step_Refs.Create;
+                  Context.Step.Value.Loc := Get_Location (Context, Content);
+                  Context.Step.Value.Actions.Append (Action);
+                  Context.Recipe.Value.Steps.Append (Step);
+               elsif not Context.Step.Is_Null then
+                  Context.Step.Value.Actions.Append (Action);
+               end if;
+            end;
+         end loop;
+         return;
+      end if;
+
       if Content.Kind = TYPE_NAMES then
-         Action.Arg1 := Content.Node.Names;
+         Action.Params := Content.Node.Names;
       else
-         Action.Arg1.Append (Get_String (Content));
+         Action.Params.Append (Get_String (Content));
+      end if;
+      if not Context.Recipe.Is_Null then
+         Context.Step := Step_Refs.Create;
+         Context.Step.Value.Loc := Get_Location (Context, Content);
+         Context.Step.Value.Actions.Append (Action);
+         Context.Recipe.Value.Steps.Append (Context.Step);
       end if;
       if not Context.Step.Is_Null then
          Context.Step.Value.Actions.Append (Action);
@@ -527,7 +715,7 @@ package body Porion.Templates.Parser is
       elsif Config = "filtering" and then not Context.Recipe.Is_Null then
          Context.Recipe.Value.Filtering := Value.Node.Str_Value;
       else
-         Error (Context, Name, "unkown configuration: '{0}'", Get_UString (Name));
+         Error (Context, Name, "unknown configuration: '{0}'", Get_UString (Name));
       end if;
    end Set_Config;
 
@@ -564,6 +752,8 @@ package body Porion.Templates.Parser is
                 Place   => Name,
                 Message => "expecting step name '{0}'",
                 Arg1    => Context.Step.Value.Name);
+      else
+         Context.Template.Value.Steps.Include (To_UString (Step_Name), Context.Step);
       end if;
       Context.Step := Null_Step;
    end Finish_Step;
@@ -579,6 +769,10 @@ package body Porion.Templates.Parser is
                 Place   => Name,
                 Message => "expecting recipe name '{0}'",
                 Arg1    => Context.Recipe.Value.Name);
+      end if;
+      if not Context.Recipe.Is_Null then
+         Log.Debug ("Finished recipe {0} with{1} steps",
+                    Recipe_Name, Context.Recipe.Value.Steps.Length'Image);
       end if;
       Context.Recipe := Null_Recipe;
    end Finish_Recipe;

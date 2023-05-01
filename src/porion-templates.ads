@@ -22,10 +22,12 @@ with Util.Strings.Vectors;
 with Util.Strings.Maps;
 with Ada.Containers.Vectors;
 with Ada.Containers.Ordered_Maps;
-with Porion.Builds;
+with Porion.Builds.Models;
+private with Ada.Characters.Handling;
 package Porion.Templates is
 
    type Repository_Type is limited private;
+   type Template_Ref is private;
 
    --  Set the search path to find and load templates.
    procedure Set_Search_Paths (Repository : in out Repository_Type;
@@ -37,6 +39,9 @@ package Porion.Templates is
                                Name       : in String) return String;
 
 private
+
+   function To_Lower (S : in String) return String
+                      renames Ada.Characters.Handling.To_Lower;
 
    function Get_Template_Name (Path : in String) return String;
 
@@ -67,10 +72,10 @@ private
 
    type Step_Action is record
       Kind    : Porion.Builds.Step_Type := Porion.Builds.STEP_MAKE;
+      Builder : Porion.Builds.Models.Builder_Type := Porion.Builds.Models.BUILDER_SCRIPT;
       Ignore  : Util.Nullables.Nullable_Boolean;
       Timeout : Util.Nullables.Nullable_Integer;
-      Arg1    : Util.Strings.Vectors.Vector;
-      Arg2    : Util.Strings.Vectors.Vector;
+      Params  : Util.Strings.Vectors.Vector;
    end record;
 
    package Step_Action_Vectors is
@@ -151,6 +156,10 @@ private
                                Element_Access => Template_Access);
 
    function "=" (Left, Right : in Template_Refs.Ref) return Boolean;
+
+   function Null_Template return Template_Refs.Ref;
+
+   type Template_Ref is new Template_Refs.Ref with null record;
 
    package Template_Maps is
      new Ada.Containers.Ordered_Maps (Key_Type     => UString,

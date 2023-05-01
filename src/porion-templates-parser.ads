@@ -25,6 +25,10 @@ package Porion.Templates.Parser is
    procedure Load (Path       : in String;
                    Repository : in out Repository_Type);
 
+   procedure Load (Path       : in String;
+                   Repository : in out Repository_Type;
+                   Template   : out Template_Ref);
+
    --  The parser token or expression.
    type YYSType is private;
 
@@ -35,6 +39,10 @@ package Porion.Templates.Parser is
    EMPTY : constant YYSType;
 
 private
+
+   procedure Load (Path       : in String;
+                   Repository : in out Repository_Type;
+                   Template   : out Template_Refs.Ref);
 
    type Time_Unit_Type is (UNIT_MS, UNIT_SEC, UNIT_MINUTE, UNIT_HOUR);
 
@@ -124,6 +132,7 @@ private
       Step      : Step_Refs.Ref;
       Ignore    : Util.Nullables.Nullable_Boolean;
       Timeout   : Util.Nullables.Nullable_Integer;
+      Withs     : Template_Maps.Map;
    end record;
 
    procedure Finish_Template (Repository : in out Repository_Type;
@@ -141,13 +150,28 @@ private
    --  extend an another recipe.
    procedure Create_Recipe (Context    : in out Parser_Context_Type;
                             Name       : in YYSType;
-                            Extends    : in YYSType);
+                            Extends    : in YYSType;
+                            On         : in YYSType);
 
    --  Create a ste[ instance with the given name and that could
    --  extend an another step.
    procedure Create_Step (Context    : in out Parser_Context_Type;
                           Name       : in YYSType;
                           Extends    : in YYSType);
+
+   --  Find the template with the given name.
+   function Find_Template (Context : in Parser_Context_Type;
+                           Name    : in String) return Template_Refs.Ref;
+
+   --  Find the step with the given name.  Look in the current template
+   --  or in a with'ed unit indicated in the name.
+   function Find_Step (Context : in Parser_Context_Type;
+                       Name    : in String) return Step_Refs.Ref;
+
+   --  Find the recipe with the given name.  Look in the current template
+   --  or in the with'ed unit indicated in the name.
+   function Find_Recipe (Context : in Parser_Context_Type;
+                         Name    : in String) return Recipe_Refs.Ref;
 
    procedure Delete_Recipe (Context : in out Parser_Context_Type;
                             Name    : in YYSType);

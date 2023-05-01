@@ -345,71 +345,74 @@ when 25 => -- #line 152
 when 27 => -- #line 156
  Create_Step (Context, yy.value_stack (yy.tos-3), yy.value_stack (yy.tos-1));
 
+when 29 => -- #line 160
+ Create_Step (Context, yy.value_stack (yy.tos), EMPTY);
+
 when 30 => -- #line 162
+ Finish_Step (Context, yy.value_stack (yy.tos-2));
+
+when 31 => -- #line 165
  Error (Context, yy.value_stack (yy.tos).Line, yy.value_stack (yy.tos).Column, "invalid step rule");
 
-when 31 => -- #line 167
+when 32 => -- #line 170
  Finish_Step (Context, yy.value_stack (yy.tos-1));
 
-when 32 => -- #line 170
+when 33 => -- #line 173
  Error (Context, yy.value_stack (yy.tos-2).Line, yy.value_stack (yy.tos-2).Column, "expecting step name after 'end' keyword");
          Finish_Step (Context, yy.value_stack (yy.tos-1));
 
-when 34 => -- #line 178
+when 35 => -- #line 181
  Create_Recipe (Context, yy.value_stack (yy.tos-5), yy.value_stack (yy.tos-3));
          Finish_Recipe (Context, yy.value_stack (yy.tos-5));
 
-when 35 => -- #line 182
+when 36 => -- #line 185
  Error (Context, yy.value_stack (yy.tos).Line, yy.value_stack (yy.tos).Column, "invalid recipe rule");
 
-when 36 => -- #line 187
+when 37 => -- #line 190
  Create_Recipe (Context, yy.value_stack (yy.tos-3), yy.value_stack (yy.tos-2));
 
-when 37 => -- #line 190
+when 38 => -- #line 193
  Create_Recipe (Context, yy.value_stack (yy.tos-1), EMPTY);
 
-when 38 => -- #line 193
+when 39 => -- #line 196
  Create_Recipe (Context, yy.value_stack (yy.tos-5), yy.value_stack (yy.tos-3));
 
-when 39 => -- #line 196
+when 40 => -- #line 199
  Create_Recipe (Context, yy.value_stack (yy.tos-3), yy.value_stack (yy.tos-1));
 
-when 40 => -- #line 201
+when 41 => -- #line 204
  Finish_Recipe (Context, yy.value_stack (yy.tos-1));
 
-when 41 => -- #line 204
+when 42 => -- #line 207
  Error (Context, yy.value_stack (yy.tos-2).Line, yy.value_stack (yy.tos-2).Column, "expecting recipe name after 'end' keyword");
          Finish_Step (Context, yy.value_stack (yy.tos-1));
 
-when 51 => -- #line 232
- Add_Step (Context, Porion.Builds.STEP_METRIC, yy.value_stack (yy.tos-1));
-
 when 52 => -- #line 235
- Add_Step (Context, yy.value_stack (yy.tos-3), yy.value_stack (yy.tos-1));
+ Add_Step (Context, Porion.Builds.STEP_METRIC, yy.value_stack (yy.tos-1));
 
 when 53 => -- #line 238
- Add_Step (Context, Porion.Builds.STEP_MAKE, yy.value_stack (yy.tos-1));
+ Add_Step (Context, yy.value_stack (yy.tos-3), yy.value_stack (yy.tos-1));
 
 when 54 => -- #line 241
+ Add_Step (Context, Porion.Builds.STEP_MAKE, yy.value_stack (yy.tos-1));
+
+when 55 => -- #line 244
  Error (Context, yy.value_stack (yy.tos-2).Line, yy.value_stack (yy.tos-2).Column, "invalid run step"); yyerrok;
 
-when 55 => -- #line 246
+when 56 => -- #line 249
  Add_Step (Context, Porion.Builds.STEP_METRIC, yy.value_stack (yy.tos-1));
 
-when 56 => -- #line 249
+when 57 => -- #line 252
  Error (Context, yy.value_stack (yy.tos-2).Line, yy.value_stack (yy.tos-2).Column, "invalid metric step"); yyerrok;
 
-when 57 => -- #line 254
+when 58 => -- #line 257
  Add_Step (Context, Porion.Builds.STEP_TEST, yy.value_stack (yy.tos-3));
 
-when 58 => -- #line 257
+when 59 => -- #line 260
  Add_Step (Context, Porion.Builds.STEP_TEST, yy.value_stack (yy.tos-1));
 
-when 59 => -- #line 260
+when 60 => -- #line 263
  Error (Context, yy.value_stack (yy.tos-2).Line, yy.value_stack (yy.tos-2).Column, "invalid xunit step"); yyerrok;
-
-when 60 => -- #line 265
- YYVal := yy.value_stack (yy.tos-1); YYVal.Kind := TYPE_RENAMES;
 
 when 61 => -- #line 268
  YYVal := yy.value_stack (yy.tos-1); YYVal.Kind := TYPE_RENAMES;
@@ -417,23 +420,23 @@ when 61 => -- #line 268
 when 62 => -- #line 271
  YYVal := yy.value_stack (yy.tos-1); YYVal.Kind := TYPE_RENAMES;
 
-when 66 => -- #line 282
- Add_Variable (Context, Name => yy.value_stack (yy.tos-4), Of_Type => yy.value_stack (yy.tos-1), Secret => True, Value => EMPTY);
+when 63 => -- #line 274
+ YYVal := yy.value_stack (yy.tos-1); YYVal.Kind := TYPE_RENAMES;
 
 when 67 => -- #line 285
- Add_Variable (Context, Name => yy.value_stack (yy.tos-5), Of_Type => yy.value_stack (yy.tos-3), Secret => False, Value => yy.value_stack (yy.tos-1));
+ Add_Variable (Context, Name => yy.value_stack (yy.tos-4), Of_Type => yy.value_stack (yy.tos-1), Secret => True, Value => EMPTY);
 
 when 68 => -- #line 288
- Add_Variable (Context, Name => yy.value_stack (yy.tos-3), Of_Type => EMPTY, Secret => False, Value => yy.value_stack (yy.tos-1));
+ Add_Variable (Context, Name => yy.value_stack (yy.tos-5), Of_Type => yy.value_stack (yy.tos-3), Secret => False, Value => yy.value_stack (yy.tos-1));
 
 when 69 => -- #line 291
- Add_Variable (Context, Name => yy.value_stack (yy.tos-3), Of_Type => yy.value_stack (yy.tos-1), Secret => False, Value => EMPTY);
+ Add_Variable (Context, Name => yy.value_stack (yy.tos-3), Of_Type => EMPTY, Secret => False, Value => yy.value_stack (yy.tos-1));
 
 when 70 => -- #line 294
- Error (Context, yy.value_stack (yy.tos-2), "invalid variable declaration");
+ Add_Variable (Context, Name => yy.value_stack (yy.tos-3), Of_Type => yy.value_stack (yy.tos-1), Secret => False, Value => EMPTY);
 
-when 71 => -- #line 299
- Set_Config (Context, yy.value_stack (yy.tos-2), yy.value_stack (yy.tos-1));
+when 71 => -- #line 297
+ Error (Context, yy.value_stack (yy.tos-2), "invalid variable declaration");
 
 when 72 => -- #line 302
  Set_Config (Context, yy.value_stack (yy.tos-2), yy.value_stack (yy.tos-1));
@@ -445,24 +448,24 @@ when 74 => -- #line 308
  Set_Config (Context, yy.value_stack (yy.tos-2), yy.value_stack (yy.tos-1));
 
 when 75 => -- #line 311
- Error (Context, yy.value_stack (yy.tos).Line, yy.value_stack (yy.tos).Column, "invalid set declaration");
+ Set_Config (Context, yy.value_stack (yy.tos-2), yy.value_stack (yy.tos-1));
 
-when 76 => -- #line 316
- Delete_Recipe (Context, yy.value_stack (yy.tos-1));
+when 76 => -- #line 314
+ Error (Context, yy.value_stack (yy.tos).Line, yy.value_stack (yy.tos).Column, "invalid set declaration");
 
 when 77 => -- #line 319
  Delete_Recipe (Context, yy.value_stack (yy.tos-1));
 
 when 78 => -- #line 322
+ Delete_Recipe (Context, yy.value_stack (yy.tos-1));
+
+when 79 => -- #line 325
  Error (Context, yy.value_stack (yy.tos).Line, yy.value_stack (yy.tos).Column, "invalid delete rule");
 
-when 79 => -- #line 327
+when 80 => -- #line 330
  Set_Names (YYVal, yy.value_stack (yy.tos-1), yy.value_stack (yy.tos));
 
-when 80 => -- #line 330
- YYVal := yy.value_stack (yy.tos);
-
-when 81 => -- #line 335
+when 81 => -- #line 333
  YYVal := yy.value_stack (yy.tos);
 
 when 82 => -- #line 338
@@ -471,19 +474,22 @@ when 82 => -- #line 338
 when 83 => -- #line 341
  YYVal := yy.value_stack (yy.tos);
 
-when 84 => -- #line 346
+when 84 => -- #line 344
  YYVal := yy.value_stack (yy.tos);
 
 when 85 => -- #line 349
  YYVal := yy.value_stack (yy.tos);
 
-when 86 => -- #line 354
- YYVal := yy.value_stack (yy.tos-2); Append_String (YYVal, yy.value_stack (yy.tos));
-
-when 87 => -- #line 357
+when 86 => -- #line 352
  YYVal := yy.value_stack (yy.tos);
 
+when 87 => -- #line 357
+ YYVal := yy.value_stack (yy.tos-2); Append_String (YYVal, yy.value_stack (yy.tos));
+
 when 88 => -- #line 360
+ YYVal := yy.value_stack (yy.tos);
+
+when 89 => -- #line 363
  Error (Context, yy.value_stack (yy.tos), "missing string termination character"); YYVal := yy.value_stack (yy.tos);
                pragma Style_Checks (On);
 

@@ -38,7 +38,9 @@ package body Porion.Templates.Tests is
                        Test_Parse_Error'Access);
    end Add_Tests;
 
+   --  ------------------------------
    --  Test parsing several valid templates.
+   --  ------------------------------
    procedure Test_Parse_Template (T : in out Test) is
       Path       : constant String := Util.Tests.Get_Test_Path ("tmpl-1");
       Service    : Porion.Services.Context_Type;
@@ -59,12 +61,16 @@ package body Porion.Templates.Tests is
       end;
    end Test_Parse_Template;
 
+   --  ------------------------------
    --  Test parsing several valid templates.
+   --  ------------------------------
    procedure Test_Parse_Error (T : in out Test) is
-      Path     : constant String := Util.Tests.Get_Path ("regtests/files/bad-templates");
+      Path       : constant String := Util.Tests.Get_Path ("regtests/files/bad-templates");
       Repository : Porion.Templates.Repository_Type;
+      Tmpl       : Porion.Templates.Template_Ref;
    begin
-      Parser.Load (Path & "/bad-rule-1.porion", Repository);
+      Parser.Load (Path & "/bad-rule-1.porion", Repository, Tmpl);
+      T.Assert (Tmpl.Is_Null, "Load returned a template");
    end Test_Parse_Error;
 
 end Porion.Templates.Tests;

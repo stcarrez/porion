@@ -178,7 +178,7 @@ recipe_rule :
     recipe_rule_start recipe_steps recipe_rule_end
   |
     T_RECIPE name T_EXTENDS name T_ON name ';'
-       { Create_Recipe (Context, $2, $4);
+       { Create_Recipe (Context, $2, $4, $6);
          Finish_Recipe (Context, $2); }
   |
     T_RECIPE error ';'
@@ -187,16 +187,16 @@ recipe_rule :
 
 recipe_rule_start :
     T_RECIPE name T_ON name T_IS
-       { Create_Recipe (Context, $2, $3); }
+       { Create_Recipe (Context, $2, EMPTY, $3); }
   |
     T_RECIPE name T_IS
-       { Create_Recipe (Context, $2, EMPTY); }
+       { Create_Recipe (Context, $2, EMPTY, EMPTY); }
   |
     T_RECIPE name T_EXTENDS name T_ON name T_IS
-       { Create_Recipe (Context, $2, $4); }
+       { Create_Recipe (Context, $2, $4, $6); }
   |
     T_RECIPE name T_EXTENDS name T_IS
-       { Create_Recipe (Context, $2, $4); }
+       { Create_Recipe (Context, $2, $4, EMPTY); }
   ;
 
 recipe_rule_end :

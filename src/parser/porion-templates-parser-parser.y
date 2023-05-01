@@ -156,7 +156,10 @@ step_rule :
        { Create_Step (Context, $2, $4); }
     recipe_steps step_rule_end
   |
-    T_STEP name step_simple_action
+    T_STEP name
+       { Create_Step (Context, $2, EMPTY); }
+    step_simple_action
+       { Finish_Step (Context, $2); }
   |
     T_STEP error ';'
       { Error (Context, $3.Line, $3.Column, "invalid step rule"); }

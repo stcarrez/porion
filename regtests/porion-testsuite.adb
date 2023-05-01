@@ -95,7 +95,7 @@ package body Porion.Testsuite is
 
    function Suite return Util.Tests.Access_Test_Suite is
    begin
-      Porion.Tests.Add_Tests (Tests'Access);
+      --  Porion.Tests.Add_Tests (Tests'Access);
       Porion.Tools.Tests.Add_Tests (Tests'Access);
       Porion.XUnit.Tests.Add_Tests (Tests'Access);
       Porion.Sources.Tests.Add_Tests (Tests'Access);

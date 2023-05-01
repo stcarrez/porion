@@ -22,6 +22,10 @@ with Util.Test_Caller;
 with Porion.Configs;
 with Porion.Executors;
 with Porion.Templates.Parser;
+with Porion.Services;
+with Porion.Testsuite;
+with Porion.Templates.Generator;
+with Porion.Builds.Services;
 package body Porion.Templates.Tests is
 
    package Caller is new Util.Test_Caller (Test, "Porion.Templates");
@@ -36,14 +40,23 @@ package body Porion.Templates.Tests is
 
    --  Test parsing several valid templates.
    procedure Test_Parse_Template (T : in out Test) is
-      Path     : constant String := Util.Tests.Get_Path ("regtests/files/templates");
-      Repository : Porion.Templates.Repository_Type;
+      Path       : constant String := Util.Tests.Get_Test_Path ("tmpl-1");
+      Service    : Porion.Services.Context_Type;
+      Tmpl_Path  : constant String := Util.Tests.Get_Path ("regtests/files/templates");
+      Tmpl       : Porion.Templates.Template_Ref;
    begin
-      Porion.Templates.Set_Search_Paths (Repository, Path);
-      Parser.Load (Path & "/gnu.porion", Repository);
-      Parser.Load (Path & "/local.porion", Repository);
-      Parser.Load (Path & "/ado.porion", Repository);
-      Parser.Load (Path & "/awa.porion", Repository);
+      Porion.Testsuite.Create (Service, Path, True);
+      Porion.Templates.Set_Search_Paths (Service.Templates, Tmpl_Path);
+      Parser.Load (Tmpl_Path & "/gnu.porion", Service.Templates);
+      Parser.Load (Tmpl_Path & "/local.porion", Service.Templates);
+      Parser.Load (Tmpl_Path & "/ado.porion", Service.Templates, Tmpl);
+      declare
+         Build : Porion.Builds.Services.Build_Config_Vector;
+      begin
+         Porion.Templates.Generator.Generate (Service, Tmpl, Build);
+         Util.Tests.Assert_Equals (T, 2, Natural (Build.Length),
+                                   "Invalid number of recipes");
+      end;
    end Test_Parse_Template;
 
    --  Test parsing several valid templates.

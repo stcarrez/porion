@@ -1,4 +1,4 @@
-Version 0.14.0 - Under development
+Version 0.14.0 - Apr 2023
   - Fix adding a recipe on a new branch
   - Fix displaying the project recipes on all branches
   - Use single ssh connection for multiple commands when building on remote node

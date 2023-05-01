@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-commands-template -- Template management command
---  Copyright (C) 2022 Stephane Carrez
+--  Copyright (C) 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,6 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Porion.Builds.Models;
 with Porion.Commands.Drivers;
 private package Porion.Commands.Template is
 
@@ -37,6 +36,8 @@ private package Porion.Commands.Template is
 private
 
    type Command_Type is new Porion.Commands.Drivers.Command_Type with record
+      Check             : aliased Boolean;
+      Apply             : aliased Boolean;
       Template          : aliased GNAT.Strings.String_Access;
    end record;
 

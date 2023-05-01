@@ -47,7 +47,6 @@ with Porion.Commands.Logs;
 with Porion.Commands.Set;
 with Porion.Commands.Env;
 with Porion.Commands.Template;
-with Porion.Templates.Parser;
 private with Util.Systems.Constants;
 package body Porion.Commands is
 

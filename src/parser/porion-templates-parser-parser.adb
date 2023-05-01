@@ -362,23 +362,23 @@ when 33 => -- #line 173
          Finish_Step (Context, yy.value_stack (yy.tos-1));
 
 when 35 => -- #line 181
- Create_Recipe (Context, yy.value_stack (yy.tos-5), yy.value_stack (yy.tos-3));
+ Create_Recipe (Context, yy.value_stack (yy.tos-5), yy.value_stack (yy.tos-3), yy.value_stack (yy.tos-1));
          Finish_Recipe (Context, yy.value_stack (yy.tos-5));
 
 when 36 => -- #line 185
  Error (Context, yy.value_stack (yy.tos).Line, yy.value_stack (yy.tos).Column, "invalid recipe rule");
 
 when 37 => -- #line 190
- Create_Recipe (Context, yy.value_stack (yy.tos-3), yy.value_stack (yy.tos-2));
+ Create_Recipe (Context, yy.value_stack (yy.tos-3), EMPTY, yy.value_stack (yy.tos-2));
 
 when 38 => -- #line 193
- Create_Recipe (Context, yy.value_stack (yy.tos-1), EMPTY);
+ Create_Recipe (Context, yy.value_stack (yy.tos-1), EMPTY, EMPTY);
 
 when 39 => -- #line 196
- Create_Recipe (Context, yy.value_stack (yy.tos-5), yy.value_stack (yy.tos-3));
+ Create_Recipe (Context, yy.value_stack (yy.tos-5), yy.value_stack (yy.tos-3), yy.value_stack (yy.tos-1));
 
 when 40 => -- #line 199
- Create_Recipe (Context, yy.value_stack (yy.tos-3), yy.value_stack (yy.tos-1));
+ Create_Recipe (Context, yy.value_stack (yy.tos-3), yy.value_stack (yy.tos-1), EMPTY);
 
 when 41 => -- #line 204
  Finish_Recipe (Context, yy.value_stack (yy.tos-1));

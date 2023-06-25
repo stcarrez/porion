@@ -58,7 +58,7 @@ package body Porion.XUnit.Tests is
       Branch.Last_Tag := To_Unbounded_String ("123");
       Porion.Configs.Initialize ("regtests/files/porion.properties");
       Porion.Testsuite.Create (Service, Dir, True);
-
+      Porion.Testsuite.Add_Build_Node (Service, "localhost");
       begin
          Service.Load_Project ("ada-lzma");
 

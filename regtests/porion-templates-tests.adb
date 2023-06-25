@@ -83,6 +83,10 @@ package body Porion.Templates.Tests is
       Branch    : Porion.Sources.Branch_Type;
    begin
       Porion.Testsuite.Create (Service, Dir, True);
+      Porion.Testsuite.Add_Build_Node (Service, "freebsd");
+      Porion.Testsuite.Add_Build_Node (Service, "netbsd");
+      Porion.Testsuite.Add_Build_Node (Service, "dionysos");
+      Porion.Testsuite.Add_Build_Node (Service, "boree");
       Porion.Templates.Set_Search_Paths (Service.Templates, Tmpl_Path);
       Porion.Templates.Parser.Load (Tmpl_Path & "/local.porion", Service.Templates, Tmpl);
 

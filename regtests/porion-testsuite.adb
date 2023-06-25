@@ -97,15 +97,37 @@ package body Porion.Testsuite is
       end if;
       Service.Open (Porion.Resources.Queries.Get_Content'Access, Schema);
       Porion.Configs.Save;
-      begin
-         Nodes.Services.Load_Default_Node (Service);
-
-      exception
-         when Porion.Nodes.Services.Not_Found =>
-            Nodes.Services.Add_Default_Node (Service, Hostname => "localhost",
-                                             Login    => "porion");
-      end;
    end Create;
+
+   --  ------------------------------
+   --  Add a fake test build node in the database.
+   --  ------------------------------
+   procedure Add_Build_Node (Service : in out Porion.Services.Context_Type;
+                             Name   : in String) is
+   begin
+      if Name = "localhost" then
+         begin
+            Nodes.Services.Load_Default_Node (Service);
+
+         exception
+            when Porion.Nodes.Services.Not_Found =>
+               Nodes.Services.Add_Default_Node (Service, Hostname => "localhost",
+                                                Login    => "porion");
+         end;
+      else
+         begin
+            Nodes.Services.Load_Node (Service, Name);
+
+         exception
+            when Porion.Nodes.Services.Not_Found =>
+               Nodes.Services.Add_Node (Service,
+                                        Kind       => Porion.Nodes.NODE_SSH,
+                                        Hostname => Name,
+                                        Login    => "porion",
+                                        Repository => "regtests");
+         end;
+      end if;
+   end Add_Build_Node;
 
    function Suite return Util.Tests.Access_Test_Suite is
    begin

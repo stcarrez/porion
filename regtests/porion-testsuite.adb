@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-testsuite -- Testsuite for porion
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,7 @@ with ADO.Sessions.Factory;
 
 with Util.Log.Loggers;
 with Util.Processes;
+with Util.Files;
 with Util.Streams.Pipes;
 with Util.Streams.Buffered;
 
@@ -32,6 +33,7 @@ with Porion.Resources.Schema;
 with Porion.Tests;
 with Porion.Reports.Tests;
 with Porion.Nodes.Tests;
+with Porion.Nodes.Services;
 with Porion.Projects.Tests;
 with Porion.Sources.Tests;
 with Porion.Tools.Tests;
@@ -80,7 +82,10 @@ package body Porion.Testsuite is
                      Remove  : in Boolean) is
       Schema : constant Porion.Resources.Content_Access
         := Porion.Resources.Schema.Get_Content ("create-porion_agent-sqlite");
+      Empty  : Porion.Configs.Config_Type;
    begin
+      Porion.Configs.Initialize (Util.Files.Compose (Path, "porion.config"));
+      Porion.Configs.Initialize (Empty);
       Porion.Configs.Set (Porion.Configs.WORKSPACE_DIR_NAME, Path);
       if Ada.Directories.Exists (Path) and Remove then
          Ada.Directories.Delete_Tree (Path);
@@ -91,18 +96,27 @@ package body Porion.Testsuite is
          Ada.Directories.Create_Path (Porion.Configs.Get_Config_Directory);
       end if;
       Service.Open (Porion.Resources.Queries.Get_Content'Access, Schema);
+      Porion.Configs.Save;
+      begin
+         Nodes.Services.Load_Default_Node (Service);
+
+      exception
+         when Porion.Nodes.Services.Not_Found =>
+            Nodes.Services.Add_Default_Node (Service, Hostname => "localhost",
+                                             Login    => "porion");
+      end;
    end Create;
 
    function Suite return Util.Tests.Access_Test_Suite is
    begin
+      Porion.Templates.Tests.Add_Tests (Tests'Access);
+      Porion.Reports.Tests.Add_Tests (Tests'Access);
       --  Porion.Tests.Add_Tests (Tests'Access);
       Porion.Tools.Tests.Add_Tests (Tests'Access);
       Porion.XUnit.Tests.Add_Tests (Tests'Access);
       Porion.Sources.Tests.Add_Tests (Tests'Access);
-      Porion.Nodes.Tests.Add_Tests (Tests'Access);
       Porion.Projects.Tests.Add_Tests (Tests'Access);
-      Porion.Reports.Tests.Add_Tests (Tests'Access);
-      Porion.Templates.Tests.Add_Tests (Tests'Access);
+      Porion.Nodes.Tests.Add_Tests (Tests'Access);
       return Tests'Access;
    end Suite;
 

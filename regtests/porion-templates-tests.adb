@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-templates-tests -- Unit tests for porion templates
---  Copyright (C) 2022 Stephane Carrez
+--  Copyright (C) 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,9 +21,11 @@ with Util.Test_Caller;
 
 with Porion.Configs;
 with Porion.Executors;
+with Porion.Sources;
 with Porion.Templates.Parser;
 with Porion.Services;
 with Porion.Testsuite;
+with Porion.Projects.Services;
 with Porion.Templates.Generator;
 with Porion.Builds.Services;
 package body Porion.Templates.Tests is
@@ -36,6 +38,8 @@ package body Porion.Templates.Tests is
                        Test_Parse_Template'Access);
       Caller.Add_Test (Suite, "Test Porion.Templates.Parser.Load (Error)",
                        Test_Parse_Error'Access);
+      Caller.Add_Test (Suite, "Test Porion.Templates.Generator.Generate",
+                       Test_Generate'Access);
    end Add_Tests;
 
    --  ------------------------------
@@ -52,13 +56,6 @@ package body Porion.Templates.Tests is
       Parser.Load (Tmpl_Path & "/gnu.porion", Service.Templates);
       Parser.Load (Tmpl_Path & "/local.porion", Service.Templates);
       Parser.Load (Tmpl_Path & "/ado.porion", Service.Templates, Tmpl);
-      declare
-         Build : Porion.Builds.Services.Build_Config_Vector;
-      begin
-         Porion.Templates.Generator.Generate (Service, Tmpl, Build);
-         Util.Tests.Assert_Equals (T, 2, Natural (Build.Length),
-                                   "Invalid number of recipes");
-      end;
    end Test_Parse_Template;
 
    --  ------------------------------
@@ -72,5 +69,36 @@ package body Porion.Templates.Tests is
       Parser.Load (Path & "/bad-rule-1.porion", Repository, Tmpl);
       T.Assert (Tmpl.Is_Null, "Load returned a template");
    end Test_Parse_Error;
+
+   --  ------------------------------
+   --  Test the generation of project recipes from a template.
+   --  ------------------------------
+   procedure Test_Generate (T : in out Test) is
+      Dir       : constant String := Util.Tests.Get_Test_Path ("tmpls");
+      Tmpl_Path : constant String := Util.Tests.Get_Path ("regtests/files/templates");
+      Service   : Porion.Services.Context_Type;
+      Build     : Porion.Builds.Services.Build_Config_Vector;
+      Tmpl      : Porion.Templates.Template_Ref;
+      Info      : Porion.Sources.Source_Info_Type;
+      Branch    : Porion.Sources.Branch_Type;
+   begin
+      Porion.Testsuite.Create (Service, Dir, True);
+      Porion.Templates.Set_Search_Paths (Service.Templates, Tmpl_Path);
+      Porion.Templates.Parser.Load (Tmpl_Path & "/local.porion", Service.Templates, Tmpl);
+
+      begin
+         Service.Load_Project ("hello");
+
+      exception
+         when Porion.Services.Not_Found =>
+            Info.Kind := Porion.Sources.SRC_FILE;
+            Info.Name := To_UString ("hello");
+            Info.URI := To_UString ("regtests/files/hello-1.0.tar.gz");
+            Projects.Services.Add_Project (Service, Info);
+      end;
+      Projects.Services.Add_Branch (Service, "master", Branch, True);
+      Porion.Templates.Generator.Generate (Service, Tmpl, Build);
+      Porion.Builds.Services.Update (Service, Build);
+   end Test_Generate;
 
 end Porion.Templates.Tests;

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-templates-tests -- Unit tests for porion templates
---  Copyright (C) 2022 Stephane Carrez
+--  Copyright (C) 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,5 +28,8 @@ package Porion.Templates.Tests is
 
    --  Test parsing several invalid templates.
    procedure Test_Parse_Error (T : in out Test);
+
+   --  Test the generation of project recipes from a template.
+   procedure Test_Generate (T : in out Test);
 
 end Porion.Templates.Tests;

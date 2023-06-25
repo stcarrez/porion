@@ -187,7 +187,7 @@ recipe_rule :
 
 recipe_rule_start :
     T_RECIPE name T_ON name T_IS
-       { Create_Recipe (Context, $2, EMPTY, $3); }
+       { Create_Recipe (Context, $2, EMPTY, $4); }
   |
     T_RECIPE name T_IS
        { Create_Recipe (Context, $2, EMPTY, EMPTY); }

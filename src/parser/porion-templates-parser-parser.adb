@@ -369,7 +369,7 @@ when 36 => -- #line 185
  Error (Context, yy.value_stack (yy.tos).Line, yy.value_stack (yy.tos).Column, "invalid recipe rule");
 
 when 37 => -- #line 190
- Create_Recipe (Context, yy.value_stack (yy.tos-3), EMPTY, yy.value_stack (yy.tos-2));
+ Create_Recipe (Context, yy.value_stack (yy.tos-3), EMPTY, yy.value_stack (yy.tos-1));
 
 when 38 => -- #line 193
  Create_Recipe (Context, yy.value_stack (yy.tos-1), EMPTY, EMPTY);

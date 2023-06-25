@@ -1424,8 +1424,8 @@ package body Porion.Builds.Services is
          begin
             Rank := Rank + 1;
             Step_Ref.Step.Set_Number (Rank);
-            Update_Parameters (Service, Step_Ref.Step, Step_Ref.Config);
             if Step_Ref.Step.Is_Loaded then
+               Update_Parameters (Service, Step_Ref.Step, Step_Ref.Config);
                if Step_Ref.Step.Is_Modified then
                   Step_Ref.Step.Save (Service.DB);
                end if;
@@ -1489,6 +1489,7 @@ package body Porion.Builds.Services is
                Remove (Build_Configs, Config_Ref.Config.Get_Id);
             else
                Config_Ref.Config.Save (Service.DB);
+               Update (Service, Config_Ref.Element.all);
             end if;
          end;
       end loop;

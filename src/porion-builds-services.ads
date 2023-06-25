@@ -128,7 +128,8 @@ package Porion.Builds.Services is
                      Config  : in out Build_Config);
 
    procedure Update (Service : in out Context_Type;
-                     Configs : in out Build_Config_Vector);
+                     Configs : in out Build_Config_Vector) with
+     Pre => Service.Is_Open and Service.Has_Project;
 
    procedure Make_Recipes (Service  : in out Context_Type;
                            Branch   : in String;

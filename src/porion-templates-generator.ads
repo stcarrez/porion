@@ -25,6 +25,7 @@ package Porion.Templates.Generator is
 
    procedure Generate (Service    : in out Porion.Services.Context_Type;
                        Template   : in Template_Ref;
-                       List       : in out Build_Config_Vector);
+                       List       : in out Build_Config_Vector) with
+      Pre => Service.Is_Open and then Service.Has_Project and then Service.Has_Branch;
 
 end Porion.Templates.Generator;

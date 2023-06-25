@@ -34,6 +34,8 @@ package body Porion.Templates.Generator is
       Id     : Natural := 0;
    begin
       Config.Config.Set_Name (Recipe.Name);
+      Config.Config.Set_Branch (Service.Branch);
+      Config.Config.Set_Project (Service.Project);
       for Step of Recipe.Steps loop
          for Action of Step.Value.Actions loop
             declare

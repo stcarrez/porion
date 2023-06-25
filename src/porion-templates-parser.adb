@@ -500,6 +500,8 @@ package body Porion.Templates.Parser is
       Context.Recipe := Recipe_Refs.Create;
       Context.Recipe.Value.Name := Recipe_Name;
       Context.Recipe.Value.Loc := Get_Location (Context, Name);
+      Context.Recipe.Value.Node.Loc := Get_Location (Context, On);
+      Context.Recipe.Value.Node.Name := Get_UString (On);
       if Extends.Kind in TYPE_STRING | TYPE_IDENT then
          declare
             Inherit : constant String := Get_String (Extends);

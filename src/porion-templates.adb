@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 with Ada.Unchecked_Deallocation;
 with Ada.Directories;
+with Ada.Text_IO;
 with Util.Files;
 with Util.Strings;
 package body Porion.Templates is
@@ -172,5 +173,12 @@ package body Porion.Templates is
    begin
       Free (Template.File);
    end Finalize;
+
+   procedure Error (Loc     : in Location_Type;
+                    Message : in String) is
+      L   : constant String := Util.Log.Locations.To_String (Loc);
+   begin
+      Ada.Text_IO.Put_Line (L & ": error: " & Message);
+   end Error;
 
 end Porion.Templates;

@@ -15,11 +15,15 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Util.Log.Loggers;
 with Porion.Builders;
+with Porion.Nodes.Services;
 package body Porion.Templates.Generator is
 
    use Porion.Builds;
    use Porion.Builds.Services;
+
+   Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Templates.Generator");
 
    function Get_Timeout (Action : in Step_Action) return Natural
      is (if Action.Timeout.Is_Null then 0 else Action.Timeout.Value);
@@ -33,9 +37,25 @@ package body Porion.Templates.Generator is
       Config : Build_Config;
       Id     : Natural := 0;
    begin
+      Log.Debug ("Generate recipe {0}", Recipe.Name);
+
+      if Length (Recipe.Node.Name) > 0 then
+         declare
+            Hostname : constant String := To_String (Recipe.Node.Name);
+         begin
+            Porion.Nodes.Services.Load_Node (Service, Hostname);
+
+         exception
+            when Porion.Nodes.Services.Not_Found =>
+               Error (Recipe.Node.Loc, "build node '" & Hostname & "' not found");
+               return;
+         end;
+      end if;
       Config.Config.Set_Name (Recipe.Name);
       Config.Config.Set_Branch (Service.Branch);
       Config.Config.Set_Project (Service.Project);
+      Config.Config.Set_Node (Service.Build_Node);
+      config.Config.Set_Status (Porion.Builds.Models.CONFIG_BUILD_REQUIRED);
       for Step of Recipe.Steps loop
          for Action of Step.Value.Actions loop
             declare

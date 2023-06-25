@@ -109,11 +109,17 @@ private
                                       Element_Type => Step_Refs.Ref,
                                       "<"          => Ada.Strings.Unbounded."<");
 
+   type Node_Type is record
+      Loc    : Location_Type;
+      Name   : UString;
+   end record;
+
    type Recipe_Type is new Util.Refs.Ref_Entity with record
       Loc       : Location_Type;
       Name      : UString;
       Extends   : UString;
       Filtering : UString;
+      Node      : Node_Type;
       Steps     : Step_Vectors.Vector;
       Vars      : Variable_Vectors.Vector;
    end record;
@@ -171,5 +177,8 @@ private
       Search_Paths   : UString;
       Template_Paths : Util.Strings.Maps.Map;
    end record;
+
+   procedure Error (Loc     : in Location_Type;
+                    Message : in String);
 
 end Porion.Templates;

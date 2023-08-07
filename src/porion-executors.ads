@@ -21,12 +21,12 @@ with EL.Expressions;
 with Util.Properties;
 with Util.Strings.Vectors;
 with Util.Strings.Sets;
-with Util.Strings.Maps;
 with Util.Streams.Buffered;
 with ADO;
 with Porion.Logs;
-with Porion.Builds;
-with Porion.Nodes.Models;
+with Porion.Builds.Environments;
+with Porion.Nodes;
+with Porion.Services;
 package Porion.Executors is
 
    subtype Input_Buffer_Stream is Util.Streams.Buffered.Input_Buffer_Stream;
@@ -81,10 +81,14 @@ package Porion.Executors is
                        Mode     : in Porion.Builds.Execution_Type;
                        Ident    : in ADO.Identifier);
 
-   --  Setup the executor to build with the given build node.
-   procedure Set_Build_Node (Executor : in out Executor_Type;
-                             Node     : in Porion.Nodes.Models.Node_Ref;
-                             Env      : in Util.Strings.Maps.Map);
+   --  Prepare the executor to build the recipe configured on the service.
+   procedure Prepare_Build (Executor : in out Executor_Type;
+                            Service  : in out Porion.Services.Context_Type) with
+     Pre => Service.Is_Open and Service.Has_Recipe;
+
+   --  Prepare the executor to execute the given step number.
+   procedure Prepare_Step (Executor : in out Executor_Type;
+                           Step     : in Positive);
 
    --  Create the directory and optionally make sure it is cleaned.
    procedure Create_Directory (Executor : in out Executor_Type;
@@ -190,6 +194,7 @@ private
       Log_Dir    : UString;
       Cmd_Logger : Porion.Logs.Logger_Type;
       Use_Cmd_Logger : Boolean := False;
+      Env        : Porion.Builds.Environments.Environment_Type;
    end record;
 
 end Porion.Executors;

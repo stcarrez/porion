@@ -551,7 +551,7 @@ package body Porion.Projects.Services is
    --  ------------------------------
    procedure Set_Source (Service  : in out Context_Type;
                          Uri      : in String;
-                         Kind     : in Porion.Sources.Source_Control_Type;
+                         Kind     : in Porion.Source_Control_Type;
                          Modified : out Boolean) is
    begin
       Log.Info ("Set project source on {0} to {1}",

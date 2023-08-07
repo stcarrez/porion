@@ -113,7 +113,7 @@ package body Porion.Services.Parsers is
                N.Project.Set_Status (Projects.Models.Project_Status_Type_Objects.To_Value (Value));
 
             when PROJECT_SCM =>
-               N.Project.Set_Scm (Sources.Source_Control_Type_Objects.To_Value (Value));
+               N.Project.Set_Scm (Source_Control_Type_Objects.To_Value (Value));
 
             when PROJECT_SCM_URL =>
                N.Project.Set_Scm_Url (UBO.To_String (Value));

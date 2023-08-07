@@ -96,7 +96,7 @@ package Porion.Projects.Services is
    --  Set the source control type and parameter for this project.
    procedure Set_Source (Service  : in out Context_Type;
                          Uri      : in String;
-                         Kind     : in Porion.Sources.Source_Control_Type;
+                         Kind     : in Porion.Source_Control_Type;
                          Modified : out Boolean) with
       Pre => Service.Has_Project;
 

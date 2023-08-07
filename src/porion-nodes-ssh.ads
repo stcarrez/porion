@@ -98,6 +98,12 @@ private package Porion.Nodes.SSH is
                              Pattern    : in String;
                              List       : in out Util.Strings.Sets.Set);
 
+   --  Create a file with the given content.
+   overriding
+   procedure Create_File (Controller : in out Controller_Type;
+                          Path       : in String;
+                          Content    : in String);
+
    overriding
    procedure Start (Controller : in out Controller_Type);
 

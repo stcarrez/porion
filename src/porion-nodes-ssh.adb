@@ -168,6 +168,11 @@ package body Porion.Nodes.SSH is
          Controller.Err_Reader.Set_Boundary (Controller.Boundary);
 
          Process (Controller.Out_Reader, Controller.Err_Reader);
+         if Controller.Err_Reader.Is_Eof then
+            Status := Util.Processes.Get_Exit_Status (Controller.Proc);
+            Log.Warn ("Remote execution terminated with status {0}", Status'Image);
+            return;
+         end if;
          Controller.Err_Reader.Set_Boundary (Controller.Boundary & ASCII.LF);
          Controller.Err_Reader.Read (Status_Line);
          begin
@@ -300,14 +305,13 @@ package body Porion.Nodes.SSH is
    procedure Start (Controller : in out Controller_Type) is
       use Ada.Streams;
 
-      Sec_Gen : Security.Random.Generator;
       Data    : Stream_Element_Array (1 .. BOUNDARY_LENGTH);
       Props   : aliased EL.Contexts.Default.Default_ELResolver;
       Ctx     : EL.Contexts.Default.Default_Context;
    begin
       Log.Info ("Start ssh on remote node {0}", Controller.Hostname);
 
-      Sec_Gen.Generate (Data);
+      Controller.Sec_Gen.Generate (Data);
       for I in 1 .. Stream_Element_Offset (BOUNDARY_LENGTH) loop
          declare
             Pos : constant Stream_Element_Offset
@@ -412,5 +416,21 @@ package body Porion.Nodes.SSH is
          end;
       end loop;
    end Send_Environment;
+
+   --  ------------------------------
+   --  Create a file with the given content.
+   --  ------------------------------
+   procedure Create_File (Controller : in out Controller_Type;
+                          Path       : in String;
+                          Content    : in String) is
+   begin
+      Controller.Cmd_Writer.Write ("cat <<'END_FILE_MARKER' > ");
+      Controller.Cmd_Writer.Write (Path);
+      Controller.Cmd_Writer.Write (ASCII.LF);
+      Controller.Cmd_Writer.Write (Content);
+      Controller.Cmd_Writer.Write (ASCII.LF);
+      Controller.Cmd_Writer.Write ("END_FILE_MARKER");
+      Controller.Cmd_Writer.Write (ASCII.LF);
+   end Create_File;
 
 end Porion.Nodes.SSH;

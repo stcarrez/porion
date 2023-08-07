@@ -21,6 +21,7 @@ with Util.Strings.Sets;
 with Util.Streams.Buffered;
 with Util.Strings.Vectors;
 with Util.Beans.Objects.Enums;
+private with Security.Random;
 package Porion.Nodes is
 
    subtype System_Time is Long_Long_Integer;
@@ -155,6 +156,14 @@ package Porion.Nodes is
                              Pattern    : in String;
                              List       : in out Util.Strings.Sets.Set) is null;
 
+   --  Create a file with the given content.
+   procedure Create_File (Controller : in out Controller_Type;
+                          Path       : in String;
+                          Content    : in String) is null;
+
+   --  Create a random path on the target node to store some temporary content.
+   function Create_Random_Path (Controller : in out Controller_Type) return String;
+
 private
 
    protected type Report_Output is
@@ -166,8 +175,10 @@ private
    end Report_Output;
 
    type Controller_Type is abstract limited new Ada.Finalization.Limited_Controlled with record
-      Listener : Listener_Access;
-      Usage    : Usage_Type := (others => 0);
+      Listener  : Listener_Access;
+      Usage     : Usage_Type := (others => 0);
+      Sec_Gen   : Security.Random.Generator;
+      Build_Dir : UString;
    end record;
 
    --  Returns true if commands are not executed but collected.

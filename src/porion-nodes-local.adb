@@ -250,4 +250,20 @@ package body Porion.Nodes.Local is
                 Path, Pattern, List.Length'Image);
    end Scan_Directory;
 
+   --  ------------------------------
+   --  Create a file with the given content.
+   --  ------------------------------
+   overriding
+   procedure Create_File (Controller : in out Controller_Type;
+                          Path       : in String;
+                          Content    : in String) is
+      Stream : Util.Streams.Files.File_Stream;
+      Data   : Ada.Streams.Stream_Element_Array (1 .. Content'Length);
+      for Data'Address use Content'Address;
+   begin
+      Stream.Create (Ada.Streams.Stream_IO.Out_File, Path);
+      Stream.Write (Data);
+      Stream.Close;
+   end Create_File;
+
 end Porion.Nodes.Local;

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-builds-services -- build service to manage builds
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -216,14 +216,11 @@ package body Porion.Builds.Services is
       Log_Dir     : constant String := Get_Log_Directory (Service);
       Config      : Util.Properties.Manager;
       Status      : Builds.Models.Build_Status_Type := Builds.Models.BUILD_RUNNING;
-      Env         : Util.Strings.Maps.Map;
       Changes     : Porion.Sources.Checkout_Type;
    begin
       Log.Info ("Build {0} in {1}", Ident, Path);
 
-      Load_Environment (Service, Service.Recipe, Env);
-
-      Executor.Set_Build_Node (Service.Build_Node, Env);
+      Executor.Prepare_Build (Service);
 
       Executor.Set_Step (Builds.STEP_CHECKOUT, Builds.EXEC_NO_ERROR, ADO.NO_IDENTIFIER);
       if not Executor.Is_Dry_Run then
@@ -268,11 +265,11 @@ package body Porion.Builds.Services is
       end if;
    end Build;
 
-   procedure Run_Build_Steps (Service     : in out Context_Type;
-                              Steps       : in Build_Step_Vector;
-                              Path        : in String;
-                              Status      : out Builds.Models.Build_Status_Type;
-                              Executor    : in out Porion.Executors.Executor_Type'Class) is
+   procedure Run_Build_Steps (Service  : in out Context_Type;
+                              Steps    : in Build_Step_Vector;
+                              Path     : in String;
+                              Status   : out Builds.Models.Build_Status_Type;
+                              Executor : in out Porion.Executors.Executor_Type'Class) is
       Usage       : Nodes.Usage_Type := (others => 0);
    begin
       Status := Builds.Models.BUILD_RUNNING;
@@ -289,6 +286,7 @@ package body Porion.Builds.Services is
                   Exec_Step.Set_Recipe_Step (Step.Step);
                   Exec_Step.Save (Service.DB);
                   Service.DB.Commit;
+                  Executor.Prepare_Step (Step.Step.Get_Number);
                end if;
                Executor.Set_Step (Step.Step.Get_Step, Step.Step.Get_Execution, Step.Step.Get_Id);
                Executor.Set_Status (0);

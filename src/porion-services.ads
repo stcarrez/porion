@@ -78,6 +78,13 @@ package Porion.Services is
                              Recipe  : in Porion.Builds.Models.Recipe_Ref'Class) return String with
       Pre => Service.Has_Project and not Recipe.Is_Null;
 
+   function Get_Secret (Service : in out Context_Type;
+                        Name    : in String) return String is
+      (Service.Wallet.Get (Name));
+   function Get_Secret (Service : in out Context_Type;
+                        Name    : in String) return UString is
+      (To_UString (Service.Wallet.Get (Name)));
+
    procedure Load_Project (Service : in out Context_Type;
                            Name    : in String);
 

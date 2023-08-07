@@ -106,16 +106,27 @@ package body Porion.Executors is
    --  ------------------------------
    --  Setup the executor to build with the given build node.
    --  ------------------------------
-   procedure Set_Build_Node (Executor : in out Executor_Type;
-                             Node     : in Porion.Nodes.Models.Node_Ref;
-                             Env      : in Util.Strings.Maps.Map) is
+   --  Prepare the executor to build the recipe configured on the service.
+   procedure Prepare_Build (Executor : in out Executor_Type;
+                            Service  : in out Porion.Services.Context_Type) is
    begin
-      Executor.Controller := Nodes.Services.Create_Controller (Executor'Unchecked_Access, Node);
-      Executor.Controller.Set_Environment (Env);
+      Executor.Controller := Nodes.Services.Create_Controller (Executor'Unchecked_Access,
+                                                               Service.Build_Node);
+      Executor.Env.Load (Service);
+      --  Executor.Controller.Set_Environment (Env);
       if not Executor.Dry_Run then
          Executor.Controller.Start;
       end if;
-   end Set_Build_Node;
+   end Prepare_Build;
+
+   --  ------------------------------
+   --  Prepare the executor to execute the given step number.
+   --  ------------------------------
+   procedure Prepare_Step (Executor : in out Executor_Type;
+                           Step     : in Positive) is
+   begin
+      Executor.Env.Prepare (Step, Executor.Controller);
+   end Prepare_Step;
 
    --  ------------------------------
    --  Get the usage when running the executor on build nodes.

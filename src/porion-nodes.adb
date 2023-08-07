@@ -189,4 +189,36 @@ package body Porion.Nodes is
       Ignore_Working_Dir := True;
    end Expand;
 
+   RANDOM_PATH_LEN : constant := 15;
+   RANDOM_PATH_EXT : constant String := ".txt";
+   RANDOM_PATH_MAP : constant String := "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+      & "_abcdefghijklmnopqrstuvwxyz";
+
+   --  ------------------------------
+   --  Create a random path on the target node to store some temporary content.
+   --  ------------------------------
+   function Create_Random_Path (Controller : in out Controller_Type) return String is
+      use Ada.Streams;
+      Dir    : constant String := To_String (Controller.Build_Dir);
+      Data   : Stream_Element_Array (1 .. RANDOM_PATH_LEN);
+      Result : String (1 .. Dir'Length + RANDOM_PATH_LEN + RANDOM_PATH_EXT'Length + 1);
+      Pos    : Positive := Dir'Length;
+   begin
+      Controller.Sec_Gen.Generate (Data);
+      Result (1 .. Pos) := Dir;
+      Result (Pos + 1) := '/';
+      Pos := Pos + 2;
+      for I in 1 .. Stream_Element_Offset (RANDOM_PATH_LEN) loop
+         declare
+            C : constant Stream_Element_Offset
+               := Stream_Element_Offset (Data (I) and 16#7F#) mod RANDOM_PATH_MAP'Length;
+         begin
+            Result (Pos) := RANDOM_PATH_MAP (1 + Natural (C));
+            Pos := Pos + 1;
+         end;
+      end loop;
+      Result (Pos .. Result'Last) := RANDOM_PATH_EXT;
+      return Result;
+   end Create_Random_Path;
+
 end Porion.Nodes;

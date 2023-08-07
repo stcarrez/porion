@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-commands-add -- Add command
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,13 +19,12 @@ with Porion.Projects.Services;
 with Porion.Configs;
 with Porion.Executors;
 with Porion.Services;
+with Porion.Projects.Models;
 with Porion.Nodes.Services;
 with Porion.Builds.Models;
 with Porion.Builds.Services;
 with Porion.Sources;
 package body Porion.Commands.Add is
-
-   use type Porion.Sources.Source_Control_Type;
 
    --  ------------------------------
    --  Add a project with source control described by the URI.
@@ -43,7 +42,7 @@ package body Porion.Commands.Add is
                             Config   => Config,
                             Result   => Info,
                             Executor => Executor);
-      if Info.Kind = Porion.Sources.SRC_UNKNOWN then
+      if Info.Kind = Porion.SRC_UNKNOWN then
          Porion.Commands.Error (-("cannot identify source type of {0}"), URI);
          return;
       end if;
@@ -88,6 +87,8 @@ package body Porion.Commands.Add is
                          Target  : in String;
                          Source  : in String;
                          Context : in out Context_Type) is
+      use Porion.Projects.Models;
+
       Ident        : Porion.Projects.Ident_Type;
       Target_Ident : Porion.Projects.Ident_Type;
       Recipes      : Porion.Builds.Models.Recipe_Vector;
@@ -143,6 +144,10 @@ package body Porion.Commands.Add is
          if Recipe.Is_Null then
             Ident.Node := To_UString ("");
             Porion.Builds.Services.Load_Recipes (Context.Project_Service, Ident, Recipes);
+            if Recipes.Is_Empty and then Porion.Projects.Has_Branch (Ident) then
+               Ident.Branch := To_UString ("");
+               Porion.Builds.Services.Load_Recipes (Context.Project_Service, Ident, Recipes);
+            end if;
             for Existing_Recipe of Recipes loop
                if Existing_Recipe.Get_Main_Recipe then
                   Recipe := Existing_Recipe;
@@ -152,6 +157,7 @@ package body Porion.Commands.Add is
          end if;
 
          Ident.Node := Target_Ident.Node;
+         Ident.Branch := Target_Ident.Branch;
          Context.Project_Service.Load (Ident);
 
       exception
@@ -167,7 +173,11 @@ package body Porion.Commands.Add is
       end if;
 
       if not Porion.Projects.Has_Recipe (Target_Ident) then
-         Target_Ident.Recipe := Target_Ident.Node;
+         if Context.Project_Service.Branch /= Branch_Ref (Recipe.Get_Branch) then
+            Target_Ident.Recipe := Recipe.Get_Name;
+         else
+            Target_Ident.Recipe := Target_Ident.Node;
+         end if;
       end if;
 
       Builds.Services.Copy_Recipe (Context.Project_Service,
@@ -188,6 +198,9 @@ package body Porion.Commands.Add is
       end if;
 
    exception
+      when Porion.Builds.Services.Name_Used =>
+         Commands.Error (-("recipe name '{0}' is already used"), To_String (Target_Ident.Recipe));
+
       when Porion.Nodes.Services.Not_Found =>
          Commands.Error (-("invalid build node '{0}'"), To_String (Ident.Node));
 
@@ -212,11 +225,18 @@ package body Porion.Commands.Add is
       Context.Open;
 
       if Command.Recipe then
-         if Args.Get_Count = 2 then
-            Command.Add_Recipe (Args.Get_Argument (1), Args.Get_Argument (2), Context);
-         else
-            Command.Add_Recipe (Args.Get_Argument (1), "", Context);
-         end if;
+         case Args.Get_Count is
+            when 1 =>
+               Command.Add_Recipe (Args.Get_Argument (1), "", Context);
+
+            when 2 =>
+               Command.Add_Recipe (Args.Get_Argument (1), Args.Get_Argument (2), Context);
+
+            when others =>
+               Porion.Commands.Error (-("too many arguments"));
+               return;
+
+         end case;
       else
          Command.Add_Project (Args.Get_Argument (1), Context);
       end if;

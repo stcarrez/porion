@@ -1,0 +1,382 @@
+.\"
+.\"
+.TH PORION 1 "Apr 8, 2023" "Continuous build system"
+.SH NAME
+porion - Continuous build system
+.SH SYNOPSIS
+.B porion
+[ -v ] [-vv] [-vvv] [-V] [ -c
+.I config-file
+]
+.I command
+ [args]
+.br
+.SH DESCRIPTION
+\fIporion\fR is a continuous integration agent that helps automate the building,
+testing and deployment of software development projects written in any language.
+\fIporion\fR maintains a list of projects with build recipes to build these projects.
+It periodically checks for changes in projects and schedules a build when a project
+is modified.  \fIporion\fR uses a build node to build a project and the build node can
+be the current host or a specific remote host registered for that purpose.
+.\"
+.PP
+\fIporion\fR uses a workspace directory to maintain the list of projects, their build status
+and build area.  The workspace directory contains a SQLite database which is used
+to maintain the list of projects, build nodes, build recipes, build queue and build
+results.
+.PP
+The \fIporion\fR agent has a server companion that is dedicated to providing web access.
+The
+.IR porion-server (8)
+is the server that handles the HTTP requests.  It is not strictly necessary to run
+it to build and manage the projects.
+.\"
+.PP
+The steps to use \fIporion\fR are the following:
+.\"
+.IP \(bu 2
+the \fIporion\fR workspace directory is created by using the \fIporion init\fR command,
+.\"
+.IP \(bu 2
+projects are registered by using the \fIporion add\fR command with enough information to
+allow \fIporion\fR to checkout the source and detect changes.  When a project is added
+\fIporion\fR will guess a set of build recipes for the new project,
+.\"
+.IP \(bu 2
+project build recipes and build steps are updated and configured on the project
+by using either \fIporion add --recipe\fR or \fIporion step\fR commands.  These build
+recipes describe the steps that must be executed to build, test and deploy the project,
+.\"
+.IP \(bu 2
+source changes are detected by running the \fIporion check\fR command.  This command can
+be executed explicitly for a given project or globally from a
+.IR cron (8)
+job for example.  When it detect a change in a project, it adds the project to the
+build queue,
+.\"
+.IP \(bu 2
+the build queue is processed by running the \fIporion build\fR command.
+It looks at the build queue and executes the build either on the current host or
+on the build node specified by the recipe,
+.\"
+.IP \(bu 2
+when the build is finished, the user can look at the build result by
+using either the \fIporion info\fR or the \fIporion logs\fR commands.
+.\"
+.PP
+\fIporion\fR uses an identification string to reference a project, a branch,
+a build recipe or a build.  That identification string has the following pattern:
+.PP
+.RS 0
+\fIproject-name\fR[#\fIbranch-name\fR][~\fIrecipe-name\fR][@\fIhostname\fR][:\fIbuild-number\fR]
+.RE
+.PP
+.\"
+.PP
+.SH OPTIONS
+The following options are recognized by \fIporion\fR:
+.TP 5
+-V
+Prints the
+.I porion
+version.
+.TP 5
+-v
+Enable the verbose mode.
+.TP 5
+-vv
+Enable debugging output.
+.TP 5
+-vvv
+Enable full debugging output.
+.TP 5
+-c
+.I config-file
+Defines the path of the global
+.I porion
+configuration file.
+.\"
+.SH COMMANDS
+.\"
+.SS The init command
+.RS 0
+porion \fBinit\fR \fIdirectory\fR
+.RE
+.PP
+Setup the build workspace directory used by the porion build agent.
+This directory is created by the command and is used for:
+.IP \(bu 2
+the SQLite database that describes projects, builds, tests
+.IP \(bu 2
+the project directories where projects are built
+.\"
+.SS The add command
+.RS 0
+porion \fBadd\fP \fIurl\fR
+.RE
+.RS 0
+porion \fBadd\fP \fI--recipe\fR {\fIident\fR} [\fIsource-ident\fR]
+.RE
+.PP
+The \fIporion add\fR command is used to add a new project or a new recipe to an existing project.
+The first form creates a new project with the source scheme.
+A default project name is created from the source scheme name
+and a set of build recipes are guessed by analysing the sources.
+.\"
+.PP
+The second form adds a new recipe with the given identification and initializes
+it from either the main project recipe or from the given source identification
+recipe.  You may also specify a build number as the identification in which case
+the recipe used by that build number will be copied.
+.\"
+.SS The build command
+.RS 0
+porion \fBbuild\fP \fIproject\fR
+.RE
+.PP
+For each active branch of the project, check if some changes are pending
+or if a build is required and build the project on the branch.
+When --force is given, run the build even if no changes are detected.
+When --dry-run is given, don't build but print the commands that are
+executed to build the project.
+This command is available when the
+.\"
+.SS The check command
+.RS 0
+porion \fBcheck\fR [--all] [\fIproject\fR...]
+.RE
+.PP
+The
+.I check
+command is used to check for changes in projects and when a change is detected in a
+project branch, the build recipes are added to the build queue
+if that branch is active.
+.PP
+For each project, porion maintains a check date and a check delay
+controls the periodicity of the check.  A project is checked
+only when its check date has been passed or when its name is
+specified in the command line.
+.PP
+The
+.I --all
+option allows to force a check for every active project.
+.\"
+.SS The config command
+.RS 0
+porion \fBconfig\fP \fIkeystore.akt\fR -- \fIname\fR
+.RE
+.PP
+.\"
+.SS The env command
+.RS 0
+porion \fBenv\fP [--unset \fIname\fR] {\fIident\fR} [NAME=VALUE]
+.RE
+.PP
+Configure the environment variables used to build a project, a branch
+a specific recipe or on a build node.  The environment variable is
+associated with
+.IR ident .
+.PP
+The
+.I --unset name
+option allows to remove a past definition.
+.\"
+.SS The depend command
+.RS 0
+porion \fBdepend\fP [--remove] \fIproject\fR \fIdependency1\fR ...
+.RE
+.PP
+Add or remove a project dependency.  When a dependency project is modified
+this triggers a build of the project.
+.PP
+The
+.I --remove
+option allows to remove one or several project dependencies.
+.\"
+.SS The edit command
+.RS 0
+porion \fBedit \fIproject\fR
+.RE
+.PP
+The
+.I edit
+command can be used to edit the configuration of a project.
+The editor is launched
+with the path and when editing is finished the temporary file is read.
+The temporary directory and files are erased when the editor terminates
+successfully or not.  The editor can be specified by using the
+.I -e
+option, by setting up the
+.I EDITOR
+environment variable or by updating the
+.IR editor (1)
+alternative with
+.IR update-alternative (1).
+.\"
+.\"
+.SS The info command
+.RS 0
+porion \fBinfo\fR \fIproject\fR
+.RE
+.PP
+The
+.I list
+command describes the entries stored in the keystore with
+their name, size, type, creation date and number of keys which
+protect the entry.
+.\"
+.\"
+.SS The list command
+.RS 0
+porion \fBlist\fR
+.RE
+.PP
+.\"
+.\"
+.\"
+.SS The logs command
+.RS 0
+porion \fBlogs\fR [--no-filter] <ident> ...
+.RE
+.PP
+.\"
+Displays the logs produced by a build with the given identification.
+Each identifier must define at least the project name and the build
+number (the branch, recipe and build host are optional).
+.PP
+By default, the displayed logs are filtered according to the filtering
+rules defined on the recipe.  The
+.I --no-filter
+option can be used to disable this filtering.
+.P
+Use \fIporion set <recipe> filter_rules=<filter1,...,filterN>\fR to configure
+the recipe filtering rules.  The recipe filtering rules can be changed
+after a build.
+.\"
+.\"
+.SS The node command
+.RS 0
+porion \fBnode\fR \fIhostname\fR
+.RE
+.PP
+.\"
+.SS The remove command
+.RS 0
+porion \fBremove\fR [--force] [--interactive] \fIident\fR [\fIident\fR...]
+.RE
+.PP
+Remove a project, a recipe or a build and all its data.
+When the ident string indicates a build number, only the build number
+is removed.  The project rating are then updated.
+.PP
+When the ident string contains a recipe name, the recipe is removed
+as well as all the builds that were made with it.  The project rating
+are then updated.
+.PP
+With the
+.I --interactive
+option, a confirmation is asked before removal.
+.PP
+The
+.I --force
+option forces the removal and ignores any error.
+.\"
+.SS The set command
+.RS 0
+porion \fBset\fP \fIident\fR {\fIname\fR} {\fIcontent...\fR}
+.RE
+.PP
+The \fIporion set\fR command changes a configuration variable for a project,
+a branch or a build recipe.  The identification string can reference a project,
+a branch or a build recipe.  Some variables are specific to a project, others
+are specific to a branch or build recipes.  The variable identification is given
+with a single pre-defined name.  The value is composed of the concatenation of
+the program arguments which remain.
+.\"
+.TP 12
+source
+Controls the URI to access the sources of the project.
+.\"
+.TP 12
+name
+controls the name of the project.
+.\"
+.TP 12
+description
+allows to define a description for the project or branch.
+.\"
+.TP 12
+status
+enable or disable the project, branch or recipe.
+.\"
+.TP 12
+check_delay
+defines the delay in seconds between source checks for changes.
+.\"
+.SS The step command
+.RS 0
+porion \fBstep\fR [--quiet] [--ignore-error] [--timeout \fItimeout\fR]
+       [--disable] [--insert \fIpos\fR] [--update \fIpos\fR]
+       [--remove \fIpos\fR] \fIident\fR command args...
+.RE
+.PP
+The
+.I step
+command is used to add, update or remove a recipe
+build step.  After updating the recipe, the list of build steps is
+printed unless the
+.I --quiet
+option is passed.
+.PP
+By default a build step is added at the end of the build recipe as a last
+step.  The position can be controlled by using the
+.I --insert
+.I pos
+option.
+.PP
+With the
+.I --update
+option, the build step at the given position is replaced.
+.PP
+With the
+.I --remove
+option, the build step is removed.
+.\"
+.SH CONFIGURATION
+The
+.I porion
+global configuration file contains several configuration properties
+which are used to customize several commands.  These properties can
+be modified with the
+.B config
+command.
+.\"
+.SS workspace_dir
+This property defines the absolute path of the
+.I porion
+workspace directory.
+.\"
+.SS project_dir
+This property defines the absolute path where project directories
+are stored.  The default is
+.IR workspace_dir /projects.
+.\"
+.SS rules_dir
+This property defines the path of the rules directory which contains
+description of filtering rules that can be configured in a project recipe.
+.\"
+.SS templates_search_path
+This property defines a list of directories to search for build templates.
+Each directory must be separated by
+.IR ';' .
+.\"
+.SH SEE ALSO
+\fIeditor(1)\fR, \fIupdate-alternative(1)\fR, \fImake(1)\fR,
+\fImvn(1)\fR,
+\fIcron(8)\fR,
+\fIporion-server(8)\fR
+.\"
+.\"
+.SH AUTHOR
+Written by Stephane Carrez.
+.\"

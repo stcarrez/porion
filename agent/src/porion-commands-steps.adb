@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-commands-steps -- Command to add, update remove build steps
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,8 +18,33 @@
 with Util.Strings.Vectors;
 with Porion.Services;
 with Porion.Projects;
+with Porion.Executors;
 with Porion.Builds.Services;
 package body Porion.Commands.Steps is
+
+   procedure Get_Recipe_Step_Offset (Context : in out Context_Type;
+                                     Count   : out Natural);
+
+   procedure Get_Recipe_Step_Offset (Context : in out Context_Type;
+                                     Count   : out Natural) is
+      use type Porion.Builds.Step_Type;
+
+      Executor : Porion.Executors.Executor_Type;
+      Commands : Porion.Executors.Command_Vector;
+   begin
+      Executor.Enable_Dry_Run;
+
+      Porion.Builds.Services.Build (Context.Project_Service,
+                                    Context.Project_Service.Recipe,
+                                    Executor);
+
+      Executor.Fetch_Commands (Commands);
+      Count := 0;
+      for Command of Commands loop
+         exit when Command.Step /= Porion.Builds.STEP_CHECKOUT;
+         Count := Count + 1;
+      end loop;
+   end Get_Recipe_Step_Offset;
 
    procedure Add_Step (Command : in out Command_Type;
                        Recipe  : in out Porion.Builds.Models.Recipe_Ref;
@@ -30,6 +55,7 @@ package body Porion.Commands.Steps is
       Step   : Porion.Builds.Step_Type;
       Params : Util.Strings.Vectors.Vector;
       Pos    : Positive := 2;
+      Offset : Natural;
    begin
       if First = "xunit" then
          Kind := Porion.Builds.Models.BUILDER_XUNIT;
@@ -49,7 +75,12 @@ package body Porion.Commands.Steps is
       end loop;
 
       if Command.Insert_Pos > 0 then
-         Command.Insert_Pos := Command.Insert_Pos - 1;
+         Get_Recipe_Step_Offset (Context, Offset);
+         if Command.Insert_Pos <= Offset then
+            Porion.Commands.Error (-("cannot insert before or at the checkout commands"));
+            return;
+         end if;
+         Command.Insert_Pos := Command.Insert_Pos - Offset;
       end if;
       Builds.Services.Insert_Step (Context.Project_Service, Recipe,
                                    Command.Insert_Pos, Kind, Step, Params);
@@ -67,21 +98,27 @@ package body Porion.Commands.Steps is
             Step.Set_Timeout (Command.Timeout);
          end if;
          if Command.Disable then
-            Step.Set_Execution (Porion.Builds.Models.EXEC_DISABLED);
+            Step.Set_Execution (Porion.Builds.EXEC_DISABLED);
          elsif Command.Ignore_Error then
-            Step.Set_Execution (Porion.Builds.Models.EXEC_IGNORE_ERROR);
+            Step.Set_Execution (Porion.Builds.EXEC_IGNORE_ERROR);
          end if;
       end Update;
 
+      Offset : Natural;
    begin
-      if Command.Update_Pos = 1 then
+      Get_Recipe_Step_Offset (Context, Offset);
+      if Command.Update_Pos <= Offset then
          Porion.Commands.Error (-("cannot update the first step"));
+         return;
+      end if;
+      if Recipe.Is_Null then
+         Porion.Commands.Error (-("recipe was not found"));
          return;
       end if;
 
       if Args.Get_Count = 1 then
          Builds.Services.Update_Step (Context.Project_Service, Recipe,
-                                      Command.Update_Pos - 1, Update'Access);
+                                      Command.Update_Pos - Offset, Update'Access);
       else
          declare
             First  : constant String := Args.Get_Argument (2);
@@ -108,7 +145,7 @@ package body Porion.Commands.Steps is
             end loop;
 
             Builds.Services.Update_Step (Context.Project_Service, Recipe,
-                                         Command.Update_Pos - 1, Kind, Step, Params);
+                                         Command.Update_Pos - Offset, Kind, Step, Params);
          end;
       end if;
    end Update_Step;
@@ -117,8 +154,15 @@ package body Porion.Commands.Steps is
                           Recipe  : in out Porion.Builds.Models.Recipe_Ref;
                           Context : in out Context_Type) is
    begin
-      if Command.Delete_Pos = 1 then
+      if Context.Project_Service.Project.Get_Scm = Porion.SRC_GIT then
+         Command.Delete_Pos := Command.Delete_Pos - 1;
+      end if;
+      if Command.Delete_Pos <= 1 then
          Porion.Commands.Error (-("cannot delete the first step"));
+         return;
+      end if;
+      if Recipe.Is_Null then
+         Porion.Commands.Error (-("recipe was not found"));
          return;
       end if;
 
@@ -159,6 +203,10 @@ package body Porion.Commands.Steps is
       begin
          Ident := Porion.Projects.Parse (Name);
          Context.Project_Service.Load (Ident);
+         if Context.Project_Service.Recipe.Is_Null then
+            Porion.Commands.Error (-("missing source recipe identification to update"));
+            return;
+         end if;
 
          if Command.Delete_Pos > 0 then
             Command.Delete_Step (Context.Project_Service.Recipe, Context);
@@ -173,7 +221,7 @@ package body Porion.Commands.Steps is
             Command.Add_Step (Context.Project_Service.Recipe, Args, Context);
          end if;
 
-         if not Command.Quiet then
+         if not Command.Quiet and not Context.Project_Service.Recipe.Is_Null then
             Porion.Commands.Print_Recipe_Steps (Context);
          end if;
 

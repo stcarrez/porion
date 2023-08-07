@@ -261,6 +261,9 @@ package body Porion.XUnit.Analysis is
          Build.Set_Timeout_Count (Timeout_Count);
          Build.Set_Test_Duration (Duration);
          Build.Save (Session);
+
+         Log.Info ("Tests execution:{0} passed{1} failed{2} timeout in{3} ms",
+                   Pass_Count'Image, Fail_Count'Image, Timeout_Count'Image, Duration'Image);
       end;
    end Save_Run_Tests;
 

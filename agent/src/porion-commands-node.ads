@@ -39,6 +39,7 @@ private
       Rules  : aliased GNAT.Strings.String_Access;
       Remove : aliased Boolean := False;
       Probe  : aliased Boolean := False;
+      Update : aliased Boolean := False;
    end record;
 
 end Porion.Commands.Node;

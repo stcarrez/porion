@@ -16,6 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Util.Commands.Drivers;
+with Util.Commands.Raw_IO;
 with Util.Commands.Parsers.GNAT_Parser;
 private package Porion.Commands.Drivers is
 
@@ -23,6 +24,7 @@ private package Porion.Commands.Drivers is
      new Util.Commands.Drivers (Context_Type  => Context_Type,
                                 Config_Parser => Util.Commands.Parsers.GNAT_Parser.Config_Parser,
                                 Translate     => Intl.Gettext,
+                                IO            => Util.Commands.Raw_IO,
                                 Driver_Name   => "porion");
 
    subtype Help_Command_Type is Main_Driver.Help_Command_Type;

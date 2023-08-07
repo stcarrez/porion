@@ -120,7 +120,7 @@
             SELECT
             queue.id AS id,
             queue.`order` AS `order`,
-            queue.creation_date AS create_date,
+            queue.create_date AS create_date,
             queue.building AS building,
             project.name AS name,
             project.status AS status,

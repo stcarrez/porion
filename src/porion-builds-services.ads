@@ -27,6 +27,7 @@ with Porion.Executors;
 package Porion.Builds.Services is
 
    Invalid_Position : exception;
+   Name_Used        : exception;
 
    type Build_Step is record
       Step   : Porion.Builds.Models.Recipe_Step_Ref;
@@ -127,7 +128,8 @@ package Porion.Builds.Services is
                      Config  : in out Build_Config);
 
    procedure Update (Service : in out Context_Type;
-                     Configs : in out Build_Config_Vector);
+                     Configs : in out Build_Config_Vector) with
+     Pre => Service.Is_Open and Service.Has_Project;
 
    procedure Make_Recipes (Service  : in out Context_Type;
                            Branch   : in String;
@@ -211,6 +213,14 @@ private
 
    function Get_Build_Directory (Service : in Context_Type) return String;
 
+   --  Cancel the building status on the build queues for the given node.
+   procedure Cancel_Building (Service : in out Context_Type;
+                              Node    : in String);
+
+   --  Get the source tag that was used by the last build
+   procedure Last_Build_Tag (Service : in out Context_Type;
+                             Tag     : out UString);
+
    procedure Build (Service     : in out Context_Type;
                     Steps       : in Build_Step_Vector;
                     Executor    : in out Porion.Executors.Executor_Type'Class);
@@ -232,5 +242,11 @@ private
    procedure Update_Build_Reason (Service     : in out Context_Type;
                                   Is_Finished : in Boolean) with
       Pre => not Service.Queue.Is_Null;
+
+   procedure Run_Build_Steps (Service     : in out Context_Type;
+                              Steps       : in Build_Step_Vector;
+                              Path        : in String;
+                              Status      : out Builds.Models.Build_Status_Type;
+                              Executor    : in out Porion.Executors.Executor_Type'Class);
 
 end Porion.Builds.Services;

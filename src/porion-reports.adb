@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-reports -- Report generation
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -77,24 +77,30 @@ package body Porion.Reports is
    --  Format a duration expressed in milliseconds.
    --  ------------------------------
    function Format (Value : in Millisecond_Type) return String is
-      Ms   : constant Natural := Natural (Value mod 1000);
-      Ms2  : constant Natural := Ms mod 100;
-      Ms3  : constant Natural := Ms2 mod 10;
       Secs : constant Natural := Natural (Value / 1000);
-      Mins : Natural;
    begin
-      if Ms2 = 0 then
-         return Util.Strings.Image (Secs) & "." & To_Digit (Ms / 100);
-      elsif Ms3 = 0 then
-         return Util.Strings.Image (Secs) & "." & To_Digit (Ms / 100) & To_Digit (Ms2 / 10);
-      elsif Secs < 60 then
-         return Util.Strings.Image (Secs) & "." & To_Digit (Ms / 100) & To_Digit (Ms2 / 10)
-                   & To_Digit (Ms3);
+      if Secs > 60 then
+         declare
+            Ss  : constant Natural := Secs mod 60;
+            Img : constant String := ":" & To_Digit (Ss / 10) & To_Digit (Ss mod 10);
+         begin
+            return Util.Strings.Image (Secs / 60) & Img;
+         end;
       else
-         Mins := Secs / 60;
-         return Util.Strings.Image (Mins) & ":"
-                   & Util.Strings.Image (Secs mod 60)
-                   & "." & To_Digit (Ms / 100);
+         declare
+            Ms   : constant Natural := Natural (Value mod 1000);
+            Ms2  : constant Natural := Ms mod 100;
+            Ms3  : constant Natural := Ms2 mod 10;
+         begin
+            if Ms2 = 0 then
+               return Util.Strings.Image (Secs) & "." & To_Digit (Ms / 100);
+            elsif Ms3 = 0 then
+               return Util.Strings.Image (Secs) & "." & To_Digit (Ms / 100) & To_Digit (Ms2 / 10);
+            else
+               return Util.Strings.Image (Secs) & "." & To_Digit (Ms / 100) & To_Digit (Ms2 / 10)
+                           & To_Digit (Ms3);
+            end if;
+         end;
       end if;
    end Format;
 
@@ -308,6 +314,9 @@ package body Porion.Reports is
          elsif Build.Build_Status = Builds.Models.BUILD_PASS then
             Writer.Copy_Style (To => Style1, From => Styles.Success);
             Writer.Copy_Style (To => Style2, From => Styles.Success);
+         elsif Build.Build_Status = Builds.Models.BUILD_RUNNING then
+            Writer.Copy_Style (To => Style1, From => Styles.Warning);
+            Writer.Copy_Style (To => Style2, From => Styles.Warning);
          else
             Writer.Copy_Style (To => Style1, From => Styles.Error);
             Writer.Copy_Style (To => Style2, From => Styles.Error);
@@ -471,6 +480,17 @@ package body Porion.Reports is
 
       for Cmd of Commands loop
          Step := Step + 1;
+         case Cmd.Mode is
+            when Builds.EXEC_DISABLED =>
+               Writer.Copy_Style (To => Style1, From => Styles.Disabled);
+
+            when Builds.EXEC_IGNORE_ERROR =>
+               Writer.Copy_Style (To => Style1, From => Styles.Success);
+
+            when Builds.Exec_NO_ERROR =>
+               Writer.Copy_Style (To => Style1, From => Styles.Default);
+         end case;
+
          Writer.Put (Fields (1), Util.Strings.Image (Step) & ".");
          Writer.Put (Fields (2), Get_Image (Cmd.Step));
          Writer.Put (Fields (3), Cmd.Command);

@@ -1,0 +1,81 @@
+<query-mapping package='Porion.Queries'>
+    <description>
+        Stats for the builds
+    </description>
+
+    <class name="Porion.Queries.Node_Stat" bean="yes">
+        <comment>Statistics about the usage of a build node.</comment>
+        <property type='Date' name="day" not-null="yes">
+            <comment>the build status.</comment>
+        </property>
+        <property type='Porion.Builds.Models.Build_Status_Type' name="build_status">
+            <comment>the build status.</comment>
+        </property>
+        <property type='Natural' name="count">
+            <comment>the number of builds.</comment>
+        </property>
+        <property type='Natural' name="test_duration">
+            <comment>the total duration of all tests.</comment>
+        </property>
+        <property type='Porion.Millisecond_Type' name="build_duration" not-null="yes">
+            <comment>the total build duration.</comment>
+        </property>
+        <property type='Porion.Millisecond_Type' name="sys_time" not-null="yes">
+            <comment>the total system time.</comment>
+        </property>
+        <property type='Porion.Millisecond_Type' name="user_time" not-null="yes">
+            <comment>the total user time.</comment>
+        </property>
+    </class>
+
+    <query name='stat-nodes'>
+        <comment>Statistics about the usage of the build node over time</comment>
+        <sql>
+          SELECT
+          strftime('%Y-%m-%d', build.create_date) AS date,
+          build.status AS status,
+          COUNT(build.id) AS cnt,
+          SUM(build.test_duration) AS test_duration,
+          SUM(build.build_duration) AS build_duration,
+          SUM(build.sys_time) AS sys_time,
+          SUM(build.user_time) AS user_time
+          FROM porion_build AS build
+          WHERE build.node_id = :node_id
+          GROUP BY date, build.status
+        </sql>
+    </query> 
+
+    <query name='stat-project-nodes'>
+        <comment>Statistics about the usage of the all build nodes over time for a given project</comment>
+        <sql>
+          SELECT
+          strftime('%Y-%m-%d', build.create_date) AS date,
+          build.status AS status,
+          COUNT(build.id) AS cnt,
+          SUM(build.test_duration) AS test_duration,
+          SUM(build.build_duration) AS build_duration,
+          SUM(build.sys_time) AS sys_time,
+          SUM(build.user_time) AS user_time
+          FROM porion_build AS build
+          WHERE build.project_id = :project_id
+          GROUP BY date, build.status
+        </sql>
+    </query> 
+
+    <query name='stat-all-nodes'>
+        <comment>Statistics about the usage of the all build nodes over time</comment>
+        <sql>
+          SELECT
+          strftime('%Y-%m-%d', build.create_date) AS date,
+          build.status AS status,
+          COUNT(build.id) AS cnt,
+          SUM(build.test_duration) AS test_duration,
+          SUM(build.build_duration) AS build_duration,
+          SUM(build.sys_time) AS sys_time,
+          SUM(build.user_time) AS user_time
+          FROM porion_build AS build
+          GROUP BY date, build.status
+        </sql>
+    </query> 
+
+</query-mapping>

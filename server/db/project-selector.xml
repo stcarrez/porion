@@ -1,0 +1,16 @@
+<query-mapping package='Porion.Queries.Server'>
+    <description>
+        Selector for list of project
+    </description>
+
+    <query name='project-selector'>
+        <comment>Selector for list of projects</comment>
+        <sql>
+            SELECT
+            project.name, project.name
+            FROM porion_project AS project
+            ORDER BY project.name ASC
+        </sql>
+    </query>
+
+</query-mapping>

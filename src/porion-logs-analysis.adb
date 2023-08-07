@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-logs-analysis -- Log analysis
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -54,33 +54,53 @@ package body Porion.Logs.Analysis is
    procedure Read (Context : in out Analyser_Type;
                    Path    : in String;
                    Result  : in out Line_Vector) is
+      procedure Analyze (Level : in Level_Type; Line : in String);
       procedure Process (Line : in String);
 
       Line_Num : Natural := 0;
+      Step     : ADO.Identifier := ADO.NO_IDENTIFIER;
+
+      procedure Analyze (Level : in Level_Type; Line : in String) is
+         State : Line_Info_Type;
+      begin
+         Analyse (Context, Line, State);
+         if not State.Drop then
+            if State.Level = LOG_UNKNOWN and then Level /= LOG_INFO then
+               State.Level := Level;
+            end if;
+            Result.Append ((Length  => Line'Length,
+                            Number  => Line_Num,
+                            Level   => State.Level,
+                            Step    => Step,
+                            Context => False,
+                            Content => Line));
+         end if;
+      end Analyze;
 
       procedure Process (Line : in String) is
-         State : Line_Info_Type;
       begin
          Line_Num := Line_Num + 1;
          if Line'Length > 10 and then Util.Strings.Starts_With (Line, "porion:") then
+            if Util.Strings.Starts_With (Line, "porion:step:") then
+               Step := ADO.Identifier'Value (Line (Line'First + 13 .. Line'Last));
+               return;
+            end if;
+            if Util.Strings.Starts_With (Line, "porion:error: ") then
+               Analyze (LOG_ERROR, Line (Line'First + 14 .. Line'Last));
+               return;
+            end if;
             if Context.Levels (LOG_PORION) then
                Result.Append ((Length  => Line'Length,
                                Number  => Line_Num,
                                Level   => LOG_PORION,
+                               Step    => Step,
                                Context => False,
                                Content => Line));
             end if;
             return;
          end if;
 
-         Analyse (Context, Line, State);
-         if not State.Drop then
-            Result.Append ((Length  => Line'Length,
-                            Number  => Line_Num,
-                            Level   => State.Level,
-                            Context => False,
-                            Content => Line));
-         end if;
+         Analyze (LOG_INFO, Line);
       end Process;
 
    begin

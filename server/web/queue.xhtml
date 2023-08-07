@@ -1,0 +1,38 @@
+<ui:composition xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:c="http://java.sun.com/jstl/core"
+                template="/WEB-INF/layouts/layout.xhtml">
+  <ui:param name="title" value="Build queue" />
+  <ui:param name="pageStyle" value="page-nodes"/>
+  <ui:param name="top_nav" value="page-queue"/>
+
+  <ui:define name="pageNav">
+    <ui:include src="/WEB-INF/layouts/nodes-header.xhtml"/>
+  </ui:define>
+
+  <!-- Main page body -->
+  <ui:define name="pageBody">
+    <f:metadata>
+      <f:viewAction action='#{queueList.load}'/>
+    </f:metadata>
+    <ui:composition template="/nodes/lists/queue.xhtml">
+	    <ui:param name="queue" value="#{queueList.queue}"/>
+
+	    <ui:define name="list-header">
+	      <div class='awa-header-col queue-name'>
+            Hostname
+	      </div>
+	    </ui:define>
+	
+	    <ui:define name="list-item">
+          <div class='queue-name'>
+            <a href="#{contextPath}/nodes/view/#{recipe.node_name}/summary" title="Build node #{recipe.node_name}">
+              #{recipe.node_name}
+            </a>
+          </div>
+	    </ui:define>
+
+      </ui:composition>
+  </ui:define>
+</ui:composition>

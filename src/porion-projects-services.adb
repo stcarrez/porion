@@ -19,6 +19,7 @@ with Ada.Directories;
 with Util.Log.Loggers;
 with Util.Properties;
 with Util.Strings;
+with Util.Files;
 with Util.Dates.ISO8601;
 with Porion.Configs;
 with Porion.Builds.Models;
@@ -169,7 +170,9 @@ package body Porion.Projects.Services is
          Dir : constant String := Porion.Configs.Get_Project_Directory (Name);
       begin
          if Ada.Directories.Exists (Dir) then
-            Ada.Directories.Delete_Tree (Dir);
+            --  Don't use Ada.Directories.Delete_Tree because it fails if the directory
+            --  contains some special files such as sockets or symbolic links to missing files.
+            Util.Files.Delete_Tree (Dir);
          end if;
       end;
 
@@ -304,7 +307,7 @@ package body Porion.Projects.Services is
       Log.Info ("Checking changes in {0}", Name);
 
       Executor.Create_Logger (Log_Dir, "source.log");
-      Executor.Set_Step (Builds.STEP_CHECKOUT);
+      Executor.Set_Step (Builds.STEP_CHECKOUT, Builds.EXEC_NO_ERROR, ADO.NO_IDENTIFIER);
 
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
 
@@ -542,6 +545,25 @@ package body Porion.Projects.Services is
       end if;
       Service.DB.Commit;
    end Set_Description;
+
+   --  ------------------------------
+   --  Set the source control type and parameter for this project.
+   --  ------------------------------
+   procedure Set_Source (Service  : in out Context_Type;
+                         Uri      : in String;
+                         Kind     : in Porion.Source_Control_Type;
+                         Modified : out Boolean) is
+   begin
+      Log.Info ("Set project source on {0} to {1}",
+                String '(Service.Project.Get_Name), Uri);
+
+      Service.DB.Begin_Transaction;
+      Service.Project.Set_Scm_Url (Uri);
+      Service.Project.Set_Scm (Kind);
+      Modified := Service.Project.Is_Modified;
+      Service.Project.Save (Service.DB);
+      Service.DB.Commit;
+   end Set_Source;
 
    --  ------------------------------
    --  Set the project status to enable, disable or put the project onhold.

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module version="1.0">
+
+  <application>
+    <message-bundle var='notificationsMsg'>notifications</message-bundle>
+  </application>
+
+  <managed-bean>
+    <description>List of subscriber for notifications</description>
+    <managed-bean-name>notifications</managed-bean-name>
+    <managed-bean-class>Porion.Notifications.Beans.Notification_List_Bean</managed-bean-class>
+    <managed-bean-scope>request</managed-bean-scope>
+  </managed-bean>
+
+  <filter-mapping>
+    <filter-name>service</filter-name>
+    <url-pattern>/notifications/*.html</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>auth-filter</filter-name>
+    <url-pattern>/notifications/*.html</url-pattern>
+  </filter-mapping>
+
+  <url-policy>
+    <permission>logged-user</permission>
+    <url-pattern>/notifications/.*</url-pattern>
+  </url-policy>
+
+</module>

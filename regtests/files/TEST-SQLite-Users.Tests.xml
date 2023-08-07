@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<testsuite errors="0" failures="0" skips="0" tests="5" time="0.040744000" name="SQLite Users.Tests">
+<testcase classname="SQLite Users.Tests" name="Test AWA.Users.Tests.Create_User (/users/register.xhtml)" time="0.016000000">
+<system-out></system-out>
+</testcase>
+<testcase classname="SQLite Users.Tests" name="Test AWA.Users.Services.Close_Session" time="0.000283000">
+<system-out></system-out>
+</testcase>
+<testcase classname="SQLite Users.Tests" name="Test AWA.Users.Tests.Login_User (/users/login.xhtml)" time="0.008158000">
+<system-out></system-out>
+</testcase>
+<testcase classname="SQLite Users.Tests" name="Test AWA.Users.Services.Lost_Password, Reset_Password" time="0.015107000">
+<system-out></system-out>
+</testcase>
+<testcase classname="SQLite Users.Tests" name="Test AWA.Users.Services.Authenticate" time="0.001196000">
+<system-out></system-out>
+</testcase>
+</testsuite>

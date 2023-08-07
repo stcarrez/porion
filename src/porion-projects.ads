@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-projects -- Project information
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -54,6 +54,9 @@ package Porion.Projects is
 
    --  Parse an identification string with the format:
    --   <project>[#<branch>][~<recipe>][@<node][:<build-number>]
+   --  The following format is also recognized for URL compatibility and there must
+   --  be at least one `recipe`, `node` or `build-number` component:
+   --   <project>:<branch>{[~<recipe>][@<node][:<build-number>]}
    --  Raises the Invalid_Ident exception if the format is invalid.
    function Parse (Ident : in String) return Ident_Type with
       Post => Is_Valid (Parse'Result);

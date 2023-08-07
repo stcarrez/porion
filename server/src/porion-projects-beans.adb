@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-projects-beans -- Beans for module projects
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,11 +15,14 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with ADO.Queries;
 with AWA.Services.Contexts;
+with Util.Strings.Sets;
 with Porion.Services;
 package body Porion.Projects.Beans is
 
    package ASC renames AWA.Services.Contexts;
+   use type Porion.Builds.Models.Build_Status_Type;
 
    --  ------------------------------
    --  Get the value identified by the name.
@@ -37,8 +40,16 @@ package body Porion.Projects.Beans is
       elsif Name = "metrics" then
          return Util.Beans.Objects.To_Object (Value   => From.Metric_Bean,
                                               Storage => Util.Beans.Objects.STATIC);
+      elsif Name = "recipes" then
+         return Util.Beans.Objects.To_Object (Value   => From.Recipes_Bean,
+                                              Storage => Util.Beans.Objects.STATIC);
+      elsif Name = "builds" then
+         return Util.Beans.Objects.To_Object (Value   => From.Builds_Bean,
+                                              Storage => Util.Beans.Objects.STATIC);
       elsif Name = "ident" then
          return UBO.To_Object (Porion.Projects.To_String (From.Ident));
+      elsif Name = "build_status" then
+         return Porion.Builds.Models.Build_Status_Type_Objects.to_Object (From.Build_Status);
       else
          return From.Project.Get_Value (Name);
       end if;
@@ -60,10 +71,12 @@ package body Porion.Projects.Beans is
    --  ------------------------------
    --  Load the stats.
    --  ------------------------------
+   overriding
    procedure Load (Bean    : in out Project_Bean;
                    Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
       Ctx     : constant ASC.Service_Context_Access := ASC.Current;
       Context : Porion.Services.Context_Type;
+      Query   : ADO.Queries.Context;
    begin
       Context.DB := ASC.Get_Master_Session (Ctx);
 
@@ -74,11 +87,91 @@ package body Porion.Projects.Beans is
       Bean.Metric.Cloc_Max_Count := 4;
       Bean.Metric.Load (Outcome);
 
+      Query.Set_Query (Porion.Queries.Query_Project_Last_Build_List);
+      Query.Bind_Param ("project_id", Context.Project.Get_Id);
+      Porion.Queries.List (Bean.Builds, Context.DB, Query);
+
+      if not Bean.Builds.List.Is_Empty then
+         declare
+            Branch_List : Util.Strings.Sets.Set;
+         begin
+            Bean.Build_Status := Porion.Builds.Models.BUILD_PASS;
+            for Build of Bean.Builds.List loop
+               declare
+                  Branch_Name : constant String := To_String (Build.Branch_Name);
+               begin
+                  if not Branch_List.Contains (Branch_Name) then
+                     if Build.Build_Status = Porion.Builds.Models.BUILD_FAIL then
+                        Bean.Build_Status := Porion.Builds.Models.BUILD_FAIL;
+                        exit;
+                     end if;
+                     Branch_List.Include (Branch_Name);
+                  end if;
+               end;
+            end loop;
+         end;
+      else
+         Bean.Build_Status := Porion.Builds.Models.BUILD_FAIL;
+      end if;
+
+      Query.Set_Query (Porion.Queries.Query_Recipe_List);
+      Query.Bind_Param ("project_id", Context.Project.Get_Id);
+      Porion.Queries.List (Bean.Recipes, Context.DB, Query);
+
    exception
       when Porion.Services.Not_Found =>
          Outcome := To_UString ("not-found");
 
    end Load;
+
+   --  Load the project and the list of builds.
+   overriding
+   procedure Load_Builds (Bean    : in out Project_Bean;
+                         Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
+      Ctx     : constant ASC.Service_Context_Access := ASC.Current;
+      Context : Porion.Services.Context_Type;
+      Query   : ADO.Queries.Context;
+   begin
+      Context.DB := ASC.Get_Master_Session (Ctx);
+
+      Context.Load (Bean.Ident);
+      Bean.Project := Context.Project;
+      Bean.Branch := Context.Branch;
+      Bean.Metric.Project := Context.Project.Get_Id;
+      Bean.Metric.Cloc_Max_Count := 4;
+      Bean.Metric.Load (Outcome);
+
+      Query.Set_Query (Porion.Queries.Query_Project_Build_List);
+      Query.Bind_Param ("project_id", Context.Project.Get_Id);
+      Porion.Queries.List (Bean.Builds, Context.DB, Query);
+
+      if not Bean.Builds.List.Is_Empty then
+         declare
+            Branch_List : Util.Strings.Sets.Set;
+         begin
+            Bean.Build_Status := Porion.Builds.Models.BUILD_PASS;
+            for Build of Bean.Builds.List loop
+               declare
+                  Branch_Name : constant String := To_String (Build.Branch_Name);
+               begin
+                  if not Branch_List.Contains (Branch_Name) then
+                     if Build.Build_Status = Porion.Builds.Models.BUILD_FAIL then
+                        Bean.Build_Status := Porion.Builds.Models.BUILD_FAIL;
+                        exit;
+                     end if;
+                     Branch_List.Include (Branch_Name);
+                  end if;
+               end;
+            end loop;
+         end;
+      else
+         Bean.Build_Status := Porion.Builds.Models.BUILD_FAIL;
+      end if;
+
+   exception
+      when Porion.Services.Not_Found =>
+         Outcome := To_UString ("not-found");
+   end Load_Builds;
 
    --  ------------------------------
    --  Create the Project_Bean bean instance.
@@ -91,6 +184,8 @@ package body Porion.Projects.Beans is
       Object.Module := Module;
       Object.Project_Bean := Object.Project'Access;
       Object.Metric_Bean := Object.Metric'Access;
+      Object.Recipes_Bean := Object.Recipes'Access;
+      Object.Builds_Bean := Object.Builds'Access;
       Porion.Dashboards.Beans.Stats.Initialize (Metrics);
       return Object.all'Access;
    end Create_Project_Bean;

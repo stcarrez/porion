@@ -1,0 +1,28 @@
+with GNU;
+with AWA;
+build local extends GNU is
+
+  recipe netbsd extends GNU.main on netbsd is
+    MAKE := "gmake";
+  end netbsd;
+
+  recipe freebsd extends GNU.main on freebsd is
+    MAKE := "gmake";
+  end freebsd;
+
+  recipe ubuntu20 extends GNU.main on boree is
+    run publish;
+  end ubuntu20;
+
+  recipe ubuntu18 extends GNU.main on dionysos;
+
+  recipe release on dionysos is
+    set ignore on;
+    metric disk before;
+    run "cleanup-script.sh";
+    run AWA.main;
+    run publish;
+    metric disk after;
+  end release;
+
+end local;

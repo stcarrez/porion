@@ -80,6 +80,15 @@ package Porion.Nodes.Services is
      Pre  => Service.Is_Open and Hostname'Length > 0,
      Post => Service.Build_Node.Is_Inserted;
 
+   --  Update a build node
+   procedure Update_Node (Service    : in out Context_Type;
+                          Kind       : in Node_Type;
+                          Hostname   : in String;
+                          Login      : in String;
+                          Repository : in String) with
+     Pre  => Service.Is_Open and Hostname'Length > 0,
+     Post => Service.Build_Node.Is_Inserted;
+
    --  Remove the node with the given name.
    procedure Remove_Node (Service : in out Context_Type;
                           Name    : in String) with

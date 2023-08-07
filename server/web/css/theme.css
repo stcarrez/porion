@@ -2,10 +2,16 @@
  * Dark mode support
  */
 @media (prefers-color-scheme: dark) {
-  body, #awa-page, .wiki-page-container,
+  body, main, #awa-page, .wiki-page-container,
   #wiki-page-list, #document-list-editor, #wiki-page-create {
     background-color: #2b2b2b;
     color: #ccc;
+  }
+  .flot-y-axis, .flot-x-axis {
+    fill: #eee;
+  }
+  .project-graph {
+    background: #424342;
   }
   .log-level-porion {
     color: yellow;
@@ -33,7 +39,50 @@
   .build-log {
       background-color: #4b4b4b;
   }
-
+  .awa-menu a:hover{
+      background-color: #bbb;
+      color: #4b4b4b;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      -webkit-border-top-left-radius: 8px;
+      -webkit-border-top-right-radius: 8px;
+      -moz-border-radius-topleft: 8px;
+      -moz-border-radius-topright: 8px;
+  }
+  .project-header .project-title {
+      color: #ccc;
+  }
+  .awa-side-nav, .project-header .awa-menu, .node-header .awa-page-nav, .nodes-header .awa-size-nav, .activity-header .awa-page-nav  {
+      background-color: #444546;
+  }
+  .page-REPORT_WEEK .activity-header .activity-tab-week,
+  .page-REPORT_MONTH .activity-header .activity-tab-month,
+  .page-REPORT_4WEEK .activity-header .activity-tab-4week,
+  .page-summary .nodes-header .nodes-tab-summary,
+  .page-queue .nodes-header .nodes-tab-queue,
+  .page-summary .node-header .node-tab-summary,
+  .page-builds .node-header .node-tab-builds,
+  .page-queue .node-header .node-tab-queue,
+  .page-summary .project-header .project-tab-summary,
+  .page-xunits .project-header .project-tab-xunits,
+  .page-builds .project-header .project-tab-builds,
+  .page-coverage .project-header .project-tab-coverage {
+      background: #ddd;
+  }
+  .page-REPORT_WEEK .activity-header .activity-tab-week a,
+  .page-REPORT_MONTH .activity-header .activity-tab-month a,
+  .page-REPORT_4WEEK .activity-header .activity-tab-4week a,
+  .page-summary .nodes-header .nodes-tab-summary a,
+  .page-queue .nodes-header .nodes-tab-queue a,
+  .page-summary .node-header .node-tab-summary a,
+  .page-builds .node-header .node-tab-builds a,
+  .page-queue .node-header .node-tab-queue a,
+  .page-summary .project-header .project-tab-summary a,
+  .page-xunits .project-header .project-tab-xunits a,
+  .page-builds .project-header .project-tab-builds a,
+  .page-coverage .project-header .project-tab-coverage a {
+      color: #454647;
+  }
   div.post-text a,
   a.feed,
   div.awa-project a,
@@ -126,12 +175,60 @@
       background: #3b3b3b;
       color: #ddd;
    }
+   .xunit-group-title {
+       color: #ddd;
+   }
+   .xunits {
+       color: #bbbd;
+   }
+
+   .chart-container .legend-dataset-text, .chart-container .dataset-units, .chart-container .axis  {
+        fill: #ccc;
+    }
 }
 @media (prefers-color-scheme: light) {
   .day.light-scheme   { background: white; color:  #555; }
   .night.light-scheme { background:  #eee; color: black; }
 }
+@media screen and (min-width: 768px) {
+    .awa-page-nav {
+        max-height: none;
+        top: 0;
+        position: relative;
+        /* float: right; */
+        /* width: fit-content; */
+        width: 100%;
+    }
+    .awa-page-nav li {
+        display: block;
+    }
+    .awa-page-menu li {
+        float: left;
+    }
+    .awa-page-menu a:hover {
+        background-color: transparent;
+        /* color: var(--gray);*/
+    }
+
+    .hamb{
+        display: none;
+    }
+}
 @media screen and (max-width: 768px) {
+    .page-REPORT_WEEK .activity-header .activity-tab-week,
+  .page-REPORT_MONTH .activity-header .activity-tab-month,
+  .page-REPORT_4WEEK .activity-header .activity-tab-4week,
+  .page-summary .nodes-header .nodes-tab-summary,
+  .page-queue .nodes-header .nodes-tab-queue,
+  .page-summary .node-header .node-tab-summary,
+  .page-builds .node-header .node-tab-builds,
+  .page-queue .node-header .node-tab-queue,
+  .page-summary .project-header .project-tab-summary,
+  .page-xunits .project-header .project-tab-xunits,
+  .page-builds .project-header .project-tab-builds,
+  .page-coverage .project-header .project-tab-coverage {
+       display: block;
+    }
     #awa-top-nav li a {
         font-size: 100%;
         padding-left: 5px;
@@ -184,8 +281,11 @@
     body{
         font-size:100%;
     }
+    #awa-hdr h2 {
+        font-size: 1.5em;
+    }
     div.awa-modal {
-	    top: 5%;
+	top: 5%;
     	left: 5%;
     	width: 90%;
     	max-width: 530px;
@@ -197,5 +297,59 @@
     .build-info-line li,
     .project-page-grid {
         width: 96%;
+    }
+    .project-recipe-list .recipe-name, .project-recipe-list .recipe-node {
+	width: 40%;
+    }
+    .project-recipe-list .recipe-build-count {
+	margin-left: 2em;
+    }
+    .project-recipe-list .recipe-build-count, .project-recipe-list .recipe-build-number, .project-recipe-list .recipe-test-pass,
+    .project-recipe-list .recipe-test-fail, .project-recipe-list .recipe-build-count, .project-recipe-list .recipe-build-count {
+	width: 10%;
+    }
+    .project-recipe-list .recipe-build-progress {
+	width: 100%;
+    }
+    .recipe-name, .recipe-node, .recipe-build-count, .recipe-build-number, .recipe-test-pass, .recipe-test-fail {
+        width: 95%;
+    }
+    /* Project builds */
+    .project-build-list .build-node, .project-build-list .build-branch-name,
+    .project-build-list .build-tag, .project-build-list .build-xunit,
+    .project-build-list .build-duration, .project-build-list .build-date {
+	width: 32%;
+    }
+    .project-build-list .build-number, .project-build-list .build-recipe {
+	width: 20%;
+    }
+    .project-build-list .build-recipe {
+	margin-left: 1.5em;
+    }
+    .project-build-list .build-duration, .project-build-list .build-date {
+	text-align: left;
+	float: left;
+    }
+    .project-build-header .build-xunit-pass, .project-build-header .build-xunit-fail, .project-build-header .build-xunit-timeout {
+	display: none;
+    }
+    /* Build page */
+    .build-step .build-step-energy, .build-step .build-step-duration {
+	width: 30%;
+    }
+    .build-step .build-step-command {
+	width: 100%;
+	text-align: right;
+	overflow: hidden;
+    }
+    /* Test page */
+    .build-xunit-group .group-name {
+	width: 80%;
+    }
+    .build-xunit-group .group-pass, .build-xunit-group .group-fail, .build-xunit-group .group-duration, .build-xunit-group .xunit-build {
+	width: 20%;
+    }
+    .build-xunit-group .xunit-build {
+	float: right;
     }
 }

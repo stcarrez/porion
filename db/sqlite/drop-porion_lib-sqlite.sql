@@ -22,5 +22,6 @@ DROP TABLE IF EXISTS `porion_build_executor`;
 DROP TABLE IF EXISTS `porion_build`;
 /* Copied from ado-drop-sqlite.sql*/
 /* File generated automatically by dynamo */
-DROP TABLE IF EXISTS `sequence`;
-DROP TABLE IF EXISTS `entity_type`;
+DROP TABLE IF EXISTS `ado_version`;
+DROP TABLE IF EXISTS `ado_sequence`;
+DROP TABLE IF EXISTS `ado_entity_type`;

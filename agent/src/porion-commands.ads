@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-commands -- Porion agent commands
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,9 @@ private with GNAT.Strings;
 private with Porion.Projects.Services;
 private with Util.Commands.Consoles.Text;
 private with Util.Strings.Formats;
+private with Util.Commands.Raw_IO;
 private with Porion.Logs.Analysis;
+private with Porion.Audits.Services;
 package Porion.Commands is
 
    Command_Error : exception;
@@ -57,12 +59,18 @@ private
 
    type Notice_Type is (N_USAGE, N_INFO, N_ERROR);
 
+   function To_String (S : in String) return String is (S);
+
    package Consoles is
      new Util.Commands.Consoles (Field_Type  => Field_Number,
-                                 Notice_Type => Notice_Type);
+                                 Notice_Type => Notice_Type,
+                                 Element_Type => Character,
+                                 Input_Type   => String,
+                                 To_Input     => Util.Strings.Image);
 
    package Text_Consoles is
-      new Consoles.Text;
+     new Consoles.Text (IO        => Util.Commands.Raw_IO,
+                        To_String => To_String);
 
    type Context_Type is limited new Ada.Finalization.Limited_Controlled with record
       Console           : Text_Consoles.Console_Type;
@@ -87,6 +95,7 @@ private
       Command_Config    : GC.Command_Line_Configuration;
       First_Arg         : Positive := 1;
       Project_Service   : Porion.Projects.Services.Context_Type;
+      Audit_Manager     : aliased Porion.Audits.Services.Audit_Manager;
       Styles            : Porion.Reports.Style_Configuration;
       Printer           : PT.Printer_Access;
    end record;

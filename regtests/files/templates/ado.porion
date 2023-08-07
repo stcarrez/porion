@@ -1,0 +1,23 @@
+with GNU;
+build ado extends GNU is
+
+   step test_results xunit
+       "regtests/results/MySQL-*.xml"
+       "regtests/results/SQLite-*.xml"
+       "regtests/results/PostgreSQL-*.xml"
+   ignore
+       "regtests/results/MySQL-bad*.xml"
+       "regtests/results/SQLite-bad*.xml"
+       "regtests/results/PostgreSQL-bad*.xml";
+
+   recipe main extends GNU.main is
+     delete step publish;
+     metric file "bin/ado_harness";
+   end main;
+
+   recipe release extends main on netbsd is
+     MAKE := "gmake";
+     
+   end release;
+
+end ado;

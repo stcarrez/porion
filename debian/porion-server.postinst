@@ -7,6 +7,7 @@ if [ "$1" = "configure" ]; then
 	adduser --system --quiet --shell /bin/sh --ingroup porion porion
 	chown porion:porion /var/lib/porion
 	su --login porion -c '/usr/bin/porion-server -c /var/lib/porion/config/porion.properties init /var/lib/porion'
+	su --login porion -c '/usr/bin/porion-server -c /var/lib/porion/config/porion.properties migrate --execute'
 fi
 
 installinit_error() {

@@ -22,18 +22,7 @@
         xmlns:u="http://code.google.com/p/ada-asf/util"
         xmlns:h="http://java.sun.com/jsf/html">
   <div class='build-top-title build-#{build.status}'>
-    <div class="build-status"/>
     <div class='build-top-info'>
-      <div class='build-info build-project-name'>
-        <span>
-          Build ##{build.number}
-        </span>
-        <span>
-          <a href="#{contextPath}/projects/view/#{build.project.name}" title="#{build.project.name}">
-            #{build.project.name}
-          </a>
-        </span>
-      </div>
 
       <div class='build-info'>
         <span>
@@ -44,7 +33,7 @@
       <div class='build-info'>
         <span>
           Build node
-          <a href="#{contextPath}/nodes/view/#{build.node.name}" title="#{build.node.name}">
+          <a href="#{contextPath}/nodes/view/#{build.node.name}/summary" title="#{build.node.name}">
             #{build.node.name}
           </a>
         </span>
@@ -71,6 +60,7 @@
   <div class='build-info'>
     <ul class='build-info-line'>
 
+      <h:panelGroup rendered="#{build.pass_count + build.fail_count + build.timeout_count ne 0}">
       <li>
         <div class='dashboard-title'>
           Tests
@@ -78,13 +68,15 @@
         <div class='dashboard-value'>
           #{build.pass_count}
         </div>
-        <div class='dashboard-value'>
+        <div class='dashboard-progress'>
           <div class="progress-bar">
-            <span class="progress-status" style="width: #{build.pass_count == 0 ? 0 : ((100 * build.pass_count) / (build.pass_count + build.fail_count + build_timeout_count))}%"/>
+            <span class="progress-status" style="width: #{build.pass_count == 0 ? 0 : ((100 * build.pass_count) / (build.pass_count + build.fail_count + build.timeout_count))}%"/>
           </div>
         </div>
       </li>
+      </h:panelGroup>
 
+      <h:panelGroup rendered="#{build.metrics.lines.count ne 0}">
       <li>
         <div class='dashboard-title'>
           Line coverage
@@ -94,12 +86,14 @@
             <f:converter converterId="percentConverter"/>
           </h:outputText> %
         </div>
-        <div class='dashboard-value'>
+        <div class='dashboard-progress'>
           <div class="progress-bar">
             <span class="progress-status" style="width: #{build.metrics.lines.count == 0 ? 0 : build.metrics.lines.sum_value / (10 * build.metrics.lines.count)}%"/>
           </div>
         </div>
       </li>
+      </h:panelGroup>
+      <h:panelGroup rendered="#{build.metrics.functions.count ne 0}">
     <li>
         <div class='dashboard-title'>
           Function coverage
@@ -109,12 +103,13 @@
             <f:converter converterId="percentConverter"/>
           </h:outputText> %
         </div>
-        <div class='dashboard-value'>
+        <div class='dashboard-progress'>
           <div class="progress-bar">
             <span class="progress-status" style="width: #{build.metrics.functions.count == 0 ? 0 : build.metrics.functions.sum_value / (10 * build.metrics.functions.count)}%"/>
           </div>
         </div>
       </li>
+      </h:panelGroup>
     </ul>
   </div>
 

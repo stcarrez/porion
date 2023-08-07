@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-configs -- Configuration
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -324,11 +324,33 @@ package body Porion.Configs is
    end Get_Work_Directory;
 
    --  ------------------------------
+   --  Get the directory holding local template files.
+   --  ------------------------------
+   function Get_Templates_Directory return String is
+   begin
+      return Util.Files.Compose (Get_Porion_Directory, "templates");
+   end Get_Templates_Directory;
+
+   --  ------------------------------
+   --  Get the search path to find templates.
+   --  ------------------------------
+   function Get_Templates_Search_Path return String is
+   begin
+      if Exists (TEMPL_SEARCH_PATH_NAME) then
+         return Get (TEMPL_SEARCH_PATH_NAME);
+      else
+         return Get_Templates_Directory & ";"
+            & Util.Files.Compose (Get_Share_Directory, "templates");
+      end if;
+   end Get_Templates_Search_Path;
+
+   --  ------------------------------
    --  Get the default path of the local database.
    --  ------------------------------
    function Get_Default_Database_Path return String is
    begin
-      return "sqlite:///" & Util.Files.Compose (Get_Config_Directory, "porion.db");
+      return "sqlite:///" & Util.Files.Compose (Get_Config_Directory, "porion.db")
+        & "?encoding='UTF-8'&journal_mode=WAL";
    end Get_Default_Database_Path;
 
    --  ------------------------------
@@ -342,6 +364,21 @@ package body Porion.Configs is
          return Get_Default_Database_Path;
       end if;
    end Get_Database_Path;
+
+   --  ------------------------------
+   --  Get the database configuration string.
+   --  ------------------------------
+   function Get_Database_Config (Create : in Boolean) return String is
+      Path : constant String := Porion.Configs.Get_Database_Path;
+   begin
+      if not Create then
+         return Path;
+      elsif Util.Strings.Index (Path, '?') > 0 then
+         return Path & "&create=true";
+      else
+         return Path & "?create=true";
+      end if;
+   end Get_Database_Config;
 
    function Null_Config return Config_Type is
    begin

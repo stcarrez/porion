@@ -1,3 +1,93 @@
+porion (0.13.0-2) unstable; urgency=medium
+
+  * New release.
+
+ -- Stephane Carrez <Stephane.Carrez@gmail.com>  Sun, 19 Mar 2023 19:03:04 +0100
+
+porion (0.13.0-1) unstable; urgency=medium
+
+  * New release.
+
+ -- Stephane Carrez <Stephane.Carrez@gmail.com>  Sun, 17 Dec 2022 20:03:04 +0100
+
+porion (0.12.0-1) unstable; urgency=medium
+
+  * New release.
+
+ -- Stephane Carrez <Stephane.Carrez@gmail.com>  Sun, 16 Oct 2022 16:03:14 +0100
+
+porion (0.11.0-1) unstable; urgency=medium
+
+  * New release.
+
+ -- Stephane Carrez <Stephane.Carrez@gmail.com>  Sun, 18 Sep 2022 20:01:14 +0100
+
+porion (0.10.3-4) unstable; urgency=medium
+
+  * New release.
+
+ -- Stephane Carrez <Stephane.Carrez@gmail.com>  Mon, 15 Aug 2022 17:51:04 +0100
+
+porion (0.10.2-3) unstable; urgency=medium
+
+  * New release.
+
+ -- Stephane Carrez <Stephane.Carrez@gmail.com>  Sun, 14 Aug 2022 19:51:04 +0100
+
+porion (0.10.2-2) unstable; urgency=medium
+
+  * New release.
+
+ -- Stephane Carrez <Stephane.Carrez@gmail.com>  Sun, 14 Aug 2022 17:51:04 +0100
+
+porion (0.10.2-1) unstable; urgency=medium
+
+  * New release.
+
+ -- Stephane Carrez <Stephane.Carrez@gmail.com>  Sun, 14 Aug 2022 16:51:04 +0100
+
+porion (0.10.1-1) unstable; urgency=medium
+
+  * New release.
+
+ -- Stephane Carrez <Stephane.Carrez@gmail.com>  Wed, 10 Aug 2022 22:41:14 +0100
+
+porion (0.10.0-1) unstable; urgency=medium
+
+  * New release.
+
+ -- Stephane Carrez <Stephane.Carrez@gmail.com>  Tue, 9 Aug 2022 22:21:34 +0100
+
+porion (0.9.0) unstable; urgency=medium
+
+  * New release.
+
+ -- Stephane Carrez <Stephane.Carrez@gmail.com>  Sun, 19 Jun 2022 14:41:32 +0100
+
+porion (0.8.2) unstable; urgency=medium
+
+  * New release.
+
+ -- Stephane Carrez <Stephane.Carrez@gmail.com>  Sun, 12 Jun 2022 14:32:42 +0100
+
+porion (0.8.1) unstable; urgency=medium
+
+  * New release.
+
+ -- Stephane Carrez <Stephane.Carrez@gmail.com>  Sun, 12 Jun 2022 11:32:42 +0100
+
+porion (0.8.0) unstable; urgency=medium
+
+  * New release.
+
+ -- Stephane Carrez <Stephane.Carrez@gmail.com>  Sat, 11 Jun 2022 13:31:01 +0100
+
+porion (0.7.0) unstable; urgency=medium
+
+  * Fosdem 2022 release.
+
+ -- Stephane Carrez <Stephane.Carrez@gmail.com>  Sat, 5 Feb 2022 17:51:11 +0100
+
 porion (0.6.0) unstable; urgency=medium
 
   * Initial release.

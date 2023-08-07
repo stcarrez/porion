@@ -17,7 +17,18 @@
 -----------------------------------------------------------------------
 with Intl;
 with Ada.Strings.Unbounded;
+with Util.Beans.Objects.Enums;
 package Porion is
+
+   type Source_Control_Type is (SRC_UNKNOWN, SRC_GIT, SRC_FILE);
+
+   --  Use a fixed enum configuration because the value is stored in database.
+   for Source_Control_Type use (SRC_UNKNOWN => 0,
+                                SRC_GIT => 1,
+                                SRC_FILE => 2);
+
+   package Source_Control_Type_Objects is
+      new Util.Beans.Objects.Enums (Source_Control_Type);
 
    type Microsecond_Type is new Natural;
 

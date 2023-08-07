@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-projects-tests -- Tests for projects package
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,6 +26,9 @@ package Porion.Projects.Tests is
 
    --  Test parsing a project identification string.
    procedure Test_Parse (T : in out Test);
+
+   --  Test parsing invalid project identification string.
+   procedure Test_Parse_Error (T : in out Test);
 
    --  Test converting the Ident_Type back to a string.
    procedure Test_To_String (T : in out Test);

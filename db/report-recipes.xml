@@ -1,0 +1,102 @@
+<query-mapping package='Porion.Queries'>
+    <description>
+        List of recipes for a project
+    </description>
+
+    <class name="Porion.Queries.Recipe_Info" bean="yes">
+        <comment>Information about a recipe.</comment>
+        <property type='ADO.Identifier' name="id">
+            <comment>the recipe id.</comment>
+        </property>
+        <property type='String' name="name">
+            <comment>the recipe name.</comment>
+        </property>
+        <property type='Porion.Builds.Models.Config_Status_Type' name="recipe_status">
+            <comment>the recipe status.</comment>
+        </property>
+        <property type='String' name="node_name">
+            <comment>the build node name.</comment>
+        </property>
+        <property type='ADO.Identifier' name="branch_id">
+            <comment>the branch id.</comment>
+        </property>
+        <property type='String' name="branch_name">
+            <comment>the branch name.</comment>
+        </property>
+        <property type='String' name="branch_tag">
+            <comment>the branch tag.</comment>
+        </property>
+        <property type='Porion.Projects.Models.Branch_Status_Type' name="branch_status">
+            <comment>the branch status.</comment>
+        </property>
+        <property type='Integer' name="last_success_build">
+            <comment>the last successful build number.</comment>
+        </property>
+        <property type='Integer' name="last_fail_build">
+            <comment>the last failed build number.</comment>
+        </property>
+        <property type='Integer' name="max_build_duration">
+            <comment>the max build duration.</comment>
+        </property>
+        <property type='Long' name="sum_build_duration">
+            <comment>the sum of build duration.</comment>
+        </property>
+        <property type='Integer' name="max_pass_count">
+            <comment>the number of tests that succeeded.</comment>
+        </property>
+        <property type='Integer' name="sum_pass_count">
+            <comment>the number of tests that succeeded.</comment>
+        </property>
+        <property type='Integer' name="max_fail_count">
+            <comment>the number of tests that failed.</comment>
+        </property>
+        <property type='Integer' name="sum_fail_count">
+            <comment>the number of tests that failed.</comment>
+        </property>
+        <property type='Integer' name="build_pass_count">
+            <comment>the number of builds that succeeded.</comment>
+        </property>
+        <property type='Integer' name="build_fail_count">
+            <comment>the number of builds that failed.</comment>
+        </property>
+    </class>
+
+    <query name='recipe-list'>
+        <comment>Get the list of recipes</comment>
+        <sql>
+          SELECT
+            recipe.id AS id,
+            recipe.name AS name,
+            recipe.status AS status,
+            node.name AS node_name,
+            recipe.branch_id AS branch_id,
+            COALESCE(branch.name, '') AS branch_name,
+            COALESCE(branch.tag, '') AS branch_tag,
+            COALESCE(branch.status, 0) AS branch_status,
+            COALESCE(MAX(build_ok.number), 0) AS last_build,
+            COALESCE(MAX(build_ko.number), 0) AS failed_build,
+            COALESCE(MAX(build_ok.build_duration), 0) AS max_duration,
+            COALESCE(SUM(build_ok.build_duration), 0) AS sum_duration,
+            COALESCE(MAX(build_ok.pass_count), 0) AS pass_count,
+            COALESCE(SUM(build_ok.pass_count), 0) AS sum_pass,
+            COALESCE(MAX(build_ok.fail_count), 0) AS fail_count,
+            COALESCE(SUM(build_ok.fail_count), 0) AS sum_fail,
+            COUNT(distinct build_ok.id) AS ok_count,
+            COUNT(distinct build_ko.id) AS ko_count
+            FROM porion_recipe AS recipe
+            INNER JOIN porion_branch AS branch ON recipe.branch_id = branch.id
+            INNER JOIN porion_node AS node ON recipe.node_id = node.id
+            LEFT JOIN porion_build AS build_ok ON recipe.id = build_ok.recipe_id AND build_ok.status = 2
+            LEFT JOIN porion_build AS build_ko ON recipe.id = build_ko.recipe_id AND build_ko.status != 2
+            WHERE recipe.project_id = :project_id
+            GROUP BY recipe.id, recipe.branch_id
+        </sql>
+        <sql-count>
+            SELECT
+            count(recipe.id)
+            FROM porion_recipe AS recipe
+            WHERE recipe.project_id = :project_id
+        </sql-count>
+    </query>
+
+</query-mapping>

@@ -113,7 +113,7 @@ package body Porion.Services.Parsers is
                N.Project.Set_Status (Projects.Models.Project_Status_Type_Objects.To_Value (Value));
 
             when PROJECT_SCM =>
-               N.Project.Set_Scm (Sources.Source_Control_Type_Objects.To_Value (Value));
+               N.Project.Set_Scm (Source_Control_Type_Objects.To_Value (Value));
 
             when PROJECT_SCM_URL =>
                N.Project.Set_Scm_Url (UBO.To_String (Value));
@@ -148,7 +148,7 @@ package body Porion.Services.Parsers is
                N.Step.Step.Set_Builder (Builds.Models.Builder_Type_Objects.To_Value (Value));
 
             when BUILD_STEP_EXECUTION =>
-               N.Step.Step.Set_Execution (Builds.Models.Execution_Type_Objects.To_Value (Value));
+               N.Step.Step.Set_Execution (Builds.Execution_Type_Objects.To_Value (Value));
 
             when BUILD_PARAM_NAME =>
                N.Param_Name := Value;

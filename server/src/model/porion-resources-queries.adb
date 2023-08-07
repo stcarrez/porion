@@ -1,22 +1,23 @@
---  Advanced Resource Embedder 1.2.0
+--  Advanced Resource Embedder 1.2.1
 with Interfaces; use Interfaces;
 
 package body Porion.Resources.Queries is
    function Hash (S : String) return Natural;
 
    P : constant array (0 .. 3) of Natural :=
-     (1, 8, 12, 14);
+     (3, 8, 12, 14);
 
    T1 : constant array (0 .. 3) of Unsigned_8 :=
-     (38, 16, 5, 28);
+     (3, 43, 16, 22);
 
    T2 : constant array (0 .. 3) of Unsigned_8 :=
-     (2, 2, 16, 30);
+     (22, 59, 5, 52);
 
-   G : constant array (0 .. 44) of Unsigned_8 :=
-     (0, 0, 5, 0, 0, 3, 5, 10, 0, 0, 16, 0, 0, 0, 13, 1, 0, 9, 0, 0, 6, 7,
-      18, 9, 0, 0, 0, 0, 0, 11, 4, 0, 0, 0, 0, 3, 11, 13, 4, 0, 7, 0, 0, 16,
-      2);
+   G : constant array (0 .. 64) of Unsigned_8 :=
+     (22, 0, 17, 18, 0, 5, 0, 0, 0, 8, 7, 8, 23, 0, 19, 18, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 18, 1, 0, 9, 0, 0, 0, 0, 19, 0, 21, 0, 3, 26, 0, 0, 0, 0,
+      0, 22, 0, 0, 13, 0, 0, 0, 18, 0, 2, 10, 0, 25, 22, 0, 4, 1, 12, 27,
+      22, 15);
 
    function Hash (S : String) return Natural is
       F : constant Natural := S'First - 1;
@@ -27,10 +28,10 @@ package body Porion.Resources.Queries is
       for K in P'Range loop
          exit when L < P (K);
          J  := Character'Pos (S (P (K) + F));
-         F1 := (F1 + Natural (T1 (K)) * J) mod 45;
-         F2 := (F2 + Natural (T2 (K)) * J) mod 45;
+         F1 := (F1 + Natural (T1 (K)) * J) mod 65;
+         F2 := (F2 + Natural (T2 (K)) * J) mod 65;
       end loop;
-      return (Natural (G (F1)) + Natural (G (F2))) mod 22;
+      return (Natural (G (F1)) + Natural (G (F2))) mod 32;
    end Hash;
 
    C_0 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
@@ -64,6 +65,51 @@ package body Porion.Resources.Queries is
        & "   </query> " & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
    C_1 : aliased constant String := "<query-mapping package='Porion.Builds.Mod"
+       & "els'>" & ASCII.LF & "    <description>" & ASCII.LF & "        Build vari"
+       & "ables for a build recipe" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF
+       & "    <class name=""Porion.Builds.Models.Variable_Info"" bean=""no"">" & ASCII.LF
+       & "        <comment>Information for a build variable.</comment>" & ASCII.LF
+       & "        <property type='String' name=""name"">" & ASCII.LF & "          "
+       & "  <comment>the build variable name.</comment>" & ASCII.LF & "        </p"
+       & "roperty>" & ASCII.LF & "        <property type='String' name=""value"">" & ASCII.LF
+       & "            <comment>the build variable value.</comment>" & ASCII.LF & " "
+       & "       </property>" & ASCII.LF & "        <property type='Porion.Builds."
+       & "Models.Variable_Type' name=""kind"">" & ASCII.LF & "            <comment"
+       & ">the build variable type.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='boolean' name=""secret"">" & ASCII.LF & "       "
+       & "     <comment>whether the build variable is secret.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Integer' name"
+       & "=""step_number"" not-null='no'>" & ASCII.LF & "            <comment>the "
+       & "optional recipe step number.</comment>" & ASCII.LF & "        </property"
+       & ">" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF & "    <query name"
+       & "='build-variables'>" & ASCII.LF & "        <comment>Environment variable"
+       & "s to build a recipe.  List is sorted on the overriding precedence:" & ASCII.LF
+       & "        - recipe specific variables are put first," & ASCII.LF & ASCII.HT
+       & "- branch specific variables are put," & ASCII.LF & ASCII.HT & "- projec"
+       & "t specific variables are put," & ASCII.LF & ASCII.HT & "- node specific"
+       & " variables are put," & ASCII.LF & ASCII.HT & "- global variables are pu"
+       & "t last." & ASCII.LF & "        </comment>" & ASCII.LF & "        <sql>" & ASCII.LF
+       & "          SELECT" & ASCII.LF & "          env.name AS name," & ASCII.LF
+       & "          env.value AS value," & ASCII.LF & "          env.kind AS kind,"
+       & ASCII.LF & "          env.secret AS secret," & ASCII.LF & ASCII.HT & " "
+       & " env.step_number AS step" & ASCII.LF & "          FROM porion_environmen"
+       & "t AS env" & ASCII.LF & "          WHERE env.recipe_id = :recipe_id" & ASCII.LF
+       & ASCII.HT & "     OR (env.recipe_id IS NULL" & ASCII.LF & ASCII.HT & "  "
+       & "     AND (env.branch_id = :branch_id AND (env.node_id = :node_id OR env."
+       & "node_id IS NULL)))" & ASCII.LF & ASCII.HT & "     OR (env.recipe_id IS "
+       & "NULL AND env.branch_id IS NULL" & ASCII.LF & ASCII.HT & "       AND (en"
+       & "v.project_id = :project_Id AND (env.node_id = :node_id OR env.node_id IS"
+       & " NULL)))" & ASCII.LF & ASCII.HT & "     OR (env.recipe_id IS NULL AND e"
+       & "nv.branch_id IS NULL" & ASCII.LF & ASCII.HT & "       AND (env.project_"
+       & "id IS NULL AND env.node_id = :node_id))" & ASCII.LF & ASCII.HT & "     "
+       & "OR (env.recipe_id IS NULL AND env.branch_id IS NULL AND env.project_id I"
+       & "S NULL AND env.node_id IS NULL)" & ASCII.LF & ASCII.HT & "  ORDER by CO"
+       & "ALESCE(env.recipe_id,0) DESC, COALESCE(env.branch_id,0) DESC," & ASCII.LF
+       & ASCII.HT & "           COALESCE(env.project_id,0) DESC, COALESCE(env.nod"
+       & "e_id, 0) DESC;" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>"
+       & " " & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+
+   C_2 : aliased constant String := "<query-mapping package='Porion.Builds.Mod"
        & "els'>" & ASCII.LF & "    <description>" & ASCII.LF & "      Queries to c"
        & "leanup a build" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF
        & "    <query name='cleanup-build-step'>" & ASCII.LF & "       <comment>Cle"
@@ -95,7 +141,7 @@ package body Porion.Resources.Queries is
        & "     </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</que"
        & "ry-mapping>" & ASCII.LF;
 
-   C_2 : aliased constant String := "<query-mapping package='Porion.Projects.M"
+   C_3 : aliased constant String := "<query-mapping package='Porion.Projects.M"
        & "odels'>" & ASCII.LF & "    <description>" & ASCII.LF & "      Queries to"
        & " cleanup a project" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF
        & "    <query name='cleanup-project-build-step'>" & ASCII.LF & "       <com"
@@ -179,7 +225,7 @@ package body Porion.Resources.Queries is
        & "oject_id" & ASCII.LF & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF
        & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_3 : aliased constant String := "<query-mapping package='Porion.Builds.Mod"
+   C_4 : aliased constant String := "<query-mapping package='Porion.Builds.Mod"
        & "els'>" & ASCII.LF & "    <description>" & ASCII.LF & "      Queries to c"
        & "leanup a recipe" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF
        & "    <query name='cleanup-recipe-build-step'>" & ASCII.LF & "       <comm"
@@ -238,7 +284,24 @@ package body Porion.Resources.Queries is
        & "ipe_id = :recipe_id" & ASCII.LF & "       </sql>" & ASCII.LF & "    </qu"
        & "ery>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_4 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_5 : aliased constant String := "<query-mapping package='AWA.Commands.Mode"
+       & "ls'>" & ASCII.LF & "    <description>" & ASCII.LF & "      List audit re"
+       & "cords" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF & "    <"
+       & "query name='command-audit-list'>" & ASCII.LF & "       <comment>List the"
+       & " last audit fields</comment>" & ASCII.LF & "       <sql>" & ASCII.LF & " "
+       & "   SELECT" & ASCII.LF & "      au.date," & ASCII.LF & "      au.entity_i"
+       & "d," & ASCII.LF & "      ent.name," & ASCII.LF & "      field.name AS fie"
+       & "ld," & ASCII.LF & "      au.old_value," & ASCII.LF & "      au.new_value"
+       & ASCII.LF & "    FROM awa_audit AS au" & ASCII.LF & "    INNER JOIN awa_a"
+       & "udit_field AS field ON field.id = au.field" & ASCII.LF & "    INNER JOIN"
+       & " ado_entity_type AS ent ON ent.id = au.entity_type" & ASCII.LF & "    OR"
+       & "DER by au.date DESC LIMIT 100" & ASCII.LF & "       </sql>" & ASCII.LF & " "
+       & "      <sql-count>" & ASCII.LF & "    SELECT" & ASCII.LF & "       count("
+       & "au.id)" & ASCII.LF & "    FROM awa_audit AS au" & ASCII.LF & "       </s"
+       & "ql-count>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</query"
+       & "-mapping>" & ASCII.LF;
+
+   C_6 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of project branches" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
        & "ueries.Branch_Info"" bean=""no"">" & ASCII.LF & "        <comment>Inform"
@@ -268,7 +331,7 @@ package body Porion.Resources.Queries is
        & "ount>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</query-map"
        & "ping>" & ASCII.LF;
 
-   C_5 : aliased constant String := "<query-mapping package='AWA.Commands.Mode"
+   C_7 : aliased constant String := "<query-mapping package='AWA.Commands.Mode"
        & "ls'>" & ASCII.LF & "    <description>" & ASCII.LF & "        List of job"
        & "s" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF & "    <quer"
        & "y name='command-job-list'>" & ASCII.LF & "        <comment>Get the list "
@@ -305,7 +368,7 @@ package body Porion.Resources.Queries is
        & "        FROM awa_job AS job" & ASCII.LF & "        </sql-count>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_6 : aliased constant String := "<query-mapping package='AWA.Commands.Mode"
+   C_8 : aliased constant String := "<query-mapping package='AWA.Commands.Mode"
        & "ls'>" & ASCII.LF & "    <description>" & ASCII.LF & "      List of sessi"
        & "ons" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF & "    <qu"
        & "ery name='command-session-list'>" & ASCII.LF & "       <comment>Get the "
@@ -323,27 +386,116 @@ package body Porion.Resources.Queries is
        & "</sql-count>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</qu"
        & "ery-mapping>" & ASCII.LF;
 
-   C_7 : aliased constant String := "<query-mapping package='AWA.Commands.Mode"
+   C_9 : aliased constant String := "<query-mapping package='AWA.Commands.Mode"
        & "ls'>" & ASCII.LF & "    <description>" & ASCII.LF & "      List of users"
        & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF & "    <query nam"
        & "e='command-user-list'>" & ASCII.LF & "       <comment>Get the list of us"
        & "ers with login sessions</comment>" & ASCII.LF & "       <sql>" & ASCII.LF
        & "    SELECT" & ASCII.LF & "      u.id AS id," & ASCII.LF & "      u.name "
-       & "AS name," & ASCII.LF & "      email.email AS email," & ASCII.LF & "     "
-       & " (SELECT COUNT(*) FROM awa_acl AS acl" & ASCII.LF & "         WHERE u.id"
-       & " = acl.user_id) AS acl_count," & ASCII.LF & "      (SELECT COUNT(*) FROM"
-       & " awa_session AS session" & ASCII.LF & "         WHERE session.user_id = "
-       & "u.id AND session.stype = 1) AS auth_count," & ASCII.LF & "      (SELECT "
-       & "MAX(session.start_date) FROM awa_session AS session" & ASCII.LF & "     "
-       & "    WHERE session.user_id = u.id AND session.stype = 1) AS last_login" & ASCII.LF
-       & "    FROM awa_user AS u" & ASCII.LF & "    LEFT JOIN awa_email AS email O"
-       & "N u.email_id = email.id" & ASCII.LF & "       </sql>" & ASCII.LF & "    "
-       & "   <sql-count>" & ASCII.LF & "    SELECT" & ASCII.LF & "       count(u.i"
-       & "d)" & ASCII.LF & "    FROM awa_user AS u" & ASCII.LF & "       </sql-cou"
-       & "nt>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</query-mappi"
-       & "ng>" & ASCII.LF;
+       & "AS name," & ASCII.LF & "      u.status AS status," & ASCII.LF & "      e"
+       & "mail.email AS email," & ASCII.LF & "      (SELECT COUNT(*) FROM awa_acl "
+       & "AS acl" & ASCII.LF & "         WHERE u.id = acl.user_id) AS acl_count," & ASCII.LF
+       & "      (SELECT COUNT(*) FROM awa_session AS session" & ASCII.LF & "      "
+       & "   WHERE session.user_id = u.id AND session.stype = 1) AS auth_count," & ASCII.LF
+       & "      (SELECT MAX(session.start_date) FROM awa_session AS session" & ASCII.LF
+       & "         WHERE session.user_id = u.id AND session.stype = 1) AS last_log"
+       & "in" & ASCII.LF & "    FROM awa_user AS u" & ASCII.LF & "    LEFT JOIN aw"
+       & "a_email AS email ON u.email_id = email.id" & ASCII.LF & "       </sql>" & ASCII.LF
+       & "       <sql-count>" & ASCII.LF & "    SELECT" & ASCII.LF & "       count"
+       & "(u.id)" & ASCII.LF & "    FROM awa_user AS u" & ASCII.LF & "       </sql"
+       & "-count>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</query-m"
+       & "apping>" & ASCII.LF;
 
-   C_8 : aliased constant String := "<query-mapping package='AWA.Permissions.M"
+   C_10 : aliased constant String := "<query-mapping package='Porion.Notificati"
+       & "ons.Models'>" & ASCII.LF & "    <description>" & ASCII.LF & "        Lis"
+       & "t of changes to report for notifications" & ASCII.LF & "    </descriptio"
+       & "n>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Notifications.Mod"
+       & "els.Audit_Info"" bean=""no"">" & ASCII.LF & "        <property type='ADO"
+       & ".Identifier' name=""audit_id"">" & ASCII.LF & "            <comment>the "
+       & "audit id.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "  "
+       & "      <property type='Date' name=""date"">" & ASCII.LF & "            <c"
+       & "omment>the date when the change was made.</comment>" & ASCII.LF & "     "
+       & "   </property>" & ASCII.LF & "        <property type='ADO.Entity_Type' n"
+       & "ame=""kind"">" & ASCII.LF & "            <comment>the field name that wa"
+       & "s changed.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & " "
+       & "       <property type='String' name=""field"">" & ASCII.LF & "          "
+       & "  <comment>the field name that was changed.</comment>" & ASCII.LF & "   "
+       & "     </property>" & ASCII.LF & "        <property type='ADO.Identifier' "
+       & "name=""id"">" & ASCII.LF & "            <comment>the id that was changed"
+       & ".</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <p"
+       & "roperty type='String' name=""old_value"" not-null=""no"">" & ASCII.LF & " "
+       & "           <comment>the old value.</comment>" & ASCII.LF & "        </pr"
+       & "operty>" & ASCII.LF & "        <property type='String' name=""new_value"""
+       & " not-null=""no"">" & ASCII.LF & "            <comment>the new value.</co"
+       & "mment>" & ASCII.LF & "        </property>" & ASCII.LF & "    </class>" & ASCII.LF
+       & ASCII.LF & "    <query name='audit-list'>" & ASCII.LF & "        <commen"
+       & "t>Get the list of changes made after some date</comment>" & ASCII.LF & " "
+       & "       <sql>" & ASCII.LF & "          SELECT" & ASCII.LF & "          au"
+       & "dit.id," & ASCII.LF & "          audit.date," & ASCII.LF & "          au"
+       & "dit.entity_type," & ASCII.LF & "          field.name," & ASCII.LF & "   "
+       & "       audit.entity_id," & ASCII.LF & "          audit.old_value," & ASCII.LF
+       & "          audit.new_value" & ASCII.LF & "          FROM awa_audit AS aud"
+       & "it" & ASCII.LF & "          LEFT JOIN awa_audit_field AS field ON audit."
+       & "field = field.id" & ASCII.LF & "          WHERE audit.id >= :last_audit" & ASCII.LF
+       & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</"
+       & "query-mapping>" & ASCII.LF;
+
+   C_11 : aliased constant String := "<query-mapping package='Porion.Notificati"
+       & "ons.Models'>" & ASCII.LF & "    <description>" & ASCII.LF & "        Lis"
+       & "t of subscribed notifications" & ASCII.LF & "    </description>" & ASCII.LF
+       & ASCII.LF & "    <class name=""Porion.Notifications.Models.Notification_I"
+       & "nfo"" bean=""yes"">" & ASCII.LF & "        <comment>Information about a "
+       & "notification.</comment>" & ASCII.LF & "        <property type='ADO.Ident"
+       & "ifier' name=""id"">" & ASCII.LF & "            <comment>the subscriber i"
+       & "d.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <"
+       & "property type='String' name=""name"">" & ASCII.LF & "            <commen"
+       & "t>the project name.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Porion.Projects.Models.Project_Status_Type' name"
+       & "=""project_status"">" & ASCII.LF & "            <comment>the project sta"
+       & "tus.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "       "
+       & " <property type='String' name=""email"">" & ASCII.LF & "            <com"
+       & "ment>the user email address.</comment>" & ASCII.LF & "        </property"
+       & ">" & ASCII.LF & "        <property type='Porion.Notifications.Models.Fre"
+       & "quency_Type' name=""frequency"">" & ASCII.LF & "            <comment>the"
+       & " notification frequency.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Date' name=""last_notification_date"" not-null='"
+       & "false'>" & ASCII.LF & "            <comment>the last notification date.<"
+       & "/comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <pro"
+       & "perty type='Date' name=""check_date"" not-null='false'>" & ASCII.LF & " "
+       & "           <comment>the last check date.</comment>" & ASCII.LF & "      "
+       & "  </property>" & ASCII.LF & "        <property type='Natural' name=""sen"
+       & "d_count"">" & ASCII.LF & "            <comment>the number of notificatio"
+       & "n sent.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "    "
+       & "    <property type='Boolean' name=""notify_config"">" & ASCII.LF & "    "
+       & "        <comment>the notify config flag.</comment>" & ASCII.LF & "      "
+       & "  </property>" & ASCII.LF & "        <property type='Boolean' name=""not"
+       & "ify_build"">" & ASCII.LF & "            <comment>the notify build flag.<"
+       & "/comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <pro"
+       & "perty type='Boolean' name=""notify_xunit"">" & ASCII.LF & "            <"
+       & "comment>the notify xunit flag.</comment>" & ASCII.LF & "        </proper"
+       & "ty>" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF & "    <query na"
+       & "me='notification-list'>" & ASCII.LF & "        <comment>Get the list of "
+       & "notifications</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & "    "
+       & "        SELECT" & ASCII.LF & "            subscriber.id AS id," & ASCII.LF
+       & "            project.name AS name," & ASCII.LF & "            project.sta"
+       & "tus AS status," & ASCII.LF & "            email.email AS email," & ASCII.LF
+       & "            subscriber.frequency AS frequency," & ASCII.LF & "          "
+       & "  subscriber.last_notification_date AS last_notification_date," & ASCII.LF
+       & "            subscriber.check_date AS check_date," & ASCII.LF & "        "
+       & "    subscriber.send_count AS send_count," & ASCII.LF & "            subs"
+       & "criber.notify_config AS notify_config," & ASCII.LF & "            subscr"
+       & "iber.notify_build AS notify_build," & ASCII.LF & "            subscriber"
+       & ".notify_xunit AS notify_xunit" & ASCII.LF & "            FROM porion_sub"
+       & "scriber AS subscriber" & ASCII.LF & "            INNER JOIN porion_proje"
+       & "ct AS project ON subscriber.project_id = project.id" & ASCII.LF & "     "
+       & "       INNER JOIN awa_email AS email ON subscriber.email_id = email.id" & ASCII.LF
+       & "        </sql>" & ASCII.LF & "        <sql-count>" & ASCII.LF & "       "
+       & "     SELECT" & ASCII.LF & "            count(subscriber.id)" & ASCII.LF
+       & "            FROM porion_subscriber AS subscriber" & ASCII.LF & "        "
+       & "</sql-count>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</qu"
+       & "ery-mapping>" & ASCII.LF;
+
+   C_12 : aliased constant String := "<query-mapping package='AWA.Permissions.M"
        & "odels'>" & ASCII.LF & "    <description>" & ASCII.LF & "      Queries us"
        & "ed by the permission manager" & ASCII.LF & "    </description>" & ASCII.LF
        & ASCII.LF & "    <query name='check-entity-permission'>" & ASCII.LF & "  "
@@ -369,7 +521,7 @@ package body Porion.Resources.Queries is
        & "= :user_id" & ASCII.LF & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF
        & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_9 : aliased constant String := "<query-mapping package='Porion.Projects.M"
+   C_13 : aliased constant String := "<query-mapping package='Porion.Projects.M"
        & "odels'>" & ASCII.LF & "    <description>" & ASCII.LF & "      Informatio"
        & "n about branches on a project." & ASCII.LF & "    </description>" & ASCII.LF
        & ASCII.LF & "    <query name='project-branches'>" & ASCII.LF & "       <c"
@@ -385,7 +537,7 @@ package body Porion.Resources.Queries is
        & "ject_id" & ASCII.LF & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF
        & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_10 : aliased constant String := "<query-mapping package='Porion.Projects.M"
+   C_14 : aliased constant String := "<query-mapping package='Porion.Projects.M"
        & "odels'>" & ASCII.LF & "    <description>" & ASCII.LF & "      Informatio"
        & "n about branches on a project." & ASCII.LF & "    </description>" & ASCII.LF
        & ASCII.LF & "    <query name='project-last-build'>" & ASCII.LF & "       "
@@ -396,7 +548,83 @@ package body Porion.Resources.Queries is
        & "sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapp"
        & "ing>" & ASCII.LF;
 
-   C_11 : aliased constant String := "<query-mapping package='Porion.Builds.Mod"
+   C_15 : aliased constant String := "<query-mapping package='Porion.Queries.Se"
+       & "rver'>" & ASCII.LF & "    <description>" & ASCII.LF & "        Selector "
+       & "for list of project" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF
+       & "    <query name='project-selector'>" & ASCII.LF & "        <comment>Sele"
+       & "ctor for list of projects</comment>" & ASCII.LF & "        <sql>" & ASCII.LF
+       & "            SELECT" & ASCII.LF & "            project.name, project.name"
+       & ASCII.LF & "            FROM porion_project AS project" & ASCII.LF & "  "
+       & "          ORDER BY project.name ASC" & ASCII.LF & "        </sql>" & ASCII.LF
+       & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+
+   C_16 : aliased constant String := "<query-mapping package='Porion.Beans'>" & ASCII.LF
+       & "    <description>" & ASCII.LF & "        Simple statistics about project"
+       & " changes" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF & "  "
+       & "  <class name=""Porion.Beans.Project_Audit"" bean=""no"">" & ASCII.LF & " "
+       & "       <comment>Statistics about project changes</comment>" & ASCII.LF & " "
+       & "       <property type='ADO.Identifier' name=""project_id"">" & ASCII.LF
+       & "            <comment>the project id.</comment>" & ASCII.LF & "        </"
+       & "property>" & ASCII.LF & "        <property type='ADO.Identifier' name="""
+       & "last_audit_id"">" & ASCII.LF & "            <comment>the last audit reco"
+       & "rd id.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "     "
+       & "   <property type='Natural' name=""count"">" & ASCII.LF & "            <"
+       & "comment>the number of changes.</comment>" & ASCII.LF & "        </proper"
+       & "ty>" & ASCII.LF & "        <property type='Natural' name=""sum"">" & ASCII.LF
+       & "            <comment>the number of changes.</comment>" & ASCII.LF & "   "
+       & "     </property>" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF & " "
+       & "   <query name='project-change-count'>" & ASCII.LF & "        <comment>N"
+       & "umber of configuration changes per project</comment>" & ASCII.LF & "    "
+       & "    <sql>" & ASCII.LF & "          SELECT" & ASCII.LF & "          audit"
+       & ".entity_id," & ASCII.LF & "          MAX(audit.id)," & ASCII.LF & "     "
+       & "     COUNT(audit.id)," & ASCII.LF & "          0" & ASCII.LF & "        "
+       & "  FROM awa_audit AS audit" & ASCII.LF & "          INNER JOIN awa_audit_"
+       & "field AS field ON audit.field = field.id" & ASCII.LF & "          WHERE "
+       & "audit.id >= :last_audit AND audit.entity_type = $entity_type[porion_proj"
+       & "ect]" & ASCII.LF & "          AND (field.name = 'name' OR field.name = '"
+       & "scm_url' OR field.name = 'scm' OR field.name = 'check_delay')" & ASCII.LF
+       & "          GROUP BY audit.entity_id" & ASCII.LF & "          ORDER BY aud"
+       & "it.entity_id" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF
+       & ASCII.LF & "    <query name='recipe-change-count'>" & ASCII.LF & "      "
+       & "  <comment>Number of recipe changes per project</comment>" & ASCII.LF & " "
+       & "       <sql>" & ASCII.LF & "          SELECT" & ASCII.LF & "          re"
+       & "cipe.project_id," & ASCII.LF & "          MAX(audit.id)," & ASCII.LF & " "
+       & "         COUNT(audit.id)," & ASCII.LF & "          0" & ASCII.LF & "    "
+       & "      FROM awa_audit AS audit" & ASCII.LF & "          INNER JOIN porion"
+       & "_recipe AS recipe ON recipe.id = audit.entity_id" & ASCII.LF & "        "
+       & "  INNER JOIN awa_audit_field AS field ON audit.field = field.id" & ASCII.LF
+       & "          WHERE audit.id >= :last_audit AND audit.entity_type = $entity_"
+       & "type[porion_recipe]" & ASCII.LF & "          AND (field.name = 'name' OR"
+       & " field.name = 'description' OR field.name = 'rate_factor' OR field.name "
+       & "= 'filter_rules')" & ASCII.LF & "          GROUP BY recipe.project_id" & ASCII.LF
+       & "          ORDER BY recipe.project_id" & ASCII.LF & "        </sql>" & ASCII.LF
+       & "    </query>" & ASCII.LF & ASCII.LF & "    <query name='build-count'>" & ASCII.LF
+       & "        <comment>Number of builds and source change per project</comment"
+       & ">" & ASCII.LF & "        <sql>" & ASCII.LF & "          SELECT" & ASCII.LF
+       & "          build.project_id," & ASCII.LF & "          MAX(audit.id)," & ASCII.LF
+       & "          COUNT(audit.id)," & ASCII.LF & "          SUM(build.source_cha"
+       & "nges)" & ASCII.LF & "          FROM awa_audit AS audit" & ASCII.LF & "  "
+       & "        INNER JOIN porion_build AS build ON build.id = audit.entity_id" & ASCII.LF
+       & "          INNER JOIN awa_audit_field AS field ON audit.field = field.id" & ASCII.LF
+       & "          WHERE audit.id >= :last_audit AND audit.entity_type = $entity_"
+       & "type[porion_build]" & ASCII.LF & "          AND (field.name = 'id')" & ASCII.LF
+       & "          GROUP BY build.project_id" & ASCII.LF & "          ORDER BY bu"
+       & "ild.project_id" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>"
+       & ASCII.LF & ASCII.LF & "    <query name='first-audit-after-date'>" & ASCII.LF
+       & "        <comment>Get the audit id of the first change that occured after"
+       & " a given date</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & "    "
+       & "      SELECT MIN(audit.id)" & ASCII.LF & "          FROM awa_audit AS au"
+       & "dit" & ASCII.LF & "          WHERE audit.date > :date" & ASCII.LF & "   "
+       & "     </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "    <"
+       & "query name='audit-day-activity'>" & ASCII.LF & "        <comment>Get the"
+       & " audit stat changes per day</comment>" & ASCII.LF & "        <sql>" & ASCII.LF
+       & "          SELECT" & ASCII.LF & "          COUNT(audit.id)," & ASCII.LF & " "
+       & "         strftime(""%Y-%m-%d"", audit.date) AS day" & ASCII.LF & "      "
+       & "    FROM awa_audit AS audit" & ASCII.LF & "          WHERE audit.id >= 1"
+       & " " & ASCII.LF & "          GROUP BY day" & ASCII.LF & "        </sql>" & ASCII.LF
+       & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+
+   C_17 : aliased constant String := "<query-mapping package='Porion.Builds.Mod"
        & "els'>" & ASCII.LF & "    <description>" & ASCII.LF & "        Provide pr"
        & "oject build status" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF
        & "    <class name=""Porion.Builds.Models.Build_Status"" bean=""yes"">" & ASCII.LF
@@ -442,7 +670,7 @@ package body Porion.Resources.Queries is
        & " sb WHERE sb.recipe_id = recipe.id))" & ASCII.LF & "        </sql>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_12 : aliased constant String := "<query-mapping package='AWA.Events.Models"
+   C_18 : aliased constant String := "<query-mapping package='AWA.Events.Models"
        & "'>" & ASCII.LF & "    <description>" & ASCII.LF & "      Get the list of"
        & " messages" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF & " "
        & "   <query name='queue-pending-message'>" & ASCII.LF & "       <comment>G"
@@ -460,7 +688,42 @@ package body Porion.Resources.Queries is
        & "iority DESC, m.id ASC LIMIT :max" & ASCII.LF & "       </sql>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_13 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_19 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+       & "    <description>" & ASCII.LF & "        Stats for the tests executed in"
+       & " builds" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF & "   "
+       & " <class name=""Porion.Queries.Build_Metric_Info"" bean=""yes"">" & ASCII.LF
+       & "        <comment>Build metrics.</comment>" & ASCII.LF & "        <proper"
+       & "ty type='Integer' name=""build_id"">" & ASCII.LF & "            <comment"
+       & ">the build id.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Natural' name=""build_number"">" & ASCII.LF & " "
+       & "           <comment>the build number.</comment>" & ASCII.LF & "        <"
+       & "/property>" & ASCII.LF & "        <property type='Date' name=""build_dat"
+       & "e"" not-null=""no"">" & ASCII.LF & "            <comment>the build start"
+       & "ing date.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "  "
+       & "      <property type='Porion.Builds.Models.Build_Status_Type' name=""bui"
+       & "ld_status"">" & ASCII.LF & "            <comment>the build status.</comm"
+       & "ent>" & ASCII.LF & "        </property>" & ASCII.LF & "        <property"
+       & " type='String' name=""metric"">" & ASCII.LF & "            <comment>the "
+       & "metric name.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & " "
+       & "       <property type='Integer' name=""value"">" & ASCII.LF & "         "
+       & "   <comment>the metric value.</comment>" & ASCII.LF & "        </propert"
+       & "y>" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF & "    <query nam"
+       & "e='report-build-metrics'>" & ASCII.LF & "        <comment>The build metr"
+       & "ics for a given metric kind</comment>" & ASCII.LF & ASCII.HT & "<sql>" & ASCII.LF
+       & ASCII.HT & "  SELECT" & ASCII.LF & "          build.id AS build_id," & ASCII.LF
+       & ASCII.HT & "  build.number AS build_number," & ASCII.LF & "          bui"
+       & "ld.create_date AS build_date," & ASCII.LF & "          build.status AS b"
+       & "uild_status," & ASCII.LF & ASCII.HT & "  metric.name," & ASCII.LF & "  "
+       & "        mb.value AS value" & ASCII.LF & ASCII.HT & "  FROM porion_build"
+       & " AS build" & ASCII.LF & ASCII.HT & "  INNER JOIN porion_build_metric as"
+       & " mb ON mb.build_id = build.id" & ASCII.LF & ASCII.HT & "  INNER JOIN po"
+       & "rion_metric AS metric ON mb.metric_id = metric.id AND metric.metric = :m"
+       & "etric" & ASCII.LF & ASCII.HT & "  WHERE build.project_id = :project_id" & ASCII.LF
+       & ASCII.HT & "  ORDER BY build.number ASC" & ASCII.LF & ASCII.HT & "</sql"
+       & ">" & ASCII.LF & "    </query> " & ASCII.LF & ASCII.LF & "</query-mappin"
+       & "g>" & ASCII.LF;
+
+   C_20 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List the build queues" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
        & "ueries.Queue_Info"" bean=""yes"">" & ASCII.LF & "        <comment>Inform"
@@ -554,14 +817,14 @@ package body Porion.Resources.Queries is
        & "ue for a given build node</comment>" & ASCII.LF & "        <sql>" & ASCII.LF
        & "            SELECT" & ASCII.LF & "            queue.id AS id," & ASCII.LF
        & "            queue.`order` AS `order`," & ASCII.LF & "            queue.c"
-       & "reation_date AS create_date," & ASCII.LF & "            queue.building A"
-       & "S building," & ASCII.LF & "            project.name AS name," & ASCII.LF
-       & "            project.status AS status," & ASCII.LF & "            branch."
-       & "name AS branch_name," & ASCII.LF & "            branch.tag AS branch_tag"
-       & "," & ASCII.LF & "            branch.status AS branch_status," & ASCII.LF
-       & "            recipe.id AS recipe_id," & ASCII.LF & "            recipe.na"
-       & "me AS recipe_name," & ASCII.LF & "            recipe.status AS recipe_st"
-       & "atus," & ASCII.LF & "            recipe.main_recipe AS main_recipe," & ASCII.LF
+       & "reate_date AS create_date," & ASCII.LF & "            queue.building AS "
+       & "building," & ASCII.LF & "            project.name AS name," & ASCII.LF & " "
+       & "           project.status AS status," & ASCII.LF & "            branch.n"
+       & "ame AS branch_name," & ASCII.LF & "            branch.tag AS branch_tag,"
+       & ASCII.LF & "            branch.status AS branch_status," & ASCII.LF & " "
+       & "           recipe.id AS recipe_id," & ASCII.LF & "            recipe.nam"
+       & "e AS recipe_name," & ASCII.LF & "            recipe.status AS recipe_sta"
+       & "tus," & ASCII.LF & "            recipe.main_recipe AS main_recipe," & ASCII.LF
        & "            node.name AS node_name," & ASCII.LF & "            node.stat"
        & "us AS node_status" & ASCII.LF & "            FROM porion_build_queue AS "
        & "queue" & ASCII.LF & "            INNER JOIN porion_node AS node ON queue"
@@ -574,7 +837,7 @@ package body Porion.Resources.Queries is
        & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</"
        & "query-mapping>" & ASCII.LF;
 
-   C_14 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_21 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of build steps with the ex"
        & "ecution time" & ASCII.LF & "    </description>" & ASCII.LF & " " & ASCII.LF
        & "    <class name=""Porion.Queries.Build_Step_Info"" bean=""yes"">" & ASCII.LF
@@ -589,13 +852,15 @@ package body Porion.Resources.Queries is
        & " </property>" & ASCII.LF & "        <property type='Porion.Builds.Step_T"
        & "ype' name=""kind"">" & ASCII.LF & "            <comment>the recipe step "
        & "type.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "      "
-       & "  <property type='Porion.Builds.Models.Execution_Type' name=""execution"""
-       & ">" & ASCII.LF & "            <comment>the recipe execution mode.</commen"
-       & "t>" & ASCII.LF & "        </property>" & ASCII.LF & "        <property t"
-       & "ype='Date' name=""start_date"">" & ASCII.LF & "            <comment>the "
-       & "start date.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & " "
-       & "       <property type='Nullable_Date' name=""end_date"" not-null=""no"">"
-       & ASCII.LF & "            <comment>the finish date.</comment>" & ASCII.LF
+       & "  <property type='Porion.Builds.Execution_Type' name=""execution"">" & ASCII.LF
+       & "            <comment>the recipe execution mode.</comment>" & ASCII.LF & " "
+       & "       </property>" & ASCII.LF & "        <property type='String' name="""
+       & "parameters"">" & ASCII.LF & "            <comment>the recipe parameters."
+       & "</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <pr"
+       & "operty type='Date' name=""start_date"">" & ASCII.LF & "            <comm"
+       & "ent>the start date.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Nullable_Date' name=""end_date"" not-null=""no"""
+       & ">" & ASCII.LF & "            <comment>the finish date.</comment>" & ASCII.LF
        & "        </property>" & ASCII.LF & "        <property type='Integer' name"
        & "=""status"">" & ASCII.LF & "            <comment>the execution status.</"
        & "comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <prop"
@@ -612,23 +877,61 @@ package body Porion.Resources.Queries is
        & ">" & ASCII.LF & "            SELECT" & ASCII.LF & "            recipe_st"
        & "ep.id," & ASCII.LF & "            recipe_step.number," & ASCII.LF & "   "
        & "         recipe_step.builder," & ASCII.LF & "            recipe_step.ste"
-       & "p," & ASCII.LF & "            recipe_step.execution," & ASCII.LF & "    "
-       & "        build_step.start_date," & ASCII.LF & "            build_step.end"
-       & "_date," & ASCII.LF & "            build_step.exit_status," & ASCII.LF & " "
-       & "           build_step.user_time," & ASCII.LF & "            build_step.s"
-       & "ys_time," & ASCII.LF & "            build_step.step_duration" & ASCII.LF
-       & "            FROM porion_build_step AS build_step" & ASCII.LF & "        "
-       & "    INNER JOIN porion_recipe_step as recipe_step ON build_step.recipe_st"
-       & "ep_id = recipe_step.id" & ASCII.LF & "            WHERE build_step.build"
-       & "_id = :build_id" & ASCII.LF & "            ORDER BY build_step.id ASC" & ASCII.LF
-       & "        </sql>" & ASCII.LF & "        <sql-count>" & ASCII.LF & "       "
-       & "     SELECT" & ASCII.LF & "            count(build_step.id)" & ASCII.LF
-       & "            FROM porion_build_step AS build_step" & ASCII.LF & "        "
-       & "    WHERE build_step.build_id = :build_id" & ASCII.LF & "        </sql-c"
-       & "ount>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</query-map"
-       & "ping>" & ASCII.LF;
+       & "p," & ASCII.LF & "            recipe_step.execution," & ASCII.LF & ASCII.HT
+       & "    recipe_step.parameters," & ASCII.LF & "            build_step.start_"
+       & "date," & ASCII.LF & "            build_step.end_date," & ASCII.LF & "   "
+       & "         build_step.exit_status," & ASCII.LF & "            build_step.u"
+       & "ser_time," & ASCII.LF & "            build_step.sys_time," & ASCII.LF & " "
+       & "           build_step.step_duration" & ASCII.LF & "            FROM pori"
+       & "on_build_step AS build_step" & ASCII.LF & "            INNER JOIN porion"
+       & "_recipe_step as recipe_step ON build_step.recipe_step_id = recipe_step.i"
+       & "d" & ASCII.LF & "            WHERE build_step.build_id = :build_id" & ASCII.LF
+       & "            ORDER BY build_step.id ASC" & ASCII.LF & "        </sql>" & ASCII.LF
+       & "        <sql-count>" & ASCII.LF & "            SELECT" & ASCII.LF & "   "
+       & "         count(build_step.id)" & ASCII.LF & "            FROM porion_bui"
+       & "ld_step AS build_step" & ASCII.LF & "            WHERE build_step.build_"
+       & "id = :build_id" & ASCII.LF & "        </sql-count>" & ASCII.LF & "    </"
+       & "query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_15 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_22 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+       & "    <description>" & ASCII.LF & "        Stats for the tests executed in"
+       & " builds" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF & "   "
+       & " <class name=""Porion.Queries.Build_Test_Info"" bean=""yes"">" & ASCII.LF
+       & "        <comment>Statistics about a tests executed during the builds.</c"
+       & "omment>" & ASCII.LF & "        <property type='Integer' name=""build_id"""
+       & ">" & ASCII.LF & "            <comment>the build id.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Natural' name"
+       & "=""build_number"">" & ASCII.LF & "            <comment>the build number."
+       & "</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <pr"
+       & "operty type='Date' name=""build_date"" not-null=""no"">" & ASCII.LF & " "
+       & "           <comment>the build starting date.</comment>" & ASCII.LF & "  "
+       & "      </property>" & ASCII.LF & "        <property type='Porion.Builds.M"
+       & "odels.Build_Status_Type' name=""build_status"">" & ASCII.LF & "         "
+       & "   <comment>the build status.</comment>" & ASCII.LF & "        </propert"
+       & "y>" & ASCII.LF & "        <property type='Natural' name=""pass_count"">" & ASCII.LF
+       & "            <comment>the total number of tests that passed.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Natural' name"
+       & "=""fail_count"">" & ASCII.LF & "            <comment>the total number of"
+       & " tests that failed.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Natural' name=""timeout_count"">" & ASCII.LF & " "
+       & "           <comment>the total number of tests that timeout.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Natural' name"
+       & "=""test_duration"">" & ASCII.LF & "            <comment>the total durati"
+       & "on of all tests.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "    </class>" & ASCII.LF & ASCII.LF & "    <query name='stat-tests'>" & ASCII.LF
+       & "        <comment>Statistics about the last project builds</comment>" & ASCII.LF
+       & "        <sql>" & ASCII.LF & "          SELECT" & ASCII.LF & "          b"
+       & "uild.id AS build_id," & ASCII.LF & ASCII.HT & "  build.number AS build_"
+       & "number," & ASCII.LF & "          build.create_date AS build_date," & ASCII.LF
+       & "          build.status AS build_status," & ASCII.LF & "          build.p"
+       & "ass_count AS pass_count," & ASCII.LF & "          build.fail_count AS fa"
+       & "il_count," & ASCII.LF & "          build.timeout_count AS timeout_count,"
+       & ASCII.LF & "          build.test_duration AS test_duration" & ASCII.LF & " "
+       & "         FROM porion_build AS build" & ASCII.LF & "          WHERE build"
+       & ".project_id = :project_id" & ASCII.LF & "        </sql>" & ASCII.LF & " "
+       & "   </query> " & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+
+   C_23 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of builds" & ASCII.LF & " "
        & "   </description>" & ASCII.LF & " " & ASCII.LF & "    <class name=""Pori"
        & "on.Queries.Build_Info"" bean=""yes"">" & ASCII.LF & "        <comment>In"
@@ -693,10 +996,11 @@ package body Porion.Resources.Queries is
        & "ON branch.id = build.branch_id" & ASCII.LF & "            INNER JOIN por"
        & "ion_recipe AS recipe ON build.recipe_id = recipe.id" & ASCII.LF & "     "
        & "       INNER JOIN porion_node AS node ON build.node_id = node.id" & ASCII.LF
-       & "            ORDER BY finish_date DESC" & ASCII.LF & "        </sql>" & ASCII.LF
-       & "        <sql-count>" & ASCII.LF & "            SELECT" & ASCII.LF & "   "
-       & "         count(build.id)" & ASCII.LF & "            FROM porion_build AS"
-       & " build" & ASCII.LF & "        </sql-count>" & ASCII.LF & "    </query>" & ASCII.LF
+       & "            ORDER BY CASE WHEN finish_date IS NULL THEN build_date ELSE "
+       & "finish_date END DESC" & ASCII.LF & "        </sql>" & ASCII.LF & "      "
+       & "  <sql-count>" & ASCII.LF & "            SELECT" & ASCII.LF & "         "
+       & "   count(build.id)" & ASCII.LF & "            FROM porion_build AS build"
+       & ASCII.LF & "        </sql-count>" & ASCII.LF & "    </query>" & ASCII.LF
        & ASCII.LF & "   <query name='project-last-build-list'>" & ASCII.LF & "   "
        & "     <comment>Get the list of builds</comment>" & ASCII.LF & "        <s"
        & "ql>" & ASCII.LF & "            SELECT" & ASCII.LF & "            project"
@@ -720,10 +1024,58 @@ package body Porion.Resources.Queries is
        & "ipe AS recipe ON build.recipe_id = recipe.id" & ASCII.LF & "            "
        & "INNER JOIN porion_node AS node ON build.node_id = node.id" & ASCII.LF & " "
        & "           WHERE project.id = :project_id" & ASCII.LF & "            ORD"
-       & "ER BY finish_date DESC" & ASCII.LF & "        </sql>" & ASCII.LF & "    "
-       & "</query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+       & "ER BY CASE WHEN finish_date IS NULL THEN build_date ELSE finish_date END"
+       & " DESC" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF
+       & ASCII.LF & "   <query name='project-build-list'>" & ASCII.LF & "        "
+       & "<comment>Get the list of builds for a project</comment>" & ASCII.LF & " "
+       & "       <sql>" & ASCII.LF & "            SELECT" & ASCII.LF & "          "
+       & "  project.name AS name," & ASCII.LF & "            project.status AS sta"
+       & "tus," & ASCII.LF & "            branch.name AS branch_name," & ASCII.LF
+       & "            branch.status AS branch_status," & ASCII.LF & "            n"
+       & "ode.name AS node_name," & ASCII.LF & "            recipe.name AS recipe_"
+       & "name," & ASCII.LF & "            build.id AS build_id," & ASCII.LF & "  "
+       & "          build.number AS number," & ASCII.LF & "            build.tag A"
+       & "S tag," & ASCII.LF & "            build.status AS build_status," & ASCII.LF
+       & "            build.create_date AS build_date," & ASCII.LF & "            "
+       & "build.finish_date AS finish_date," & ASCII.LF & "            build.build"
+       & "_duration AS build_duration," & ASCII.LF & "            build.pass_count"
+       & " AS pass_count," & ASCII.LF & "            build.fail_count AS fail_coun"
+       & "t," & ASCII.LF & "            build.timeout_count AS timeout_count" & ASCII.LF
+       & "            FROM porion_build AS build" & ASCII.LF & "            INNER "
+       & "JOIN porion_project AS project ON build.project_id = project.id" & ASCII.LF
+       & "            INNER JOIN porion_branch AS branch ON branch.id = build.bran"
+       & "ch_id" & ASCII.LF & "            INNER JOIN porion_recipe AS recipe ON b"
+       & "uild.recipe_id = recipe.id" & ASCII.LF & "            INNER JOIN porion_"
+       & "node AS node ON build.node_id = node.id" & ASCII.LF & "            WHERE"
+       & " project.id = :project_id" & ASCII.LF & "            ORDER BY CASE WHEN "
+       & "finish_date IS NULL THEN build_date ELSE finish_date END DESC" & ASCII.LF
+       & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "  "
+       & " <query name='node-build-list'>" & ASCII.LF & "        <comment>Get the "
+       & "list of builds for a build node</comment>" & ASCII.LF & "        <sql>" & ASCII.LF
+       & "            SELECT" & ASCII.LF & "            project.name AS name," & ASCII.LF
+       & "            project.status AS status," & ASCII.LF & "            branch."
+       & "name AS branch_name," & ASCII.LF & "            branch.status AS branch_"
+       & "status," & ASCII.LF & "            node.name AS node_name," & ASCII.LF & " "
+       & "           recipe.name AS recipe_name," & ASCII.LF & "            build."
+       & "id AS build_id," & ASCII.LF & "            build.number AS number," & ASCII.LF
+       & "            build.tag AS tag," & ASCII.LF & "            build.status AS"
+       & " build_status," & ASCII.LF & "            build.create_date AS build_dat"
+       & "e," & ASCII.LF & "            build.finish_date AS finish_date," & ASCII.LF
+       & "            build.build_duration AS build_duration," & ASCII.LF & "     "
+       & "       build.pass_count AS pass_count," & ASCII.LF & "            build."
+       & "fail_count AS fail_count," & ASCII.LF & "            build.timeout_count"
+       & " AS timeout_count" & ASCII.LF & "            FROM porion_build AS build" & ASCII.LF
+       & "            INNER JOIN porion_project AS project ON build.project_id = p"
+       & "roject.id" & ASCII.LF & "            INNER JOIN porion_branch AS branch "
+       & "ON branch.id = build.branch_id" & ASCII.LF & "            INNER JOIN por"
+       & "ion_recipe AS recipe ON build.recipe_id = recipe.id" & ASCII.LF & "     "
+       & "       INNER JOIN porion_node AS node ON build.node_id = node.id" & ASCII.LF
+       & "            WHERE build.node_id = :node_id" & ASCII.LF & "            OR"
+       & "DER BY CASE WHEN finish_date IS NULL THEN build_date ELSE finish_date EN"
+       & "D DESC" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF
+       & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_16 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_24 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of environment variables" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
        & "ueries.Environment_Info"" bean=""yes"">" & ASCII.LF & "        <comment>"
@@ -780,7 +1132,7 @@ package body Porion.Resources.Queries is
        & "R env.project_id IS NULL" & ASCII.LF & "        </sql-count>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_17 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_25 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of builds" & ASCII.LF & " "
        & "   </description>" & ASCII.LF & " " & ASCII.LF & "    <class name=""Pori"
        & "on.Queries.Node_Info"" bean=""yes"">" & ASCII.LF & "        <comment>Inf"
@@ -848,20 +1200,22 @@ package body Porion.Resources.Queries is
        & "            ORDER BY node.name" & ASCII.LF & "        </sql>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_18 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_26 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of projects" & ASCII.LF & " "
        & "   </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Qu"
        & "eries.Project_Info"" bean=""yes"">" & ASCII.LF & "        <comment>Infor"
        & "mation about a project.</comment>" & ASCII.LF & "        <property type="
-       & "'String' name=""name"">" & ASCII.LF & "            <comment>the project "
-       & "name.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "      "
-       & "  <property type='Porion.Projects.Models.Project_Status_Type' name=""pro"
-       & "ject_status"">" & ASCII.LF & "            <comment>the project status.</"
-       & "comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <prop"
-       & "erty type='Porion.Permille_Type' name=""build_progress"">" & ASCII.LF & " "
-       & "           <comment>the build progress (how much pending build have been"
-       & " made).</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "    "
-       & "    <property type='Porion.Permille_Type' name=""build_rate"">" & ASCII.LF
+       & "'ADO.Identifier' name=""project_id"">" & ASCII.LF & "            <commen"
+       & "t>the project id.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='String' name=""name"">" & ASCII.LF & "          "
+       & "  <comment>the project name.</comment>" & ASCII.LF & "        </property"
+       & ">" & ASCII.LF & "        <property type='Porion.Projects.Models.Project_"
+       & "Status_Type' name=""project_status"">" & ASCII.LF & "            <commen"
+       & "t>the project status.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Porion.Permille_Type' name=""build_progress"">" & ASCII.LF
+       & "            <comment>the build progress (how much pending build have bee"
+       & "n made).</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "   "
+       & "     <property type='Porion.Permille_Type' name=""build_rate"">" & ASCII.LF
        & "            <comment>the build success rate (how much success on builds)"
        & ".</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <p"
        & "roperty type='Porion.Permille_Type' name=""pass_rate"">" & ASCII.LF & " "
@@ -900,39 +1254,12 @@ package body Porion.Resources.Queries is
        & "ts that timeout.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
        & "    </class>" & ASCII.LF & ASCII.LF & "    <query name='project-list'>" & ASCII.LF
        & "        <comment>Get the list of projects</comment>" & ASCII.LF & "     "
-       & "   <sql>" & ASCII.LF & "            SELECT" & ASCII.LF & "            pr"
-       & "oject.name AS name," & ASCII.LF & "            project.status AS status,"
-       & ASCII.LF & "            project.build_progress AS build_progress," & ASCII.LF
-       & "            project.build_rate AS build_rate," & ASCII.LF & "           "
-       & " project.pass_rate AS pass_rate," & ASCII.LF & "            project.fail"
-       & "_rate AS fail_rate," & ASCII.LF & "            project.timeout_rate AS t"
-       & "imeout_rate," & ASCII.LF & "            COALESCE(branch.name, '') AS bra"
-       & "nch_name," & ASCII.LF & "            COALESCE(branch.tag, '') AS branch_"
-       & "tag," & ASCII.LF & "            COALESCE(branch.status, 0) AS branch_sta"
-       & "tus," & ASCII.LF & "            build.finish_date AS build_date," & ASCII.LF
-       & "            COALESCE(build.status, 0) AS build_status," & ASCII.LF & "  "
-       & "          COALESCE(build.tag, '') AS build_tag," & ASCII.LF & "         "
-       & "   COALESCE(build.number, 0) AS build_number," & ASCII.LF & "           "
-       & " COALESCE(build.pass_count, 0) AS pass_count," & ASCII.LF & "           "
-       & " COALESCE(build.fail_count, 0) AS fail_count," & ASCII.LF & "           "
-       & " COALESCE(build.timeout_count, 0) AS timeout_count" & ASCII.LF & "      "
-       & "      FROM porion_project AS project" & ASCII.LF & "            LEFT JOI"
-       & "N porion_branch AS branch ON project.id = branch.project_id AND branch.s"
-       & "tatus != 0" & ASCII.LF & "            LEFT JOIN porion_last_build AS las"
-       & "t_build ON last_build.branch_id = branch.id AND last_build.last_build = "
-       & "1" & ASCII.LF & "            LEFT JOIN porion_build AS build ON last_bui"
-       & "ld.build_id = build.id" & ASCII.LF & "        </sql>" & ASCII.LF & "    "
-       & "    <sql-count>" & ASCII.LF & "            SELECT" & ASCII.LF & "       "
-       & "     count(project.id)" & ASCII.LF & "            FROM porion_project AS"
-       & " project" & ASCII.LF & "        </sql-count>" & ASCII.LF & "    </query>"
-       & ASCII.LF & ASCII.LF & "    <query name='project-dependency-list'>" & ASCII.LF
-       & "        <comment>Get the list of projects that another project depend on"
-       & "</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & "            SELEC"
-       & "T" & ASCII.LF & "            project.name AS name," & ASCII.LF & "      "
-       & "      project.status AS status," & ASCII.LF & "            project.build"
-       & "_progress AS build_progress," & ASCII.LF & "            project.build_ra"
-       & "te AS build_rate," & ASCII.LF & "            project.pass_rate AS pass_r"
-       & "ate," & ASCII.LF & "            project.fail_rate AS fail_rate," & ASCII.LF
+       & "   <sql>" & ASCII.LF & "          SELECT" & ASCII.LF & "            proj"
+       & "ect.id AS id," & ASCII.LF & "            project.name AS name," & ASCII.LF
+       & "            project.status AS status," & ASCII.LF & "            project"
+       & ".build_progress AS build_progress," & ASCII.LF & "            project.bu"
+       & "ild_rate AS build_rate," & ASCII.LF & "            project.pass_rate AS "
+       & "pass_rate," & ASCII.LF & "            project.fail_rate AS fail_rate," & ASCII.LF
        & "            project.timeout_rate AS timeout_rate," & ASCII.LF & "       "
        & "     COALESCE(branch.name, '') AS branch_name," & ASCII.LF & "          "
        & "  COALESCE(branch.tag, '') AS branch_tag," & ASCII.LF & "            COA"
@@ -943,24 +1270,163 @@ package body Porion.Resources.Queries is
        & ") AS build_number," & ASCII.LF & "            COALESCE(build.pass_count,"
        & " 0) AS pass_count," & ASCII.LF & "            COALESCE(build.fail_count,"
        & " 0) AS fail_count," & ASCII.LF & "            COALESCE(build.timeout_cou"
-       & "nt, 0) AS timeout_count" & ASCII.LF & "            FROM porion_dependenc"
-       & "y AS dependency" & ASCII.LF & "            INNER JOIN porion_project AS "
-       & "project ON dependency.project_id = project.id" & ASCII.LF & "           "
-       & " LEFT JOIN porion_branch AS branch ON project.id = branch.project_id AND"
-       & " branch.status != 0" & ASCII.LF & "            LEFT JOIN porion_last_bui"
-       & "ld AS last_build ON last_build.branch_id = branch.id AND last_build.last"
-       & "_build = 1" & ASCII.LF & "            LEFT JOIN porion_build AS build ON"
-       & " last_build.build_id = build.id" & ASCII.LF & "            WHERE depende"
-       & "ncy.owner_id = :project_id AND" & ASCII.LF & "            (build.id IS N"
-       & "ULL OR build.id IN (SELECT MAX(sb.build_id) FROM porion_last_build AS sb"
-       & ASCII.LF & "                INNER JOIN porion_branch AS br ON sb.branch_"
-       & "id = br.id WHERE br.project_id = project.id))" & ASCII.LF & "        </s"
-       & "ql>" & ASCII.LF & "        <sql-count>" & ASCII.LF & "            SELECT"
-       & ASCII.LF & "            count(project.id)" & ASCII.LF & "            FRO"
-       & "M porion_project AS project" & ASCII.LF & "        </sql-count>" & ASCII.LF
+       & "nt, 0) AS timeout_count" & ASCII.LF & "            FROM porion_project A"
+       & "S project" & ASCII.LF & "            LEFT JOIN porion_branch AS branch O"
+       & "N project.id = branch.project_id AND branch.status != 0" & ASCII.LF & " "
+       & "           LEFT JOIN porion_last_build AS last_build ON last_build.branc"
+       & "h_id = branch.id AND last_build.last_build = 1" & ASCII.LF & "          "
+       & "  LEFT JOIN porion_build AS build ON last_build.build_id = build.id" & ASCII.LF
+       & "        </sql>" & ASCII.LF & "        <sql-count>" & ASCII.LF & "       "
+       & "     SELECT" & ASCII.LF & "            count(project.id)" & ASCII.LF & " "
+       & "           FROM porion_project AS project" & ASCII.LF & "        </sql-c"
+       & "ount>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "    <query "
+       & "name='project-summary-list'>" & ASCII.LF & "        <comment>Get the lis"
+       & "t of projects (summary)</comment>" & ASCII.LF & "        <sql>" & ASCII.LF
+       & "          SELECT" & ASCII.LF & "            project.id AS id," & ASCII.LF
+       & "            project.name AS name," & ASCII.LF & "            project.sta"
+       & "tus AS status," & ASCII.LF & "            project.build_progress AS buil"
+       & "d_progress," & ASCII.LF & "            project.build_rate AS build_rate,"
+       & ASCII.LF & "            project.pass_rate AS pass_rate," & ASCII.LF & " "
+       & "           project.fail_rate AS fail_rate," & ASCII.LF & "            pr"
+       & "oject.timeout_rate AS timeout_rate," & ASCII.LF & "            COALESCE("
+       & "branch.name, '') AS branch_name," & ASCII.LF & "            COALESCE(bra"
+       & "nch.tag, '') AS branch_tag," & ASCII.LF & "            COALESCE(branch.s"
+       & "tatus, 0) AS branch_status," & ASCII.LF & "            build.finish_date"
+       & " AS build_date," & ASCII.LF & "            COALESCE(build.status, 0) AS "
+       & "build_status," & ASCII.LF & "            COALESCE(build.tag, '') AS buil"
+       & "d_tag," & ASCII.LF & "            MAX(COALESCE(build.number, 0)) AS buil"
+       & "d_number," & ASCII.LF & "            MAX(COALESCE(build.pass_count, 0)) "
+       & "AS pass_count," & ASCII.LF & "            MAX(COALESCE(build.fail_count,"
+       & " 0)) AS fail_count," & ASCII.LF & "            MAX(COALESCE(build.timeou"
+       & "t_count, 0)) AS timeout_count" & ASCII.LF & "            FROM porion_pro"
+       & "ject AS project" & ASCII.LF & "            LEFT JOIN porion_branch AS br"
+       & "anch ON project.id = branch.project_id AND branch.status != 0" & ASCII.LF
+       & "            LEFT JOIN porion_last_build AS last_build ON last_build.bran"
+       & "ch_id = branch.id AND last_build.last_build = 1" & ASCII.LF & "         "
+       & "   LEFT JOIN porion_build AS build ON last_build.build_id = build.id" & ASCII.LF
+       & "            GROUP BY project.name" & ASCII.LF & "        </sql>" & ASCII.LF
+       & "        <sql-count>" & ASCII.LF & "            SELECT" & ASCII.LF & "   "
+       & "         count(project.id)" & ASCII.LF & "            FROM porion_projec"
+       & "t AS project" & ASCII.LF & "        </sql-count>" & ASCII.LF & "    </qu"
+       & "ery>" & ASCII.LF & ASCII.LF & "    <query name='project-dependency-list"
+       & "'>" & ASCII.LF & "        <comment>Get the list of projects that another"
+       & " project depend on</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & " "
+       & "         SELECT" & ASCII.LF & "            project.id AS id," & ASCII.LF
+       & "            project.name AS name," & ASCII.LF & "            project.sta"
+       & "tus AS status," & ASCII.LF & "            project.build_progress AS buil"
+       & "d_progress," & ASCII.LF & "            project.build_rate AS build_rate,"
+       & ASCII.LF & "            project.pass_rate AS pass_rate," & ASCII.LF & " "
+       & "           project.fail_rate AS fail_rate," & ASCII.LF & "            pr"
+       & "oject.timeout_rate AS timeout_rate," & ASCII.LF & "            COALESCE("
+       & "branch.name, '') AS branch_name," & ASCII.LF & "            COALESCE(bra"
+       & "nch.tag, '') AS branch_tag," & ASCII.LF & "            COALESCE(branch.s"
+       & "tatus, 0) AS branch_status," & ASCII.LF & "            build.finish_date"
+       & " AS build_date," & ASCII.LF & "            COALESCE(build.status, 0) AS "
+       & "build_status," & ASCII.LF & "            COALESCE(build.tag, '') AS buil"
+       & "d_tag," & ASCII.LF & "            COALESCE(build.number, 0) AS build_num"
+       & "ber," & ASCII.LF & "            COALESCE(build.pass_count, 0) AS pass_co"
+       & "unt," & ASCII.LF & "            COALESCE(build.fail_count, 0) AS fail_co"
+       & "unt," & ASCII.LF & "            COALESCE(build.timeout_count, 0) AS time"
+       & "out_count" & ASCII.LF & "            FROM porion_dependency AS dependenc"
+       & "y" & ASCII.LF & "            INNER JOIN porion_project AS project ON dep"
+       & "endency.project_id = project.id" & ASCII.LF & "            LEFT JOIN por"
+       & "ion_branch AS branch ON project.id = branch.project_id AND branch.status"
+       & " != 0" & ASCII.LF & "            LEFT JOIN porion_last_build AS last_bui"
+       & "ld ON last_build.branch_id = branch.id AND last_build.last_build = 1" & ASCII.LF
+       & "            LEFT JOIN porion_build AS build ON last_build.build_id = bui"
+       & "ld.id" & ASCII.LF & "            WHERE dependency.owner_id = :project_id"
+       & " AND" & ASCII.LF & "            (build.id IS NULL OR build.id IN (SELECT"
+       & " MAX(sb.build_id) FROM porion_last_build AS sb" & ASCII.LF & "          "
+       & "      INNER JOIN porion_branch AS br ON sb.branch_id = br.id WHERE br.pr"
+       & "oject_id = project.id))" & ASCII.LF & "        </sql>" & ASCII.LF & "   "
+       & "     <sql-count>" & ASCII.LF & "            SELECT" & ASCII.LF & "      "
+       & "      count(project.id)" & ASCII.LF & "            FROM porion_project A"
+       & "S project" & ASCII.LF & "        </sql-count>" & ASCII.LF & "    </query"
+       & ">" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+
+   C_27 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+       & "    <description>" & ASCII.LF & "        List of recipes for a project" & ASCII.LF
+       & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
+       & "ueries.Recipe_Info"" bean=""yes"">" & ASCII.LF & "        <comment>Infor"
+       & "mation about a recipe.</comment>" & ASCII.LF & "        <property type='"
+       & "ADO.Identifier' name=""id"">" & ASCII.LF & "            <comment>the rec"
+       & "ipe id.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "    "
+       & "    <property type='String' name=""name"">" & ASCII.LF & "            <c"
+       & "omment>the recipe name.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Porion.Builds.Models.Config_Status_Type' name="""
+       & "recipe_status"">" & ASCII.LF & "            <comment>the recipe status.<"
+       & "/comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <pro"
+       & "perty type='String' name=""node_name"">" & ASCII.LF & "            <comm"
+       & "ent>the build node name.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='ADO.Identifier' name=""branch_id"">" & ASCII.LF
+       & "            <comment>the branch id.</comment>" & ASCII.LF & "        </p"
+       & "roperty>" & ASCII.LF & "        <property type='String' name=""branch_na"
+       & "me"">" & ASCII.LF & "            <comment>the branch name.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='String' name="
+       & """branch_tag"">" & ASCII.LF & "            <comment>the branch tag.</com"
+       & "ment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <propert"
+       & "y type='Porion.Projects.Models.Branch_Status_Type' name=""branch_status"""
+       & ">" & ASCII.LF & "            <comment>the branch status.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Integer' name"
+       & "=""last_success_build"">" & ASCII.LF & "            <comment>the last su"
+       & "ccessful build number.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Integer' name=""last_fail_build"">" & ASCII.LF & " "
+       & "           <comment>the last failed build number.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Integer' name"
+       & "=""max_build_duration"">" & ASCII.LF & "            <comment>the max bui"
+       & "ld duration.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & " "
+       & "       <property type='Long' name=""sum_build_duration"">" & ASCII.LF & " "
+       & "           <comment>the sum of build duration.</comment>" & ASCII.LF & " "
+       & "       </property>" & ASCII.LF & "        <property type='Integer' name="
+       & """max_pass_count"">" & ASCII.LF & "            <comment>the number of te"
+       & "sts that succeeded.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Integer' name=""sum_pass_count"">" & ASCII.LF & " "
+       & "           <comment>the number of tests that succeeded.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Integer' name"
+       & "=""max_fail_count"">" & ASCII.LF & "            <comment>the number of t"
+       & "ests that failed.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Integer' name=""sum_fail_count"">" & ASCII.LF & " "
+       & "           <comment>the number of tests that failed.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Integer' name"
+       & "=""build_pass_count"">" & ASCII.LF & "            <comment>the number of"
+       & " builds that succeeded.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Integer' name=""build_fail_count"">" & ASCII.LF
+       & "            <comment>the number of builds that failed.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF
+       & "    <query name='recipe-list'>" & ASCII.LF & "        <comment>Get the l"
+       & "ist of recipes</comment>" & ASCII.LF & "        <sql>" & ASCII.LF & "   "
+       & "       SELECT" & ASCII.LF & "            recipe.id AS id," & ASCII.LF & " "
+       & "           recipe.name AS name," & ASCII.LF & "            recipe.status"
+       & " AS status," & ASCII.LF & "            node.name AS node_name," & ASCII.LF
+       & "            recipe.branch_id AS branch_id," & ASCII.LF & "            CO"
+       & "ALESCE(branch.name, '') AS branch_name," & ASCII.LF & "            COALE"
+       & "SCE(branch.tag, '') AS branch_tag," & ASCII.LF & "            COALESCE(b"
+       & "ranch.status, 0) AS branch_status," & ASCII.LF & "            COALESCE(M"
+       & "AX(build_ok.number), 0) AS last_build," & ASCII.LF & "            COALES"
+       & "CE(MAX(build_ko.number), 0) AS failed_build," & ASCII.LF & "            "
+       & "COALESCE(MAX(build_ok.build_duration), 0) AS max_duration," & ASCII.LF & " "
+       & "           COALESCE(SUM(build_ok.build_duration), 0) AS sum_duration," & ASCII.LF
+       & "            COALESCE(MAX(build_ok.pass_count), 0) AS pass_count," & ASCII.LF
+       & "            COALESCE(SUM(build_ok.pass_count), 0) AS sum_pass," & ASCII.LF
+       & "            COALESCE(MAX(build_ok.fail_count), 0) AS fail_count," & ASCII.LF
+       & "            COALESCE(SUM(build_ok.fail_count), 0) AS sum_fail," & ASCII.LF
+       & "            COUNT(distinct build_ok.id) AS ok_count," & ASCII.LF & "    "
+       & "        COUNT(distinct build_ko.id) AS ko_count" & ASCII.LF & "         "
+       & "   FROM porion_recipe AS recipe" & ASCII.LF & "            INNER JOIN po"
+       & "rion_branch AS branch ON recipe.branch_id = branch.id" & ASCII.LF & "   "
+       & "         INNER JOIN porion_node AS node ON recipe.node_id = node.id" & ASCII.LF
+       & "            LEFT JOIN porion_build AS build_ok ON recipe.id = build_ok.r"
+       & "ecipe_id AND build_ok.status = 2" & ASCII.LF & "            LEFT JOIN po"
+       & "rion_build AS build_ko ON recipe.id = build_ko.recipe_id AND build_ko.st"
+       & "atus != 2" & ASCII.LF & "            WHERE recipe.project_id = :project_"
+       & "id" & ASCII.LF & "            GROUP BY recipe.id, recipe.branch_id" & ASCII.LF
+       & "        </sql>" & ASCII.LF & "        <sql-count>" & ASCII.LF & "       "
+       & "     SELECT" & ASCII.LF & "            count(recipe.id)" & ASCII.LF & " "
+       & "           FROM porion_recipe AS recipe" & ASCII.LF & "            WHERE"
+       & " recipe.project_id = :project_id" & ASCII.LF & "        </sql-count>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_19 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_28 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List the tests" & ASCII.LF & " "
        & "   </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Qu"
        & "eries.Test_Info"" bean=""yes"">" & ASCII.LF & "        <comment>Informat"
@@ -981,30 +1447,74 @@ package body Porion.Resources.Queries is
        & " the test failed.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
        & "        <property type='Integer' name=""test_timeout_count"">" & ASCII.LF
        & "            <comment>the number of times the test timed out.</comment>" & ASCII.LF
-       & "        </property>" & ASCII.LF & "        <property type='Porion.Micros"
-       & "econd_Type' name=""test_duration"">" & ASCII.LF & "            <comment>"
-       & "the test duration.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
-       & "        <property type='Porion.XUnit.Models.Test_Status_Type' name=""tes"
-       & "t_status"">" & ASCII.LF & "            <comment>the test status.</commen"
-       & "t>" & ASCII.LF & "        </property>" & ASCII.LF & "    </class>" & ASCII.LF
-       & ASCII.LF & "    <query name='build-test-list'>" & ASCII.LF & "        <c"
-       & "omment>Get the list of tests for a build</comment>" & ASCII.LF & "      "
-       & "  <sql>" & ASCII.LF & "            SELECT" & ASCII.LF & "            grp"
-       & ".id AS id," & ASCII.LF & "            grp.name AS grp_name," & ASCII.LF
-       & "            test.id AS tid," & ASCII.LF & "            test.name AS test"
-       & "_name," & ASCII.LF & "            test.total_pass_count AS pass_count," & ASCII.LF
-       & "            test.total_fail_count AS fail_count," & ASCII.LF & "        "
-       & "    test.total_timeout_count AS timeout_count," & ASCII.LF & "          "
-       & "  run.duration AS duration," & ASCII.LF & "            run.status AS sta"
-       & "tus" & ASCII.LF & "            FROM porion_test_run_group AS rgrp" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Integer' name"
+       & "=""test_skip_count"">" & ASCII.LF & "            <comment>the number of "
+       & "times the test was skipped.</comment>" & ASCII.LF & "        </property>"
+       & ASCII.LF & "        <property type='Integer' name=""last_pass_build"">" & ASCII.LF
+       & "            <comment>the last build number where this test passed.</comm"
+       & "ent>" & ASCII.LF & "        </property>" & ASCII.LF & "        <property"
+       & " type='Integer' name=""last_fail_build"">" & ASCII.LF & "            <co"
+       & "mment>the last build number where this test failed.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Integer' name"
+       & "=""last_timeout_build"">" & ASCII.LF & "            <comment>the last bu"
+       & "ild number where this test timed out.</comment>" & ASCII.LF & "        <"
+       & "/property>" & ASCII.LF & "        <property type='Integer' name=""last_s"
+       & "kip_build"">" & ASCII.LF & "            <comment>the last build number w"
+       & "here this test was skipped.</comment>" & ASCII.LF & "        </property>"
+       & ASCII.LF & "        <property type='Porion.Microsecond_Type' name=""test"
+       & "_duration"">" & ASCII.LF & "            <comment>the test duration.</com"
+       & "ment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <propert"
+       & "y type='Porion.XUnit.Models.Test_Status_Type' name=""test_status"">" & ASCII.LF
+       & "            <comment>the test status.</comment>" & ASCII.LF & "        <"
+       & "/property>" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF & "    <q"
+       & "uery name='build-test-list'>" & ASCII.LF & "        <comment>Get the lis"
+       & "t of tests for a build</comment>" & ASCII.LF & "        <sql>" & ASCII.LF
+       & "            SELECT" & ASCII.LF & "            grp.id AS id," & ASCII.LF
+       & "            grp.name AS grp_name," & ASCII.LF & "            test.id AS "
+       & "tid," & ASCII.LF & "            test.name AS test_name," & ASCII.LF & " "
+       & "           test.total_pass_count AS pass_count," & ASCII.LF & "         "
+       & "   test.total_fail_count AS fail_count," & ASCII.LF & "            test."
+       & "total_timeout_count AS timeout_count," & ASCII.LF & ASCII.HT & "    tes"
+       & "t.total_skip_count AS skip_count," & ASCII.LF & ASCII.HT & "    COALESC"
+       & "E(test.last_pass_build, 0) AS pass_build," & ASCII.LF & ASCII.HT & "   "
+       & " COALESCE(test.last_fail_build, 0) AS fail_build," & ASCII.LF & ASCII.HT
+       & "    COALESCE(test.last_timeout_build, 0) AS timeout_build," & ASCII.LF & ASCII.HT
+       & "    COALESCE(test.last_skip_build, 0) AS skip_build," & ASCII.LF & "    "
+       & "        run.duration AS duration," & ASCII.LF & "            run.status "
+       & "AS status" & ASCII.LF & "            FROM porion_test_run_group AS rgrp" & ASCII.LF
        & "            INNER JOIN porion_test_group AS grp ON rgrp.group_id = grp.i"
        & "d" & ASCII.LF & "            INNER JOIN porion_test_run AS run ON run.gr"
        & "oup_id = rgrp.id" & ASCII.LF & "            INNER JOIN porion_test AS te"
        & "st ON run.test_id = test.id" & ASCII.LF & "            WHERE rgrp.build_"
-       & "id = :build_id" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>"
-       & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+       & "id = :build_id" & ASCII.LF & ASCII.HT & "    ORDER BY grp.name, test.na"
+       & "me" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF
+       & ASCII.LF & "    <query name='project-test-list'>" & ASCII.LF & "        "
+       & "<comment>Get the list of tests for a project</comment>" & ASCII.LF & "  "
+       & "      <sql>" & ASCII.LF & "            SELECT" & ASCII.LF & "           "
+       & " grp.id AS id," & ASCII.LF & "            grp.name AS grp_name," & ASCII.LF
+       & "            test.id AS tid," & ASCII.LF & "            test.name AS test"
+       & "_name," & ASCII.LF & "            test.total_pass_count AS pass_count," & ASCII.LF
+       & "            test.total_fail_count AS fail_count," & ASCII.LF & "        "
+       & "    test.total_timeout_count AS timeout_count," & ASCII.LF & ASCII.HT & " "
+       & "   test.total_skip_count AS skip_count," & ASCII.LF & ASCII.HT & "    C"
+       & "OALESCE(test.last_pass_build, 0) AS pass_build," & ASCII.LF & ASCII.HT
+       & "    COALESCE(test.last_fail_build, 0) AS fail_build," & ASCII.LF & ASCII.HT
+       & "    COALESCE(test.last_timeout_build, 0) AS timeout_build," & ASCII.LF & ASCII.HT
+       & "    COALESCE(test.last_skip_build, 0) AS skip_build," & ASCII.LF & "    "
+       & "        COALESCE(run.duration, 0) AS duration," & ASCII.LF & "          "
+       & "  COALESCE(run.status, 1) AS status" & ASCII.LF & "            FROM pori"
+       & "on_test_group AS grp" & ASCII.LF & "            INNER JOIN porion_test A"
+       & "S test ON grp.id = test.group_id" & ASCII.LF & ASCII.HT & "    LEFT JOI"
+       & "N porion_build AS build ON build.project_id = :project_id AND build.numb"
+       & "er = test.last_pass_build" & ASCII.LF & ASCII.HT & "    LEFT JOIN porio"
+       & "n_test_run_group AS rgrp ON rgrp.group_id = test.group_id AND rgrp.build"
+       & "_id = build.id" & ASCII.LF & "            LEFT JOIN porion_test_run AS r"
+       & "un ON run.test_id = test.id AND run.group_id = rgrp.id" & ASCII.LF & "  "
+       & "          WHERE grp.project_id = :project_id" & ASCII.LF & ASCII.HT & " "
+       & "   ORDER BY grp.name, test.name" & ASCII.LF & "        </sql>" & ASCII.LF
+       & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_20 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_29 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        Stats for the builds" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
        & "ueries.Build_Stat"" bean=""yes"">" & ASCII.LF & "        <comment>Statis"
@@ -1076,7 +1586,7 @@ package body Porion.Resources.Queries is
        & "        </sql>" & ASCII.LF & "    </query> " & ASCII.LF & ASCII.LF & "<"
        & "/query-mapping>" & ASCII.LF;
 
-   C_21 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_30 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        Stats with the build metrics" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
        & "ueries.Metric_Stat"" bean=""yes"">" & ASCII.LF & "        <comment>Stati"
@@ -1150,13 +1660,75 @@ package body Porion.Resources.Queries is
        & "          GROUP BY metric.name" & ASCII.LF & "        </sql>" & ASCII.LF
        & "    </query> " & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
+   C_31 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+       & "    <description>" & ASCII.LF & "        Stats for the builds" & ASCII.LF
+       & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
+       & "ueries.Node_Stat"" bean=""yes"">" & ASCII.LF & "        <comment>Statist"
+       & "ics about the usage of a build node.</comment>" & ASCII.LF & "        <p"
+       & "roperty type='Date' name=""day"" not-null=""yes"">" & ASCII.LF & "      "
+       & "      <comment>the build status.</comment>" & ASCII.LF & "        </prop"
+       & "erty>" & ASCII.LF & "        <property type='Porion.Builds.Models.Build_"
+       & "Status_Type' name=""build_status"">" & ASCII.LF & "            <comment>"
+       & "the build status.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='Natural' name=""count"">" & ASCII.LF & "        "
+       & "    <comment>the number of builds.</comment>" & ASCII.LF & "        </pr"
+       & "operty>" & ASCII.LF & "        <property type='Natural' name=""test_dura"
+       & "tion"">" & ASCII.LF & "            <comment>the total duration of all te"
+       & "sts.</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "       "
+       & " <property type='Porion.Millisecond_Type' name=""build_duration"" not-nu"
+       & "ll=""yes"">" & ASCII.LF & "            <comment>the total build duration"
+       & ".</comment>" & ASCII.LF & "        </property>" & ASCII.LF & "        <p"
+       & "roperty type='Porion.Millisecond_Type' name=""sys_time"" not-null=""yes"""
+       & ">" & ASCII.LF & "            <comment>the total system time.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Porion.Millis"
+       & "econd_Type' name=""user_time"" not-null=""yes"">" & ASCII.LF & "        "
+       & "    <comment>the total user time.</comment>" & ASCII.LF & "        </pro"
+       & "perty>" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF & "    <query"
+       & " name='stat-nodes'>" & ASCII.LF & "        <comment>Statistics about the"
+       & " usage of the build node over time</comment>" & ASCII.LF & "        <sql"
+       & ">" & ASCII.LF & "          SELECT" & ASCII.LF & "          strftime('%Y-"
+       & "%m-%d', build.create_date) AS date," & ASCII.LF & "          build.statu"
+       & "s AS status," & ASCII.LF & "          COUNT(build.id) AS cnt," & ASCII.LF
+       & "          SUM(build.test_duration) AS test_duration," & ASCII.LF & "    "
+       & "      SUM(build.build_duration) AS build_duration," & ASCII.LF & "      "
+       & "    SUM(build.sys_time) AS sys_time," & ASCII.LF & "          SUM(build."
+       & "user_time) AS user_time" & ASCII.LF & "          FROM porion_build AS bu"
+       & "ild" & ASCII.LF & "          WHERE build.node_id = :node_id" & ASCII.LF
+       & "          GROUP BY date, build.status" & ASCII.LF & "        </sql>" & ASCII.LF
+       & "    </query> " & ASCII.LF & ASCII.LF & "    <query name='stat-project-n"
+       & "odes'>" & ASCII.LF & "        <comment>Statistics about the usage of the"
+       & " all build nodes over time for a given project</comment>" & ASCII.LF & " "
+       & "       <sql>" & ASCII.LF & "          SELECT" & ASCII.LF & "          st"
+       & "rftime('%Y-%m-%d', build.create_date) AS date," & ASCII.LF & "          "
+       & "build.status AS status," & ASCII.LF & "          COUNT(build.id) AS cnt,"
+       & ASCII.LF & "          SUM(build.test_duration) AS test_duration," & ASCII.LF
+       & "          SUM(build.build_duration) AS build_duration," & ASCII.LF & "  "
+       & "        SUM(build.sys_time) AS sys_time," & ASCII.LF & "          SUM(bu"
+       & "ild.user_time) AS user_time" & ASCII.LF & "          FROM porion_build A"
+       & "S build" & ASCII.LF & "          WHERE build.project_id = :project_id" & ASCII.LF
+       & "          GROUP BY date, build.status" & ASCII.LF & "        </sql>" & ASCII.LF
+       & "    </query> " & ASCII.LF & ASCII.LF & "    <query name='stat-all-nodes"
+       & "'>" & ASCII.LF & "        <comment>Statistics about the usage of the all"
+       & " build nodes over time</comment>" & ASCII.LF & "        <sql>" & ASCII.LF
+       & "          SELECT" & ASCII.LF & "          strftime('%Y-%m-%d', build.cre"
+       & "ate_date) AS date," & ASCII.LF & "          build.status AS status," & ASCII.LF
+       & "          COUNT(build.id) AS cnt," & ASCII.LF & "          SUM(build.tes"
+       & "t_duration) AS test_duration," & ASCII.LF & "          SUM(build.build_d"
+       & "uration) AS build_duration," & ASCII.LF & "          SUM(build.sys_time)"
+       & " AS sys_time," & ASCII.LF & "          SUM(build.user_time) AS user_time"
+       & ASCII.LF & "          FROM porion_build AS build" & ASCII.LF & "        "
+       & "  GROUP BY date, build.status" & ASCII.LF & "        </sql>" & ASCII.LF
+       & "    </query> " & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+
 
    type Content_List_Array is array (Natural range <>) of access constant String;
    Contents : constant Content_List_Array := (
       C_0'Access, C_1'Access, C_2'Access, C_3'Access, C_4'Access, C_5'Access,
       C_6'Access, C_7'Access, C_8'Access, C_9'Access, C_10'Access, C_11'Access,
       C_12'Access, C_13'Access, C_14'Access, C_15'Access, C_16'Access, C_17'Access,
-      C_18'Access, C_19'Access, C_20'Access, C_21'Access);
+      C_18'Access, C_19'Access, C_20'Access, C_21'Access, C_22'Access, C_23'Access,
+      C_24'Access, C_25'Access, C_26'Access, C_27'Access, C_28'Access, C_29'Access,
+      C_30'Access, C_31'Access);
 
    function Get_Content (Name : String) return access constant String is
       H : constant Natural := Hash (Name);

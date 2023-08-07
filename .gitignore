@@ -1,5 +1,7 @@
 *~
 *.log
+cover
+src/yaml
 Makefile.conf
 config.status
 auto.cgpr
@@ -15,8 +17,9 @@ ChangeLog
 configure.lineno
 autom4te.cache
 gnatinspect.db
+gnathub
 porion-loc.xml
-*.txt
+# *.txt
 *.gcov
 *.mat
 *.gz
@@ -24,6 +27,7 @@ porion-loc.xml
 lib/
 obj/
 regtests/results
+regtests/files/many
 porion_lib.gpr
 agent/porion_agent.gpr
 server/porion_server.gpr
@@ -47,3 +51,5 @@ debian/porion/
 debian/porion-server/
 debian/files
 debian/tmp/
+src/porion-configs-setup.ads
+src/parser/porion-templates-parser-parser.verbose

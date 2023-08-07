@@ -80,7 +80,7 @@
             INNER JOIN porion_branch AS branch ON branch.id = build.branch_id
             INNER JOIN porion_recipe AS recipe ON build.recipe_id = recipe.id
             INNER JOIN porion_node AS node ON build.node_id = node.id
-            ORDER BY finish_date DESC
+            ORDER BY CASE WHEN finish_date IS NULL THEN build_date ELSE finish_date END DESC
         </sql>
         <sql-count>
             SELECT
@@ -116,7 +116,67 @@
             INNER JOIN porion_recipe AS recipe ON build.recipe_id = recipe.id
             INNER JOIN porion_node AS node ON build.node_id = node.id
             WHERE project.id = :project_id
-            ORDER BY finish_date DESC
+            ORDER BY CASE WHEN finish_date IS NULL THEN build_date ELSE finish_date END DESC
+        </sql>
+    </query>
+
+   <query name='project-build-list'>
+        <comment>Get the list of builds for a project</comment>
+        <sql>
+            SELECT
+            project.name AS name,
+            project.status AS status,
+            branch.name AS branch_name,
+            branch.status AS branch_status,
+            node.name AS node_name,
+            recipe.name AS recipe_name,
+            build.id AS build_id,
+            build.number AS number,
+            build.tag AS tag,
+            build.status AS build_status,
+            build.create_date AS build_date,
+            build.finish_date AS finish_date,
+            build.build_duration AS build_duration,
+            build.pass_count AS pass_count,
+            build.fail_count AS fail_count,
+            build.timeout_count AS timeout_count
+            FROM porion_build AS build
+            INNER JOIN porion_project AS project ON build.project_id = project.id
+            INNER JOIN porion_branch AS branch ON branch.id = build.branch_id
+            INNER JOIN porion_recipe AS recipe ON build.recipe_id = recipe.id
+            INNER JOIN porion_node AS node ON build.node_id = node.id
+            WHERE project.id = :project_id
+            ORDER BY CASE WHEN finish_date IS NULL THEN build_date ELSE finish_date END DESC
+        </sql>
+    </query>
+
+   <query name='node-build-list'>
+        <comment>Get the list of builds for a build node</comment>
+        <sql>
+            SELECT
+            project.name AS name,
+            project.status AS status,
+            branch.name AS branch_name,
+            branch.status AS branch_status,
+            node.name AS node_name,
+            recipe.name AS recipe_name,
+            build.id AS build_id,
+            build.number AS number,
+            build.tag AS tag,
+            build.status AS build_status,
+            build.create_date AS build_date,
+            build.finish_date AS finish_date,
+            build.build_duration AS build_duration,
+            build.pass_count AS pass_count,
+            build.fail_count AS fail_count,
+            build.timeout_count AS timeout_count
+            FROM porion_build AS build
+            INNER JOIN porion_project AS project ON build.project_id = project.id
+            INNER JOIN porion_branch AS branch ON branch.id = build.branch_id
+            INNER JOIN porion_recipe AS recipe ON build.recipe_id = recipe.id
+            INNER JOIN porion_node AS node ON build.node_id = node.id
+            WHERE build.node_id = :node_id
+            ORDER BY CASE WHEN finish_date IS NULL THEN build_date ELSE finish_date END DESC
         </sql>
     </query>
 

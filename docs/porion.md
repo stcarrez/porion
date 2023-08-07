@@ -267,6 +267,39 @@ The
 _--force_ option forces the removal and ignores any error.
 
 
+### The set command
+```
+porion set ident {name} {content...}
+```
+
+The _porion set_ command changes a configuration variable for a project,
+a branch or a build recipe.  The identification string can reference a project,
+a branch or a build recipe.  Some variables are specific to a project, others
+are specific to a branch or build recipes.  The variable identification is given
+with a single pre-defined name.  The value is composed of the concatenation of
+the program arguments which remain.
+
+
+source
+Controls the URI to access the sources of the project.
+
+
+name
+controls the name of the project.
+
+
+description
+allows to define a description for the project or branch.
+
+
+status
+enable or disable the project, branch or recipe.
+
+
+check_delay
+defines the delay in seconds between source checks for changes.
+
+
 ### The step command
 ```
 porion step [--quiet] [--ignore-error] [--timeout timeout]

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
---  porion-Logs -- Log build execution
---  Copyright (C) 2021 Stephane Carrez
+--  porion-logs -- Log build execution
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -56,6 +56,16 @@ package body Porion.Logs is
    end Create;
 
    --  ------------------------------
+   --  Close the logger file.
+   --  ------------------------------
+   procedure Close (Logger : in out Logger_Type) is
+   begin
+      if Ada.Text_IO.Is_Open (Logger.File) then
+         Ada.Text_IO.Close (Logger.File);
+      end if;
+   end Close;
+
+   --  ------------------------------
    --  Write the line on the logger with the source to identify the producer.
    --  ------------------------------
    procedure Write (Logger : in out Logger_Type;
@@ -76,8 +86,14 @@ package body Porion.Logs is
             when LOG_FAILURE =>
                Ada.Text_IO.Put (Logger.File, "porion:nok: ");
 
+            when LOG_STEP_INFO =>
+               Ada.Text_IO.Put (Logger.File, "porion:step: ");
+
             when LOG_EXECUTION =>
                null;
+
+            when LOG_EXECUTION_ERROR =>
+               Ada.Text_IO.Put (Logger.File, "porion:error: ");
 
          end case;
          Ada.Text_IO.Put_Line (Logger.File, Line);

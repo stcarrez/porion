@@ -25,44 +25,20 @@
   <div class='build-top-title build-#{build.status}'>
     <div class="build-status"/>
     <div class='build-top-info'>
-      <div class='build-info build-project-name'>
-        <span>
-          Project
-        </span>
-        <span>
-          <a href="#{contextPath}/projects/view/#{project.project.name}" title="#{project.project.name}">
-            #{project.project.name}
-          </a>
-        </span>
-      </div>
-
       <div class='build-info'>
         <span>
-          Files
+          Files:
+          #{project.metrics.files.sum_value}
         </span>
         <span>
-          #{project.metrics.files.sum_value}
+	  Disk space:
+          <h:outputText value="#{(project.metrics.sizes.max_value * 1024)}">
+            <f:converter converterId="sizeConverter"/>
+          </h:outputText>
         </span>
       </div>
     </div>
   </div>
-  <div id="project-lang-graph" class='porion-graph'>
-    <u:script>
-    $(function() {
-    var series = [];
-    var pos = 1;
-    var ticks = [];
-    <h:list var="lang" value="#{project.metrics.cloc}">
-      series.push({label: "#{lang.label}", data: [[#{lang.sum_value}, pos]] });
-      ticks.push([pos, "#{lang.label}"]);
-      pos++;
-    </h:list>
-
-    new Porion.BarGraph('project-lang-graph', '', series, ticks);
-    });
-    </u:script>
-  </div>
-
   <div class='build-info'>
     <ul class='build-info-line'>
       <li>
@@ -74,21 +50,21 @@
             <f:converter converterId="percentConverter"/>
           </h:outputText> %
         </div>
-        <div class='dashboard-value'>
+        <div class='dashboard-progress'>
           <w:progress value="#{project.project.build_progress}" maxValue="1000" />
         </div>
       </li>
 
       <li>
         <div class='dashboard-title'>
-          Build rate
+          Build success rate
         </div>
         <div class='dashboard-value'>
           <h:outputText value="#{project.project.build_rate / 10}">
             <f:converter converterId="percentConverter"/>
           </h:outputText> %
         </div>
-        <div class='dashboard-value'>
+        <div class='dashboard-progress build-progress'>
           <w:progress value="#{project.project.build_rate}" maxValue="1000" />
         </div>
       </li>
@@ -98,15 +74,16 @@
           Tests
         </div>
         <div class='dashboard-value'>
-          <h:outputText value="#{project.project.pass_count}">
+          <h:outputText value="#{project.project.pass_rate / 10}">
             <f:converter converterId="percentConverter"/>
           </h:outputText> %
         </div>
-        <div class='dashboard-value'>
-          <w:progress value="#{project.project.build_rate}" maxValue="1000" />
+        <div class='dashboard-progress'>
+          <w:progress value="#{project.project.pass_rate}" maxValue="1000" />
         </div>
       </li>
 
+      <h:panelGroup rendered="#{project.metrics.lines.count ne 0}">
       <li>
         <div class='dashboard-title'>
           Line coverage
@@ -116,11 +93,13 @@
             <f:converter converterId="percentConverter"/>
           </h:outputText> %
         </div>
-        <div class='dashboard-value'>
+        <div class='dashboard-progress'>
           <w:progress value="#{project.metrics.lines.sum_value}" maxValue="#{project.metrics.lines.count * 1000}" />
         </div>
       </li>
-    <li>
+      </h:panelGroup>
+      <h:panelGroup rendered="#{project.metrics.functions.count ne 0}">
+        <li>
         <div class='dashboard-title'>
           Function coverage
         </div>
@@ -129,11 +108,39 @@
             <f:converter converterId="percentConverter"/>
           </h:outputText> %
         </div>
-        <div class='dashboard-value'>
-          <w:progress value="#{project.metrics.functions.sum_value}" direction='vertical' maxValue="#{project.metrics.functions.count * 1000}" />
+        <div class='dashboard-progress'>
+          <w:progress value="#{project.metrics.functions.sum_value}" maxValue="#{project.metrics.functions.count * 1000}" />
         </div>
       </li>
+      </h:panelGroup>
     </ul>
   </div>
+  <div id="project-lang-graph" class='porion-graph'>
+    <u:script>
+      let labels = [];
+      let values = [];
+      <h:list var="lang" value="#{project.metrics.cloc}">
+        labels.push("#{lang.label}");
+        values.push(#{lang.sum_value});
+      </h:list>
+      new Porion.BarGraph('project-lang-graph', '', labels, values);
+    </u:script>
+  </div>
+  <div class='project-graph-view'>
+    <div class='project-graph-title'>Test execution</div>
+    <div id='project-xunits-graph' class='project-graph'/>
+
+    <u:script>
+    new Porion.TestChart({container: 'project-xunits-graph'}, '#{project.name}');
+    </u:script>
+  </div>
+  <div class='project-graph-view'>
+    <div class='project-graph-title'>Coverage</div>
+    <div id='project-coverage-graph' class='project-graph'/>
+    <u:script>
+      new Porion.CoverageChart({container: 'project-coverage-graph'}, '#{project.name}');
+    </u:script>
+  </div>
+
 
 </ui:composition>

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion -- porion applications
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,8 @@
 
 with Util.Log.Loggers;
 with Porion.Configs;
+with Porion.Resources.Queries;
+with Porion.Queries.Server;
 package body Porion.Applications is
 
    use AWA.Applications;
@@ -33,6 +35,7 @@ package body Porion.Applications is
    procedure Initialize_Config (App  : in out Application;
                                 Conf : in out ASF.Applications.Config) is
    begin
+      App.Set_Query_Loader (Resources.Queries.Get_Content'Access);
       AWA.Applications.Application (App).Initialize_Config (Conf);
       Porion.Configs.Initialize (Porion.Configs.Config_Type (Conf));
    end Initialize_Config;
@@ -124,6 +127,10 @@ package body Porion.Applications is
                 Name   => Porion.Nodes.Modules.NAME,
                 URI    => "nodes",
                 Module => App.Node_Module'Access);
+      Register (App    => App.Self.all'Access,
+                Name   => Porion.Notifications.Modules.NAME,
+                URI    => "notifications",
+                Module => App.Notification_Module'Access);
    end Initialize_Modules;
 
 end Porion.Applications;

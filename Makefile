@@ -5,6 +5,9 @@ UTIL_OS=linux64
 PACKAGE_XML=package.xml
 #GPRPATH_AGENT=porion_agent.gpr
 
+AYACC=ayacc
+AFLEX=aflex
+
 -include Makefile.conf
 
 include Makefile.defaults
@@ -14,12 +17,30 @@ DIST_FILE=porion-$(VERSION).tar.gz
 ROOT_DIR=$(shell pwd)
 
 GPRFLAGS += -j$(PROCESSORS) -XROOT_DIR=$(ROOT_DIR) -XUTIL_OS=$(UTIL_OS) -XUTIL_AWS_IMPL=$(UTIL_AWS_VERSION)
+GPRFLAGS += -XAWA_BUILD=$(BUILD) -XADO_BUILD=$(BUILD) -XOPENAPI_BUILD=$(BUILD)
 
 ifeq (${HAVE_DYNAMO},yes)
 GPRFLAGS += -XBUILD_DYNAMO=no
 else
 GPRFLAGS += -XBUILD_DYNAMO=yes
-DYNAMO=$(ROOT_DIR)/bin/dynamo
+PRJ_PATH:=$(ROOT_DIR)/awa/ada-util/.alire:$(ROOT_DIR)/awa/ada-util/.alire/xml:$(ROOT_DIR)/awa/ada-util/.alire/aws
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-util/.alire/unit
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-util
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-el/.alire
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-el
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-keystore/.alire:$(ROOT_DIR)/awa/ada-keystore
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-ado/.alire/sqlite:$(ROOT_DIR)/awa/ada-ado/.alire/mysql
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-ado/.alire/postgresql:$(ROOT_DIR)/awa/ada-ado/.alire/all
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-ado/.alire:$(ROOT_DIR)/awa/ada-ado
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-security/.alire:$(ROOT_DIR)/awa/ada-security
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-servlet/.alire:$(ROOT_DIR)/awa/ada-servlet/.alire/aws
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-servlet:$(ROOT_DIR)/awa/ada-asf/.alire
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-asf:$(ROOT_DIR)/awa/ada-wiki/.alire
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-wiki:$(ROOT_DIR)/awa/ada-wiki/.alire
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/openapi-ada/.alire:$(ROOT_DIR)/awa/dynamo
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/.alire:$(ROOT_DIR)/awa/awa
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/resource-embedder
+DYNAMO=env ADA_PROJECT_PATH="$(PRJ_PATH)" DYNAMO_SEARCH_PATH="$(ROOT_DIR)/awa/plugins" DYNAMO_UML_PATH="$(ROOT_DIR)/awa/uml" $(ROOT_DIR)/bin/dynamo
 endif
 
 ifeq (${HAVE_ARE},yes)
@@ -44,10 +65,13 @@ DYNAMO_ARGS=\
   db uml/porion.zargo
 
 AGENT_DYNAMO_ARGS=\
-  db
+  --package Porion.Audits.Models \
+  db ../uml/porion.zargo
 
 SERVER_DYNAMO_ARGS=\
-  --package Porion.Dashboards.Models \
+  --package Porion.Queries.Server \
+  --package Porion.Notifications.Models \
+  --package Porion.Beans \
   db ../uml/porion.zargo
 
 ROOTDIR=.
@@ -64,7 +88,10 @@ server build-server::
 test:	build
 	bin/porion_harness -v -config test.properties -xml porion-aunit.xml
 
-generate::
+generate:: build-dynamo
+	$(MAKE) generate-model
+
+generate-model::
 	mkdir -p db agent/db
 	$(DYNAMO) generate $(DYNAMO_ARGS)
 	cd agent && $(DYNAMO) generate $(AGENT_DYNAMO_ARGS)
@@ -81,8 +108,10 @@ server-package:
 	cd server && $(DYNAMO) dist $(DESTDIR)$(DIST_DIR) $(PACKAGE_XML)
 
 build-ts:
-	tsc server/web/js/projects.ts
-	tsc server/web/js/builds.ts
+	tsc server/web/js/projects.ts server/web/js/builds.ts server/web/js/xunits.ts \
+            server/web/js/nodes.ts \
+            server/web/js/activity.ts \
+            server/web/js/notifications.ts
 
 setup:: src/porion-configs-setup.ads
 src/porion-configs-setup.ads:   Makefile.conf src/porion-configs-setup.gpb
@@ -92,8 +121,7 @@ src/porion-configs-setup.ads:   Makefile.conf src/porion-configs-setup.gpb
 ifneq (${HAVE_DYNAMO},yes)
 setup:: awa/dynamo/src/gen-configs.ads
 awa/dynamo/src/gen-configs.ads:   Makefile.conf awa/dynamo/src/gen-configs.gpb
-	gnatprep -DCONFIG_DIR='"$(ROOT_DIR)/awa/dynamo/config"' -DVERSION='"1.2.3"' \
-		  awa/dynamo/src/gen-configs.gpb awa/dynamo/src/gen-configs.ads
+	cd awa/dynamo && sh ./alire-setup.sh
 
 setup:: awa/ada-ado/src/drivers/ado-drivers-initialize.adb
 awa/ada-ado/src/drivers/ado-drivers-initialize.adb: awa/ada-ado/src/drivers/ado-drivers-initialize.gpb Makefile.conf
@@ -102,16 +130,66 @@ awa/ada-ado/src/drivers/ado-drivers-initialize.adb: awa/ada-ado/src/drivers/ado-
 	          -DHAVE_POSTGRESQL=False \
 		  awa/ada-ado/src/drivers/ado-drivers-initialize.gpb $@
 
+# Install the AWA UML model in Dynamo UML search path
+awa/dynamo/config/uml/AWA.xmi: awa/awa/uml/awa.zargo
+	unzip -cq awa/awa/uml/awa.zargo awa.xmi > awa/dynamo/config/uml/AWA.xmi
+
+build-dynamo: bin/dynamo awa/dynamo/config/uml/AWA.xmi
+
+bin/dynamo: setup
+	$(GNATMAKE) $(GPRFLAGS) -p -P "$(GPRPATH)" $(MAKE_ARGS)
+else
+
+build-dynamo:
+
 endif
 
 install::
 	mkdir -p $(DESTDIR)$(prefix)/bin
 	$(INSTALL) bin/porion $(DESTDIR)$(prefix)/bin/porion
 	mkdir -p $(DESTDIR)$(prefix)/share/man/man1 $(DESTDIR)$(prefix)/share/man/man8
-	$(INSTALL) docs/porion.1 $(DESTDIR)$(prefix)/share/man/man1/porion.1
+	$(INSTALL) docs/man1/porion.1 $(DESTDIR)$(prefix)/share/man/man1/porion.1
 	$(INSTALL) docs/porion-server.8 $(DESTDIR)$(prefix)/share/man/man8/porion-server.8
 	(cd share && tar --exclude='*~' -cf - .) \
        | (cd $(DESTDIR)$(prefix)/share/ && tar xf -)
 
 clean::
 	rm -rf server/$(DIST_DIR)
+	rm -rf awa/obj awa/ada-ado/obj awa/ada-util/obj awa/ada-el/obj awa/ada-asf/obj \
+               awa/ada-keystore/obj awa/ada-security/obj awa/ada-servlet/obj \
+               awa/openapi-ada/obj awa/ada-wiki/obj
+
+PORION_DOC= \
+  title.md \
+  pagebreak.tex \
+  index.md \
+  pagebreak.tex \
+  Installation.md \
+  pagebreak.tex
+
+DOC_OPTIONS=-f markdown
+DOC_OPTIONS+= --listings --number-sections --toc
+HTML_OPTIONS=-f markdown
+HTML_OPTIONS+= --listings --number-sections --toc --css docs/pandoc.css
+
+$(eval $(call pandoc_build,porion-book,$(PORION_DOC)))
+
+# Development targets that requires ayacc and aflex to be installed.
+# Do not call these unless you modify the lex/yacc grammar.
+parser:	
+	cd src/parser && \
+	   $(AYACC) -n 256 -v -k -P -s -e .ada porion-templates-parser-parser.y && \
+	   gnatchop -w porion-templates-parser-parser.ada && \
+	   rm -f porion-templates-parser-parser.ada
+	# -rm -f src/parser/porion-templates-parser-parser.verbose
+
+lexer:
+	cd src/parser; \
+	  $(AFLEX) -ms -P -L porion-templates-parser-lexer.l
+	cd src/parser && \
+	  gnatchop -w porion-templates-parser-lexer.ada && \
+	  rm -f porion-templates-parser-lexer.ada
+
+info:
+	$(DYNAMO) info
+	cd server && $(DYNAMO) info

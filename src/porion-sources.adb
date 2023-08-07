@@ -45,10 +45,31 @@ package body Porion.Sources is
    procedure Checkout (Kind     : in Source_Control_Type;
                        Config   : in Porion.Configs.Config_Type;
                        Path     : in String;
+                       Result   : out UString;
                        Executor : in out Porion.Executors.Executor_Type'Class) is
       Controller : Controller_Access := Factories.Create (Kind, Config);
    begin
-      Controller.Checkout (Path, Executor);
+      Controller.Checkout (Path, Result, Executor);
+      Free (Controller);
+   end Checkout;
+
+   --  ------------------------------
+   --  Checkout the source of the project by using the executor.
+   --  The checkout parameters are configured in Config and the
+   --  files are extracted in the Path directory (possibly on a remote host).
+   --  ------------------------------
+   procedure Checkout (Kind       : in Source_Control_Type;
+                       Config     : in Porion.Configs.Config_Type;
+                       Extraction : in out Checkout_Type;
+                       Executor   : in out Porion.Executors.Executor_Type'Class) is
+      Controller : Controller_Access := Factories.Create (Kind, Config);
+      Result     : UString;
+   begin
+      Controller.Checkout (To_String (Extraction.Path), Result, Executor);
+      if Length (Result) > 0 then
+         Extraction.Path := Result;
+      end if;
+      Controller.Changes (To_String (Extraction.Path), Extraction, Executor);
       Free (Controller);
    end Checkout;
 

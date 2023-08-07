@@ -1,0 +1,9 @@
+template bad is
+  recipe empty is
+  end empty;
+
+  recipe wrong is
+     run test;
+  end;
+
+end bad;

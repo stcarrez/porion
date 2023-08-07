@@ -24,6 +24,7 @@ with Porion.Nodes.Models;
 with Porion.Projects.Models;
 with Porion.Builds.Models;
 with Porion.Resources;
+with Porion.Templates;
 package Porion.Services is
 
    Not_Found : exception;
@@ -42,6 +43,7 @@ package Porion.Services is
       Ident             : Porion.Projects.Ident_Type;
       Dry_Run           : Boolean := False;
       Wallet            : Keystore.Files.Wallet_File;
+      Templates         : Porion.Templates.Repository_Type;
    end record;
 
    --  Returns True if the service is opened.
@@ -59,6 +61,9 @@ package Porion.Services is
    function Has_Recipe (Service : in Context_Type) return Boolean is
       (not Service.Recipe.Is_Null);
 
+   function Has_Node (Service : in Context_Type) return Boolean is
+      (not Service.Build_Node.Is_Null);
+
    --  Get the current project id.
    function Get_Project_Id (Service : in Context_Type) return ADO.Identifier;
 
@@ -72,6 +77,13 @@ package Porion.Services is
    function Get_Recipe_Name (Service : in Context_Type;
                              Recipe  : in Porion.Builds.Models.Recipe_Ref'Class) return String with
       Pre => Service.Has_Project and not Recipe.Is_Null;
+
+   function Get_Secret (Service : in out Context_Type;
+                        Name    : in String) return String is
+      (Service.Wallet.Get (Name));
+   function Get_Secret (Service : in out Context_Type;
+                        Name    : in String) return UString is
+      (To_UString (Service.Wallet.Get (Name)));
 
    procedure Load_Project (Service : in out Context_Type;
                            Name    : in String);

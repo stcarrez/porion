@@ -1,0 +1,10 @@
+[availability]
+which gcc
+
+[version]
+gcc --version | head -1
+
+[log-error]
+^.*:[0-9]+:[0-9]+: fatal error:.*
+^.*:[0-9]+:[0-9]+: error:.*
+

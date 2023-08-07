@@ -1,0 +1,38 @@
+<ui:composition xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:u="http://code.google.com/p/ada-asf/util"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:util="http://code.google.com/p/ada-asf/util"
+                xmlns:c="http://java.sun.com/jstl/core"
+                template="/WEB-INF/layouts/layout.xhtml">
+  <ui:param name="title" value="#{node.name} - Queue" />
+  <ui:param name="pageStyle" value="page-node"/>
+  <ui:param name="top_nav" value="page-queue"/>
+
+  <ui:define name="pageNav">
+    <ui:include src="/WEB-INF/layouts/node-header.xhtml">
+      <ui:param name="nodeName" value="#{queueList.name}"/>
+    </ui:include>
+  </ui:define>
+
+  <!-- Main page body -->
+  <ui:define name="pageBody">
+    <f:metadata>
+      <f:viewAction action='#{queueList.load}'/>
+    </f:metadata>
+    <ui:composition template="/nodes/lists/queue.xhtml">
+	    <ui:param name="queue" value="#{queueList.queue}"/>
+	      <ui:define name="list-header">
+	      </ui:define>
+	
+	      <ui:define name="list-item">
+	      </ui:define>
+
+    </ui:composition>
+  </ui:define>
+
+  <ui:define name="pageScript">
+    <script type="text/javascript" src="#{contextPath}/js/projects.js"></script>
+  </ui:define>
+
+</ui:composition>

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-commands -- Porion agent commands
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,6 +46,7 @@ with Porion.Commands.Check;
 with Porion.Commands.Logs;
 with Porion.Commands.Set;
 with Porion.Commands.Env;
+with Porion.Commands.Template;
 private with Util.Systems.Constants;
 package body Porion.Commands is
 
@@ -66,6 +67,7 @@ package body Porion.Commands is
    Logs_Command            : aliased Porion.Commands.Logs.Command_Type;
    Set_Command             : aliased Porion.Commands.Set.Command_Type;
    Env_Command             : aliased Porion.Commands.Env.Command_Type;
+   Template_Command        : aliased Porion.Commands.Template.Command_Type;
    Driver                  : Drivers.Driver_Type;
 
    Text_Printer            : aliased PT.Drivers.Texts.Printer_Type;
@@ -209,6 +211,9 @@ package body Porion.Commands is
       Driver.Add_Command ("env",
                           -("set or unset build environment variables"),
                            Env_Command'Access);
+      Driver.Add_Command ("template",
+                          -("template operation"),
+                          Template_Command'Access);
    end Initialize;
 
    --  ------------------------------
@@ -358,11 +363,23 @@ package body Porion.Commands is
    procedure Error_Not_Found (Context : in out Context_Type;
                               Ident   : in Projects.Ident_Type) is
    begin
-      if Context.Project_Service.Has_Project and Projects.Has_Build (Ident) then
+      if not Context.Project_Service.Has_Project then
+         Error (-("project '{0}' not found"), To_String (Ident.Name));
+      elsif Projects.Has_Branch (Ident) and not Context.Project_Service.Has_Branch then
+         Error (-("project '{0}' has no branch named '{1}'"),
+                To_String (Ident.Name), To_String (Ident.Branch));
+      elsif Projects.Has_Build (Ident) and not Context.Project_Service.Has_Build then
          Error (-("project '{0}' has no build number '{1}'"),
                 To_String (Ident.Name), Util.Strings.Image (Ident.Build));
+      elsif Projects.Has_Node (Ident) and not Context.Project_Service.Has_Node then
+         Error (-("build node '{0}' not found"),
+                To_String (Ident.Node));
+      elsif Projects.Has_Recipe (Ident) and not Context.Project_Service.Has_Recipe then
+         Error (-("project '{0}' has no recipe named '{1}'"),
+                To_String (Ident.Name), To_String (Ident.Recipe));
       else
-         Error (-("project '{0}' not found"), To_String (Ident.Name));
+         Error (-("project '{0}' not found"),
+                To_String (Ident.Name));
       end if;
    end Error_Not_Found;
 
@@ -388,10 +405,14 @@ package body Porion.Commands is
       end if;
    end Notice;
 
+   --  ------------------------------
    --  Open the database.
+   --  ------------------------------
    procedure Open (Context : in out Context_Type) is
    begin
+      Context.Project_Service.Factory.Set_Audit_Manager (Context.Audit_Manager'Unchecked_Access);
       Context.Project_Service.Open (Porion.Resources.Queries.Get_Content'Access, null);
+      Context.Audit_Manager.Initialize (Context.Project_Service.DB);
    end Open;
 
    overriding

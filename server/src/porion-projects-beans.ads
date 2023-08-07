@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-projects-beans -- Beans for module projects
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,9 +20,11 @@ with Ada.Strings.Unbounded;
 
 with Util.Beans.Basic;
 with Util.Beans.Objects;
-with Porion.Dashboards.Models;
+with Porion.Queries;
+with Porion.Beans;
 with Porion.Projects.Modules;
 with Porion.Projects.Models;
+with Porion.Builds.Models;
 with Porion.Nodes.Models;
 with Porion.Dashboards.Beans.Stats;
 package Porion.Projects.Beans is
@@ -30,17 +32,22 @@ package Porion.Projects.Beans is
    package UBB renames Util.Beans.Basic;
    package UBO renames Util.Beans.Objects;
 
-   type Project_Bean is new Porion.Dashboards.Models.Project_List_Bean with record
+   type Project_Bean is new Porion.Beans.Project_Bean with record
       Ident        : Porion.Projects.Ident_Type;
       Module       : Porion.Projects.Modules.Project_Module_Access := null;
       Branch       : aliased Porion.Projects.Models.Branch_Ref;
       Branch_Bean  : UBB.Readonly_Bean_Access;
       Project      : aliased Porion.Projects.Models.Project_Ref;
       Project_Bean : UBB.Readonly_Bean_Access;
+      Recipes      : aliased Porion.Queries.Recipe_Info_List_Bean;
+      Recipes_Bean : UBB.Readonly_Bean_Access;
       Node         : aliased Porion.Nodes.Models.Node_Ref;
       Node_Bean    : UBB.Readonly_Bean_Access;
+      Builds       : aliased Porion.Queries.Build_Info_List_Bean;
+      Builds_Bean  : UBB.Readonly_Bean_Access;
       Metric       : aliased Porion.Dashboards.Beans.Stats.Metrics_Bean;
       Metric_Bean  : UBB.Readonly_Bean_Access;
+      Build_Status : Porion.Builds.Models.Build_Status_Type;
    end record;
    type Project_Bean_Access is access all Project_Bean'Class;
 
@@ -56,8 +63,14 @@ package Porion.Projects.Beans is
                         Value : in Util.Beans.Objects.Object);
 
    --  Load the project.
+   overriding
    procedure Load (Bean    : in out Project_Bean;
                    Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
+
+   --  Load the project and the list of builds.
+   overriding
+   procedure Load_Builds (Bean    : in out Project_Bean;
+                          Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
 
    --  Create the Projects_Bean bean instance.
    function Create_Project_Bean (Module : in Porion.Projects.Modules.Project_Module_Access)

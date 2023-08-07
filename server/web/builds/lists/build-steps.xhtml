@@ -23,28 +23,39 @@
   xmlns:w="http://code.google.com/p/ada-asf/widget"
   xmlns:h="http://java.sun.com/jsf/html">
   <div class='dashboard-list'>
+    <div class="build-step build-step-header">
+      <div class="build-step-number">
+        Step
+      </div>
+      <div class="build-step-energy">
+        CPU
+      </div>
+      <div class="build-step-duration">
+        Duration
+      </div>
+      <div class="build-step-command">
+        Command
+      </div>
+    </div>
     <h:list var="step" value="#{build.build_steps}">
-      <div class='project-page-grid'>
-        <div>
+      <div class="build-step build-step-#{step.kind} #{step.status eq 0 ? 'build-step-ok' : 'build-step-fail'}">
+        <div class="build-step-number">
           #{step.number}
         </div>
-        <div>
-          #{step.builder}
+        <div class="build-step-energy">
+          <h:outputText value="#{step.user_time + step.sys_time}">
+            <f:converter converterId="millisecondConverter"/>
+          </h:outputText>
         </div>
-        <div>
-          #{step.kind}
+        <div class="build-step-duration">
+          <h:outputText value="#{step.step_duration}">
+            <f:converter converterId="millisecondConverter"/>
+          </h:outputText>
         </div>
-        <div>
-          #{step.status}
-        </div>
-        <div>
-          #{step.user_time}
-        </div>
-        <div>
-          #{step.sys_time}
-        </div>
-        <div>
-          #{step.step_duration}
+        <div class="build-step-command">
+          <h:outputText rendered="#{step.kind eq 'STEP_MAKE'}" value="#{u:parseJSON(step.parameters).command}"/>
+          <h:outputText rendered="#{step.kind eq 'STEP_METRIC'}" value="#{u:parseJSON(step.parameters).metric} #{u:parseJSON(step.parameters).params}"/>
+          <h:outputText rendered="#{step.kind eq 'STEP_TEST'}" value="#{u:parseJSON(step.parameters).includes[1]}"/>
         </div>
       </div>
     </h:list>

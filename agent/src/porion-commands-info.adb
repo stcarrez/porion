@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-commands-info -- Info command
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -229,6 +229,10 @@ package body Porion.Commands.Info is
       Printer.Put_UString (Fields (2), Ident.Name);
       Printer.New_Line;
 
+      Printer.Put (Fields (1), -("Sources"));
+      Printer.Put (Fields (2), Context.Project_Service.Project.Get_Scm_Url);
+      Printer.New_Line;
+
       declare
          Description : constant String := Context.Project_Service.Project.Get_Description;
       begin
@@ -290,7 +294,10 @@ package body Porion.Commands.Info is
 
          Printer.Put (Fields (3), -("Last builds"));
          Printer.New_Line;
+         Printer.Create_Field (Fields (3), Context.Styles.Default, 30.0);
+         Printer.Create_Field (Fields (5), Context.Styles.Default, 60.0);
          Printer.Set_Bottom_Right_Padding (Fields (3), (2, 0));
+         Printer.Set_Max_Dimension (Fields (4), (5, 0));
          Printer.Set_Bottom_Right_Padding (Fields (4), (2, 0));
          Printer.Layout_Fields (Fields (3 .. 5));
          for Build of Last_Builds loop
@@ -380,6 +387,7 @@ package body Porion.Commands.Info is
       if Command.List_Recipes then
          Printer.Layout_Fields (Fields (3 .. 3));
          Executor.Enable_Dry_Run;
+         Context.Project_Service.Branch := Porion.Projects.Models.Null_Branch;
          Builds.Services.Find_Build_Configs (Context.Project_Service, True, Recipes);
          for Recipe of Recipes loop
             Porion.Builds.Services.Build (Context.Project_Service, Recipe, Executor);

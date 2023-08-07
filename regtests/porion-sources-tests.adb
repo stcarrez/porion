@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-sources-tests -- Tests for sources management
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -47,7 +47,7 @@ package body Porion.Sources.Tests is
                             Executor => Executor);
 
       T.Assert_Equals ("porion", Result.Name, "invalid project name");
-      Assert_Equals (T, Porion.Sources.SRC_GIT, Result.Kind, "invalid source kind");
+      Assert_Equals (T, Porion.SRC_GIT, Result.Kind, "invalid source kind");
 
       Porion.Sources.Guess (Path     => "src/model",
                             Config   => Config,
@@ -55,7 +55,7 @@ package body Porion.Sources.Tests is
                             Executor => Executor);
 
       T.Assert_Equals ("porion", Result.Name, "invalid project name");
-      Assert_Equals (T, Porion.Sources.SRC_GIT, Result.Kind, "invalid source kind");
+      Assert_Equals (T, Porion.SRC_GIT, Result.Kind, "invalid source kind");
    end Test_Guess_Git;
 
    procedure Test_Guess_Files (T : in out Test) is
@@ -70,7 +70,7 @@ package body Porion.Sources.Tests is
                             Executor => Executor);
 
       T.Assert_Equals ("hello-1.0", Result.Name, "invalid project name");
-      Assert_Equals (T, Porion.Sources.SRC_FILE, Result.Kind, "invalid source kind");
+      Assert_Equals (T, Porion.SRC_FILE, Result.Kind, "invalid source kind");
    end Test_Guess_Files;
 
 end Porion.Sources.Tests;

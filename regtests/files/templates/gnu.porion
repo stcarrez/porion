@@ -1,0 +1,32 @@
+build GNU is
+   MAKE     : String := "make";
+   PREFIX   : String := "../../install-dir";
+   COVERAGE : String;
+   TAR      : String;
+   SHELL    : String := "/bin/sh";
+
+   set timeout 60s;
+   set timeout 30mn;
+   step configure run "./configure --prefix ${PREFIX}";
+   step configure_coverage run "./configure --prefix ${PREFIX} --enable-coverage";
+   step make is
+      set timeout 1h;
+      run "${MAKE} -s";
+   end make;
+   step test is
+      set ignore on;
+      set timeout 30mn;
+      as test run "make runtest -i";
+   end test;
+   step cloc metric cloc;
+   step coverage metric coverage "${COVERAGE}";
+   step test_results xunit "regtests/results/TEST-*.xml";
+   step publish as publish run "scp ${TAR} porion@download.vacs.fr:";
+
+   recipe main is
+     --  metric disk before;
+     run configure make test coverage test_results;
+     --  metric disk after;
+   end main;
+
+end GNU;

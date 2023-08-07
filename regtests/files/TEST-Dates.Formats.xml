@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<testsuite errors="0" failures="1" skips="0" tests="12" time="0.059999000" name="Dates.Formats">
+<testcase classname="Dates.Formats" name="Test Util.Dates.Formats.Format" time="0.002638000">
+<failure type="util-dates-formats-tests.adb:90: Invalid result for: %j: expecting &apos;324&apos; value was &apos;323&apos;">util-dates-formats-tests.adb:90: Invalid result for: %j: expecting &apos;324&apos; value was &apos;323&apos;
+</failure>
+<system-out></system-out>
+</testcase>
+<testcase classname="Dates.Formats" name="Test Util.Dates.Split" time="0.001951000">
+<system-out></system-out>
+</testcase>
+<testcase classname="Dates.Formats" name="Test Util.Dates.Formats.Parse" time="0.002756000">
+<system-out></system-out>
+</testcase>
+<testcase classname="Dates.Formats" name="Test Util.Dates.Formats.Parse (Error)" time="0.004154000">
+<system-out></system-out>
+</testcase>
+<testcase classname="Dates.Formats" name="Test Util.Dates.Get_Day_Start" time="0.004534000">
+<system-out></system-out>
+</testcase>
+<testcase classname="Dates.Formats" name="Test Util.Dates.Get_Week_Start" time="0.012447000">
+<system-out></system-out>
+</testcase>
+<testcase classname="Dates.Formats" name="Test Util.Dates.Get_Month_Start" time="0.004541000">
+<system-out></system-out>
+</testcase>
+<testcase classname="Dates.Formats" name="Test Util.Dates.Get_Day_End" time="0.004617000">
+<system-out></system-out>
+</testcase>
+<testcase classname="Dates.Formats" name="Test Util.Dates.Get_Week_End" time="0.012307000">
+<system-out></system-out>
+</testcase>
+<testcase classname="Dates.Formats" name="Test Util.Dates.Get_Month_End" time="0.005972000">
+<system-out></system-out>
+</testcase>
+<testcase classname="Dates.Formats" name="Test Util.Dates.RFC7231.Append_Date" time="0.002066000">
+<system-out></system-out>
+</testcase>
+<testcase classname="Dates.Formats" name="Test Util.Dates.ISO8601.Image" time="0.002016000">
+<system-out></system-out>
+</testcase>
+</testsuite>

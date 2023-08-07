@@ -2,13 +2,14 @@ dnl Autoconf configure script for porion
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(src/porion.ads)
+AC_INIT
+AC_CONFIG_SRCDIR([src/porion.ads])
 
 AM_GNAT_LIBRARY_PROJECT(porion)
 
 # Current release settings
 PORION_MAJOR_VERSION=0
-PORION_MINOR_VERSION=6
+PORION_MINOR_VERSION=14
 PORION_MICRO_VERSION=0
 PORION_VERSION=$PORION_MAJOR_VERSION.$PORION_MINOR_VERSION.$PORION_MICRO_VERSION
 
@@ -21,76 +22,8 @@ AC_SUBST(PORION_MICRO_VERSION)
 PORION_LIBDIR="lib"
 AC_SUBST(PORION_LIBDIR)
 
-os_base='unix'
-os_version='none'
-AC_MSG_CHECKING([operating system])
-case "${target_os}" in
-     linux|linux-*|solaris*|sysv-*)
-        os_version='linux'
-        ;;
-
-     netbsd*|dragonfly*)
-        os_version='netbsd'
-        ;;
-
-     openbsd*|freebsd*)
-        # Let OpenBSD people cry 
-        os_version='freebsd'
-        ;;
-
-     macos*|darwin*)
-        os_version='macos'
-        ;;
-
-     mingw32*|cygwin*|mingw64*|msys)
-        os_version='win'
-        os_base='windows'
-        ;;
-
-     mingw32*|cygwin*|mingw64*|msys)
-        os_version='win'
-        os_base='windows'
-        ;;
-
-     *)
-        # Be authoritative
-        os_version='linux'
-        ;;
-esac
-
-AC_MSG_RESULT($os_version)
-
-AC_MSG_CHECKING([hardware platform])
-case "${target_cpu}" in
-     x86_64)
-        os_version="${os_version}64"
-        HARDWARE_PLATFORM=${target_cpu}
-        ;;
-
-     i386|i486|i586|i686)
-        os_version="${os_version}32"
-        HARDWARE_PLATFORM='x86'
-        ;;
-
-     armv7*)
-        os_version="${os_version}32"
-        HARDWARE_PLATFORM=${target_cpu}
-        ;;
-
-     armv8*)
-        os_version="${os_version}64"
-        HARDWARE_PLATFORM=${target_cpu}
-        ;;
-
-     *)
-        HARDWARE_PLATFORM=${target_cpu}
-        ;;
-esac
-AC_MSG_RESULT($HARDWARE_PLATFORM)
-AC_SUBST(HARDWARE_PLATFORM)
-
-UTIL_OS=${os_version}
-AC_SUBST(UTIL_OS)
+AM_ADA_UTIL_HARDWARE()
+AM_ADA_UTIL_AWS_VERSION()
 
 case "${target_os}" in
   mingw32*|cygwin*|mingw64*|msys)
@@ -139,50 +72,6 @@ AC_CHECK_PROG(HAVE_PANDOC,pandoc,yes)
 AC_CHECK_PROG(HAVE_DYNAMO,dynamo,yes)
 AC_CHECK_PROG(HAVE_ARE,are,yes)
 
-##########################################
-# Check for Ada Web Server
-##########################################
-AM_GNAT_CHECK_AWS(
-  [
-    HAVE_AWS=no
-    WITH_SERVER="";
-    WITH_UTIL_AWS="";
-    UTIL_AWS_VERSION="none"
-  ], [
-    UTIL_HAVE_AWS=yes
-    WITH_SERVER=$ac_cv_gnat_project_with_aws
-
-    AM_GNAT_AWS_VERSION
-
-    AC_MSG_CHECKING([which AWS implementation to use])
-    UTIL_AWS_VERSION=1
-case $AWS_VERSION in
-  22.0)
-     UTIL_AWS_VERSION=3
-     ;;
-
-  *2017*|*2018*|*2019*|*202*|20.0)
-     UTIL_AWS_VERSION=2
-     ;;
-
-  3.3.2)
-     UTIL_AWS_VERSION=2
-     ;;
-
-  3.*|2.*)
-     UTIL_AWS_VERSION=1
-     ;;
-
-  *)
-     UTIL_AWS_VERSION=3
-     ;;
-esac
-    AC_MSG_RESULT(${UTIL_AWS_VERSION})
-
-  ])
-
-AC_SUBST(UTIL_AWS_VERSION)
-
 AWA_DIR=""
 ADO_DIR=""
 EL_DIR=""
@@ -219,7 +108,7 @@ AC_SUBST(BUNDLE_DIR)
 DYNAMO_SEARCH_DIR="$ROOT_DIR/awa/awa/plugins"
 AC_SUBST(DYNAMO_SEARCH_DIR)
 
-AC_OUTPUT(
-Makefile.conf agent/porion_agent.gpr server/porion_server.gpr porion_lib.gpr porion_tests.gpr
+AC_CONFIG_FILES([Makefile.conf agent/porion_agent.gpr server/porion_server.gpr porion_lib.gpr porion_tests.gpr
 awa/dynamo/config/generator.properties
-)
+])
+AC_OUTPUT

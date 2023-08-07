@@ -26,6 +26,8 @@ with AWA.Commands.Start;
 with AWA.Commands.Stop;
 with AWA.Commands.List;
 with AWA.Commands.Info;
+with AWA.Commands.User;
+with AWA.Commands.Migrate;
 
 with ADO.Sqlite;
 
@@ -46,7 +48,10 @@ procedure Porion.Server is
    package Start_Command is new AWA.Commands.Start (Server_Commands);
    package Stop_Command is new AWA.Commands.Stop (Server_Commands);
    package Info_Command is new AWA.Commands.Info (Server_Commands);
-   pragma Unreferenced (List_Command, Start_Command, Stop_Command, Info_Command);
+   package User_Command is new AWA.Commands.User (Server_Commands);
+   package Migrate_Command is new AWA.Commands.Migrate (Server_Commands);
+   pragma Unreferenced (List_Command, Start_Command, Stop_Command, Info_Command,
+                        User_Command, Migrate_Command);
 
    type Init_Command_Type is new Server_Commands.Command_Type with null record;
 

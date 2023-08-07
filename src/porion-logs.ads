@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
---  porion-Logs -- Log build execution
---  Copyright (C) 2021 Stephane Carrez
+--  porion-logs -- Log build execution
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,8 @@ package Porion.Logs is
    type Source_Type is (LOG_INFO,
                         LOG_COMMAND,
                         LOG_EXECUTION,
+                        LOG_EXECUTION_ERROR,
+                        LOG_STEP_INFO,
                         LOG_RESULT,
                         LOG_FAILURE);
 
@@ -36,6 +38,9 @@ package Porion.Logs is
    procedure Create (Logger : in out Logger_Type;
                      Dir    : in String;
                      Name   : in String);
+
+   --  Close the logger file.
+   procedure Close (Logger : in out Logger_Type);
 
    --  Write the line on the logger with the source to identify the producer.
    procedure Write (Logger : in out Logger_Type;

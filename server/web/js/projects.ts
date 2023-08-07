@@ -16,54 +16,258 @@
  *  limitations under the License.
  */
 namespace Porion {
-    export class BarGraph {
+   export class BarGraph {
 
-        constructor(container: string, legend: string, series: jquery.flot.dataSeries[], ticks: any) {
-            var div : HTMLElement = document.getElementById(container);
-            $.plot($(div), series, {
-                series: {
-                    bars: {
-                        show: true,
-                        horizontal: true,
-                        align: "center"
-                    }
-                },
-                legend: {
-                    show: false,
-                    backgroundOpacity: 0.5
-                },
-                xaxis: {
-                    ticks: [],
-                    color: "#993D00"
-                },
-                yaxis: {
-                    ticks: ticks,
-                    tickSize: [ 10, "px" ],
-                    font: { size: 18, style: "normal" },
-                    show: true,
-                    color: "#993D00",
-                    tickColor: "#00ff00"
-                }
-            });
+      constructor(container: string, legend: string, labels: string[], values: number[]) {
+         var div : HTMLElement | null = document.getElementById(container);
+         const data : Frappe.ChartData = {
+            labels: labels,
+            datasets: [{
+                 name: "Language",
+                 type: "line",
+                 values: values
+              }]
+           };
+           const chart : Frappe.Chart = new Frappe.Chart(div, {
+              animate: 1,
+              data: data,
+              type: 'percentage',
+              height: 150,
+              valuesOverPoints: 0,
+              maxSlices: 7,
+              lineOptions: {
+                 regionFill: 0,
+                 dotSize: 1,
+                 hideDots: 1
+              },
+              axisOptions: {
+                 yAxisMode: "tick"
+              },
+              colors: ['red', 'blue', 'green']
+           })
         }
     }
 
-    export class PieChart {
+    export interface BuildTestInfo {
+       build_id: number,
+       build_number: number,
+       build_date: string,
+       build_status: string,
+       pass_count: number,
+       fail_count: number,
+       timeout_count : number,
+       test_duration: number
+    }
+    export interface BuildTests {
+       project_id: string,
+       tests: BuildTestInfo[]
+    }
 
-        constructor(container: string, legend: string, series: jquery.flot.dataSeries[], ticks: any) {
-            var div : HTMLElement = document.getElementById(container);
-            $.plot($(div), series, {
-                series: {
-                    pie: {
-                        show: true,
-                        startAngle: 1.0, radius: 1.0, innerRadius: 0.5, tilt: 1.0, offset: { top: 0, left: 0 },
-                        label: { show: true }
+    export interface BuildCoverageInfo {
+       build_id: number,
+       build_number: number,
+       build_date: string,
+       build_status: string,
+       lines: number,
+       functions: number
+    }
+    export interface BuildCoverage {
+       project_id: string,
+       metrics: BuildCoverageInfo[]
+    }
+
+    export interface Options {
+        container: string,
+        btnShowAll: string,
+        btnShowInfo: string,
+        btnShowWarning: string,
+        countAll: string,
+        countInfo: string,
+        countWarn: string
+    }
+    export class TestChart {
+        readonly graphContainer : HTMLDivElement = <HTMLDivElement>document.createElement('div');
+        container  : HTMLElement | null;
+        project    : string = "";
+
+        constructor(options : Options, project: string) {
+            this.container = document.getElementById(options.container);
+            if (this.container) {
+               this.container.appendChild(this.graphContainer);
+            }
+            this.project = project;
+            this.getData(null)
+        }
+        getData(event : Event | null) {
+            if (this.project) {
+                const project : string = this.project;
+                const xmlhttp : XMLHttpRequest = new XMLHttpRequest();
+                
+                xmlhttp.onload = evt => {
+                    if (xmlhttp.status == 200 && this.container) {
+                        this.updateData(JSON.parse(xmlhttp.response));
                     }
-                },
-                legend: {
-                    show: false
-                }
-            });
+                };
+                xmlhttp.open("GET", "/porion/api/v1/projects/" + project + "/tests/builds");
+                xmlhttp.send();
+            }
+        }
+        updateData(content : BuildTests) {
+           var pass : number[] = new Array();
+           var fail : number[] = new Array();
+           var timeout : number[] = new Array();
+           var duration : number[] = new Array();
+           var labels : string[] = new Array();
+           var first_build : number = 10000;
+           var last_build : number = 0;
+           for (var test of content.tests) {
+              if (test.build_status == "BUILD_PASS") {
+                 if (test.build_number < first_build) {
+                    first_build = test.build_number;
+                 }
+                 if (test.build_number > last_build) {
+                    last_build = test.build_number;
+                 }
+                 timeout.push(test.timeout_count);
+                 fail.push(test.fail_count + test.timeout_count);
+                 pass.push(test.pass_count + test.fail_count + test.timeout_count);
+                 duration.push(test.test_duration / 1000);
+                 labels.push(String(test.build_number));
+              }
+           }
+           const data : Frappe.ChartData = {
+              labels: labels,
+              datasets: [{
+                 name: "Fail",
+                 type: "line",
+                 values: fail
+              }, {
+                 name: "Timeout",
+                 type: "line",
+                 values: timeout
+              }, {
+                 name: "Pass",
+                 type: "line",
+                 values: pass
+              }]
+           };
+           const chart : Frappe.Chart = new Frappe.Chart(this.container, {
+              animate: 1,
+              data: data,
+              type: 'line',
+              height: 250,
+              valuesOverPoints: 0,
+              lineOptions: {
+                 regionFill: 0,
+                 dotSize: 1,
+                 hideDots: 1
+              },
+              axisOptions: {
+                 yAxisMode: "tick",
+                 xAxisMode: "tick"
+              },
+              tooltipOptions: {
+                 formatTooltipX: (value : number) => {
+                    return "Build " + value
+                 }
+              },
+              colors: ['red', 'blue', 'green']
+           })
+        }
+    }
+
+    export class CoverageChart {
+        readonly graphContainer : HTMLDivElement = <HTMLDivElement>document.createElement('div');
+        readonly legendContainer : HTMLDivElement = <HTMLDivElement>document.createElement('div');
+        readonly tooltipContainer : HTMLDivElement = <HTMLDivElement>document.createElement('div');
+        container  : HTMLElement | null;
+        project    : string = "";
+
+        constructor(options : Options, project: string) {
+            this.container = document.getElementById(options.container);
+            
+            this.container.appendChild(this.graphContainer);
+            this.container.appendChild(this.legendContainer);
+            this.project = project;
+            this.legendContainer.className = 'graph-legend';
+            this.graphContainer.className = 'graph-view';
+            this.tooltipContainer.className = 'graph-tooltip';
+            document.body.appendChild(this.tooltipContainer);
+            this.getData(null)
+        }
+        getData(event : Event) {
+            if (this.project) {
+                const project : string = this.project;
+                const xmlhttp : XMLHttpRequest = new XMLHttpRequest();
+                
+                xmlhttp.onload = evt => {
+                    if (xmlhttp.status == 200 && this.container) {
+                        this.updateData(JSON.parse(xmlhttp.response));
+                    }
+                };
+                xmlhttp.open("GET", "/porion/api/v1/projects/" + project + "/coverage");
+                xmlhttp.send();
+            }
+        }
+        updateData(content : BuildCoverage) {
+           var lines : number[] = new Array();
+           var functions : number[] = new Array();
+           var labels : string[] = new Array();
+           var first_build : number = 10000;
+           var last_build : number = 0;
+           labels.push("");
+           lines.push(0);
+           functions.push(0);
+           for (var build of content.metrics) {
+              if (build.build_status == "BUILD_PASS") {
+                 if (build.build_number < first_build) {
+                    first_build = build.build_number;
+                 }
+                 if (build.build_number > last_build) {
+                    last_build = build.build_number;
+                 }
+                 lines.push(build.lines / 10.0);
+                 functions.push(build.functions / 10.0);
+                 labels.push(String(build.build_number));
+              }
+           }
+           const data : Frappe.ChartData = {
+              labels: labels,
+              datasets: [{
+                 name: "Functions",
+                 type: "line",
+                 values: functions
+              }, {
+                 name: "Lines",
+                 type: "line",
+                 values: lines
+              }]
+           };
+           const chart : Frappe.Chart = new Frappe.Chart(this.graphContainer, {
+              animate: 1,
+              data: data,
+              type: 'line',
+              height: 250,
+              valuesOverPoints: 0,
+              lineOptions: {
+                 regionFill: 0,
+                 dotSize: 1,
+                 hideDots: 1
+              },
+              axisOptions: {
+                 yAxisMode: "tick",
+                 xAxisMode: "tick"
+              },
+              tooltipOptions: {
+                 formatTooltipY: (value : number) => {
+                    return String(value) + "%"
+                 },
+                 formatTooltipX: (value : number) => {
+                    return "Build " + value
+                 }
+              },
+              colors: ['green', 'blue', 'red']
+           })
         }
     }
 }

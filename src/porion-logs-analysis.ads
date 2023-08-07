@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-logs-analysis -- Log analysis
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
+with ADO;
 with Ada.Containers.Indefinite_Vectors;
 private with GNAT.Regpat;
 package Porion.Logs.Analysis is
@@ -41,6 +42,7 @@ package Porion.Logs.Analysis is
       Number  : Natural := 0;
       Context : Boolean := False;
       Level   : Level_Type := LOG_INFO;
+      Step    : ADO.Identifier;
       Content : String (1 .. Length);
    end record;
 

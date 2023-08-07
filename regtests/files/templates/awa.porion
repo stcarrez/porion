@@ -1,0 +1,84 @@
+with "gnu";
+build awa is
+
+   description : String := "AWA project";
+
+   MYKEY    : secret String;
+
+   step make renames GNU.make;
+   step build renames make;
+   step configure renames GNU.configure;
+   step configure_coverage as configure run "./configure --prefix ${PREFIX} --enable-coverage";
+   step coverage as metric run "./coverage.sh ${COVERAGE}";
+   step test_results xunit "regtests/results/TEST-*.xml";
+
+   step publish_coverage run
+      "codecov-io.sh -f ${COVERAGE} -t ${CODECOV_TOKEN}";
+
+   step publish_error is
+     run "tar czf pb.tar.gz .";
+   end publish_error;
+
+   recipe main-gnu on default is
+     metric disk before;
+     run GNU.cloc GNU.configure_coverage make GNU.test coverage test_results;
+     metric disk after;
+     metric file bin/awa_harness;
+   end main-gnu;
+
+   recipe main on default is
+     metric disk before;
+     run configure build GNU.test coverage;
+     metric disk after;
+   end main;
+
+   recipe default on default is
+     metric disk before;
+     run configure build GNU.test coverage;
+     metric disk after;
+   end default;
+
+   recipe release on default is
+     metric disk before;
+     run configure build GNU.test;
+     metric disk after;
+   end release;
+
+   step coverage2 is
+     set ignore off;
+     FILE : file := "${MKEY}";
+     COV_SECRET : env := "${MKEY}";
+     as metric run "./coverage.sh ${COVERAGE}";
+     metric coverage "${COVERAGE}";
+   end coverage2;
+
+   step coverage3 is
+     set ignore on;
+     set timeout 30s;
+     set ignore off;
+
+     COV_SECRET : env := "${MKEY}";
+     TMP_FILE   : file := "${MKEY}";
+     as metric run "./coverage.sh --file ${TMP_FILE} ${COVERAGE}";
+     metric coverage "${COVERAGE}";
+   end coverage3;
+
+   step publish_coverage_io is
+      CODECOV_TOKEN : String := "${MKEY}";
+      CODECOV_TOKEN : env := "${MKEY}";
+      TMP_FILE : file := "${MKEY}";
+      set timeout 30s;
+      set ignore on;
+      --  set strategy disabled;
+      --  set strategy enabled;
+      --  set strategy default;
+      --  set strategy ignore-errors;
+      as publish run "codecov-io.sh -f ${COVERAGE} -t ${CODECOV_TOKEN} --key ${TMP_FILE}";
+   end publish_coverage_io;
+
+   step test is
+     as test run "${MAKE} -i test";
+     xunit "regtests/results/TEST-*.xml" ignore "regtests/results/TEST-*-ignore.xml";
+   end test;
+
+end awa;

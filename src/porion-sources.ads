@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-sources -- Source management
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,22 +17,11 @@
 -----------------------------------------------------------------------
 with Ada.Calendar;
 with Ada.Containers.Indefinite_Ordered_Maps;
-with Util.Beans.Objects.Enums;
 with Porion.Executors;
 with Porion.Configs;
 package Porion.Sources is
 
    Not_Supported : exception;
-
-   type Source_Control_Type is (SRC_UNKNOWN, SRC_GIT, SRC_FILE);
-
-   --  Use a fixed enum configuration because the value is stored in database.
-   for Source_Control_Type use (SRC_UNKNOWN => 0,
-                                SRC_GIT => 1,
-                                SRC_FILE => 2);
-
-   package Source_Control_Type_Objects is
-      new Util.Beans.Objects.Enums (Source_Control_Type);
 
    type Source_Info_Type is record
       Kind : Source_Control_Type := SRC_UNKNOWN;
@@ -58,6 +47,12 @@ package Porion.Sources is
       Changes    : Maps.Map;
    end record;
 
+   type Checkout_Type is record
+      Path         : UString;
+      Previous_Tag : UString;
+      Change_Count : Natural := 0;
+   end record;
+
    --  Check for changes in the project by using the executor.
    --  The source control parameters are configured in Config.
    procedure Check (Kind      : in Source_Control_Type;
@@ -69,11 +64,24 @@ package Porion.Sources is
    --  Checkout the source of the project by using the executor.
    --  The checkout parameters are configured in Config and the
    --  files are extracted in the Path directory (possibly on a remote host).
+   --  Return in Result the relative path within Path of the source locations.
    procedure Checkout (Kind     : in Source_Control_Type;
                        Config   : in Porion.Configs.Config_Type;
                        Path     : in String;
+                       Result   : out UString;
                        Executor : in out Porion.Executors.Executor_Type'Class) with
       Pre => Executor.Is_Configured and Path'Length > 0;
+
+   --  Checkout the source of the project by using the executor.
+   --  The checkout parameters are configured in Config and the extraction
+   --  is controlled by the Extraction record which contains the Path directory
+   --  (possibly on a remote host).  After extraction, the operation computes
+   --  the number of changes made since the previous build.
+   procedure Checkout (Kind       : in Source_Control_Type;
+                       Config     : in Porion.Configs.Config_Type;
+                       Extraction : in out Checkout_Type;
+                       Executor   : in out Porion.Executors.Executor_Type'Class) with
+      Pre => Executor.Is_Configured and Length (Extraction.Path) > 0;
 
    --  Guess some information about the sources located in the given directory.
    --  The source controller tries to find if it can manage the files at the given location
@@ -96,10 +104,12 @@ private
 
    procedure Checkout (Controller : in out Controller_Type;
                        Path       : in String;
+                       Result     : out UString;
                        Executor   : in out Porion.Executors.Executor_Type'Class) is abstract;
 
    procedure Changes (Controller : in out Controller_Type;
-                      Result     : out Status_Type;
+                      Path       : in String;
+                      Extraction : in out Checkout_Type;
                       Executor   : in out Porion.Executors.Executor_Type'Class) is abstract;
 
    --  Guess some information about the sources located in the given directory.

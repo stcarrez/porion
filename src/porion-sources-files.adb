@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-sources-files -- Source management with plain files
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,41 +16,25 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Directories;
-with Interfaces.C.Strings;
+with Ada.Containers;
 with Util.Log.Loggers;
-with Util.Strings;
-with Util.Systems.Constants;
+with Util.Strings.Sets;
+with Util.Strings.Vectors;
+with Util.Files;
 with EL.Contexts.Default;
 with Porion.Logs;
+with Porion.Nodes;
 package body Porion.Sources.Files is
 
    use Ada.Directories;
+   use type Ada.Containers.Count_Type;
+   subtype Output_Type is Porion.Nodes.Output_Type;
+   use type Porion.Nodes.Output_Type;
 
    Log   : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Sources.Files");
 
-   function Realpath (Path : in String) return String;
    function Make_Project_Name (Path : in String;
                                Kind : in File_Type) return String;
-
-   function Realpath (Path : in String) return String is
-      use Interfaces;
-
-      function Sys_Realpath (S : C.Strings.chars_ptr;
-                             R : C.Strings.chars_ptr) return C.Strings.chars_ptr with
-        Import => True, Convention => C,
-	Link_Name => Util.Systems.Constants.SYMBOL_PREFIX & "realpath";
-      P : C.Strings.chars_ptr := C.Strings.New_String (Path);
-      R : C.Strings.chars_ptr;
-   begin
-      R := Sys_Realpath (P, C.Strings.Null_Ptr);
-      C.Strings.Free (P);
-      declare
-         Result : constant String := C.Strings.Value (R);
-      begin
-         C.Strings.Free (R);
-         return Result;
-      end;
-   end Realpath;
 
    --  ------------------------------
    --  Guess the file type for the given file based on the file name extension.
@@ -71,6 +55,9 @@ package body Porion.Sources.Files is
       --  Repeat the extension test to handle some '.' in the name (ex: gcc-10.1.2.tar).
       while Sep < Path'Last loop
          if Path (Sep .. Path'Last) = ".tar.gz" then
+            return TAR_GZ;
+         end if;
+         if Path (Sep .. Path'Last) = ".tgz" then
             return TAR_GZ;
          end if;
          if Path (Sep .. Path'Last) = ".tar.xz" then
@@ -116,8 +103,15 @@ package body Porion.Sources.Files is
             return Path (First .. Last - 1);
 
          when TAR_GZ | TAR_BZ2 | TAR_XZ =>
-            Last := Util.Strings.Rindex (Path, '.', Last - 1);
-            return Path (First .. Last - 1);
+            declare
+               Sep : constant Natural := Util.Strings.Rindex (Path, '.', Last - 1);
+            begin
+               if Sep = 0 then
+                  return Path (First .. Last - 1);
+               else
+                  return Path (First .. Sep - 1);
+               end if;
+            end;
 
          when others =>
             return Path (First .. Last - 1);
@@ -150,25 +144,61 @@ package body Porion.Sources.Files is
    overriding
    procedure Checkout (Controller : in out Controller_Type;
                        Path       : in String;
+                       Result     : out UString;
                        Executor   : in out Porion.Executors.Executor_Type'Class) is
       Status   : Integer;
       Src_Path : constant String := Controller.Config.Get ("repository_url");
       Kind     : constant File_Type := Get_File_Type (Src_Path);
+      List     : Util.Strings.Sets.Set;
+      Empty    : Util.Strings.Vectors.Vector;
+      Exported_Path : UString;
    begin
       Log.Info ("Extracting files from '{0}' to '{1}'", Src_Path, Path);
 
+      Result := To_UString ("");
       Controller.Setup (Kind);
       Controller.Config.Set ("build_dir", Path);
+      Executor.Export_File (Src_Path, Path, Exported_Path);
+      if Length (Exported_Path) = 0 then
+         Controller.Config.Set ("path", Src_Path);
+      else
+         Controller.Config.Set ("path", To_String (Exported_Path));
+      end if;
       Executor.Execute (Command     => Controller.Extract_Command,
                         Parameters  => Controller.Config,
                         Working_Dir => Path,
                         Strip_Crlf  => False,
                         Status      => Status);
+      if Status = 0 then
+         Log.Info ("Checking extraction in {0}", Path);
+         Executor.Scan_Directory (Path => Path,
+                                  Pattern => "*",
+                                  Excludes => Empty,
+                                  List => List);
+         if List.Length = 2 then
+            declare
+               Pos : Util.Strings.Sets.Cursor := List.First;
+            begin
+               while Util.Strings.Sets.Has_Element (Pos) loop
+                  if Get_File_Type (Util.Strings.Sets.Element (Pos)) /= UNKNOWN then
+                     List.Delete (Pos);
+                     exit;
+                  end if;
+                  Util.Strings.Sets.Next (Pos);
+               end loop;
+            end;
+         end if;
+         if List.Length = 1 then
+            Result := To_UString (Util.Strings.Sets.Element (List.First));
+            Log.Info ("Using sources stored in {0}", Result);
+         end if;
+      end if;
    end Checkout;
 
    overriding
    procedure Changes (Controller : in out Controller_Type;
-                      Result     : out Status_Type;
+                      Path       : in String;
+                      Extraction : in out Checkout_Type;
                       Executor   : in out Porion.Executors.Executor_Type'Class) is
    begin
       null;
@@ -185,10 +215,16 @@ package body Porion.Sources.Files is
                     Result     : out Source_Info_Type;
                     Executor   : in out Porion.Executors.Executor_Type'Class) is
 
-      procedure Process (Line : in String);
+      procedure Process (Kind : in Output_Type;
+                         Line : in String);
 
-      procedure Process (Line : in String) is
+      procedure Process (Kind : in Output_Type;
+                         Line : in String) is
       begin
+         if Kind = Porion.Nodes.STDERR then
+            Executor.Log (Porion.Logs.LOG_EXECUTION_ERROR, Line);
+            return;
+         end if;
          if Line'Length > 0 then
             Result.URI := To_UString (Line);
          end if;
@@ -214,7 +250,7 @@ package body Porion.Sources.Files is
       Executor.Execute (Controller.Guess_Command, Controller.Config,
                         Process'Access, Strip_Crlf => True, Status => Status);
       if Status = 0 then
-         Result.URI := To_UString (Realpath (Path));
+         Result.URI := To_UString (Util.Files.Realpath (Path));
          Result.Name := To_UString (Make_Project_Name (Path, Kind));
          Result.Kind := SRC_FILE;
       end if;

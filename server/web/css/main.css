@@ -1,12 +1,44 @@
-body.awa {
-  background-color: #81CFB7;
+:root{
+    --white: #36383F;
+    --black: #f9f9f9;
+    --grey: #85888C;
+}
+body {
+    position: relative;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+#awa-page {
+    position: inherit;
+    height: auto;
 }
 #awa-hdr {
     height: 3em;
 }
+main {
+    flex-grow: 1;
+}
+footer {
+    width: 100%;
+    bottom: 0;
+    height: 30px;
+    clear: both;
+}
+footer ul {
+    list-style-type: none;
+}
+footer li {
+    float: right;
+    padding-right: 0.5em;
+}
 #awa-hdr h2 {
     font-size: 2em;
     padding-left: 0.5em;
+    display: inline-block;
+}
+#awa-footer_content {
+    margin-top: 0;
 }
 .awa-title {
   margin: 1em;
@@ -52,6 +84,141 @@ div.awa-title dd {
     text-decoration: none;
 }
 
+@media (min-width:768px) {
+    .awa-side-nav {
+        float: left;
+        width: 100%;
+    }
+    .awa-side-nav {
+        position: relative;
+    }
+}
+@media (max-width: 768px) {
+    .awa-menu li {
+        display: none;
+    }
+}
+
+/* Project page */
+.project-header, .node-header, .nodes-header, .notification-header, .activity-header {
+    /* float: left;*/
+    width: 100%;
+}
+.project-header .awa-page-nav, .node-header .awa-page-nav, .nodes-header .awa-page-nav, .activity-header .awa-page-nav {
+    background: #eee;
+}
+
+/* Nav menu */
+.awa-page-nav {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    background-color: var(--black);
+    overflow: hidden;
+    background: #eee;
+}
+.awa-page-nav li {
+    padding: 0.25em;
+    display: none;
+}
+.awa-page-nav span {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    font-size: 1.2em;
+}
+.awa-page-nav a {
+    text-decoration: none;
+}
+.awa-page-nav {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+.awa-page-menu a {
+    display: block;
+}
+.awa-page-menu a:hover {
+    background-color: var(--gray);
+    color: var(--black);
+}
+.awa-page-nav {
+    /* max-height: 0; */
+    transition: max-height .5s ease-out;
+}
+.awa-page-nav ul {
+    list-style-type: none;
+    width: 100%;
+    height: 32px;
+}
+.awa-menu span {
+    font-size: 1.2em;
+}
+.awa-menu a {
+    padding-top: 3px;
+}
+.page-summary .project-header .project-tab-summary,
+.page-xunits .project-header .project-tab-xunits,
+.page-builds .project-header .project-tab-builds {
+    border-color: #eee;
+    display: block;    
+}
+.awa-side-menu:checked ~ nav li {
+    display: block;
+}
+
+.page-summary #awa-top-nav #nav-tools a,
+.page-tutorials #awa-top-nav #nav-tutorials a,
+.page-wiki #awa-top-nav #nav-wiki a,
+.page-download #awa-top-nav #nav-download a,
+.page-news #awa-top-nav #nav-news a {
+    background: #eee;
+    color: #333;
+    border-color: #eee;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    -webkit-border-top-left-radius: 8px;
+    -webkit-border-top-right-radius: 8px;
+    -moz-border-radius-topleft: 8px;
+    -moz-border-radius-topright: 8px;
+    /* padding-bottom: 10px;*/
+}
+.awa-menu a:hover{
+    border-color: transparent;
+}
+/* .awa-menu a:hover {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}*/
+
+.page-REPORT_WEEK .activity-header .activity-tab-week,
+.page-REPORT_MONTH .activity-header .activity-tab-month,
+.page-REPORT_4WEEK .activity-header .activity-tab-4week,
+.page-summary .nodes-header .nodes-tab-summary,
+.page-queue .nodes-header .nodes-tab-queue,
+.page-summary .node-header .node-tab-summary,
+.page-builds .node-header .node-tab-builds,
+.page-queue .node-header .node-tab-queue,
+.page-summary .project-header .project-tab-summary,
+.page-xunits .project-header .project-tab-xunits,
+.page-builds .project-header .project-tab-builds,
+.page-coverage .project-header .project-tab-coverage {
+    background: white; /* see also theme.css */
+    border-top-left-radius: 0.5em;
+    border-top-right-radius: 0.5em;
+}
+.project-header .project-title, .node-header .node-title, .nodes-header .node-title {
+    padding-left: 0.5em;
+    font-size: 2em;
+    color: #626263;
+    width: 100%;
+}
+.project-header .project-title span {
+    width: 1em;
+    height: 1em;
+    margin-right: 0.5em;
+    border-radius: 1em;
+}
 .project-page-grid {
     float: left;
     width: 32%;
@@ -70,7 +237,7 @@ div.awa-title dd {
     line-height: 32px;
     vertical-align: top;
 }
-.project-page-grid .project-build-status, .project-page-grid .project-progress-status {
+.project-build-status, .project-page-grid .project-progress-status {
     display: inline-block;
     width: 16px;
     height: 40px;
@@ -79,13 +246,19 @@ div.awa-title dd {
 .project-page-grid .project-progress-status {
     float: right;
 }
-.build-status-BUILD_FAIL .project-build-status, .build-status-BUILD_FAIL .project-progress-status {
+.project-recipe-list .CONFIG_BUILD_REQUIRED .recipe-status {
+    background-color: #0000cc;
+}
+.build-status-BUILD_FAIL .project-build-status, .build-status-BUILD_FAIL .project-progress-status,
+.project-build-list .BUILD_FAIL .build-status {
     background: red;
 }
-.build-status-BUILD_PASS .project-build-status, .build-status-BUILD_PASS .project-progress-status {
+.build-status-BUILD_PASS .project-build-status, .build-status-BUILD_PASS .project-progress-status,
+.project-recipe-list .CONFIG_BUILD_PASS .recipe-status, .project-build-list .BUILD_PASS .build-status {
     background: green;
 }
-.build-status-BUILD_RUNNING .project-build-status, .build-status-BUILD_RUNNING .project-progress-status {
+.build-status-BUILD_RUNNING .project-build-status, .build-status-BUILD_RUNNING .project-progress-status,
+.project-build-list .BUILD_RUNNING .build-status {
     background: orange;
 }
 .project-page-grid .project-title {
@@ -150,7 +323,6 @@ div.awa-title dd {
 .project-dashboard .dashboard-value {
     float: left;
     width: 100%;
-    text-align: center;
 }
 .dashboard-cloc {
     overflow: hidden;
@@ -183,6 +355,9 @@ div.awa-title dd {
     margin-bottom: 0.5em;
     text-align: left;
 }
+.build-progress .asf-progress-bar {
+    background: red;
+}
 
 /* Build info */
 .build-info {
@@ -196,6 +371,7 @@ div.awa-title dd {
     padding-left: 1%;
     padding-right: 1%;
     padding-bottom: 1em;
+    width: 98%;
 }
 .build-top-title .build-project-name {
     font-size: 2em;
@@ -207,6 +383,8 @@ div.awa-title dd {
 }
 .build-top-title span {
     padding-right: 2em;
+    white-space: nowrap;
+    overflow: hidden;
 }
 .build-BUILD_PASS .build-status {
     float: left;
@@ -214,6 +392,13 @@ div.awa-title dd {
     width: 32px;
     height: 32px;
     background-color: #00C000;
+}
+.build-BUILD_FAIL .build-status {
+    float: left;
+    padding-right: 0;
+    width: 32px;
+    height: 32px;
+    background-color: red;
 }
 .build-info-line {
     float: left;
@@ -227,6 +412,20 @@ div.awa-title dd {
     padding-left: 1em;
     padding-right: 1em;
 }
+.build-info-line .dashboard-title, .build-info-line .dashboard-value {
+    float: left;
+    width: 50%;
+    height: 1em;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.build-info-line .dashboard-value {
+    text-align: right;
+}
+.build-info-line .dashboard-progress {
+    float: left;
+    width: 100%;
+}
 .porion-label {
     text-align: center;
     font-size: 1.2em;
@@ -237,6 +436,49 @@ div.awa-title dd {
     text-align: center;
     border-bottom-size: 3px;
 }
+/* Build step */
+.build-step {
+    float: left;
+    width: 100%;
+    border: 1px solid #ccc;
+    margin-bottom: 0.5em;
+    border-radius: 1em;
+}
+.build-step div {
+    float: left;
+    padding: 0.25em;
+}
+.build-step .build-step-number {
+    width: 4.0em;
+    text-align: center;
+    border-top-left-radius: 1em;
+    border-bottom-left-radius: 1em;
+}
+.build-step .build-step-energy {
+    width: 5%;
+    text-align: right;
+}
+.build-step .build-step-duration {
+    width: 5%;
+    text-align: right;
+}
+.build-step .build-step-command {
+    width: 75%;
+}
+.build-step-ok .build-step-number {
+    background-color: green;
+    color: white;
+}
+.build-step-fail .build-step-number {
+    background-color: red;
+    color: white;
+}
+.build-step-header {
+    border: none;
+    font-weight: bold;
+    margin-bottom: 0;
+}
+
 /* Build logs */
 .build-log {
     float: left;
@@ -262,6 +504,10 @@ div.awa-title dd {
     padding-right: 1em;
     border-radius: 0.5em;
 }
+.log-step {
+    float: left;
+    width: 100%;
+}
 .log-line, .log-line-number, .log-content {
     float: left;
 }
@@ -285,8 +531,9 @@ div.awa-title dd {
 }
 .build-show-warning .log-level-debug,
 .build-show-warning .log-level-unknown,
+.build-show-warning .log-level-porion,
 .build-show-warning .log-level-info,
-.build-show-info .log-level-unkown,
+.build-show-info .log-level-unknown,
 .build-show-info .log-level-debug {
     display: none;
 }
@@ -320,12 +567,19 @@ div.awa-title dd {
     text-align: center;
     border-left: 1px solid red;
 }
+.project-graph-view {
+    float: left;
+}
+.project-graph-title {
+    float: left;
+    width: 100%;
+    text-align: center;
+}
 .project-graph {
     float: left;
     width: 100%;
     padding-left: 1%;
     padding-right: 1%;
-    background: #424342;
 }
 #project-lang-graph, #graph-month, #graph-total {
     float: left;
@@ -341,6 +595,340 @@ div.awa-title dd {
     padding-right: 1em;
 }
 
-.flot-y-axis {
-  fill: white;
+/* Project summary with recipes */
+.project-recipe-list {
+    margin-top: 1em;
+    float: left;
+    width: 98%;
+    padding-left: 1%;
+    padding-right: 1%;
+}
+.project-recipe, .project-recipe-header {
+    float: left;
+    width: 100%;
+    line-height: 1.5em;
+}
+.project-recipe-header {
+    font-weight: bold;
+    border-bottom: 2px solid #ccc;
+    margin-bottom: 0.5em;
+}
+.project-recipe-header > div, .project-recipe > div {
+    height: 2em;
+    float: left;
+    padding: 0.25em;
+}
+.recipe-name, .recipe-node, .recipe-build-count, .recipe-build-number, .recipe-test-pass, .recipe-test-fail, .recipe-build-progress,
+.recipe-build-duration {
+    float: left;
+    width: 10%;
+}
+.project-recipe-list .recipe-status {
+    border-radius: 1em;
+    width: 1.8em;
+    height: 1.8em;
+    background-color: red;
+    display: inline-block;
+    margin-top: 0.1em;
+    margin-bottom: 0.1em;
+}
+
+/* Project builds */
+.awa-list-header > div, .awa-list-item > div {
+    float: left;
+    overflow: hidden;
+    margin-right: 0.5em;
+}
+.project-build-list .build-status {
+    width: 1em;
+    height: 1em;
+    border-radius: 1em;
+}
+.project-build-header .build-status {
+    border: none;
+}
+.project-build-list .build-number {
+    width: 5em;
+}
+.project-build-list .build-branch-name, .project-build-list .build-node, .project-build-list .build-recipe, .project-build-list .build-xunit {
+    width: 13%;
+}
+.project-build-list .build-tag {
+    width: 10%;
+}
+.project-build-list .awa-list .build-tag {
+    font-family: monospace;
+}
+.project-build-list .build-xunit-pass, .project-build-list .build-xunit-fail, .project-build-list .build-xunit-timeout {
+    width: 33.3%;
+    float: left;
+    text-align: right;
+    height: 1em;
+}
+.project-build-list .build-xunit-title {
+    width: 100%;
+    float: left;
+    text-align: center;
+}
+.project-build-list .build-duration {
+    width: 7%;
+    text-align: right;
+}
+.project-build-list .build-date {
+    width: 13%;
+    text-align: right;
+}
+.xunit-group .xunit-TEST_FAIL .xunit-group-name,
+.xunits .xunit-TEST_FAIL {
+    color: red;
+}
+.xunit-group .xunit-TEST_TIMEOUT .xunit-group-name,
+.xunits .xunit-TEST_TIMEOUT {
+    color: blue;
+}
+
+/* Fix display if parent line-height is > 1em */
+.asf-progress-bar {
+    line-height: 1em;
+}
+#project-xunits-graph, #project-coverage-graph .graph-view {
+    float: left;
+    width: 340px;
+    height: 256px;
+}
+.graph-legend {
+    float: right;
+    display: block;
+    border-width: initial;
+    border-style: none;
+    border-color: initial;
+    border-image: initial;
+    padding-right: 10px;
+    padding-top: 10px;
+}
+
+.legendLayer {
+    background: white;
+}
+.legendLayer .background {
+    fill: rgba(255, 255, 255, 0.85);
+    stroke: rgba(0, 0, 0, 0.85);
+    stroke-width: 1;
+}
+
+.graph-tooltip {
+    position: absolute;
+    display: none;
+    border: 1px solid #fdd;
+    padding: 2px;
+    background-color: #fee;
+    opacity: 0.80;
+}
+
+/* Build unit tests */
+.xunit-header {
+    font-size: 1.2em;
+}
+.xunit-header .xunit-name {
+    width: 40%;
+}
+.xunit-header .xunits-tests {
+    width: 5%;
+}
+.project-xunits, .build-xunits {
+    float: left;
+    width: 98%;
+    padding-left: 1%;
+    padding-right: 1%;
+}
+
+/* Class names used by xunits.ts for Unit tests display with expand/collapse */
+.xunit-group, .xunit, .xunit-group-title {
+    float: left;
+    width: 100%;
+}
+.xunit-group-title {
+    font-size: 1.1em;
+    color: #424343;
+    font-weight: bold;
+    padding-top: 0.2em;
+    cursor: pointer;
+}
+.xunit-group-title .xunit-group-name {
+    float: left;
+    width: 40%;
+    background: url(../images/icon-expand-tree-32.png) no-repeat;    
+    height: 32px;
+    line-height: 32px;
+}
+.xunit-group-title .xunit-group-name, .xunits .xunit {
+    padding-left: 32px;
+}
+.xunit-group-visible .xunit-group-name {
+    background: url(../images/icon-collapse-tree-32.png) no-repeat;    
+}
+.xunit-group-single .xunit-group-name {
+    background: none;
+    cursor: default;
+}
+/* Toggle visibility of list of unit tests (ie, expand/collapse) */
+.xunit-group .xunits {
+    display: none;
+}
+.xunit-group-visible .xunits {
+    display: block;
+}
+.xunits {
+    float: left;
+    width: 100%;
+    color: #525353;
+}
+.xunit-name {
+    float: left;
+    width: 55%; /* .xunit-pass.width * 3 + 40% */
+    margin-right: 16px; /* xunit-pass.margin-right * 2 */
+}
+.xunit-duration {
+    float: left;
+    width: 20%;
+    text-align: right;
+    padding-right: 0.5em;
+    height: 1.0em;
+    overflow: hidden;
+}
+.xunit-build {
+    float: left;
+    width: 20%;
+}
+.xunit-pass, .xunit-fail, .xunit-timeout {
+    float: left;
+    width: 5%;
+    text-align: right;
+    margin-right: 8px; /* Use px for alignment with xunit-group-name which uses different font size */
+}
+
+/* Global activity */
+.activity-header {
+    float: left;
+    width: 100%;
+}
+.activity-list, .activity-chart {
+    float: left;
+    width: 100%;
+}
+
+.activity-list .activity-name {
+    width: 30%;
+}
+.activity-list .activity-build {
+    width: 20%;
+}
+.activity-list .activity-info {
+    width: 40%;
+}
+
+/* Node information */
+.node-info {
+    float: left;
+    width: 100%;
+    padding-left: 1em;
+}
+.node-info-title {
+    float: left;
+    width: 140px;
+}
+.node-info-value {
+    float: left;
+    width: 70%;
+}
+#node-usage-graph, #node-duration-graph {
+    width: 800px;
+    height: 300px;
+}
+
+/* List of build nodes */
+.node-list .build-node {
+    font-size: 1.0em;
+    line-height: 1.0em;
+}
+.node-list .node-status {
+    width: 1em;
+    height: 1em;
+    border-radius: 1em;
+    background: red;
+}
+.node-list .node-list-header .node-status {
+    background: none;
+}
+.node-list .NODE_ONLINE .node-status {
+    background: green;
+}
+.node-list .node-name, .node-list .node-dir, .node-list .node-os {
+    width: 15%;
+}
+.node-list .node-dir {
+    width: 25%;
+    padding-left: 1em;
+}
+.node-list .node-recipes, .node-list .node-builds, .node-list .node-queue {
+    width: 5%;
+    text-align: right;
+}
+
+/* Build queue information */
+.queue-list .queue-order {
+    width: 5%;
+}
+.queue-list .queue-name {
+    width: 20%;
+}
+.queue-list .queue-recipe {
+    width: 40%;
+}
+.queue-list .queue-branch-tag {
+    width: 10%;
+}
+.queue-list .queue-date {
+    width: 10%;
+}
+
+/* Notifications */
+.notification-list .notification-project, .notification-list .notification-email,
+.notification-list .notification-date {
+    width: 20%;
+}
+.notification-list .notification-frequency {
+    width: 15%;
+}
+.notification-list .notification-kind {
+    width: 15%;
+}
+.notification-list .notification-count {
+    width: 5%;
+}
+.notification-list .notification-kind-title {
+    width: 100%;
+    text-align: center;
+}
+.notification-list .notification-kind-config, .notification-list .notification-kind-build, .notification-list .notification-kind-xunit {
+    width: 33%;
+    float: left;
+    text-align: center;
+}
+.graph-svg-tip {
+    color: #959da5;
+}
+.chart-container {
+    fill: white;
+    font-size: 20px;
+}
+.title {
+    fill: white;
+}
+
+.chart-container .legend-dataset-text {
+    font-size: 14px;
+}
+.chart-container .axis {
+    font-size: 20px;
 }

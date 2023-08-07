@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-builds-services -- build service to manage builds
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,7 +42,6 @@ package body Porion.Builds.Services is
    use type Ada.Calendar.Time;
    use type ADO.Identifier;
    use type Porion.Nodes.Usage_Type;
-   use type Porion.Builds.Models.Execution_Type;
    use type Porion.Builds.Models.Build_Status_Type;
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Builds.Services");
@@ -52,6 +51,7 @@ package body Porion.Builds.Services is
                           Executor    : in out Porion.Executors.Executor_Type'Class) is
       Query         : ADO.Queries.Context;
       Found         : Boolean;
+      Updated       : Boolean;
       Create_Reason : Boolean := False;
    begin
       Service.Recipe := Recipe;
@@ -76,8 +76,9 @@ package body Porion.Builds.Services is
       Service.Build.Set_Tag (String '(Service.Branch.Get_Tag));
       Service.Build.Set_Create_Date (Ada.Calendar.Clock);
       if not Executor.Is_Dry_Run then
-         Service.Branch.Set_Last_Build_Number (Service.Build.Get_Number);
          Service.Build.Save (Service.DB);
+         Service.Branch.Reload (Service.Db, Updated);
+         Service.Branch.Set_Last_Build_Number (Service.Build.Get_Number);
          Service.Branch.Save (Service.DB);
 
          --  Get or create a build queue entry for the recipe.
@@ -185,6 +186,27 @@ package body Porion.Builds.Services is
       return Configs.Get_Build_Log_Directory (Name, Branch_Name, Service.Build.Get_Number);
    end Get_Log_Directory;
 
+   --  ------------------------------
+   --  Get the source tag that was used by the last build
+   --  ------------------------------
+   procedure Last_Build_Tag (Service : in out Context_Type;
+                             Tag     : out UString) is
+      Stmt : ADO.Statements.Query_Statement :=
+         Service.DB.Create_Statement ("SELECT build.tag FROM porion_last_build AS lb "
+                                      & "INNER JOIN porion_build AS build ON "
+                                      & "lb.build_id = build.id AND last_build = 1 "
+                                      & "WHERE lb.recipe_id = :recipe AND lb.branch_id = :branch");
+   begin
+      Stmt.Bind_Param ("recipe", Service.Recipe.Get_Id);
+      Stmt.Bind_Param ("branch", Service.Branch.Get_Id);
+      Stmt.Execute;
+      if not Stmt.Has_Elements then
+         Tag := To_UString ("");
+         return;
+      end if;
+      Tag := Stmt.Get_Unbounded_String (0);
+   end Last_Build_Tag;
+
    procedure Build (Service     : in out Context_Type;
                     Steps       : in Build_Step_Vector;
                     Executor    : in out Porion.Executors.Executor_Type'Class) is
@@ -194,16 +216,13 @@ package body Porion.Builds.Services is
       Log_Dir     : constant String := Get_Log_Directory (Service);
       Config      : Util.Properties.Manager;
       Status      : Builds.Models.Build_Status_Type := Builds.Models.BUILD_RUNNING;
-      Usage       : Nodes.Usage_Type := (others => 0);
-      Env         : Util.Strings.Maps.Map;
+      Changes     : Porion.Sources.Checkout_Type;
    begin
       Log.Info ("Build {0} in {1}", Ident, Path);
 
-      Load_Environment (Service, Service.Recipe, Env);
+      Executor.Prepare_Build (Service);
 
-      Executor.Set_Build_Node (Service.Build_Node, Env);
-
-      Executor.Set_Step (Builds.STEP_CHECKOUT);
+      Executor.Set_Step (Builds.STEP_CHECKOUT, Builds.EXEC_NO_ERROR, ADO.NO_IDENTIFIER);
       if not Executor.Is_Dry_Run then
          Executor.Create_Directory (Path, False);
       end if;
@@ -214,21 +233,62 @@ package body Porion.Builds.Services is
 
       Executor.Create_Logger (Log_Dir, "build.log");
       Executor.Log (Porion.Logs.LOG_INFO, "Build '" & Ident & "' in " & Path);
-      Porion.Sources.Checkout (Service.Project.Get_Scm, Config, Path, Executor);
+      Changes.Path := To_UString (Path);
+      Last_Build_Tag (Service, Changes.Previous_Tag);
+      Porion.Sources.Checkout (Service.Project.Get_Scm, Config, Changes, Executor);
 
+      --  Record the number of source changes since the previous build for the same recipe.
+      if not Executor.Is_Dry_Run and then Changes.Change_Count /= 0 then
+         declare
+            Updated : Boolean;
+         begin
+            Service.DB.Begin_Transaction;
+            Service.Build.Reload (Service.DB, Updated);
+            Service.Build.Set_Source_Changes (Changes.Change_Count);
+            Service.Build.Save (Service.DB);
+            Service.DB.Commit;
+         end;
+      end if;
+      Run_Build_Steps (Service, Steps, To_String (Changes.Path), Status, Executor);
+
+      if not Executor.Is_Dry_Run then
+         --  Save the resource usage in the build.
+         declare
+            Usage   : constant Nodes.Usage_Type := Executor.Get_Usage;
+            Updated : Boolean;
+         begin
+            Service.Build.Reload (Service.DB, Updated);
+            Service.Build.Set_User_Time (Millisecond_Type (Usage.User_Time));
+            Service.Build.Set_Sys_Time (Millisecond_Type (Usage.Sys_Time));
+         end;
+         Update_Build (Service, Status);
+      end if;
+   end Build;
+
+   procedure Run_Build_Steps (Service  : in out Context_Type;
+                              Steps    : in Build_Step_Vector;
+                              Path     : in String;
+                              Status   : out Builds.Models.Build_Status_Type;
+                              Executor : in out Porion.Executors.Executor_Type'Class) is
+      Usage       : Nodes.Usage_Type := (others => 0);
+   begin
+      Status := Builds.Models.BUILD_RUNNING;
       for Step of Steps loop
-         if Step.Step.Get_Execution /= Builds.Models.EXEC_DISABLED then
+         if Executor.Is_Dry_Run or else Step.Step.Get_Execution /= Builds.EXEC_DISABLED then
             declare
                Exec_Step   : Builds.Models.Build_Step_Ref;
                Step_Status : Integer;
             begin
                if not Executor.Is_Dry_Run then
+                  Service.DB.Begin_Transaction;
                   Exec_Step.Set_Start_Date (Ada.Calendar.Clock);
                   Exec_Step.Set_Build (Service.Build);
                   Exec_Step.Set_Recipe_Step (Step.Step);
                   Exec_Step.Save (Service.DB);
+                  Service.DB.Commit;
+                  Executor.Prepare_Step (Step.Step.Get_Number);
                end if;
-               Executor.Set_Step (Step.Step.Get_Step);
+               Executor.Set_Step (Step.Step.Get_Step, Step.Step.Get_Execution, Step.Step.Get_Id);
                Executor.Set_Status (0);
                Builders.Run (Step.Step.Get_Builder, Service.DB, Step.Config,
                              Service.Build, Path, Executor);
@@ -242,39 +302,46 @@ package body Porion.Builds.Services is
                   begin
                      Usage := New_Usage;
                      Step_Status := Executor.Get_Status;
+                     Service.DB.Begin_Transaction;
                      Exec_Step.Set_Exit_Status (Step_Status);
                      Exec_Step.Set_End_Date ((Is_Null => False, Value => Finish));
                      Exec_Step.Set_Step_Duration (Millisecond_Type (Time * 1_000.0));
                      Exec_Step.Set_User_Time (Millisecond_Type (Step_Usage.User_Time));
                      Exec_Step.Set_Sys_Time (Millisecond_Type (Step_Usage.Sys_Time));
                      Exec_Step.Save (Service.DB);
+                     Service.DB.Commit;
                   end;
                   if Step_Status /= 0
-                    and Step.Step.Get_Execution = Builds.Models.EXEC_NO_ERROR
+                    and Step.Step.Get_Execution = Builds.EXEC_NO_ERROR
                   then
                      Status := Porion.Builds.Models.BUILD_FAIL;
-                     exit;
+                     return;
                   end if;
                end if;
             end;
          end if;
       end loop;
+      Status := Porion.Builds.Models.BUILD_PASS;
+   end Run_Build_Steps;
 
-      if not Executor.Is_Dry_Run then
-         if Status = Builds.Models.BUILD_RUNNING then
-            Status := Builds.Models.BUILD_PASS;
-         end if;
+   --  ------------------------------
+   --  Cancel the building status on the build queues for the given node.
+   --  ------------------------------
+   procedure Cancel_Building (Service : in out Context_Type;
+                              Node    : in String) is
+      Query : ADO.Queries.Context;
+      List  : Porion.Builds.Models.Build_Queue_Vector;
+   begin
+      Log.Info ("Cancel building status for build node {0}", Node);
 
-         --  Save the resource usage in the build.
-         declare
-            Usage : constant Nodes.Usage_Type := Executor.Get_Usage;
-         begin
-            Service.Build.Set_User_Time (Millisecond_Type (Usage.User_Time));
-            Service.Build.Set_Sys_Time (Millisecond_Type (Usage.Sys_Time));
-         end;
-         Update_Build (Service, Status);
-      end if;
-   end Build;
+      Query.Set_Filter ("o.building = 1 AND o.node_id = :node_id");
+      Query.Bind_Param ("node_id", Service.Build_Node.Get_Id);
+      Porion.Builds.Models.List (List, Service.DB, Query);
+      for Queue of List loop
+         Queue.Set_Building (False);
+         Queue.Save (Service.DB);
+      end loop;
+   end Cancel_Building;
 
    procedure Build_Queue (Service : in out Context_Type;
                           Node    : in String) is
@@ -297,10 +364,16 @@ package body Porion.Builds.Services is
          end if;
       end if;
 
+      --  First, cancel the building status because we know there is no executor
+      --  running for this build node.
+      Service.DB.Begin_Transaction;
+      Cancel_Building (Service, Node);
+
       Build_Executor.Set_Pid (Util.Systems.Os.Sys_Getpid);
       Build_Executor.Set_Node (Service.Build_Node);
       Build_Executor.Set_Start_Date (Ada.Calendar.Clock);
       Build_Executor.Save (Service.DB);
+      Service.DB.Commit;
 
       loop
          Service.Project := Projects.Models.Null_Project;
@@ -308,7 +381,9 @@ package body Porion.Builds.Services is
          exit when not Found;
       end loop;
 
+      Service.DB.Begin_Transaction;
       Build_Executor.Delete (Service.DB);
+      Service.DB.Commit;
    end Build_Queue;
 
    --  ------------------------------
@@ -316,14 +391,7 @@ package body Porion.Builds.Services is
    --  ------------------------------
    function Contains (List   : in Porion.Builds.Models.Build_Queue_Vector;
                       Recipe : in Porion.Builds.Models.Recipe_Ref) return Boolean is
-   begin
-      for Queue of List loop
-         if Queue.Get_Recipe.Get_Id = Recipe.Get_Id then
-            return True;
-         end if;
-      end loop;
-      return False;
-   end Contains;
+      (for some Queue of List => Queue.Get_Recipe.Get_Id = Recipe.Get_Id);
 
    --  ------------------------------
    --  Update the build queue to trigger builds and/or re-order the build queue according
@@ -569,118 +637,173 @@ package body Porion.Builds.Services is
    --  Update the ratings on the branch when a build is finished.
    --  ------------------------------
    procedure Update_Branch_Ratings (Service : in out Context_Type) is
-      List         : Porion.Builds.Models.Build_Status_Vector;
-      Query        : ADO.Queries.Context;
-      Recipe_Count : Natural := 0;
-      Total_Rate   : Natural := 0;
-      Success_Rate : Natural := 0;
-      Build_Count  : Natural := 0;
-      Pass_Rate    : Natural := 0;
-      Fail_Rate    : Natural := 0;
-      Timeout_Rate : Natural := 0;
-      Test_Rate    : Natural := 0;
-      Tag          : constant UString := Service.Branch.Get_Tag;
-   begin
-      --  Step 1: get the recipes and builds for the project branch.
-      Query.Set_Query (Porion.Builds.Models.Query_Project_Build_Status);
-      Query.Bind_Param ("project_id", Service.Project.Get_Id);
-      Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
-      Porion.Builds.Models.List (List, Service.DB, Query);
-      if List.Is_Empty then
-         Log.Warn ("No branch found for project {0}", Service.Project.Get_Name);
-         return;
-      end if;
 
-      --  Step 2: compute the pass/fail rates while applying the rate factor
-      --  defined on each recipe.  We only consider the builds that match
-      --  our current branch tag.
-      for Status of List loop
-         declare
-            Rate : constant Natural := Natural (Status.Rate_Factor);
-         begin
-            Total_Rate := Total_Rate + Rate;
-            if Status.Build_Status.Is_Null then
-               Recipe_Count := Recipe_Count + 1;
-            elsif Status.Build_Tag = Tag then
-               Build_Count := Build_Count + 1;
-               if Status.Build_Status.Value = Models.BUILD_PASS then
-                  Success_Rate := Success_Rate + Rate;
+      procedure Do_Branch_Ratings (Service : in out Context_Type);
+
+      procedure Do_Branch_Ratings (Service : in out Context_Type) is
+         List         : Porion.Builds.Models.Build_Status_Vector;
+         Query        : ADO.Queries.Context;
+         Recipe_Count : Natural := 0;
+         Total_Rate   : Natural := 0;
+         Success_Rate : Natural := 0;
+         Build_Count  : Natural := 0;
+         Pass_Rate    : Natural := 0;
+         Fail_Rate    : Natural := 0;
+         Timeout_Rate : Natural := 0;
+         Test_Rate    : Natural := 0;
+         Tag          : constant UString := Service.Branch.Get_Tag;
+      begin
+         --  Step 1: get the recipes and builds for the project branch.
+         Query.Set_Query (Porion.Builds.Models.Query_Project_Build_Status);
+         Query.Bind_Param ("project_id", Service.Project.Get_Id);
+         Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
+         Porion.Builds.Models.List (List, Service.DB, Query);
+         if List.Is_Empty then
+            Log.Warn ("No branch found for project {0}", Service.Project.Get_Name);
+            return;
+         end if;
+
+         --  Step 2: compute the pass/fail rates while applying the rate factor
+         --  defined on each recipe.  We only consider the builds that match
+         --  our current branch tag.
+         for Status of List loop
+            declare
+               Rate : constant Natural := Natural (Status.Rate_Factor);
+            begin
+               Total_Rate := Total_Rate + Rate;
+               if Status.Build_Status.Is_Null then
+                  Recipe_Count := Recipe_Count + 1;
+               elsif Status.Build_Tag = Tag then
+                  Build_Count := Build_Count + 1;
+                  if Status.Build_Status.Value = Models.BUILD_PASS then
+                     Success_Rate := Success_Rate + Rate;
+                  end if;
+                  Pass_Rate := Pass_Rate + Status.Pass_Count * Rate;
+                  Fail_Rate := Fail_Rate + Status.Fail_Count * Rate;
+                  Timeout_Rate := Timeout_Rate + Status.Timeout_Count * Rate;
+                  Test_Rate := Test_Rate
+                     + (Status.Pass_Count + Status.Fail_Count + Status.Timeout_Count) * Rate;
                end if;
-               Pass_Rate := Pass_Rate + Status.Pass_Count * Rate;
-               Fail_Rate := Fail_Rate + Status.Fail_Count * Rate;
-               Timeout_Rate := Timeout_Rate + Status.Timeout_Count * Rate;
-               Test_Rate := Test_Rate
-                  + (Status.Pass_Count + Status.Fail_Count + Status.Timeout_Count) * Rate;
-            end if;
+            end;
+         end loop;
+
+         if Total_Rate > 0 then
+            Service.Branch.Set_Build_Rate (To_Permille (Success_Rate, Total_Rate));
+         else
+            Service.Branch.Set_Build_Rate (0);
+         end if;
+         if Test_Rate > 0 then
+            Service.Branch.Set_Pass_Rate (To_Permille (Pass_Rate, Test_Rate));
+            Service.Branch.Set_Fail_Rate (To_Permille (Fail_Rate, Test_Rate));
+            Service.Branch.Set_Timeout_Rate (To_Permille (Timeout_Rate, Test_Rate));
+         else
+            Service.Branch.Set_Pass_Rate (0);
+            Service.Branch.Set_Fail_Rate (0);
+            Service.Branch.Set_Timeout_Rate (0);
+         end if;
+         Service.Branch.Set_Build_Progress (To_Permille (Build_Count, Natural (List.Length)));
+         Service.Branch.Save (Service.DB);
+         Log.Info ("Branch rating for {0} updated", String '(Service.Branch.Get_Name));
+      end Do_Branch_Ratings;
+
+      Retry   : Natural := 0;
+      Updated : Boolean;
+   begin
+      --  If two processes are updating the same branch ratings, one can get a
+      --  LAZY_LOCK exception.  To handle it, we can simply reload the branch
+      --  and run the branch rating calculation again.
+      loop
+         begin
+            Do_Branch_Ratings (Service);
+            return;
+
+         exception
+            when ADO.Objects.LAZY_LOCK =>
+               Retry := Retry + 1;
+               if Retry > 10 then
+                  raise;
+               end if;
+               Service.Branch.Reload (Service.DB, Updated);
+
          end;
       end loop;
-
-      if Total_Rate > 0 then
-         Service.Branch.Set_Build_Rate (To_Permille (Success_Rate, Total_Rate));
-      else
-         Service.Branch.Set_Build_Rate (0);
-      end if;
-      if Test_Rate > 0 then
-         Service.Branch.Set_Pass_Rate (To_Permille (Pass_Rate, Test_Rate));
-         Service.Branch.Set_Fail_Rate (To_Permille (Fail_Rate, Test_Rate));
-         Service.Branch.Set_Timeout_Rate (To_Permille (Timeout_Rate, Test_Rate));
-      else
-         Service.Branch.Set_Pass_Rate (0);
-         Service.Branch.Set_Fail_Rate (0);
-         Service.Branch.Set_Timeout_Rate (0);
-      end if;
-      Service.Branch.Set_Build_Progress (To_Permille (Build_Count, Natural (List.Length)));
-      Service.Branch.Save (Service.DB);
    end Update_Branch_Ratings;
 
    --  ------------------------------
    --  Update the ratings on the project by looking at the branches.
    --  ------------------------------
    procedure Update_Project_Ratings (Service : in out Context_Type) is
-      List         : Porion.Projects.Models.Branch_Vector;
-      Query        : ADO.Queries.Context;
-      Total_Rate   : Natural := 0;
-      Success_Rate : Natural := 0;
-      Pass_Rate    : Natural := 0;
-      Fail_Rate    : Natural := 0;
-      Timeout_Rate : Natural := 0;
-      Build_Progress : Natural := 0;
-   begin
-      --  Step 1: get the project branches.
-      Query.Bind_Param ("project_id", Service.Project.Get_Id);
-      Query.Set_Filter ("o.project_id = :project_id AND o.status != 0");
-      Porion.Projects.Models.List (List, Service.DB, Query);
 
-      --  Step 2: compute the pass/fail rates while applying the rate factor
-      --  defined on each recipe.  We only consider the builds that match
-      --  our current branch tag.
-      for Branch of List loop
-         declare
-            Rate : constant Natural := Natural (Branch.Get_Rate_Factor);
+      procedure Do_Project_Ratings (Service : in out Context_Type);
+
+      procedure Do_Project_Ratings (Service : in out Context_Type) is
+         List         : Porion.Projects.Models.Branch_Vector;
+         Query        : ADO.Queries.Context;
+         Total_Rate   : Natural := 0;
+         Success_Rate : Natural := 0;
+         Pass_Rate    : Natural := 0;
+         Fail_Rate    : Natural := 0;
+         Timeout_Rate : Natural := 0;
+         Build_Progress : Natural := 0;
+      begin
+         --  Step 1: get the project branches.
+         Query.Bind_Param ("project_id", Service.Project.Get_Id);
+         Query.Set_Filter ("o.project_id = :project_id AND o.status != 0");
+         Porion.Projects.Models.List (List, Service.DB, Query);
+
+         --  Step 2: compute the pass/fail rates while applying the rate factor
+         --  defined on each recipe.  We only consider the builds that match
+         --  our current branch tag.
+         for Branch of List loop
+            declare
+               Rate : constant Natural := Natural (Branch.Get_Rate_Factor);
+            begin
+               Total_Rate := Total_Rate + Rate;
+               Success_Rate := Success_Rate + Natural (Branch.Get_Build_Rate) * Rate;
+               Build_Progress := Build_Progress + Natural (Branch.Get_Build_Progress) * Rate;
+               Pass_Rate := Pass_Rate + Natural (Branch.Get_Pass_Rate) * Rate;
+               Fail_Rate := Fail_Rate + Natural (Branch.Get_Fail_Rate) * Rate;
+               Timeout_Rate := Timeout_Rate + Natural (Branch.Get_Timeout_Rate) * Rate;
+            end;
+         end loop;
+
+         if Total_Rate > 0 then
+            Service.Project.Set_Build_Rate (Permille_Type (Success_Rate / Total_Rate));
+            Service.Project.Set_Pass_Rate (Permille_Type (Pass_Rate / Total_Rate));
+            Service.Project.Set_Fail_Rate (Permille_Type (Fail_Rate / Total_Rate));
+            Service.Project.Set_Timeout_Rate (Permille_Type (Timeout_Rate / Total_Rate));
+            Service.Project.Set_Build_Progress (Permille_Type (Build_Progress / Total_Rate));
+         else
+            Service.Project.Set_Build_Rate (0);
+            Service.Project.Set_Pass_Rate (0);
+            Service.Project.Set_Fail_Rate (0);
+            Service.Project.Set_Timeout_Rate (0);
+         end if;
+
+         Service.Project.Save (Service.DB);
+      end Do_Project_Ratings;
+
+      Retry   : Natural := 0;
+      Updated : Boolean;
+   begin
+      --  If two processes are updating the same project ratings, one can get a
+      --  LAZY_LOCK exception.  To handle it, we can simply reload the project
+      --  and run the project rating calculation again.
+      loop
          begin
-            Total_Rate := Total_Rate + Rate;
-            Success_Rate := Success_Rate + Natural (Branch.Get_Build_Rate) * Rate;
-            Build_Progress := Build_Progress + Natural (Branch.Get_Build_Progress) * Rate;
-            Pass_Rate := Pass_Rate + Natural (Branch.Get_Pass_Rate) * Rate;
-            Fail_Rate := Fail_Rate + Natural (Branch.Get_Fail_Rate) * Rate;
-            Timeout_Rate := Timeout_Rate + Natural (Branch.Get_Timeout_Rate) * Rate;
+            Do_Project_Ratings (Service);
+            return;
+
+         exception
+            when ADO.Objects.LAZY_LOCK =>
+               Retry := Retry + 1;
+               if Retry > 10 then
+                  raise;
+               end if;
+               Service.Project.Reload (Service.DB, Updated);
+
          end;
       end loop;
-
-      if Total_Rate > 0 then
-         Service.Project.Set_Build_Rate (Permille_Type (Success_Rate / Total_Rate));
-         Service.Project.Set_Pass_Rate (Permille_Type (Pass_Rate / Total_Rate));
-         Service.Project.Set_Fail_Rate (Permille_Type (Fail_Rate / Total_Rate));
-         Service.Project.Set_Timeout_Rate (Permille_Type (Timeout_Rate / Total_Rate));
-         Service.Project.Set_Build_Progress (Permille_Type (Build_Progress / Total_Rate));
-      else
-         Service.Project.Set_Build_Rate (0);
-         Service.Project.Set_Pass_Rate (0);
-         Service.Project.Set_Fail_Rate (0);
-         Service.Project.Set_Timeout_Rate (0);
-      end if;
-
-      Service.Project.Save (Service.DB);
    end Update_Project_Ratings;
 
    --  ------------------------------
@@ -884,7 +1007,7 @@ package body Porion.Builds.Services is
       New_Step.Step.Set_Builder (Kind);
       New_Step.Step.Set_Number (Pos);
       New_Step.Step.Set_Step (Step);
-      New_Step.Step.Set_Execution (Builds.Models.EXEC_NO_ERROR);
+      New_Step.Step.Set_Execution (Builds.EXEC_NO_ERROR);
       New_Step.Step.Set_Recipe (Recipe);
       New_Step.Step.Save (Service.DB);
       Steps.Insert (Pos, New_Step);
@@ -1144,7 +1267,7 @@ package body Porion.Builds.Services is
          Append (Filter, " AND o.branch_id IS NULL");
       end if;
       if not Service.Project.Is_Null then
-         Append (Filter, "AND o.project_id = :project_id");
+         Append (Filter, " AND o.project_id = :project_id");
          Query.Bind_Param ("project_id", Service.Project.Get_Id);
       else
          Append (Filter, " AND o.project_id IS NULL");
@@ -1299,8 +1422,8 @@ package body Porion.Builds.Services is
          begin
             Rank := Rank + 1;
             Step_Ref.Step.Set_Number (Rank);
-            Update_Parameters (Service, Step_Ref.Step, Step_Ref.Config);
             if Step_Ref.Step.Is_Loaded then
+               Update_Parameters (Service, Step_Ref.Step, Step_Ref.Config);
                if Step_Ref.Step.Is_Modified then
                   Step_Ref.Step.Save (Service.DB);
                end if;
@@ -1364,6 +1487,7 @@ package body Porion.Builds.Services is
                Remove (Build_Configs, Config_Ref.Config.Get_Id);
             else
                Config_Ref.Config.Save (Service.DB);
+               Update (Service, Config_Ref.Element.all);
             end if;
          end;
       end loop;
@@ -1384,6 +1508,7 @@ package body Porion.Builds.Services is
       Query   : ADO.SQL.Query;
       Found   : Boolean;
       Added   : Boolean;
+      Dir     : UString;
    begin
       Log.Info ("Make build config {0} for branch {1} in {2}", Name, Branch, Path);
 
@@ -1402,7 +1527,7 @@ package body Porion.Builds.Services is
 
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
 
-      Sources.Checkout (Service.Project.Get_Scm, Config, Path, Executor);
+      Sources.Checkout (Service.Project.Get_Scm, Config, Path, Dir, Executor);
 
       if Service.Build_Node.Is_Null then
          Nodes.Services.Load_Default_Node (Service);
@@ -1416,7 +1541,11 @@ package body Porion.Builds.Services is
       Service.Recipe.Set_Rate_Factor (100);
       Service.Recipe.Set_Name ("main");
       Service.Recipe.Save (Service.DB);
-      Guess (Service, Path, Executor);
+      if Length (Dir) > 0 then
+         Guess (Service, To_String (Dir), Executor);
+      else
+         Guess (Service, Path, Executor);
+      end if;
 
       Add_Build_Queue (Service, Models.REASON_CONFIG, Added);
       if Added then
@@ -1430,10 +1559,12 @@ package body Porion.Builds.Services is
                            List    : in out Porion.Builds.Models.Recipe_Vector) is
       Query : ADO.Queries.Context;
       Found : Boolean;
+      Has_Branch : Boolean;
    begin
       Service.Load_Project (To_String (Ident.Name));
 
-      if Length (Ident.Branch) > 0 then
+      Has_Branch := Length (Ident.Branch) > 0;
+      if Has_Branch then
          Query.Set_Filter ("o.project_id = :project_id and o.name = :branch");
          Query.Bind_Param ("project_id", Service.Project.Get_Id);
          Query.Bind_Param ("branch", Ident.Branch);
@@ -1455,7 +1586,10 @@ package body Porion.Builds.Services is
       Query.Clear;
       Query.Bind_Param ("project_id", Service.Project.Get_Id);
       Query.Bind_Param ("node_id", Service.Build_Node.Get_Id);
-      if not Service.Branch.Is_Null and not Service.Build_Node.Is_Null then
+      if Has_Branch
+        and then not Service.Branch.Is_Null
+        and then not Service.Build_Node.Is_Null
+      then
          Query.Set_Filter ("o.project_id = :project_id AND o.node_id = :node_id "
                            & " AND o.branch_id = :branch_id");
          Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
@@ -1475,11 +1609,35 @@ package body Porion.Builds.Services is
 
       Ident   : constant String := Service.Get_Recipe_Name (From);
       Steps   : Build_Step_Vector;
+      Branch  : Porion.Projects.Models.Branch_Ref := Service.Branch;
    begin
       Log.Info ("Copy build recipe {0} to {1}", Ident, Name);
 
       --  Load the recipe steps.
       Load_Recipe (Service, From, Steps);
+
+      --  Use the source recipe branch if there is no branch defined for the new recipe.
+      if Branch.Is_Null then
+         Branch := Service.Branch;
+      end if;
+
+      --  Make sure the new recipe name is not used for the project+branch.
+      declare
+         Count_Statement : ADO.Statements.Query_Statement
+            := Service.DB.Create_Statement ("SELECT COUNT(*) FROM porion_recipe AS r "
+                         & "WHERE r.name = :name AND project_id = :project_id "
+                         & "AND branch_id = :branch_id");
+      begin
+         Count_Statement.Bind_Param ("name", Name);
+         Count_Statement.Bind_Param ("project_id", Service.Project.Get_Id);
+         Count_Statement.Bind_Param ("branch_id", Branch.Get_Id);
+         Count_Statement.Execute;
+         if Count_Statement.Get_Result_Integer /= 0 then
+            Log.Warn ("Recipe name {0} is already used", Name);
+            raise Name_Used;
+            return;
+         end if;
+      end;
 
       --  Create the new recipe and copy the build steps.
       Service.DB.Begin_Transaction;
@@ -1493,7 +1651,7 @@ package body Porion.Builds.Services is
          New_Recipe.Set_Status (Builds.Models.CONFIG_BUILD_REQUIRED);
          New_Recipe.Set_Node (Service.Build_Node);
          New_Recipe.Set_Project (Service.Project);
-         New_Recipe.Set_Branch (Service.Branch);
+         New_Recipe.Set_Branch (Branch);
          New_Recipe.Set_Filter_Rules (String '(From.Get_Filter_Rules));
          New_Recipe.Save (Service.DB);
 
@@ -1519,6 +1677,14 @@ package body Porion.Builds.Services is
          end loop;
 
          Service.Recipe := New_Recipe;
+         Service.Branch := Branch;
+
+         --  If the branch was disabled, enable it for the new recipe.
+         if Branch.Get_Status = Porion.Projects.Models.BUILD_DISABLED then
+            Branch.Set_Status (Porion.Projects.Models.BUILD_REQUIRED);
+            Branch.Save (Service.DB);
+         end if;
+
          Add_Build_Queue (Service, Models.REASON_CONFIG, Added);
          if Added then
             Update_Build_Queue (Service, Trigger_Builds => False);
@@ -1564,7 +1730,7 @@ package body Porion.Builds.Services is
                           Kind    : in Builds.Step_Type) is
       begin
          Step.Set_Step (Kind);
-         Step.Set_Execution (Builds.Models.EXEC_NO_ERROR);
+         Step.Set_Execution (Builds.EXEC_NO_ERROR);
          Step.Set_Builder (Builder);
          Step.Set_Timeout (10 * 60);
          Step.Set_Number (Current_Step);
@@ -1609,18 +1775,20 @@ package body Porion.Builds.Services is
       Has_Package_Json : Boolean;
       Rules           : UString;
    begin
-      Has_Autogen := Check ("autogen.sh", -("checking for {0}"));
-      Has_Autoconf := Check ("configure.ac", -("checking for {0}"))
-        or else Check ("configure.in", -("checking for {0}"));
+      Log.Info ("Guess default build recipes in {0}", Path);
 
-      Has_Automake := Check ("Makefile.am", -("checking for {0}"));
-      Has_Makefile_In := Check ("Makefile.in", -("checking for {0}"));
-      Has_Configure := Check ("configure", -("checking for {0}"));
-      Has_CMake := Check ("CMakeLists.txt", -("checking for {0}"));
-      Has_Makefile := Check ("Makefile", -("checking for {0}"))
-        or else Check ("makefile", -("checking for {0}"));
-      Has_Pom_Xml := Check ("pom.xml", -("checking for {0}"));
-      Has_Package_Json := Check ("package.json", -("checking for {0}"));
+      Has_Autogen := Check ("autogen.sh", -("checking for {0} {1}"));
+      Has_Autoconf := Check ("configure.ac", -("checking for {0} {1}"))
+        or else Check ("configure.in", -("checking for {0} {1}"));
+
+      Has_Automake := Check ("Makefile.am", -("checking for {0} {1}"));
+      Has_Makefile_In := Check ("Makefile.in", -("checking for {0} {1}"));
+      Has_Configure := Check ("configure", -("checking for {0} {1}"));
+      Has_CMake := Check ("CMakeLists.txt", -("checking for {0} {1}"));
+      Has_Makefile := Check ("Makefile", -("checking for {0} {1}"))
+        or else Check ("makefile", -("checking for {0} {1}"));
+      Has_Pom_Xml := Check ("pom.xml", -("checking for {0} {1}"));
+      Has_Package_Json := Check ("package.json", -("checking for {0} {1}"));
 
       Add_Metric_Step ("disk", "before");
 

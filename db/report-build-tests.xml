@@ -1,0 +1,51 @@
+<query-mapping package='Porion.Queries'>
+    <description>
+        Stats for the tests executed in builds
+    </description>
+
+    <class name="Porion.Queries.Build_Test_Info" bean="yes">
+        <comment>Statistics about a tests executed during the builds.</comment>
+        <property type='Integer' name="build_id">
+            <comment>the build id.</comment>
+        </property>
+        <property type='Natural' name="build_number">
+            <comment>the build number.</comment>
+        </property>
+        <property type='Date' name="build_date" not-null="no">
+            <comment>the build starting date.</comment>
+        </property>
+        <property type='Porion.Builds.Models.Build_Status_Type' name="build_status">
+            <comment>the build status.</comment>
+        </property>
+        <property type='Natural' name="pass_count">
+            <comment>the total number of tests that passed.</comment>
+        </property>
+        <property type='Natural' name="fail_count">
+            <comment>the total number of tests that failed.</comment>
+        </property>
+        <property type='Natural' name="timeout_count">
+            <comment>the total number of tests that timeout.</comment>
+        </property>
+        <property type='Natural' name="test_duration">
+            <comment>the total duration of all tests.</comment>
+        </property>
+    </class>
+
+    <query name='stat-tests'>
+        <comment>Statistics about the last project builds</comment>
+        <sql>
+          SELECT
+          build.id AS build_id,
+	  build.number AS build_number,
+          build.create_date AS build_date,
+          build.status AS build_status,
+          build.pass_count AS pass_count,
+          build.fail_count AS fail_count,
+          build.timeout_count AS timeout_count,
+          build.test_duration AS test_duration
+          FROM porion_build AS build
+          WHERE build.project_id = :project_id
+        </sql>
+    </query> 
+
+</query-mapping>

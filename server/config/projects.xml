@@ -45,13 +45,19 @@
   <filter-mapping>
     <filter-name>service</filter-name>
     <url-pattern>/projects/*.html</url-pattern>
-    <url-pattern>/projects/view/#{project.ident}</url-pattern>
+    <url-pattern>/projects/view/#{project.ident}/summary</url-pattern>
+    <url-pattern>/projects/view/#{project.ident}/builds</url-pattern>
+    <url-pattern>/projects/view/#{project.ident}/xunits</url-pattern>
+    <url-pattern>/projects/view/#{project.ident}/coverage</url-pattern>
   </filter-mapping>
 
   <filter-mapping>
     <filter-name>auth-filter</filter-name>
     <url-pattern>/projects/*.html</url-pattern>
-    <url-pattern>/projects/view/#{project.ident}</url-pattern>
+    <url-pattern>/projects/view/#{project.ident}/summary</url-pattern>
+    <url-pattern>/projects/view/#{project.ident}/builds</url-pattern>
+    <url-pattern>/projects/view/#{project.ident}/xunits</url-pattern>
+    <url-pattern>/projects/view/#{project.ident}/coverage</url-pattern>
   </filter-mapping>
 
   <url-policy>
@@ -66,8 +72,23 @@
   </url-policy>
 
   <url-mapping>
-    <pattern>/projects/view/#{project.ident}</pattern>
-    <view-id>/projects/view.html</view-id>
+    <pattern>/projects/view/#{project.ident}/summary</pattern>
+    <view-id>/projects/project-summary.html</view-id>
+  </url-mapping>
+
+  <url-mapping>
+    <pattern>/projects/view/#{project.ident}/builds</pattern>
+    <view-id>/projects/project-builds.html</view-id>
+  </url-mapping>
+
+  <url-mapping>
+    <pattern>/projects/view/#{project.ident}/xunits</pattern>
+    <view-id>/projects/project-xunits.html</view-id>
+  </url-mapping>
+
+  <url-mapping>
+    <pattern>/projects/view/#{project.ident}/coverage</pattern>
+    <view-id>/projects/project-coverage.html</view-id>
   </url-mapping>
 
 </module>

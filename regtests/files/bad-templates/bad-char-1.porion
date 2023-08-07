@@ -1,0 +1,4 @@
+template bad is
+  set @#@$test;
+  set test , timeout;
+end bad;

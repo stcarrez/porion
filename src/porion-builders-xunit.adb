@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-builders-xunit -- Builder to start the analysis of unit tests
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021-2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,11 +15,16 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Util.Strings.Sets;
 with Util.Beans.Objects;
 with Util.Log.Loggers;
+with Util.Files;
+with Util.Streams.Buffered;
 with Porion.XUnit.Analysis;
 with Porion.XUnit.Parsers;
 package body Porion.Builders.XUnit is
+
+   subtype Input_Buffer_Stream is Util.Streams.Buffered.Input_Buffer_Stream;
 
    Log   : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Builders.XUnit");
 
@@ -32,6 +37,7 @@ package body Porion.Builders.XUnit is
                     Path       : in String;
                     Executor   : in out Porion.Executors.Executor_Type'Class) is
       Results : Porion.XUnit.Analysis.Test_Results;
+      Files   : Util.Strings.Sets.Set;
    begin
       Log.Info ("XUnit scan and analyze tests in {0}", Path);
 
@@ -44,11 +50,36 @@ package body Porion.Builders.XUnit is
          if Executor.Is_Dry_Run then
             Executor.Record_Command ("xunit " & Include);
          else
-            Porion.XUnit.Parsers.Scan (Path, Include, Controller.Excludes, Results);
+            declare
+               Sep  : constant Natural := Util.Strings.Rindex (Include, '/');
+            begin
+               if Sep > 0 then
+                  Executor.Scan_Directory
+                    (Util.Files.Compose (Path, Include (Include'First .. Sep - 1)),
+                     Include (Sep + 1 .. Include'Last), Controller.Excludes, Files);
+               else
+                  Executor.Scan_Directory
+                    (Path, Include, Controller.Excludes, Files);
+               end if;
+            end;
          end if;
       end loop;
 
+      Log.Info ("XUnit scan found{0} files", Files.Length'Image);
+
       if not Executor.Is_Dry_Run then
+         for File of Files loop
+            declare
+               procedure Scan (Stream : in out Input_Buffer_Stream'Class);
+
+               procedure Scan (Stream : in out Input_Buffer_Stream'Class) is
+               begin
+                  Porion.XUnit.Parsers.Scan (File, Stream, Results);
+               end Scan;
+            begin
+               Executor.Read_File (File, Scan'Access);
+            end;
+         end loop;
          Porion.XUnit.Analysis.Save (Results => Results,
                                      Build   => Build,
                                      Session => Controller.Session);

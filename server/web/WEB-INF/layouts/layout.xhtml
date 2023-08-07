@@ -13,8 +13,10 @@
     <link media="screen" type="text/css" rel="stylesheet" href="#{contextPath}/css/grids/fluid_grid.css"/>
     <link media="screen" type="text/css" rel="stylesheet" href="#{contextPath}/css/asf.css"/>
     <link media="screen" type="text/css" rel="stylesheet" href="#{contextPath}/css/awa.css"/>
-    <link media="screen" type="text/css" rel="stylesheet" href="#{jquery.uiCssPath}"/>
+    <link media="screen" type="text/css" rel="stylesheet" href="#{jquery.uiCssPath}/jquery-ui.structure.css"/>
+    <link media="screen" type="text/css" rel="stylesheet" href="#{jquery.uiCssPath}/jquery-ui.theme.css"/>
     <link media="screen" type="text/css" rel="stylesheet" href="#{jquery.chosenCssPath}"/>
+    <link media="screen" type="text/css" rel="stylesheet" href="#{contextPath}/css/frappe-charts.min.css"/>
     <link media="screen" type="text/css" rel="stylesheet" href="#{contextPath}/css/users.css"/>
     <link media="screen" type="text/css" rel="stylesheet" href="#{contextPath}/css/main.css"/>
     <link media="screen" type="text/css" rel="stylesheet" href="#{contextPath}/css/theme.css"/>
@@ -22,42 +24,21 @@
     <ui:insert name="pageHeader"/>
     <title><h:outputText value="#{title}"/></title>
 </head>
-<body class="#{not empty pageStyle ? pageStyle : ''}">
+<body class="#{not empty pageStyle ? pageStyle : ''} #{top_nav}">
 
 <!-- Top header with user account -->
-<ui:include src="top-bar.xhtml"/>
+<header>
+    <ui:include src="top-bar.xhtml"/>
+    <ui:insert name="pageNav"/>
+</header>
 
-<div id='awa-page' class='container_12'>
+<main>
     <ui:insert name="pageBody"/>
-    <div id="awa-clfooter"></div>
-</div>
+</main>
 <ui:include src="footer.xhtml"/>
 
-<!-- DYNAMO-MERGE-START script=#{contextPath}/js/porion.js -->
-<script type="text/javascript" src="#{jquery.path}"></script>
-<script type="text/javascript" src="#{jquery.uiPath}core.js"></script>
-<script type="text/javascript" src="#{jquery.uiPath}widget.js"></script>
-<script type="text/javascript" src="#{jquery.uiPath}position.js"></script>
-<script type="text/javascript" src="#{jquery.uiPath}mouse.js"></script>
-<script type="text/javascript" src="#{jquery.uiPath}draggable.js"></script>
-<script type="text/javascript" src="#{jquery.uiPath}resizable.js"></script>
-<script type="text/javascript" src="#{jquery.uiPath}sortable.js"></script>
-<script type="text/javascript" src="#{jquery.uiPath}button.js"></script>
-<script type="text/javascript" src="#{jquery.uiPath}dialog.js"></script>
-<script type="text/javascript" src="#{jquery.uiPath}tabs.js"></script>
-<script type="text/javascript" src="#{jquery.uiPath}menu.js"></script>
-<script type="text/javascript" src="#{jquery.uiPath}autocomplete.js"></script>
-<script type="text/javascript" src="#{contextPath}/js/asf.js"></script>
-<script type="text/javascript" src="#{contextPath}/js/asf-editable.js"></script>
-<script type="text/javascript" src="#{contextPath}/js/asf-message.js"></script>
-<script type="text/javascript" src="#{contextPath}/js/asf-list.js"></script>
-<script type="text/javascript" src="#{contextPath}/js/asf-widgets.js"></script>
-<script type="text/javascript" src="#{contextPath}/js/awa.js"></script>
-<!-- DYNAMO-MERGE-END -->
 <ui:insert name="pageScript"/>
-<!--DEV_START-->
-<ui:debug/>
-<!--DEV_END-->
+<u:flush/>
 </body>
 </html>
 </f:view>

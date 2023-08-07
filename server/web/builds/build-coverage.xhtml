@@ -1,0 +1,29 @@
+<ui:composition
+  xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:u="http://code.google.com/p/ada-asf/util"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:c="http://java.sun.com/jstl/core"
+  template="/WEB-INF/layouts/layout.xhtml">
+  <ui:param name="title" value="#{project.name} - Coverage" />
+  <ui:param name="pageStyle" value="page-project"/>
+  <ui:param name="top_nav" value="page-coverage"/>
+
+  <ui:define name="pageNav">
+    <ui:include src="/WEB-INF/layouts/build-header.xhtml">
+      <ui:param name="projectName" value="#{build.project.name}"/>
+    </ui:include>
+  </ui:define>
+
+  <!-- Main page body -->
+  <ui:define name="pageBody">
+    <f:metadata>
+      <f:viewAction action='#{build.load}'/>
+    </f:metadata>
+    <ui:include src="views/info.xhtml"/>
+  </ui:define>
+
+  <ui:define name="pageScript">
+    <script type="text/javascript" src="#{contextPath}/js/builds.js"></script>
+  </ui:define>
+</ui:composition>

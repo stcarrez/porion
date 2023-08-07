@@ -16,9 +16,12 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Directories;
+with Ada.Containers.Indefinite_Hashed_Maps;
+with Ada.Strings.Hash;
 with Util.Properties;
 with EL.Expressions;
 with Util.Strings.Vectors;
+with Porion.Configs;
 package Porion.Tools is
 
    subtype File_Size is Ada.Directories.File_Size;
@@ -28,6 +31,17 @@ package Porion.Tools is
       Dir_Count  : Natural := 0;
       Total_Size : File_Size := 0;
    end record;
+
+   type Tool_Type is record
+      Name    : UString;
+      Path    : UString;
+      Version : UString;
+      Config  : Porion.Configs.Config_Type;
+   end record;
+
+   package Tool_Maps is
+      new Ada.Containers.Indefinite_Hashed_Maps (Key_Type => String, Element_Type => Tool_Type,
+       Hash => Ada.Strings.Hash, Equivalent_Keys => "=");
 
    --  Find statistics about the directory tree.
    procedure Find_Stats (Path  : in String;

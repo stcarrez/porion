@@ -1,20 +1,34 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <module version="1.0">
-    <application>
-        <locale-config>
-               <default-locale>en</default-locale>
-               <supported-locale>en</supported-locale>
-        </locale-config>
-        <message-bundle var='porionMsg'>porion</message-bundle>
-    </application>
-    <servlet-mapping>
-      <servlet-name>measures</servlet-name>
-      <url-pattern>/statistics.xml</url-pattern>
-    </servlet-mapping>
+  <application>
+    <locale-config>
+      <default-locale>en</default-locale>
+      <supported-locale>en</supported-locale>
+    </locale-config>
+    <message-bundle var='porionMsg'>porion</message-bundle>
+  </application>
+
+  <managed-bean>
+    <description>A project selector</description>
+    <managed-bean-name>projectSelector</managed-bean-name>
+    <managed-bean-class>AWA.Helpers.Selectors.Select_List_Bean</managed-bean-class>
+    <managed-bean-scope>request</managed-bean-scope>
+    <managed-property>
+      <property-name>query</property-name>
+      <property-class>String</property-class>
+      <value>project-selector</value>
+    </managed-property>
+  </managed-bean>
+
+  <servlet-mapping>
+    <servlet-name>measures</servlet-name>
+    <url-pattern>/statistics.xml</url-pattern>
+  </servlet-mapping>
 
   <filter-mapping>
     <filter-name>service</filter-name>
     <url-pattern>/*.html</url-pattern>
+    <url-pattern>/activities/view/#{projectReportList.period}</url-pattern>
   </filter-mapping>
 
   <url-policy>
@@ -23,11 +37,26 @@
     </description>
     <permission>anonymous</permission>
     <url-pattern>/index.html</url-pattern>
+    <url-pattern>/nodes.html</url-pattern>
+    <url-pattern>/queue.html</url-pattern>
+    <url-pattern>/activity.html</url-pattern>
+    <url-pattern>/activity/view/.*</url-pattern>
   </url-policy>
 
   <filter-mapping>
     <filter-name>service</filter-name>
-    <url-pattern>/api/v1/*</url-pattern>
+    <url-pattern>/api/*</url-pattern>
+    <url-pattern>/activity/view/#{projectReportList.period}</url-pattern>
   </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>auth-filter</filter-name>
+    <url-pattern>/activity/view/#{projectReportList.period}</url-pattern>
+  </filter-mapping>
+
+  <url-mapping>
+    <pattern>/activity/view/#{projectReportList.period}</pattern>
+    <view-id>/activity.html</view-id>
+  </url-mapping>
 
 </module>

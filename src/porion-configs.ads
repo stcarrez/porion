@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-configs -- Configuration
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +25,7 @@ package Porion.Configs is
    PROJECT_DIR_NAME       : constant String := "project_dir";
    RULES_DIR_NAME         : constant String := "rules_dir";
    RULES_SEARCH_PATH_NAME : constant String := "rules_search_path";
+   TEMPL_SEARCH_PATH_NAME : constant String := "templates_search_path";
    DATABASE_NAME          : constant String := "database";
    DEFAUL_LOG_DIR_NAME    : constant String := "log_dir";
    KEYSTORE_PATH          : constant String := "keystore-path";
@@ -100,11 +101,20 @@ package Porion.Configs is
    --  Get a working directory.
    function Get_Work_Directory (Name : in String) return String;
 
+   --  Get the directory holding local template files.
+   function Get_Templates_Directory return String;
+
+   --  Get the search path to find templates.
+   function Get_Templates_Search_Path return String;
+
    --  Get the default path of the local database.
    function Get_Default_Database_Path return String;
 
    --  Get the path of the local database.
    function Get_Database_Path return String;
+
+   --  Get the database configuration string.
+   function Get_Database_Config (Create : in Boolean) return String;
 
    function Null_Config return Config_Type;
 

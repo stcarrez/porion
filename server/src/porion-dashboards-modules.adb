@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-dashboards-modules -- Module dashboards
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,13 +42,16 @@ package body Porion.Dashboards.Modules is
       --  Register here any bean class, servlet, filter.
       Register.Register (Plugin => Plugin,
                          Name   => "Porion.Dashboards.Beans.Project_List_Bean",
-                         Handler => Porion.Dashboards.Beans.Create_Project_List_Bean'Access);
+                         Handler => Beans.Create_Project_List_Bean'Access);
+      Register.Register (Plugin => Plugin,
+                         Name   => "Porion.Dashboards.Beans.Project_Report_List_Bean",
+                         Handler => Beans.Create_Project_Report_List_Bean'Access);
       Register.Register (Plugin => Plugin,
                          Name   => "Porion.Dashboards.Beans.Stats.Last_Builds_Bean",
-                         Handler => Porion.Dashboards.Beans.Stats.Create_Last_Builds_Bean'Access);
+                         Handler => Beans.Stats.Create_Last_Builds_Bean'Access);
       Register.Register (Plugin => Plugin,
                          Name   => "Porion.Dashboards.Beans.Stats.Metrics_Bean",
-                         Handler => Porion.Dashboards.Beans.Stats.Create_Metrics_Bean'Access);
+                         Handler => Beans.Stats.Create_Metrics_Bean'Access);
 
       Plugin.Percent_Converter.Set_Picture ("ZZ9.9");
       App.Add_Converter (Name      => "percentConverter",

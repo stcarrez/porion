@@ -38,13 +38,17 @@
   <filter-mapping>
     <filter-name>service</filter-name>
     <url-pattern>/builds/*.html</url-pattern>
-    <url-pattern>/builds/view/#{build.ident}</url-pattern>
+    <url-pattern>/builds/view/#{build.ident}/summary</url-pattern>
+    <url-pattern>/builds/view/#{build.ident}/xunits</url-pattern>
+    <url-pattern>/builds/view/#{build.ident}/coverage</url-pattern>
   </filter-mapping>
 
   <filter-mapping>
     <filter-name>auth-filter</filter-name>
     <url-pattern>/builds/*.html</url-pattern>
-    <url-pattern>/builds/view/#{build.ident}</url-pattern>
+    <url-pattern>/builds/view/#{build.ident}/summary</url-pattern>
+    <url-pattern>/builds/view/#{build.ident}/xunits</url-pattern>
+    <url-pattern>/builds/view/#{build.ident}/coverage</url-pattern>
   </filter-mapping>
 
   <url-policy>
@@ -59,8 +63,18 @@
   </url-policy>
 
   <url-mapping>
-    <pattern>/builds/view/#{build.ident}</pattern>
-    <view-id>/builds/view.html</view-id>
+    <pattern>/builds/view/#{build.ident}/summary</pattern>
+    <view-id>/builds/build-summary.html</view-id>
+  </url-mapping>
+
+  <url-mapping>
+    <pattern>/builds/view/#{build.ident}/xunits</pattern>
+    <view-id>/builds/build-xunits.html</view-id>
+  </url-mapping>
+
+  <url-mapping>
+    <pattern>/builds/view/#{build.ident}/coverage</pattern>
+    <view-id>/builds/build-coverage.html</view-id>
   </url-mapping>
 
 </module>

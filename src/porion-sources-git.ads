@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-sources-git -- Source management with git
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,10 +21,11 @@ private package Porion.Sources.Git is
 
    GIT_TEST_COMMAND        : constant String := "git ls-remote -h -- #{repository_url}";
    GIT_SHOW_REMOTE_COMMAND : constant String := "git remote show #{repository_url}";
-   GIT_CHECKOUT_COMMAND    : constant String := "git clone "
+   GIT_CHECKOUT_COMMAND    : constant String := "git clone -q "
      & "#{not empty branch ? '-b' : ''} #{branch} --recursive #{repository_url} #{build_dir}";
    GIT_GUESS_COMMAND       : constant String := "git -C #{path} config remote.origin.url";
    GIT_INIT_COMMAND        : constant String := "git init --bare #{git_tmp_dir}";
+   GIT_LOG_COMMAND         : constant String := "git -C #{build_dir} log #{previous_tag}..";
 
    type Controller_Type is limited new Porion.Sources.Controller_Type with private;
 
@@ -36,11 +37,13 @@ private package Porion.Sources.Git is
    overriding
    procedure Checkout (Controller : in out Controller_Type;
                        Path       : in String;
+                       Result     : out UString;
                        Executor   : in out Porion.Executors.Executor_Type'Class);
 
    overriding
    procedure Changes (Controller : in out Controller_Type;
-                      Result     : out Status_Type;
+                      Path       : in String;
+                      Extraction : in out Checkout_Type;
                       Executor   : in out Porion.Executors.Executor_Type'Class);
 
    --  Guess some information about the sources located in the given directory.
@@ -63,6 +66,7 @@ private
       Guess_Command       : EL.Expressions.Expression;
       Show_Remote_Command : EL.Expressions.Expression;
       Init_Command        : EL.Expressions.Expression;
+      Changes_Command     : EL.Expressions.Expression;
    end record;
 
    type Git_Controller_Access is access all Controller_Type'Class;

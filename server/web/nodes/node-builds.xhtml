@@ -1,0 +1,48 @@
+<ui:composition xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:u="http://code.google.com/p/ada-asf/util"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:util="http://code.google.com/p/ada-asf/util"
+                xmlns:c="http://java.sun.com/jstl/core"
+                template="/WEB-INF/layouts/layout.xhtml">
+  <ui:param name="title" value="#{node.name} - Builds" />
+  <ui:param name="pageStyle" value="page-node"/>
+  <ui:param name="top_nav" value="page-builds"/>
+
+  <ui:define name="pageNav">
+    <ui:include src="/WEB-INF/layouts/node-header.xhtml">
+      <ui:param name="nodeName" value="#{node.name}"/>
+      <ui:param name="nodeStatus" value="#{node.status}"/>
+    </ui:include>
+  </ui:define>
+
+  <!-- Main page body -->
+  <ui:define name="pageBody">
+    <f:metadata>
+      <f:viewAction action='#{node.load_builds}'/>
+    </f:metadata>
+    <ui:composition template="/projects/lists/builds.xhtml">
+	    <ui:param name="builds" value="#{node.builds}"/>
+
+	    <ui:define name="list-header">
+        <div class='build-project'>
+          Build project
+        </div>
+	    </ui:define>
+	
+	    <ui:define name="list-item">
+        <div class='build-node'>
+	        <a href="#{contextPath}/projects/view/#{build.name}/summary" title="Project #{build.name}">
+            #{build.name}
+	        </a>
+        </div>
+	    </ui:define>
+
+    </ui:composition>
+  </ui:define>
+
+  <ui:define name="pageScript">
+    <script type="text/javascript" src="#{contextPath}/js/projects.js"></script>
+  </ui:define>
+
+</ui:composition>

@@ -1,9 +1,9 @@
 # Porion
 
 [![License](http://img.shields.io/badge/license-APACHE2-blue.svg)](LICENSE)
-[![Build Status](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/porion/badges/build.json)](https://porion.vacs.fr/porion/projects/view/porion)
-[![Test Status](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/porion/badges/tests.json)](https://porion.vacs.fr/porion/projects/view/porion)
-[![Coverage](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/porion/badges/coverage.json)](https://porion.vacs.fr/porion/projects/view/porion)
+[![Build Status](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/porion/badges/build.json)](https://porion.vacs.fr/porion/projects/view/porion/summary)
+[![Test Status](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/porion/badges/tests.json)](https://porion.vacs.fr/porion/projects/view/porion/xunits)
+[![Coverage](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/porion/badges/coverage.json)](https://porion.vacs.fr/porion/projects/view/porion/summary)
 [![semver](https://img.shields.io/badge/semver-2.0.0-blue.svg?cacheSeconds=2592000)]()
 
 # TL;DR
@@ -50,16 +50,18 @@ Get information about a project or a build number:
    porion info ada-util:2
 ```
 
-## Version 0.6.0   - Jan 2021
-  - REST API to get a schields badge using https://shields.io/endpoint
-  - Build dynamo and are if they are not installed
-  - Setup for first Debian package
+Version 0.14.0 - Apr 2023
+  - Fix adding a recipe on a new branch
+  - Fix displaying the project recipes on all branches
+  - Use single ssh connection for multiple commands when building on remote node
+  - Copy project files using scp on remote nodes
 
-## Version 0.5.0   - Dec 2021
-  - Server with Web responsive UI listing the projects and builds
-  - REST API to get the build logs
-  - Minimal operations to install the porion agent after a build
-  - Minimal man page and documentation
+Version 0.13.0 - Mar 2023
+  - Update to use last AWA version
+  - Improvement to display on mobile phones
+  - Support to collect standard error as separate streams to identify these
+    messages as errors
+  - Prototype for build templates
 
 [List all versions](https://gitlab.com/stcarrez/porion/blob/master/NEWS.md)
 
@@ -68,7 +70,7 @@ Get information about a project or a build number:
 Porion is a continuous integration server and agent that helps automate the building,
 testing and deployment of software development projects written in any language.
 Porion maintains a list of projects with build recipes to build these projects.
-It periodically checks for changes in projects and schedule a build when a project
+It periodically checks for changes in projects and it schedules a build when a project
 is modified.  Porion uses a build node to build a project and the build node can
 be the current host or a specific remote host registered for that purpose.
 
@@ -85,7 +87,6 @@ The steps to use Porion are the following:
   Porion will guess a set of build recipes for the new project.
 - project build recipes and build steps are updated and configured on the project
   by using either `porion add --recipe` or `porion step` commands.
-- the 
 
 
 # Porion commands
@@ -109,6 +110,21 @@ The steps to use Porion are the following:
 * `status`:   status about the workspace or a project
 * `step`:     control the build steps
 
+# Porion Debian Binaries
+
+Ubuntu 20.04 packages are available to help you install the `porion`
+and `porion-server` commands more easily.  You can configure your Ubuntu system as follows:
+
+```
+wget -O - https://apt.vacs.fr/apt.vacs.fr.gpg.key | sudo apt-key add -
+sudo add-apt-repository "deb https://apt.vacs.fr/ubuntu-focal focal main"
+```
+
+And then install the `porion-server` package:
+
+```
+sudo apt-get install porion-server
+```
 
 # Building Porion
 
@@ -168,6 +184,27 @@ make install
 * Man page: [porion (1)](https://gitlab.com/stcarrez/porion/blob/master/docs/porion.md)
 * Man page: [porion-server (8)](https://gitlab.com/stcarrez/porion/blob/master/docs/porion-server.md)
 
+# Presentations
+
+* [Implementing a build manager in Ada](https://www.slideshare.net/StephaneCarrez1/implementing-a-build-manager-in-ada)
+
 # Sites Using Porion
 
 * [Porion Build Manager](https://porion.vacs.fr/porion/index.html)
+
+# Porion server development setup
+
+Typescript development setup:
+
+```
+pkg install npm-node18-8.13.0
+npm install typescript --save-dev
+npm install --save @types/jquery
+npm install --save @types/flot
+```
+
+To build the Javascript files:
+
+```
+make build-ts
+```

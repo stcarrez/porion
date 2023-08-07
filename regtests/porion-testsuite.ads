@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-testsuite -- Testsuite for porion
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,6 +38,10 @@ package Porion.Testsuite is
    procedure Create (Service : in out Porion.Services.Context_Type;
                      Path    : in String;
                      Remove  : in Boolean);
+
+   --  Add a fake test build node in the database.
+   procedure Add_Build_Node (Service : in out Porion.Services.Context_Type;
+                             Name   : in String);
 
    function Suite return Util.Tests.Access_Test_Suite;
 

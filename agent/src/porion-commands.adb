@@ -46,6 +46,7 @@ with Porion.Commands.Check;
 with Porion.Commands.Logs;
 with Porion.Commands.Set;
 with Porion.Commands.Env;
+private with Util.Systems.Constants;
 package body Porion.Commands is
 
    Help_Command            : aliased Porion.Commands.Drivers.Help_Command_Type;
@@ -269,7 +270,8 @@ package body Porion.Commands is
    --  ------------------------------
    procedure Setup_Printer (Context : in out Context_Type) is
       function Get_Cols return Integer with
-        Import => True, Convention => C, Link_Name => "porion_get_cols";
+        Import => True, Convention => C,
+	Link_Name => Util.Systems.Constants.SYMBOL_PREFIX & "porion_get_cols";
 
       W : Integer := Get_Cols;
    begin

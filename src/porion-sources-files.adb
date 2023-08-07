@@ -19,6 +19,7 @@ with Ada.Directories;
 with Interfaces.C.Strings;
 with Util.Log.Loggers;
 with Util.Strings;
+with Util.Systems.Constants;
 with EL.Contexts.Default;
 with Porion.Logs;
 package body Porion.Sources.Files is
@@ -36,7 +37,8 @@ package body Porion.Sources.Files is
 
       function Sys_Realpath (S : C.Strings.chars_ptr;
                              R : C.Strings.chars_ptr) return C.Strings.chars_ptr with
-        Import => True, Convention => C, Link_Name => "realpath";
+        Import => True, Convention => C,
+	Link_Name => Util.Systems.Constants.SYMBOL_PREFIX & "realpath";
       P : C.Strings.chars_ptr := C.Strings.New_String (Path);
       R : C.Strings.chars_ptr;
    begin

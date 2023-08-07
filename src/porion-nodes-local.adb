@@ -19,13 +19,15 @@ with Ada.Directories;
 with Util.Log.Loggers;
 with Util.Streams;
 with Util.Streams.Texts;
+with Util.Systems.Constants;
 with Porion.Tools;
 package body Porion.Nodes.Local is
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Nodes.Local");
 
    procedure Sys_Rusage (Usage : out Usage_Type)
-     with Import => True, Convention => C, Link_Name => "porion_get_rusage";
+     with Import => True, Convention => C,
+          Link_Name => Util.Systems.Constants.SYMBOL_PREFIX & "porion_get_rusage";
 
    --  ------------------------------
    --  Create the controller for the management of the given build node.

@@ -35,7 +35,7 @@ with Util.Beans.Objects;
 with Util.Beans.Objects.Enums;
 with Util.Beans.Basic.Lists;
 with ADO.Audits;
-with Porion.Sources;
+with Porion;
 pragma Warnings (On);
 package Porion.Projects.Models is
 
@@ -137,11 +137,11 @@ package Porion.Projects.Models is
 
    --
    procedure Set_Scm (Object : in out Project_Ref;
-                      Value  : in Porion.Sources.Source_Control_Type);
+                      Value  : in Porion.Source_Control_Type);
 
    --
    function Get_Scm (Object : in Project_Ref)
-                 return Porion.Sources.Source_Control_Type;
+                 return Porion.Source_Control_Type;
 
    --  Set source control information parameter
    procedure Set_Scm_Url (Object : in out Project_Ref;
@@ -713,7 +713,7 @@ private
        Create_Date : Ada.Calendar.Time;
        Update_Date : ADO.Nullable_Time;
        Status : Project_Status_Type;
-       Scm : Porion.Sources.Source_Control_Type;
+       Scm : Porion.Source_Control_Type;
        Scm_Url : Ada.Strings.Unbounded.Unbounded_String;
        Pass_Rate : Porion.Permille_Type;
        Fail_Rate : Porion.Permille_Type;

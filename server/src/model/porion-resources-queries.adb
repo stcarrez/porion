@@ -1,4 +1,4 @@
---  Advanced Resource Embedder 1.3.0
+--  Advanced Resource Embedder 1.2.1
 with Interfaces; use Interfaces;
 
 package body Porion.Resources.Queries is
@@ -8,16 +8,16 @@ package body Porion.Resources.Queries is
      (3, 8, 12, 14);
 
    T1 : constant array (0 .. 3) of Unsigned_8 :=
-     (40, 25, 10, 12);
+     (3, 43, 16, 22);
 
    T2 : constant array (0 .. 3) of Unsigned_8 :=
-     (56, 0, 27, 37);
+     (22, 59, 5, 52);
 
-   G : constant array (0 .. 63) of Unsigned_8 :=
-     (0, 0, 0, 3, 0, 0, 0, 0, 0, 8, 0, 0, 0, 26, 0, 0, 2, 6, 21, 22, 17, 0,
-      23, 0, 0, 13, 0, 0, 13, 23, 16, 7, 15, 19, 6, 0, 0, 0, 0, 0, 0, 24,
-      19, 4, 0, 0, 0, 26, 0, 29, 16, 7, 0, 2, 0, 0, 0, 11, 23, 9, 30, 0, 0,
-      0);
+   G : constant array (0 .. 64) of Unsigned_8 :=
+     (22, 0, 17, 18, 0, 5, 0, 0, 0, 8, 7, 8, 23, 0, 19, 18, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 18, 1, 0, 9, 0, 0, 0, 0, 19, 0, 21, 0, 3, 26, 0, 0, 0, 0,
+      0, 22, 0, 0, 13, 0, 0, 0, 18, 0, 2, 10, 0, 25, 22, 0, 4, 1, 12, 27,
+      22, 15);
 
    function Hash (S : String) return Natural is
       F : constant Natural := S'First - 1;
@@ -28,10 +28,10 @@ package body Porion.Resources.Queries is
       for K in P'Range loop
          exit when L < P (K);
          J  := Character'Pos (S (P (K) + F));
-         F1 := (F1 + Natural (T1 (K)) * J) mod 64;
-         F2 := (F2 + Natural (T2 (K)) * J) mod 64;
+         F1 := (F1 + Natural (T1 (K)) * J) mod 65;
+         F2 := (F2 + Natural (T2 (K)) * J) mod 65;
       end loop;
-      return (Natural (G (F1)) + Natural (G (F2))) mod 31;
+      return (Natural (G (F1)) + Natural (G (F2))) mod 32;
    end Hash;
 
    C_0 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
@@ -65,6 +65,51 @@ package body Porion.Resources.Queries is
        & "   </query> " & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
    C_1 : aliased constant String := "<query-mapping package='Porion.Builds.Mod"
+       & "els'>" & ASCII.LF & "    <description>" & ASCII.LF & "        Build vari"
+       & "ables for a build recipe" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF
+       & "    <class name=""Porion.Builds.Models.Variable_Info"" bean=""no"">" & ASCII.LF
+       & "        <comment>Information for a build variable.</comment>" & ASCII.LF
+       & "        <property type='String' name=""name"">" & ASCII.LF & "          "
+       & "  <comment>the build variable name.</comment>" & ASCII.LF & "        </p"
+       & "roperty>" & ASCII.LF & "        <property type='String' name=""value"">" & ASCII.LF
+       & "            <comment>the build variable value.</comment>" & ASCII.LF & " "
+       & "       </property>" & ASCII.LF & "        <property type='Porion.Builds."
+       & "Models.Variable_Type' name=""kind"">" & ASCII.LF & "            <comment"
+       & ">the build variable type.</comment>" & ASCII.LF & "        </property>" & ASCII.LF
+       & "        <property type='boolean' name=""secret"">" & ASCII.LF & "       "
+       & "     <comment>whether the build variable is secret.</comment>" & ASCII.LF
+       & "        </property>" & ASCII.LF & "        <property type='Integer' name"
+       & "=""step_number"" not-null='no'>" & ASCII.LF & "            <comment>the "
+       & "optional recipe step number.</comment>" & ASCII.LF & "        </property"
+       & ">" & ASCII.LF & "    </class>" & ASCII.LF & ASCII.LF & "    <query name"
+       & "='build-variables'>" & ASCII.LF & "        <comment>Environment variable"
+       & "s to build a recipe.  List is sorted on the overriding precedence:" & ASCII.LF
+       & "        - recipe specific variables are put first," & ASCII.LF & ASCII.HT
+       & "- branch specific variables are put," & ASCII.LF & ASCII.HT & "- projec"
+       & "t specific variables are put," & ASCII.LF & ASCII.HT & "- node specific"
+       & " variables are put," & ASCII.LF & ASCII.HT & "- global variables are pu"
+       & "t last." & ASCII.LF & "        </comment>" & ASCII.LF & "        <sql>" & ASCII.LF
+       & "          SELECT" & ASCII.LF & "          env.name AS name," & ASCII.LF
+       & "          env.value AS value," & ASCII.LF & "          env.kind AS kind,"
+       & ASCII.LF & "          env.secret AS secret," & ASCII.LF & ASCII.HT & " "
+       & " env.step_number AS step" & ASCII.LF & "          FROM porion_environmen"
+       & "t AS env" & ASCII.LF & "          WHERE env.recipe_id = :recipe_id" & ASCII.LF
+       & ASCII.HT & "     OR (env.recipe_id IS NULL" & ASCII.LF & ASCII.HT & "  "
+       & "     AND (env.branch_id = :branch_id AND (env.node_id = :node_id OR env."
+       & "node_id IS NULL)))" & ASCII.LF & ASCII.HT & "     OR (env.recipe_id IS "
+       & "NULL AND env.branch_id IS NULL" & ASCII.LF & ASCII.HT & "       AND (en"
+       & "v.project_id = :project_Id AND (env.node_id = :node_id OR env.node_id IS"
+       & " NULL)))" & ASCII.LF & ASCII.HT & "     OR (env.recipe_id IS NULL AND e"
+       & "nv.branch_id IS NULL" & ASCII.LF & ASCII.HT & "       AND (env.project_"
+       & "id IS NULL AND env.node_id = :node_id))" & ASCII.LF & ASCII.HT & "     "
+       & "OR (env.recipe_id IS NULL AND env.branch_id IS NULL AND env.project_id I"
+       & "S NULL AND env.node_id IS NULL)" & ASCII.LF & ASCII.HT & "  ORDER by CO"
+       & "ALESCE(env.recipe_id,0) DESC, COALESCE(env.branch_id,0) DESC," & ASCII.LF
+       & ASCII.HT & "           COALESCE(env.project_id,0) DESC, COALESCE(env.nod"
+       & "e_id, 0) DESC;" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>"
+       & " " & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
+
+   C_2 : aliased constant String := "<query-mapping package='Porion.Builds.Mod"
        & "els'>" & ASCII.LF & "    <description>" & ASCII.LF & "      Queries to c"
        & "leanup a build" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF
        & "    <query name='cleanup-build-step'>" & ASCII.LF & "       <comment>Cle"
@@ -96,7 +141,7 @@ package body Porion.Resources.Queries is
        & "     </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</que"
        & "ry-mapping>" & ASCII.LF;
 
-   C_2 : aliased constant String := "<query-mapping package='Porion.Projects.M"
+   C_3 : aliased constant String := "<query-mapping package='Porion.Projects.M"
        & "odels'>" & ASCII.LF & "    <description>" & ASCII.LF & "      Queries to"
        & " cleanup a project" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF
        & "    <query name='cleanup-project-build-step'>" & ASCII.LF & "       <com"
@@ -180,7 +225,7 @@ package body Porion.Resources.Queries is
        & "oject_id" & ASCII.LF & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF
        & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_3 : aliased constant String := "<query-mapping package='Porion.Builds.Mod"
+   C_4 : aliased constant String := "<query-mapping package='Porion.Builds.Mod"
        & "els'>" & ASCII.LF & "    <description>" & ASCII.LF & "      Queries to c"
        & "leanup a recipe" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF
        & "    <query name='cleanup-recipe-build-step'>" & ASCII.LF & "       <comm"
@@ -239,7 +284,7 @@ package body Porion.Resources.Queries is
        & "ipe_id = :recipe_id" & ASCII.LF & "       </sql>" & ASCII.LF & "    </qu"
        & "ery>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_4 : aliased constant String := "<query-mapping package='AWA.Commands.Mode"
+   C_5 : aliased constant String := "<query-mapping package='AWA.Commands.Mode"
        & "ls'>" & ASCII.LF & "    <description>" & ASCII.LF & "      List audit re"
        & "cords" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF & "    <"
        & "query name='command-audit-list'>" & ASCII.LF & "       <comment>List the"
@@ -256,7 +301,7 @@ package body Porion.Resources.Queries is
        & "ql-count>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</query"
        & "-mapping>" & ASCII.LF;
 
-   C_5 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_6 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of project branches" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
        & "ueries.Branch_Info"" bean=""no"">" & ASCII.LF & "        <comment>Inform"
@@ -286,7 +331,7 @@ package body Porion.Resources.Queries is
        & "ount>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</query-map"
        & "ping>" & ASCII.LF;
 
-   C_6 : aliased constant String := "<query-mapping package='AWA.Commands.Mode"
+   C_7 : aliased constant String := "<query-mapping package='AWA.Commands.Mode"
        & "ls'>" & ASCII.LF & "    <description>" & ASCII.LF & "        List of job"
        & "s" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF & "    <quer"
        & "y name='command-job-list'>" & ASCII.LF & "        <comment>Get the list "
@@ -323,7 +368,7 @@ package body Porion.Resources.Queries is
        & "        FROM awa_job AS job" & ASCII.LF & "        </sql-count>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_7 : aliased constant String := "<query-mapping package='AWA.Commands.Mode"
+   C_8 : aliased constant String := "<query-mapping package='AWA.Commands.Mode"
        & "ls'>" & ASCII.LF & "    <description>" & ASCII.LF & "      List of sessi"
        & "ons" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF & "    <qu"
        & "ery name='command-session-list'>" & ASCII.LF & "       <comment>Get the "
@@ -341,7 +386,7 @@ package body Porion.Resources.Queries is
        & "</sql-count>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</qu"
        & "ery-mapping>" & ASCII.LF;
 
-   C_8 : aliased constant String := "<query-mapping package='AWA.Commands.Mode"
+   C_9 : aliased constant String := "<query-mapping package='AWA.Commands.Mode"
        & "ls'>" & ASCII.LF & "    <description>" & ASCII.LF & "      List of users"
        & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF & "    <query nam"
        & "e='command-user-list'>" & ASCII.LF & "       <comment>Get the list of us"
@@ -361,7 +406,7 @@ package body Porion.Resources.Queries is
        & "-count>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</query-m"
        & "apping>" & ASCII.LF;
 
-   C_9 : aliased constant String := "<query-mapping package='Porion.Notificati"
+   C_10 : aliased constant String := "<query-mapping package='Porion.Notificati"
        & "ons.Models'>" & ASCII.LF & "    <description>" & ASCII.LF & "        Lis"
        & "t of changes to report for notifications" & ASCII.LF & "    </descriptio"
        & "n>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Notifications.Mod"
@@ -395,7 +440,7 @@ package body Porion.Resources.Queries is
        & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</"
        & "query-mapping>" & ASCII.LF;
 
-   C_10 : aliased constant String := "<query-mapping package='Porion.Notificati"
+   C_11 : aliased constant String := "<query-mapping package='Porion.Notificati"
        & "ons.Models'>" & ASCII.LF & "    <description>" & ASCII.LF & "        Lis"
        & "t of subscribed notifications" & ASCII.LF & "    </description>" & ASCII.LF
        & ASCII.LF & "    <class name=""Porion.Notifications.Models.Notification_I"
@@ -450,7 +495,7 @@ package body Porion.Resources.Queries is
        & "</sql-count>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</qu"
        & "ery-mapping>" & ASCII.LF;
 
-   C_11 : aliased constant String := "<query-mapping package='AWA.Permissions.M"
+   C_12 : aliased constant String := "<query-mapping package='AWA.Permissions.M"
        & "odels'>" & ASCII.LF & "    <description>" & ASCII.LF & "      Queries us"
        & "ed by the permission manager" & ASCII.LF & "    </description>" & ASCII.LF
        & ASCII.LF & "    <query name='check-entity-permission'>" & ASCII.LF & "  "
@@ -476,7 +521,7 @@ package body Porion.Resources.Queries is
        & "= :user_id" & ASCII.LF & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF
        & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_12 : aliased constant String := "<query-mapping package='Porion.Projects.M"
+   C_13 : aliased constant String := "<query-mapping package='Porion.Projects.M"
        & "odels'>" & ASCII.LF & "    <description>" & ASCII.LF & "      Informatio"
        & "n about branches on a project." & ASCII.LF & "    </description>" & ASCII.LF
        & ASCII.LF & "    <query name='project-branches'>" & ASCII.LF & "       <c"
@@ -492,7 +537,7 @@ package body Porion.Resources.Queries is
        & "ject_id" & ASCII.LF & "       </sql>" & ASCII.LF & "    </query>" & ASCII.LF
        & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_13 : aliased constant String := "<query-mapping package='Porion.Projects.M"
+   C_14 : aliased constant String := "<query-mapping package='Porion.Projects.M"
        & "odels'>" & ASCII.LF & "    <description>" & ASCII.LF & "      Informatio"
        & "n about branches on a project." & ASCII.LF & "    </description>" & ASCII.LF
        & ASCII.LF & "    <query name='project-last-build'>" & ASCII.LF & "       "
@@ -503,7 +548,7 @@ package body Porion.Resources.Queries is
        & "sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapp"
        & "ing>" & ASCII.LF;
 
-   C_14 : aliased constant String := "<query-mapping package='Porion.Queries.Se"
+   C_15 : aliased constant String := "<query-mapping package='Porion.Queries.Se"
        & "rver'>" & ASCII.LF & "    <description>" & ASCII.LF & "        Selector "
        & "for list of project" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF
        & "    <query name='project-selector'>" & ASCII.LF & "        <comment>Sele"
@@ -513,7 +558,7 @@ package body Porion.Resources.Queries is
        & "          ORDER BY project.name ASC" & ASCII.LF & "        </sql>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_15 : aliased constant String := "<query-mapping package='Porion.Beans'>" & ASCII.LF
+   C_16 : aliased constant String := "<query-mapping package='Porion.Beans'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        Simple statistics about project"
        & " changes" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF & "  "
        & "  <class name=""Porion.Beans.Project_Audit"" bean=""no"">" & ASCII.LF & " "
@@ -579,7 +624,7 @@ package body Porion.Resources.Queries is
        & " " & ASCII.LF & "          GROUP BY day" & ASCII.LF & "        </sql>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_16 : aliased constant String := "<query-mapping package='Porion.Builds.Mod"
+   C_17 : aliased constant String := "<query-mapping package='Porion.Builds.Mod"
        & "els'>" & ASCII.LF & "    <description>" & ASCII.LF & "        Provide pr"
        & "oject build status" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF
        & "    <class name=""Porion.Builds.Models.Build_Status"" bean=""yes"">" & ASCII.LF
@@ -625,7 +670,7 @@ package body Porion.Resources.Queries is
        & " sb WHERE sb.recipe_id = recipe.id))" & ASCII.LF & "        </sql>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_17 : aliased constant String := "<query-mapping package='AWA.Events.Models"
+   C_18 : aliased constant String := "<query-mapping package='AWA.Events.Models"
        & "'>" & ASCII.LF & "    <description>" & ASCII.LF & "      Get the list of"
        & " messages" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF & " "
        & "   <query name='queue-pending-message'>" & ASCII.LF & "       <comment>G"
@@ -643,7 +688,7 @@ package body Porion.Resources.Queries is
        & "iority DESC, m.id ASC LIMIT :max" & ASCII.LF & "       </sql>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_18 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_19 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        Stats for the tests executed in"
        & " builds" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF & "   "
        & " <class name=""Porion.Queries.Build_Metric_Info"" bean=""yes"">" & ASCII.LF
@@ -678,7 +723,7 @@ package body Porion.Resources.Queries is
        & ">" & ASCII.LF & "    </query> " & ASCII.LF & ASCII.LF & "</query-mappin"
        & "g>" & ASCII.LF;
 
-   C_19 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_20 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List the build queues" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
        & "ueries.Queue_Info"" bean=""yes"">" & ASCII.LF & "        <comment>Inform"
@@ -792,7 +837,7 @@ package body Porion.Resources.Queries is
        & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF & ASCII.LF & "</"
        & "query-mapping>" & ASCII.LF;
 
-   C_20 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_21 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of build steps with the ex"
        & "ecution time" & ASCII.LF & "    </description>" & ASCII.LF & " " & ASCII.LF
        & "    <class name=""Porion.Queries.Build_Step_Info"" bean=""yes"">" & ASCII.LF
@@ -848,7 +893,7 @@ package body Porion.Resources.Queries is
        & "id = :build_id" & ASCII.LF & "        </sql-count>" & ASCII.LF & "    </"
        & "query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_21 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_22 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        Stats for the tests executed in"
        & " builds" & ASCII.LF & "    </description>" & ASCII.LF & ASCII.LF & "   "
        & " <class name=""Porion.Queries.Build_Test_Info"" bean=""yes"">" & ASCII.LF
@@ -886,7 +931,7 @@ package body Porion.Resources.Queries is
        & ".project_id = :project_id" & ASCII.LF & "        </sql>" & ASCII.LF & " "
        & "   </query> " & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_22 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_23 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of builds" & ASCII.LF & " "
        & "   </description>" & ASCII.LF & " " & ASCII.LF & "    <class name=""Pori"
        & "on.Queries.Build_Info"" bean=""yes"">" & ASCII.LF & "        <comment>In"
@@ -1030,7 +1075,7 @@ package body Porion.Resources.Queries is
        & "D DESC" & ASCII.LF & "        </sql>" & ASCII.LF & "    </query>" & ASCII.LF
        & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_23 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_24 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of environment variables" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
        & "ueries.Environment_Info"" bean=""yes"">" & ASCII.LF & "        <comment>"
@@ -1087,7 +1132,7 @@ package body Porion.Resources.Queries is
        & "R env.project_id IS NULL" & ASCII.LF & "        </sql-count>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_24 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_25 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of builds" & ASCII.LF & " "
        & "   </description>" & ASCII.LF & " " & ASCII.LF & "    <class name=""Pori"
        & "on.Queries.Node_Info"" bean=""yes"">" & ASCII.LF & "        <comment>Inf"
@@ -1155,7 +1200,7 @@ package body Porion.Resources.Queries is
        & "            ORDER BY node.name" & ASCII.LF & "        </sql>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_25 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_26 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of projects" & ASCII.LF & " "
        & "   </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Qu"
        & "eries.Project_Info"" bean=""yes"">" & ASCII.LF & "        <comment>Infor"
@@ -1299,7 +1344,7 @@ package body Porion.Resources.Queries is
        & "S project" & ASCII.LF & "        </sql-count>" & ASCII.LF & "    </query"
        & ">" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_26 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_27 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List of recipes for a project" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
        & "ueries.Recipe_Info"" bean=""yes"">" & ASCII.LF & "        <comment>Infor"
@@ -1381,7 +1426,7 @@ package body Porion.Resources.Queries is
        & " recipe.project_id = :project_id" & ASCII.LF & "        </sql-count>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_27 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_28 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        List the tests" & ASCII.LF & " "
        & "   </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Qu"
        & "eries.Test_Info"" bean=""yes"">" & ASCII.LF & "        <comment>Informat"
@@ -1469,7 +1514,7 @@ package body Porion.Resources.Queries is
        & "   ORDER BY grp.name, test.name" & ASCII.LF & "        </sql>" & ASCII.LF
        & "    </query>" & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_28 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_29 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        Stats for the builds" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
        & "ueries.Build_Stat"" bean=""yes"">" & ASCII.LF & "        <comment>Statis"
@@ -1541,7 +1586,7 @@ package body Porion.Resources.Queries is
        & "        </sql>" & ASCII.LF & "    </query> " & ASCII.LF & ASCII.LF & "<"
        & "/query-mapping>" & ASCII.LF;
 
-   C_29 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_30 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        Stats with the build metrics" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
        & "ueries.Metric_Stat"" bean=""yes"">" & ASCII.LF & "        <comment>Stati"
@@ -1615,7 +1660,7 @@ package body Porion.Resources.Queries is
        & "          GROUP BY metric.name" & ASCII.LF & "        </sql>" & ASCII.LF
        & "    </query> " & ASCII.LF & ASCII.LF & "</query-mapping>" & ASCII.LF;
 
-   C_30 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
+   C_31 : aliased constant String := "<query-mapping package='Porion.Queries'>" & ASCII.LF
        & "    <description>" & ASCII.LF & "        Stats for the builds" & ASCII.LF
        & "    </description>" & ASCII.LF & ASCII.LF & "    <class name=""Porion.Q"
        & "ueries.Node_Stat"" bean=""yes"">" & ASCII.LF & "        <comment>Statist"
@@ -1683,7 +1728,7 @@ package body Porion.Resources.Queries is
       C_12'Access, C_13'Access, C_14'Access, C_15'Access, C_16'Access, C_17'Access,
       C_18'Access, C_19'Access, C_20'Access, C_21'Access, C_22'Access, C_23'Access,
       C_24'Access, C_25'Access, C_26'Access, C_27'Access, C_28'Access, C_29'Access,
-      C_30'Access);
+      C_30'Access, C_31'Access);
 
    function Get_Content (Name : String) return access constant String is
       H : constant Natural := Hash (Name);

@@ -73,7 +73,7 @@ package body Porion.Projects.Models is
       Impl.Create_Date := ADO.DEFAULT_TIME;
       Impl.Update_Date.Is_Null := True;
       Impl.Status := Project_Status_Type'First;
-      Impl.Scm := Porion.Sources.Source_Control_Type'First;
+      Impl.Scm := Porion.Source_Control_Type'First;
       Impl.Pass_Rate := 0;
       Impl.Fail_Rate := 0;
       Impl.Timeout_Rate := 0;
@@ -231,11 +231,11 @@ package body Porion.Projects.Models is
 
 
    procedure Set_Scm (Object : in out Project_Ref;
-                      Value  : in Porion.Sources.Source_Control_Type) is
+                      Value  : in Porion.Source_Control_Type) is
       procedure Set_Field_Discrete is
         new ADO.Audits.Set_Field_Operation
-          (Porion.Sources.Source_Control_Type,
-           Porion.Sources.Source_Control_Type_Objects.To_Object);
+          (Porion.Source_Control_Type,
+           Porion.Source_Control_Type_Objects.To_Object);
       Impl : Project_Access;
    begin
       Set_Field (Object, Impl);
@@ -243,7 +243,7 @@ package body Porion.Projects.Models is
    end Set_Scm;
 
    function Get_Scm (Object : in Project_Ref)
-                  return Porion.Sources.Source_Control_Type is
+                  return Porion.Source_Control_Type is
       Impl : constant Project_Access
          := Project_Impl (Object.Get_Load_Object.all)'Access;
    begin
@@ -669,7 +669,7 @@ package body Porion.Projects.Models is
       end if;
       if Object.Is_Modified (8) then
          Stmt.Save_Field (Name  => COL_7_1_NAME, --  scm
-                          Value => Integer (Porion.Sources.Source_Control_Type'Enum_Rep (Object.Scm)));
+                          Value => Integer (Porion.Source_Control_Type'Enum_Rep (Object.Scm)));
          Object.Clear_Modified (8);
       end if;
       if Object.Is_Modified (9) then
@@ -764,7 +764,7 @@ package body Porion.Projects.Models is
       Query.Save_Field (Name  => COL_6_1_NAME, --  status
                         Value => Integer (Project_Status_Type'Enum_Rep (Object.Status)));
       Query.Save_Field (Name  => COL_7_1_NAME, --  scm
-                        Value => Integer (Porion.Sources.Source_Control_Type'Enum_Rep (Object.Scm)));
+                        Value => Integer (Porion.Source_Control_Type'Enum_Rep (Object.Scm)));
       Query.Save_Field (Name  => COL_8_1_NAME, --  scm_url
                         Value => Object.Scm_Url);
       Query.Save_Field (Name  => COL_9_1_NAME, --  pass_rate
@@ -833,7 +833,7 @@ package body Porion.Projects.Models is
       elsif Name = "status" then
          return Project_Status_Type_Objects.To_Object (Impl.Status);
       elsif Name = "scm" then
-         return Porion.Sources.Source_Control_Type_Objects.To_Object (Impl.Scm);
+         return Porion.Source_Control_Type_Objects.To_Object (Impl.Scm);
       elsif Name = "scm_url" then
          return Util.Beans.Objects.To_Object (Impl.Scm_Url);
       elsif Name = "pass_rate" then
@@ -892,7 +892,7 @@ package body Porion.Projects.Models is
       Object.Create_Date := Stmt.Get_Time (4);
       Object.Update_Date := Stmt.Get_Nullable_Time (5);
       Object.Status := Project_Status_Type'Enum_Val (Stmt.Get_Integer (6));
-      Object.Scm := Porion.Sources.Source_Control_Type'Enum_Val (Stmt.Get_Integer (7));
+      Object.Scm := Porion.Source_Control_Type'Enum_Val (Stmt.Get_Integer (7));
       Object.Scm_Url := Stmt.Get_Unbounded_String (8);
       Object.Pass_Rate := Porion.Permille_Type (Stmt.Get_Integer (9));
       Object.Fail_Rate := Porion.Permille_Type (Stmt.Get_Integer (10));

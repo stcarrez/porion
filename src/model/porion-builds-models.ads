@@ -83,6 +83,16 @@ package Porion.Builds.Models is
       Value   : Reason_Type;
    end record;
 
+   type Variable_Type is (VAR_SHELL, VAR_FILE, VAR_ENV);
+   for Variable_Type use (VAR_SHELL => 0, VAR_FILE => 1, VAR_ENV => 2);
+   package Variable_Type_Objects is
+      new Util.Beans.Objects.Enums (Variable_Type);
+
+   type Nullable_Variable_Type is record
+      Is_Null : Boolean := True;
+      Value   : Variable_Type;
+   end record;
+
    type Build_Executor_Ref is new ADO.Objects.Object_Ref with null record;
 
    type Recipe_Ref is new ADO.Objects.Object_Ref with null record;
@@ -1204,6 +1214,30 @@ package Porion.Builds.Models is
    function Get_Value (Object : in Environment_Ref)
                  return String;
 
+   --  Set the type of environment variable
+   procedure Set_Kind (Object : in out Environment_Ref;
+                       Value  : in Variable_Type);
+
+   --  Get the type of environment variable
+   function Get_Kind (Object : in Environment_Ref)
+                 return Variable_Type;
+
+   --  Set whether the value is secret.
+   procedure Set_Secret (Object : in out Environment_Ref;
+                         Value  : in Boolean);
+
+   --  Get whether the value is secret.
+   function Get_Secret (Object : in Environment_Ref)
+                 return Boolean;
+
+   --
+   procedure Set_Step_Number (Object : in out Environment_Ref;
+                              Value  : in ADO.Nullable_Integer);
+
+   --
+   function Get_Step_Number (Object : in Environment_Ref)
+                 return ADO.Nullable_Integer;
+
    --
    procedure Set_Branch (Object : in out Environment_Ref;
                          Value  : in Porion.Projects.Models.Branch_Ref'Class);
@@ -1424,19 +1458,6 @@ package Porion.Builds.Models is
                    Query   : in ADO.SQL.Query'Class);
 
 
-   Query_Cleanup_Build_Step : constant ADO.Queries.Query_Definition_Access;
-
-   Query_Cleanup_Build_Reason : constant ADO.Queries.Query_Definition_Access;
-
-   Query_Cleanup_Build_Metrics : constant ADO.Queries.Query_Definition_Access;
-
-   Query_Cleanup_Build_Test_Run : constant ADO.Queries.Query_Definition_Access;
-
-   Query_Cleanup_Build_Test_Run_Group : constant ADO.Queries.Query_Definition_Access;
-
-   Query_Cleanup_Build_Last_Build : constant ADO.Queries.Query_Definition_Access;
-
-
    Query_Cleanup_Recipe_Build_Step : constant ADO.Queries.Query_Definition_Access;
 
    Query_Cleanup_Recipe_Build_Metrics : constant ADO.Queries.Query_Definition_Access;
@@ -1456,6 +1477,19 @@ package Porion.Builds.Models is
    Query_Cleanup_Recipe_Environment : constant ADO.Queries.Query_Definition_Access;
 
    Query_Cleanup_Recipe_Step : constant ADO.Queries.Query_Definition_Access;
+
+
+   Query_Cleanup_Build_Step : constant ADO.Queries.Query_Definition_Access;
+
+   Query_Cleanup_Build_Reason : constant ADO.Queries.Query_Definition_Access;
+
+   Query_Cleanup_Build_Metrics : constant ADO.Queries.Query_Definition_Access;
+
+   Query_Cleanup_Build_Test_Run : constant ADO.Queries.Query_Definition_Access;
+
+   Query_Cleanup_Build_Test_Run_Group : constant ADO.Queries.Query_Definition_Access;
+
+   Query_Cleanup_Build_Last_Build : constant ADO.Queries.Query_Definition_Access;
 
    --  --------------------
    --    Summary of information about last builds of a project.
@@ -1523,6 +1557,41 @@ package Porion.Builds.Models is
                    Context : in out ADO.Queries.Context'Class);
 
    Query_Project_Build_Status : constant ADO.Queries.Query_Definition_Access;
+
+   --  --------------------
+   --    Information for a build variable.
+   --  --------------------
+   type Variable_Info is record
+
+      --  the build variable name.
+      Name : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the build variable value.
+      Value : Ada.Strings.Unbounded.Unbounded_String;
+
+      --  the build variable type.
+      Kind : Variable_Type;
+
+      --  whether the build variable is secret.
+      Secret : Boolean;
+
+      --  the optional recipe step number.
+      Step_Number : ADO.Nullable_Integer;
+   end record;
+
+   package Variable_Info_Vectors is
+      new Ada.Containers.Vectors (Index_Type   => Positive,
+                                  Element_Type => Variable_Info,
+                                  "="          => "=");
+
+   subtype Variable_Info_Vector is Variable_Info_Vectors.Vector;
+
+   --  Run the query controlled by <b>Context</b> and append the list in <b>Object</b>.
+   procedure List (Object  : in out Variable_Info_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
+
+   Query_Build_Variables : constant ADO.Queries.Query_Definition_Access;
 
 
 
@@ -2133,13 +2202,16 @@ private
    COL_1_8_NAME : aliased constant String := "version";
    COL_2_8_NAME : aliased constant String := "name";
    COL_3_8_NAME : aliased constant String := "value";
-   COL_4_8_NAME : aliased constant String := "branch_id";
-   COL_5_8_NAME : aliased constant String := "node_id";
-   COL_6_8_NAME : aliased constant String := "recipe_id";
-   COL_7_8_NAME : aliased constant String := "project_id";
+   COL_4_8_NAME : aliased constant String := "kind";
+   COL_5_8_NAME : aliased constant String := "secret";
+   COL_6_8_NAME : aliased constant String := "step_number";
+   COL_7_8_NAME : aliased constant String := "branch_id";
+   COL_8_8_NAME : aliased constant String := "node_id";
+   COL_9_8_NAME : aliased constant String := "recipe_id";
+   COL_10_8_NAME : aliased constant String := "project_id";
 
    ENVIRONMENT_DEF : aliased constant ADO.Schemas.Class_Mapping :=
-     (Count   => 8,
+     (Count   => 11,
       Table   => ENVIRONMENT_NAME'Access,
       Members => (
          1 => COL_0_8_NAME'Access,
@@ -2149,16 +2221,22 @@ private
          5 => COL_4_8_NAME'Access,
          6 => COL_5_8_NAME'Access,
          7 => COL_6_8_NAME'Access,
-         8 => COL_7_8_NAME'Access)
+         8 => COL_7_8_NAME'Access,
+         9 => COL_8_8_NAME'Access,
+         10 => COL_9_8_NAME'Access,
+         11 => COL_10_8_NAME'Access)
      );
    ENVIRONMENT_TABLE : constant ADO.Schemas.Class_Mapping_Access
       := ENVIRONMENT_DEF'Access;
 
    ENVIRONMENT_AUDIT_DEF : aliased constant ADO.Audits.Auditable_Mapping :=
-     (Count    => 1,
+     (Count    => 4,
       Of_Class => ENVIRONMENT_DEF'Access,
       Members  => (
-         1 => 3)
+         1 => 3,
+         2 => 4,
+         3 => 5,
+         4 => 6)
      );
    ENVIRONMENT_AUDIT_TABLE : constant ADO.Audits.Auditable_Mapping_Access
       := ENVIRONMENT_AUDIT_DEF'Access;
@@ -2174,6 +2252,9 @@ private
        Version : Integer;
        Name : Ada.Strings.Unbounded.Unbounded_String;
        Value : Ada.Strings.Unbounded.Unbounded_String;
+       Kind : Variable_Type;
+       Secret : Boolean;
+       Step_Number : ADO.Nullable_Integer;
        Branch : Porion.Projects.Models.Branch_Ref;
        Node : Porion.Nodes.Models.Node_Ref;
        Recipe : Recipe_Ref;
@@ -2286,108 +2367,108 @@ private
                         Impl   : out Last_Build_Access);
 
    package File_1 is
-      new ADO.Queries.Loaders.File (Path => "cleanup-build.xml",
-                                    Sha1 => "9B2B599473F75F92CB5AB5045675E4CCEF926543");
-
-   package Def_Cleanup_Build_Step is
-      new ADO.Queries.Loaders.Query (Name => "cleanup-build-step",
-                                     File => File_1.File'Access);
-   Query_Cleanup_Build_Step : constant ADO.Queries.Query_Definition_Access
-   := Def_Cleanup_Build_Step.Query'Access;
-
-   package Def_Cleanup_Build_Reason is
-      new ADO.Queries.Loaders.Query (Name => "cleanup-build-reason",
-                                     File => File_1.File'Access);
-   Query_Cleanup_Build_Reason : constant ADO.Queries.Query_Definition_Access
-   := Def_Cleanup_Build_Reason.Query'Access;
-
-   package Def_Cleanup_Build_Metrics is
-      new ADO.Queries.Loaders.Query (Name => "cleanup-build-metrics",
-                                     File => File_1.File'Access);
-   Query_Cleanup_Build_Metrics : constant ADO.Queries.Query_Definition_Access
-   := Def_Cleanup_Build_Metrics.Query'Access;
-
-   package Def_Cleanup_Build_Test_Run is
-      new ADO.Queries.Loaders.Query (Name => "cleanup-build-test-run",
-                                     File => File_1.File'Access);
-   Query_Cleanup_Build_Test_Run : constant ADO.Queries.Query_Definition_Access
-   := Def_Cleanup_Build_Test_Run.Query'Access;
-
-   package Def_Cleanup_Build_Test_Run_Group is
-      new ADO.Queries.Loaders.Query (Name => "cleanup-build-test-run-group",
-                                     File => File_1.File'Access);
-   Query_Cleanup_Build_Test_Run_Group : constant ADO.Queries.Query_Definition_Access
-   := Def_Cleanup_Build_Test_Run_Group.Query'Access;
-
-   package Def_Cleanup_Build_Last_Build is
-      new ADO.Queries.Loaders.Query (Name => "cleanup-build-last-build",
-                                     File => File_1.File'Access);
-   Query_Cleanup_Build_Last_Build : constant ADO.Queries.Query_Definition_Access
-   := Def_Cleanup_Build_Last_Build.Query'Access;
-
-   package File_2 is
       new ADO.Queries.Loaders.File (Path => "cleanup-recipe.xml",
                                     Sha1 => "9B2B599473F75F92CB5AB5045675E4CCEF926543");
 
    package Def_Cleanup_Recipe_Build_Step is
       new ADO.Queries.Loaders.Query (Name => "cleanup-recipe-build-step",
-                                     File => File_2.File'Access);
+                                     File => File_1.File'Access);
    Query_Cleanup_Recipe_Build_Step : constant ADO.Queries.Query_Definition_Access
    := Def_Cleanup_Recipe_Build_Step.Query'Access;
 
    package Def_Cleanup_Recipe_Build_Metrics is
       new ADO.Queries.Loaders.Query (Name => "cleanup-recipe-build-metrics",
-                                     File => File_2.File'Access);
+                                     File => File_1.File'Access);
    Query_Cleanup_Recipe_Build_Metrics : constant ADO.Queries.Query_Definition_Access
    := Def_Cleanup_Recipe_Build_Metrics.Query'Access;
 
    package Def_Cleanup_Recipe_Build_Reason is
       new ADO.Queries.Loaders.Query (Name => "cleanup-recipe-build-reason",
-                                     File => File_2.File'Access);
+                                     File => File_1.File'Access);
    Query_Cleanup_Recipe_Build_Reason : constant ADO.Queries.Query_Definition_Access
    := Def_Cleanup_Recipe_Build_Reason.Query'Access;
 
    package Def_Cleanup_Recipe_Build_Queue is
       new ADO.Queries.Loaders.Query (Name => "cleanup-recipe-build-queue",
-                                     File => File_2.File'Access);
+                                     File => File_1.File'Access);
    Query_Cleanup_Recipe_Build_Queue : constant ADO.Queries.Query_Definition_Access
    := Def_Cleanup_Recipe_Build_Queue.Query'Access;
 
    package Def_Cleanup_Recipe_Test_Run is
       new ADO.Queries.Loaders.Query (Name => "cleanup-recipe-test-run",
-                                     File => File_2.File'Access);
+                                     File => File_1.File'Access);
    Query_Cleanup_Recipe_Test_Run : constant ADO.Queries.Query_Definition_Access
    := Def_Cleanup_Recipe_Test_Run.Query'Access;
 
    package Def_Cleanup_Recipe_Test_Run_Group is
       new ADO.Queries.Loaders.Query (Name => "cleanup-recipe-test-run-group",
-                                     File => File_2.File'Access);
+                                     File => File_1.File'Access);
    Query_Cleanup_Recipe_Test_Run_Group : constant ADO.Queries.Query_Definition_Access
    := Def_Cleanup_Recipe_Test_Run_Group.Query'Access;
 
    package Def_Cleanup_Recipe_Last_Build is
       new ADO.Queries.Loaders.Query (Name => "cleanup-recipe-last-build",
-                                     File => File_2.File'Access);
+                                     File => File_1.File'Access);
    Query_Cleanup_Recipe_Last_Build : constant ADO.Queries.Query_Definition_Access
    := Def_Cleanup_Recipe_Last_Build.Query'Access;
 
    package Def_Cleanup_Recipe_Build is
       new ADO.Queries.Loaders.Query (Name => "cleanup-recipe-build",
-                                     File => File_2.File'Access);
+                                     File => File_1.File'Access);
    Query_Cleanup_Recipe_Build : constant ADO.Queries.Query_Definition_Access
    := Def_Cleanup_Recipe_Build.Query'Access;
 
    package Def_Cleanup_Recipe_Environment is
       new ADO.Queries.Loaders.Query (Name => "cleanup-recipe-environment",
-                                     File => File_2.File'Access);
+                                     File => File_1.File'Access);
    Query_Cleanup_Recipe_Environment : constant ADO.Queries.Query_Definition_Access
    := Def_Cleanup_Recipe_Environment.Query'Access;
 
    package Def_Cleanup_Recipe_Step is
       new ADO.Queries.Loaders.Query (Name => "cleanup-recipe-step",
-                                     File => File_2.File'Access);
+                                     File => File_1.File'Access);
    Query_Cleanup_Recipe_Step : constant ADO.Queries.Query_Definition_Access
    := Def_Cleanup_Recipe_Step.Query'Access;
+
+   package File_2 is
+      new ADO.Queries.Loaders.File (Path => "cleanup-build.xml",
+                                    Sha1 => "9B2B599473F75F92CB5AB5045675E4CCEF926543");
+
+   package Def_Cleanup_Build_Step is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-build-step",
+                                     File => File_2.File'Access);
+   Query_Cleanup_Build_Step : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Build_Step.Query'Access;
+
+   package Def_Cleanup_Build_Reason is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-build-reason",
+                                     File => File_2.File'Access);
+   Query_Cleanup_Build_Reason : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Build_Reason.Query'Access;
+
+   package Def_Cleanup_Build_Metrics is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-build-metrics",
+                                     File => File_2.File'Access);
+   Query_Cleanup_Build_Metrics : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Build_Metrics.Query'Access;
+
+   package Def_Cleanup_Build_Test_Run is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-build-test-run",
+                                     File => File_2.File'Access);
+   Query_Cleanup_Build_Test_Run : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Build_Test_Run.Query'Access;
+
+   package Def_Cleanup_Build_Test_Run_Group is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-build-test-run-group",
+                                     File => File_2.File'Access);
+   Query_Cleanup_Build_Test_Run_Group : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Build_Test_Run_Group.Query'Access;
+
+   package Def_Cleanup_Build_Last_Build is
+      new ADO.Queries.Loaders.Query (Name => "cleanup-build-last-build",
+                                     File => File_2.File'Access);
+   Query_Cleanup_Build_Last_Build : constant ADO.Queries.Query_Definition_Access
+   := Def_Cleanup_Build_Last_Build.Query'Access;
 
    package File_3 is
       new ADO.Queries.Loaders.File (Path => "project-update-status.xml",
@@ -2398,4 +2479,14 @@ private
                                      File => File_3.File'Access);
    Query_Project_Build_Status : constant ADO.Queries.Query_Definition_Access
    := Def_Buildstatus_Project_Build_Status.Query'Access;
+
+   package File_4 is
+      new ADO.Queries.Loaders.File (Path => "build-variables.xml",
+                                    Sha1 => "E6BA9120CC28F94C7DC80959BD5DA9C9F0501C49");
+
+   package Def_Variableinfo_Build_Variables is
+      new ADO.Queries.Loaders.Query (Name => "build-variables",
+                                     File => File_4.File'Access);
+   Query_Build_Variables : constant ADO.Queries.Query_Definition_Access
+   := Def_Variableinfo_Build_Variables.Query'Access;
 end Porion.Builds.Models;

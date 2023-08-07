@@ -164,6 +164,12 @@ CREATE TABLE IF NOT EXISTS porion_environment (
   `name` VARCHAR(255) NOT NULL,
   /* the environment variable value. */
   `value` VARCHAR(4096) NOT NULL,
+  /* the type of environment variable */
+  `kind` TINYINT NOT NULL,
+  /* whether the value is secret. */
+  `secret` TINYINT NOT NULL,
+  /*  */
+  `step_number` INTEGER ,
   /*  */
   `branch_id` BIGINT ,
   /*  */
@@ -533,6 +539,12 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_environment"), "value");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_environment"), "kind");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_environment"), "secret");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_environment"), "step_number");
+INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_recipe"), "name");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_recipe"), "description");
@@ -608,7 +620,7 @@ INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_project"), "check_delay");
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
   VALUES ((SELECT id FROM ado_entity_type WHERE name = "porion_project"), "build_progress");
-INSERT OR IGNORE INTO ado_version (name, version) VALUES ("porion_lib", 3);
+INSERT OR IGNORE INTO ado_version (name, version) VALUES ("porion_lib", 4);
 /* Copied from porion_lib-init-sqlite.sql*/
 /* Setup indexes */
 CREATE INDEX IF NOT EXISTS porion_last_build_idx_1 ON porion_last_build (

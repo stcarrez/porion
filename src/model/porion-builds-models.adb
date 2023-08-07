@@ -4197,6 +4197,9 @@ package body Porion.Builds.Models is
    begin
       Impl := new Environment_Impl;
       Impl.Version := 0;
+      Impl.Kind := Variable_Type'First;
+      Impl.Secret := False;
+      Impl.Step_Number.Is_Null := True;
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Allocate;
 
@@ -4290,12 +4293,67 @@ package body Porion.Builds.Models is
    end Get_Value;
 
 
+   procedure Set_Kind (Object : in out Environment_Ref;
+                       Value  : in Variable_Type) is
+      procedure Set_Field_Discrete is
+        new ADO.Audits.Set_Field_Operation
+          (Variable_Type,
+           Variable_Type_Objects.To_Object);
+      Impl : Environment_Access;
+   begin
+      Set_Field (Object, Impl);
+      Set_Field_Discrete (Impl.all, 5, Impl.Kind, Value);
+   end Set_Kind;
+
+   function Get_Kind (Object : in Environment_Ref)
+                  return Variable_Type is
+      Impl : constant Environment_Access
+         := Environment_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Kind;
+   end Get_Kind;
+
+
+   procedure Set_Secret (Object : in out Environment_Ref;
+                         Value  : in Boolean) is
+      Impl : Environment_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Audits.Set_Field_Boolean (Impl.all, 6, Impl.Secret, Value);
+   end Set_Secret;
+
+   function Get_Secret (Object : in Environment_Ref)
+                  return Boolean is
+      Impl : constant Environment_Access
+         := Environment_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Secret;
+   end Get_Secret;
+
+
+   procedure Set_Step_Number (Object : in out Environment_Ref;
+                              Value  : in ADO.Nullable_Integer) is
+      Impl : Environment_Access;
+   begin
+      Set_Field (Object, Impl);
+      ADO.Audits.Set_Field_Integer (Impl.all, 7, Impl.Step_Number, Value);
+   end Set_Step_Number;
+
+   function Get_Step_Number (Object : in Environment_Ref)
+                  return ADO.Nullable_Integer is
+      Impl : constant Environment_Access
+         := Environment_Impl (Object.Get_Load_Object.all)'Access;
+   begin
+      return Impl.Step_Number;
+   end Get_Step_Number;
+
+
    procedure Set_Branch (Object : in out Environment_Ref;
                          Value  : in Porion.Projects.Models.Branch_Ref'Class) is
       Impl : Environment_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 5, Impl.Branch, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 8, Impl.Branch, Value);
    end Set_Branch;
 
    function Get_Branch (Object : in Environment_Ref)
@@ -4312,7 +4370,7 @@ package body Porion.Builds.Models is
       Impl : Environment_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 6, Impl.Node, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 9, Impl.Node, Value);
    end Set_Node;
 
    function Get_Node (Object : in Environment_Ref)
@@ -4329,7 +4387,7 @@ package body Porion.Builds.Models is
       Impl : Environment_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 7, Impl.Recipe, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 10, Impl.Recipe, Value);
    end Set_Recipe;
 
    function Get_Recipe (Object : in Environment_Ref)
@@ -4346,7 +4404,7 @@ package body Porion.Builds.Models is
       Impl : Environment_Access;
    begin
       Set_Field (Object, Impl);
-      ADO.Objects.Set_Field_Object (Impl.all, 8, Impl.Project, Value);
+      ADO.Objects.Set_Field_Object (Impl.all, 11, Impl.Project, Value);
    end Set_Project;
 
    function Get_Project (Object : in Environment_Ref)
@@ -4374,6 +4432,9 @@ package body Porion.Builds.Models is
             Copy.Version := Impl.Version;
             Copy.Name := Impl.Name;
             Copy.Value := Impl.Value;
+            Copy.Kind := Impl.Kind;
+            Copy.Secret := Impl.Secret;
+            Copy.Step_Number := Impl.Step_Number;
             Copy.Branch := Impl.Branch;
             Copy.Node := Impl.Node;
             Copy.Recipe := Impl.Recipe;
@@ -4555,24 +4616,39 @@ package body Porion.Builds.Models is
          Object.Clear_Modified (4);
       end if;
       if Object.Is_Modified (5) then
-         Stmt.Save_Field (Name  => COL_4_8_NAME, --  branch_id
-                          Value => Object.Branch);
+         Stmt.Save_Field (Name  => COL_4_8_NAME, --  kind
+                          Value => Integer (Variable_Type'Enum_Rep (Object.Kind)));
          Object.Clear_Modified (5);
       end if;
       if Object.Is_Modified (6) then
-         Stmt.Save_Field (Name  => COL_5_8_NAME, --  node_id
-                          Value => Object.Node);
+         Stmt.Save_Field (Name  => COL_5_8_NAME, --  secret
+                          Value => Object.Secret);
          Object.Clear_Modified (6);
       end if;
       if Object.Is_Modified (7) then
-         Stmt.Save_Field (Name  => COL_6_8_NAME, --  recipe_id
-                          Value => Object.Recipe);
+         Stmt.Save_Field (Name  => COL_6_8_NAME, --  step_number
+                          Value => Object.Step_Number);
          Object.Clear_Modified (7);
       end if;
       if Object.Is_Modified (8) then
-         Stmt.Save_Field (Name  => COL_7_8_NAME, --  project_id
-                          Value => Object.Project);
+         Stmt.Save_Field (Name  => COL_7_8_NAME, --  branch_id
+                          Value => Object.Branch);
          Object.Clear_Modified (8);
+      end if;
+      if Object.Is_Modified (9) then
+         Stmt.Save_Field (Name  => COL_8_8_NAME, --  node_id
+                          Value => Object.Node);
+         Object.Clear_Modified (9);
+      end if;
+      if Object.Is_Modified (10) then
+         Stmt.Save_Field (Name  => COL_9_8_NAME, --  recipe_id
+                          Value => Object.Recipe);
+         Object.Clear_Modified (10);
+      end if;
+      if Object.Is_Modified (11) then
+         Stmt.Save_Field (Name  => COL_10_8_NAME, --  project_id
+                          Value => Object.Project);
+         Object.Clear_Modified (11);
       end if;
       if Stmt.Has_Save_Fields then
          Object.Version := Object.Version + 1;
@@ -4614,13 +4690,19 @@ package body Porion.Builds.Models is
                         Value => Object.Name);
       Query.Save_Field (Name  => COL_3_8_NAME, --  value
                         Value => Object.Value);
-      Query.Save_Field (Name  => COL_4_8_NAME, --  branch_id
+      Query.Save_Field (Name  => COL_4_8_NAME, --  kind
+                        Value => Integer (Variable_Type'Enum_Rep (Object.Kind)));
+      Query.Save_Field (Name  => COL_5_8_NAME, --  secret
+                        Value => Object.Secret);
+      Query.Save_Field (Name  => COL_6_8_NAME, --  step_number
+                        Value => Object.Step_Number);
+      Query.Save_Field (Name  => COL_7_8_NAME, --  branch_id
                         Value => Object.Branch);
-      Query.Save_Field (Name  => COL_5_8_NAME, --  node_id
+      Query.Save_Field (Name  => COL_8_8_NAME, --  node_id
                         Value => Object.Node);
-      Query.Save_Field (Name  => COL_6_8_NAME, --  recipe_id
+      Query.Save_Field (Name  => COL_9_8_NAME, --  recipe_id
                         Value => Object.Recipe);
-      Query.Save_Field (Name  => COL_7_8_NAME, --  project_id
+      Query.Save_Field (Name  => COL_10_8_NAME, --  project_id
                         Value => Object.Project);
       Query.Execute (Result);
       if Result /= 1 then
@@ -4661,6 +4743,16 @@ package body Porion.Builds.Models is
          return Util.Beans.Objects.To_Object (Impl.Name);
       elsif Name = "value" then
          return Util.Beans.Objects.To_Object (Impl.Value);
+      elsif Name = "kind" then
+         return Variable_Type_Objects.To_Object (Impl.Kind);
+      elsif Name = "secret" then
+         return Util.Beans.Objects.To_Object (Impl.Secret);
+      elsif Name = "step_number" then
+         if Impl.Step_Number.Is_Null then
+            return Util.Beans.Objects.Null_Object;
+         else
+            return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.Step_Number.Value));
+         end if;
       end if;
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
@@ -4697,17 +4789,20 @@ package body Porion.Builds.Models is
       Object.Set_Key_Value (Stmt.Get_Identifier (0));
       Object.Name := Stmt.Get_Unbounded_String (2);
       Object.Value := Stmt.Get_Unbounded_String (3);
-      if not Stmt.Is_Null (4) then
-         Object.Branch.Set_Key_Value (Stmt.Get_Identifier (4), Session);
-      end if;
-      if not Stmt.Is_Null (5) then
-         Object.Node.Set_Key_Value (Stmt.Get_Identifier (5), Session);
-      end if;
-      if not Stmt.Is_Null (6) then
-         Object.Recipe.Set_Key_Value (Stmt.Get_Identifier (6), Session);
-      end if;
+      Object.Kind := Variable_Type'Enum_Val (Stmt.Get_Integer (4));
+      Object.Secret := Stmt.Get_Boolean (5);
+      Object.Step_Number := Stmt.Get_Nullable_Integer (6);
       if not Stmt.Is_Null (7) then
-         Object.Project.Set_Key_Value (Stmt.Get_Identifier (7), Session);
+         Object.Branch.Set_Key_Value (Stmt.Get_Identifier (7), Session);
+      end if;
+      if not Stmt.Is_Null (8) then
+         Object.Node.Set_Key_Value (Stmt.Get_Identifier (8), Session);
+      end if;
+      if not Stmt.Is_Null (9) then
+         Object.Recipe.Set_Key_Value (Stmt.Get_Identifier (9), Session);
+      end if;
+      if not Stmt.Is_Null (10) then
+         Object.Project.Set_Key_Value (Stmt.Get_Identifier (10), Session);
       end if;
       Object.Version := Stmt.Get_Integer (1);
       ADO.Objects.Set_Created (Object);
@@ -5327,6 +5422,36 @@ package body Porion.Builds.Models is
    begin
       Stmt.Execute;
       Build_Status_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         Object.Insert_Space (Before => Pos);
+         Object.Update_Element (Index => Pos, Process => Read'Access);
+         Pos := Pos + 1;
+         Stmt.Next;
+      end loop;
+   end List;
+
+   --  --------------------
+   --  Information for a build variable.
+   --  --------------------
+   procedure List (Object  : in out Variable_Info_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+      procedure Read (Into : in out Variable_Info);
+
+      Stmt : ADO.Statements.Query_Statement
+          := Session.Create_Statement (Context);
+      Pos  : Positive := 1;
+      procedure Read (Into : in out Variable_Info) is
+      begin
+         Into.Name := Stmt.Get_Unbounded_String (0);
+         Into.Value := Stmt.Get_Unbounded_String (1);
+         Into.Kind := Variable_Type'Enum_Val (Stmt.Get_Integer (2));
+         Into.Secret := Stmt.Get_Boolean (3);
+         Into.Step_Number := Stmt.Get_Nullable_Integer (4);
+      end Read;
+   begin
+      Stmt.Execute;
+      Variable_Info_Vectors.Clear (Object);
       while Stmt.Has_Elements loop
          Object.Insert_Space (Before => Pos);
          Object.Update_Element (Index => Pos, Process => Read'Access);

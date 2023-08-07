@@ -16,14 +16,11 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Util.Strings.Vectors;
-with Porion.Sources;
 with Porion.Services;
 with Porion.Projects;
 with Porion.Executors;
 with Porion.Builds.Services;
 package body Porion.Commands.Steps is
-
-   use type Porion.Sources.Source_Control_Type;
 
    procedure Get_Recipe_Step_Offset (Context : in out Context_Type;
                                      Count   : out Natural);
@@ -157,7 +154,7 @@ package body Porion.Commands.Steps is
                           Recipe  : in out Porion.Builds.Models.Recipe_Ref;
                           Context : in out Context_Type) is
    begin
-      if Context.Project_Service.Project.Get_Scm = Porion.Sources.SRC_GIT then
+      if Context.Project_Service.Project.Get_Scm = Porion.SRC_GIT then
          Command.Delete_Pos := Command.Delete_Pos - 1;
       end if;
       if Command.Delete_Pos <= 1 then

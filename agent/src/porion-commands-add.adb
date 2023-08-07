@@ -26,8 +26,6 @@ with Porion.Builds.Services;
 with Porion.Sources;
 package body Porion.Commands.Add is
 
-   use type Porion.Sources.Source_Control_Type;
-
    --  ------------------------------
    --  Add a project with source control described by the URI.
    --  ------------------------------
@@ -44,7 +42,7 @@ package body Porion.Commands.Add is
                             Config   => Config,
                             Result   => Info,
                             Executor => Executor);
-      if Info.Kind = Porion.Sources.SRC_UNKNOWN then
+      if Info.Kind = Porion.SRC_UNKNOWN then
          Porion.Commands.Error (-("cannot identify source type of {0}"), URI);
          return;
       end if;

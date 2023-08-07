@@ -95,7 +95,7 @@ package body Porion.Templates.Tests is
 
       exception
          when Porion.Services.Not_Found =>
-            Info.Kind := Porion.Sources.SRC_FILE;
+            Info.Kind := Porion.SRC_FILE;
             Info.Name := To_UString ("hello");
             Info.URI := To_UString ("regtests/files/hello-1.0.tar.gz");
             Projects.Services.Add_Project (Service, Info);

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-commands-set -- Set command to configure a project, branch or recipe
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,6 @@
 -----------------------------------------------------------------------
 with Util.Strings.Builders;
 with Porion.Services;
-with Porion.Sources;
 package body Porion.Commands.Set is
 
    VAR_NAME         : constant String := "name";
@@ -80,7 +79,7 @@ package body Porion.Commands.Set is
          Porion.Projects.Services.Set_Name (Context.Project_Service, Value, Modified);
       elsif Name = VAR_SOURCE then
          Porion.Projects.Services.Set_Source (Context.Project_Service, Value,
-                                              Porion.Sources.SRC_GIT, Modified);
+                                              Porion.SRC_GIT, Modified);
       elsif Name = VAR_DESCRIPTION then
          Porion.Projects.Services.Set_Description (Context.Project_Service, Value, Modified);
       elsif Name = VAR_STATUS then

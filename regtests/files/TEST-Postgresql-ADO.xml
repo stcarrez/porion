@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<testsuite errors="0" failures="1" skips="0" tests="10" time="8.008841000" name="Postgresql ADO">
+<testcase classname="Postgresql ADO" name="Test insert blob" time="0.183062000">
+<failure type="ado-tests.adb:294: Invalid blob length: expecting &apos; 100&apos; value was &apos; 202&apos;">ado-tests.adb:294: Invalid blob length: expecting &apos; 100&apos; value was &apos; 202&apos;
+</failure>
+<system-out></system-out>
+</testcase>
+<testcase classname="Postgresql ADO" name="Test Object_Ref.Load" time="0.068279000">
+<system-out></system-out>
+</testcase>
+<testcase classname="Postgresql ADO" name="Test Object_Ref.Save" time="0.187144000">
+<system-out></system-out>
+</testcase>
+<testcase classname="Postgresql ADO" name="Test Master_Connection init error" time="0.000703000">
+<system-out><![CDATA[ERROR: Session is closed or not initialized
+ERROR: Session is closed or not initialized
+]]>
+</system-out>
+</testcase>
+<testcase classname="Postgresql ADO" name="Test Sequences.Factory" time="4.182529000">
+<system-out></system-out>
+</testcase>
+<testcase classname="Postgresql ADO" name="Test Object_Ref.Save/Create/Update" time="0.259552000">
+<system-out></system-out>
+</testcase>
+<testcase classname="Postgresql ADO" name="Test Object_Ref.Create (DB Insert)" time="2.437714000">
+<system-out></system-out>
+</testcase>
+<testcase classname="Postgresql ADO" name="Test Statement.Delete_Statement (delete all)" time="0.087597000">
+<system-out></system-out>
+</testcase>
+<testcase classname="Postgresql ADO" name="Test insert string" time="0.600178000">
+<system-out></system-out>
+</testcase>
+<testcase classname="Postgresql ADO" name="Test ADO.Utils.To_Object/To_Identifier" time="0.002083000">
+<system-out></system-out>
+</testcase>
+</testsuite>

@@ -25,8 +25,6 @@ with Porion.Templates.Parser;
 with Porion.Templates.Generator;
 package body Porion.Commands.Template is
 
-   use type Porion.Sources.Source_Control_Type;
-
    procedure Import_Template (Command : in out Command_Type;
                               Args    : in Argument_List'Class;
                               Context : in out Context_Type) is

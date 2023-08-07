@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-sources -- Source management
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,22 +17,11 @@
 -----------------------------------------------------------------------
 with Ada.Calendar;
 with Ada.Containers.Indefinite_Ordered_Maps;
-with Util.Beans.Objects.Enums;
 with Porion.Executors;
 with Porion.Configs;
 package Porion.Sources is
 
    Not_Supported : exception;
-
-   type Source_Control_Type is (SRC_UNKNOWN, SRC_GIT, SRC_FILE);
-
-   --  Use a fixed enum configuration because the value is stored in database.
-   for Source_Control_Type use (SRC_UNKNOWN => 0,
-                                SRC_GIT => 1,
-                                SRC_FILE => 2);
-
-   package Source_Control_Type_Objects is
-      new Util.Beans.Objects.Enums (Source_Control_Type);
 
    type Source_Info_Type is record
       Kind : Source_Control_Type := SRC_UNKNOWN;

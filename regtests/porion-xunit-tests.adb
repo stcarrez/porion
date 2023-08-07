@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-xunit-tests -- Tests for tools
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -64,7 +64,7 @@ package body Porion.XUnit.Tests is
 
       exception
          when Porion.Services.Not_Found =>
-            Info.Kind := Porion.Sources.SRC_GIT;
+            Info.Kind := Porion.SRC_GIT;
             Info.Name := To_UString ("ada-lzma");
             Info.URI := To_UString ("git://github.com/stcarrez/ada-lzma.git");
             Projects.Services.Add_Project (Service, Info);

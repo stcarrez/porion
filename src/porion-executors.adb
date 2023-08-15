@@ -386,16 +386,17 @@ package body Porion.Executors is
                   Line     : in String) is
       use type Porion.Builds.Step_Type;
       use type Porion.Logs.Source_Type;
+      Filtered_Line : constant String := Executor.Env.Filter (Line);
    begin
       if Source = Logs.LOG_EXECUTION and then Executor.Use_Cmd_Logger then
-         Executor.Cmd_Logger.Write (Source, Line);
+         Executor.Cmd_Logger.Write (Source, Filtered_Line);
       else
-         Executor.Logger.Write (Source, Line);
+         Executor.Logger.Write (Source, Filtered_Line);
       end if;
-      if Source /= Logs.LOG_RESULT and Executor.Output_Log
-        and Executor.Step /= Porion.Builds.STEP_CHECKOUT
+      if Source /= Logs.LOG_RESULT and then Executor.Output_Log
+        and then Executor.Step /= Porion.Builds.STEP_CHECKOUT
       then
-         Ada.Text_IO.Put_Line (Line);
+         Ada.Text_IO.Put_Line (Filtered_Line);
       end if;
    end Log;
 

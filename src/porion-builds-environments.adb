@@ -15,6 +15,7 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Ada.Strings.Fixed;
 with ADO.Queries;
 with Util.Strings.Sets;
 package body Porion.Builds.Environments is
@@ -103,5 +104,27 @@ package body Porion.Builds.Environments is
    begin
       null;
    end Cleanup;
+
+   function Has_Secrets (Env : in Environment_Type) return Boolean is
+   begin
+      return not Env.Secrets.Is_Empty;
+   end Has_Secrets;
+
+   --  ------------------------------
+   --  Filter the line to hide the secrets which are used in the environment.
+   --  ------------------------------
+   function Filter (Env : in Environment_Type; Line : in String) return String is
+      Result : String := Line;
+      Pos    : Natural;
+   begin
+      for Secret of Env.Secrets loop
+         Pos := Ada.Strings.Fixed.Index (Line, Secret);
+         while Pos >= Line'First and then Pos < Line'Last loop
+            Line (Pos .. Pos + Secret'Length - 1) := (others => 'X');
+            Pos := Ada.Strings.Fixed.Index (Line, Secret, Pos + Secret'Length);
+         end loop;
+      end loop;
+      return Result;
+   end Filter;
 
 end Porion.Builds.Environments;

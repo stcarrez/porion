@@ -45,6 +45,9 @@ package Porion.Builds.Environments is
    procedure Cleanup (Env  : in out Environment_Type;
                       Node : in Porion.Nodes.Controller_Access);
 
+   --  Filter the line to hide the secrets which are used in the environment.
+   function Filter (Env : in Environment_Type; Line : in String) return String;
+
 private
 
    type Variable_Type is record

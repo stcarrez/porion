@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-nodes-tests -- Tests for build node management
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,5 +28,7 @@ package Porion.Nodes.Tests is
 
    --  Test Load_Node.
    procedure Test_Load_Node (T : in out Test);
+
+   procedure Test_Create_Random_Path (T : in out Test);
 
 end Porion.Nodes.Tests;

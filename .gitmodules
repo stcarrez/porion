@@ -7,3 +7,6 @@
 [submodule "resource-embedder"]
 	path = resource-embedder
 	url = https://gitlab.com/stcarrez/resource-embedder.git
+[submodule "ansi-ada"]
+	path = ansi-ada
+	url = https://github.com/mosteo/ansi-ada

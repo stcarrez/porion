@@ -31,7 +31,8 @@ aggregate project Porion is
                          "awa/dynamo",
                          "awa/.alire",
                          "awa/awa",
-                         "resource-embedder");
+                         "resource-embedder",
+			 "ansi-ada");
 
    for Create_Missing_Dirs use "True";
 

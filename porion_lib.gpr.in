@@ -7,7 +7,6 @@ with "@ADO_DIR@ado_sqlite";
 with "@SECURITY_DIR@security";
 with "@KEYSTOREADA_DIR@keystoreada";
 
-with "printer-toolkit/ansi-ada/ansi";
 with "printer-toolkit/printer_toolkitada";
 
 library project Porion_Lib is

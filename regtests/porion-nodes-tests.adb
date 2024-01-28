@@ -21,6 +21,7 @@ with Util.Test_Caller;
 
 with Porion.Testsuite;
 with Porion.Services;
+with Porion.Executors;
 with Porion.Nodes.Services;
 package body Porion.Nodes.Tests is
 
@@ -105,11 +106,12 @@ package body Porion.Nodes.Tests is
       Path    : constant String := Util.Tests.Get_Test_Path ("nodes-2");
       Service : Porion.Services.Context_Type;
       Controller : Porion.Nodes.Controller_Access;
+      Executor   : aliased Porion.Executors.Executor_Type;
    begin
       Porion.Testsuite.Create (Service, Path, True);
       Nodes.Services.Add_Default_Node (Service, "localhost", "admin");
       Controller := Nodes.Services.Create_Controller (Executor'Unchecked_Access,
-                                                               Service.Build_Node);
+                                                      Service.Build_Node);
    end Test_Create_Random_Path;
 
 end Porion.Nodes.Tests;

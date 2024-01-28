@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-builds-environments -- Environment variables to execute build recipes
---  Copyright (C) 2023 Stephane Carrez
+--  Copyright (C) 2023, 2024 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -120,7 +120,7 @@ package body Porion.Builds.Environments is
       for Secret of Env.Secrets loop
          Pos := Ada.Strings.Fixed.Index (Line, Secret);
          while Pos >= Line'First and then Pos < Line'Last loop
-            Line (Pos .. Pos + Secret'Length - 1) := (others => 'X');
+            Result (Pos .. Pos + Secret'Length - 1) := (others => 'X');
             Pos := Ada.Strings.Fixed.Index (Line, Secret, Pos + Secret'Length);
          end loop;
       end loop;

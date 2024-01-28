@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-builds-environments -- Environment variables to execute build recipes
---  Copyright (C) 2023 Stephane Carrez
+--  Copyright (C) 2023, 2024 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@ with Ada.Containers.Vectors;
 with Porion.Nodes;
 with Porion.Builds.Models;
 with Porion.Services;
+private with Util.Strings.Vectors;
 private with Util.Strings.Maps;
 package Porion.Builds.Environments is
 
@@ -60,9 +61,10 @@ private
                                  Element_Type => Variable_Type);
 
    type Environment_Type is tagged limited record
-      Vars : Variable_Vectors.Vector;
-      Step : Natural := 0;
-      Env  : Util.Strings.Maps.Map;
+      Vars    : Variable_Vectors.Vector;
+      Step    : Natural := 0;
+      Env     : Util.Strings.Maps.Map;
+      Secrets : Util.Strings.Vectors.Vector;
    end record;
 
    procedure Prepare (Env  : in out Environment_Type;

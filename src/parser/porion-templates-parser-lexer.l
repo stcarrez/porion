@@ -1,6 +1,7 @@
 %unit Porion.Templates.Parser.Lexer
 %option bufsize=4096
 %option case-insensitive
+%option yylinenotype=Line_Number
 %option nounput
 %option nooutput
 %option noinput
@@ -11,6 +12,9 @@
 %s START
 %yyvar Ctx
 %yydecl function YYLex (Ctx : in out Lexer_IO.Context_Type; Context : in out Parser_Context_Type) return Token
+%yydfa {
+   subtype Line_Number is Natural;
+}
 %yyinit {
    ENTER(START);
 }

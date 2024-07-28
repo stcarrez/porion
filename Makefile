@@ -21,9 +21,14 @@ GPRFLAGS += -XAWA_BUILD=$(BUILD) -XADO_BUILD=$(BUILD) -XOPENAPI_BUILD=$(BUILD)
 
 ifeq (${HAVE_DYNAMO},yes)
 GPRFLAGS += -XBUILD_DYNAMO=no
+PRJ_PATH=$(ROOT_DIR)/ansi-ada
+DYNAMO=env ADA_PROJECT_PATH="$(PRJ_PATH)" dynamo
 else
 GPRFLAGS += -XBUILD_DYNAMO=yes
-PRJ_PATH:=$(ROOT_DIR)/awa/ada-util/.alire:$(ROOT_DIR)/awa/ada-util/.alire/xml:$(ROOT_DIR)/awa/ada-util/.alire/aws
+ifdef ADA_PROJECT_PATH
+PRJ_PATH?=${ADA_PROJECT_PATH}:
+endif
+PRJ_PATH:=$(PRJ_PATH)$(ROOT_DIR)/awa/ada-util/.alire:$(ROOT_DIR)/awa/ada-util/.alire/xml:$(ROOT_DIR)/awa/ada-util/.alire/aws
 PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-util/.alire/unit
 PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-util
 PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-el/.alire
@@ -40,6 +45,7 @@ PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-wiki:$(ROOT_DIR)/awa/ada-wiki/.alire
 PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/openapi-ada/.alire:$(ROOT_DIR)/awa/dynamo
 PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/.alire:$(ROOT_DIR)/awa/awa
 PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/resource-embedder
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/ansi-ada
 DYNAMO=env ADA_PROJECT_PATH="$(PRJ_PATH)" DYNAMO_SEARCH_PATH="$(ROOT_DIR)/awa/plugins" DYNAMO_UML_PATH="$(ROOT_DIR)/awa/uml" $(ROOT_DIR)/bin/dynamo
 endif
 

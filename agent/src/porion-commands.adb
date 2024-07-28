@@ -282,7 +282,7 @@ package body Porion.Commands is
 
       Context.Styles.Default := Text_Printer.Create_Style;
       if not Context.No_Colors then
-         Context.Styles.Default := Text_Printer.Create_Style (PT.Colors.Grey);
+         Context.Styles.Default := Text_Printer.Create_Style (PT.Colors.White);
          Context.Styles.Error := Text_Printer.Create_Style (PT.Colors.Light_Red);
          Context.Styles.Info := Text_Printer.Create_Style (PT.Colors.White);
          Context.Styles.Success := Text_Printer.Create_Style (PT.Colors.Green);

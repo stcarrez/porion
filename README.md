@@ -145,13 +145,13 @@ Install the following packages:
 sudo apt-get install -y make gnat gprbuild git libsqlite3-dev
 ```
 
-### FreeBSD 12
+### FreeBSD 14
 
 Install the following packages:
 
 ```
-pkg install gmake gcc6-aux-20180516_1,1 gprbuild-20160609_1 git
-pkg install lzma-18.05 curl-7.66.0 xmlada-17.0.0_1 aws-17.1_2 sqlite3-3.29.0
+pkg install gmake gnat13 gprbuild git
+pkg install xmlada sqlite3 unzip
 ```
 
 ## Getting the sources

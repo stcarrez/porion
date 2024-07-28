@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-services -- Project information
---  Copyright (C) 2021, 2022, 2023 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023, 2024 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -233,6 +233,8 @@ package body Porion.Services is
       Path    : constant String := Porion.Configs.Get_Database_Config (Create);
       Config : Util.Properties.Manager;
    begin
+      Log.Info ("Opening database {0}", Path);
+
       Config.Set (ADO.Configs.QUERY_PATHS_CONFIG, "db");
       Config.Set (ADO.Configs.DYNAMIC_DRIVER_LOAD, "false");
       Config.Set (ADO.Configs.QUERY_LOAD_CONFIG, "true");

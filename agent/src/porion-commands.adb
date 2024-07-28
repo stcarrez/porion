@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-commands -- Porion agent commands
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2024 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,7 @@ with Ada.Directories;
 with Util.Strings;
 with Util.Commands.Parsers.GNAT_Parser;
 with PT.Drivers.Texts;
+with PT.Drivers.Texts.GNAT_IO;
 with PT.Colors;
 with PT.Texts;
 with Porion.Configs.Setup;
@@ -47,7 +48,6 @@ with Porion.Commands.Logs;
 with Porion.Commands.Set;
 with Porion.Commands.Env;
 with Porion.Commands.Template;
-private with Util.Systems.Constants;
 package body Porion.Commands is
 
    Help_Command            : aliased Porion.Commands.Drivers.Help_Command_Type;
@@ -274,17 +274,10 @@ package body Porion.Commands is
    --  Setup and configure the printer to write on the console.
    --  ------------------------------
    procedure Setup_Printer (Context : in out Context_Type) is
-      function Get_Cols return Integer with
-        Import => True, Convention => C,
-	Link_Name => Util.Systems.Constants.SYMBOL_PREFIX & "porion_get_cols";
-
-      W : Integer := Get_Cols;
+      Screen    : constant PT.Dimension_Type := PT.Drivers.Texts.Screen_Dimension;
    begin
-      if W < 10 then
-         W := 80;
-      end if;
-
-      Text_Printer.Create (Width => PT.W_Type (W));
+      Text_Printer.Create (Screen.W);
+      Text_Printer.Set_Flush (PT.Drivers.Texts.GNAT_IO.Flush'Access);
       Context.Printer := Text_Printer'Access;
 
       Context.Styles.Default := Text_Printer.Create_Style;

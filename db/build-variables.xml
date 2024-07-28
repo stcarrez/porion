@@ -1,0 +1,54 @@
+<query-mapping package='Porion.Builds.Models'>
+    <description>
+        Build variables for a build recipe
+    </description>
+
+    <class name="Porion.Builds.Models.Variable_Info" bean="no">
+        <comment>Information for a build variable.</comment>
+        <property type='String' name="name">
+            <comment>the build variable name.</comment>
+        </property>
+        <property type='String' name="value">
+            <comment>the build variable value.</comment>
+        </property>
+        <property type='Porion.Builds.Models.Variable_Type' name="kind">
+            <comment>the build variable type.</comment>
+        </property>
+        <property type='boolean' name="secret">
+            <comment>whether the build variable is secret.</comment>
+        </property>
+        <property type='Integer' name="step_number" not-null='no'>
+            <comment>the optional recipe step number.</comment>
+        </property>
+    </class>
+
+    <query name='build-variables'>
+        <comment>Environment variables to build a recipe.  List is sorted on the overriding precedence:
+        - recipe specific variables are put first,
+	- branch specific variables are put,
+	- project specific variables are put,
+	- node specific variables are put,
+	- global variables are put last.
+        </comment>
+        <sql>
+          SELECT
+          env.name AS name,
+          env.value AS value,
+          env.kind AS kind,
+          env.secret AS secret,
+	  env.step_number AS step
+          FROM porion_environment AS env
+          WHERE env.recipe_id = :recipe_id
+	     OR (env.recipe_id IS NULL
+	       AND (env.branch_id = :branch_id AND (env.node_id = :node_id OR env.node_id IS NULL)))
+	     OR (env.recipe_id IS NULL AND env.branch_id IS NULL
+	       AND (env.project_id = :project_id AND (env.node_id = :node_id OR env.node_id IS NULL)))
+	     OR (env.recipe_id IS NULL AND env.branch_id IS NULL
+	       AND (env.project_id IS NULL AND env.node_id = :node_id))
+	     OR (env.recipe_id IS NULL AND env.branch_id IS NULL AND env.project_id IS NULL AND env.node_id IS NULL)
+	  ORDER by COALESCE(env.recipe_id,0) DESC, COALESCE(env.branch_id,0) DESC,
+	           COALESCE(env.project_id,0) DESC, COALESCE(env.node_id, 0) DESC;
+        </sql>
+    </query> 
+
+</query-mapping>

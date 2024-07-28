@@ -1,3 +1,7 @@
+Version 0.15.0 - Jul 2024
+  - Improvement of build environment configuration setup
+  - Preliminary support for per-project secret keys
+
 Version 0.14.0 - Apr 2023
   - Fix adding a recipe on a new branch
   - Fix displaying the project recipes on all branches

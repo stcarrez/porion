@@ -39,9 +39,9 @@ Add a remote build node:
    porion node ssh://user@hostname/home/build-directory
 ```
 
-Add a build recipe on a project:
+Add a build recipe labeled `remote` for project `ada-util` on build node `hostname`:
 ```
-   porion add --recipe=remote ada-util@hostname
+   porion add --recipe ada-util~remote@hostname
 ```
 
 Get information about a project or a build number:

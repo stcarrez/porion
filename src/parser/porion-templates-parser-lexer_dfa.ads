@@ -3,6 +3,8 @@
 --  Template: templates/spec-reentrant-dfa.ads
 private package Porion.Templates.Parser.Lexer_DFA is
 
+
+   subtype Line_Number is Natural;
    --  ----------------------------------------------------------------------------
    --  Buffer size is configured with:
    --  %option bufsize=4096
@@ -20,9 +22,9 @@ private package Porion.Templates.Parser.Lexer_DFA is
 
    type Context_Type is limited record
       aflex_debug       : Boolean := False;
-      yylineno          : Natural := 0;
+      yylineno          : Line_Number := 0;
       yylinecol         : Natural := 0;
-      yy_last_yylineno  : Natural := 0;
+      yy_last_yylineno  : Line_Number := 0;
       yy_last_yylinecol : Natural := 0;
       yytext_ptr        : Integer; --  points to start of yytext in buffer
 

@@ -23,9 +23,9 @@ package body Porion.Templates.Parser.Lexer is
       yy_current_state : yy_state_type;
 
       yylinecol : Integer renames Ctx.dfa.yylinecol;
-      yylineno  : Integer renames Ctx.dfa.yylineno;
+      yylineno  : Line_Number renames Ctx.dfa.yylineno;
       yy_last_yylinecol : Integer renames Ctx.dfa.yy_last_yylinecol;
-      yy_last_yylineno  : Integer renames Ctx.dfa.yy_last_yylineno;
+      yy_last_yylineno  : Line_Number renames Ctx.dfa.yy_last_yylineno;
       yy_eof_has_been_seen : Boolean renames Ctx.yy_eof_has_been_seen;
       aflex_debug : Boolean renames Ctx.dfa.aflex_debug;
       yy_init  : Boolean renames Ctx.dfa.yy_init;

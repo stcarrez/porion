@@ -503,6 +503,7 @@ div.awa-title dd {
     padding-left: 1em;
     padding-right: 1em;
     border-radius: 0.5em;
+    cursor: pointer;
 }
 .log-step {
     float: left;
@@ -760,6 +761,7 @@ div.awa-title dd {
     background: url(../images/icon-expand-tree-32.png) no-repeat;    
     height: 32px;
     line-height: 32px;
+    overflow: hidden;
 }
 .xunit-group-title .xunit-group-name, .xunits .xunit {
     padding-left: 32px;

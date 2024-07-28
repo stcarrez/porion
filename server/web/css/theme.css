@@ -352,4 +352,20 @@
     .build-xunit-group .xunit-build {
 	float: right;
     }
+    .project-build-list .build-xunit {
+        display: none;
+    }
+    .project-build-list .build-date {
+        text-align: right;
+        width: 100%;
+    }
+    .awa-list-header .xunit-name {
+        display: none;
+    }
+    .xunit-group .xunit-group-title .xunit-group-name {
+        width: 100%;
+    }
+    .xunit-pass, .xunit-fail, .xunit-timeout {
+        width: 16%;
+    }
 }

@@ -1,6 +1,7 @@
---  Advanced Resource Embedder 1.2.1
+--  Advanced Resource Embedder 1.5.0
 package Porion.Resources.Queries is
 
+   Names_Count : constant := 22;
    Names : constant Name_Array;
 
    --  Returns the data stream with the given name or null.
@@ -8,7 +9,6 @@ package Porion.Resources.Queries is
       access constant String;
 
 private
-
 
    K_0             : aliased constant String := "build-metrics.xml";
    K_1             : aliased constant String := "build-variables.xml";

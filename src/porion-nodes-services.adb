@@ -349,6 +349,7 @@ package body Porion.Nodes.Services is
          return;
       end if;
 
+      Controller.Start;
       Probe_Uname (Controller);
 
       --  When some check rules are specified, update the build node to check these rules.

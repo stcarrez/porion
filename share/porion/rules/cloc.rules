@@ -1,5 +1,5 @@
 [availability]
-which lcov
+which cloc
 
 [version]
 lcov --version

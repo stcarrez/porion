@@ -4,7 +4,7 @@ Section: devel
 Maintainer: Stephane Carrez <Stephane.Carrez@gmail.com>
 Build-Depends: debhelper (>= 10), autotools-dev,
  dh-ada-library,
- gnat, gnat-9,
+ gnat,
 # This line is parsed by debian/rules.
  gprbuild (>= 2015-2),
  pkg-config,

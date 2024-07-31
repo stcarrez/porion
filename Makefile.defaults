@@ -38,7 +38,7 @@ alidir?=${prefix}/${infix_ali}
 samplesdir?=${prefix}/share/doc/${docdir}
 dynamodir=${prefix}/share/dynamo
 
-MAKE_ARGS += -XBUILD=$(BUILD) -XPROCESSORS=$(PROCESSORS)
+MAKE_ARGS += -XPROCESSORS=$(PROCESSORS)
 
 build:: all
 

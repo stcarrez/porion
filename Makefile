@@ -4,6 +4,9 @@ VERSION=x.x.x
 UTIL_OS=linux64
 PACKAGE_XML=package.xml
 #GPRPATH_AGENT=porion_agent.gpr
+# BUILD_COMMAND=$(GNATMAKE) -m -p -Patlas $(MAKE_ARGS)
+ALIRE=alr --non-interactive
+BUILD_COMMAND=$(ALIRE) build -- $(MAKE_ARGS)
 
 AYACC=ayacc
 AFLEX=aflex
@@ -19,10 +22,10 @@ ROOT_DIR=$(shell pwd)
 GPRFLAGS += -j$(PROCESSORS) -XROOT_DIR=$(ROOT_DIR) -XUTIL_OS=$(UTIL_OS) -XUTIL_AWS_IMPL=$(UTIL_AWS_VERSION)
 GPRFLAGS += -XAWA_BUILD=$(BUILD) -XADO_BUILD=$(BUILD) -XOPENAPI_BUILD=$(BUILD)
 
+DYNAMO=$(ALIRE) exec -- dynamo
 ifeq (${HAVE_DYNAMO},yes)
 GPRFLAGS += -XBUILD_DYNAMO=no
 PRJ_PATH=$(ROOT_DIR)/ansi-ada
-DYNAMO=env ADA_PROJECT_PATH="$(PRJ_PATH)" dynamo
 else
 GPRFLAGS += -XBUILD_DYNAMO=yes
 ifdef ADA_PROJECT_PATH
@@ -43,6 +46,7 @@ PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-servlet:$(ROOT_DIR)/awa/ada-asf/.alire
 PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-asf:$(ROOT_DIR)/awa/ada-wiki/.alire
 PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/ada-wiki:$(ROOT_DIR)/awa/ada-wiki/.alire
 PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/openapi-ada/.alire:$(ROOT_DIR)/awa/dynamo
+PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/openapi-ada/.alire/server
 PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/.alire:$(ROOT_DIR)/awa/awa
 PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/resource-embedder
 PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/ansi-ada
@@ -86,7 +90,7 @@ ROOTDIR=.
 build-test::
 
 build:: setup
-	$(GNATMAKE) $(GPRFLAGS) -p -P "$(GPRPATH)" $(MAKE_ARGS)
+	$(BUILD_COMMAND) $(GPRFLAGS) $(MAKE_ARGS)
 
 server build-server::
 	cd server && $(GNATMAKE) $(GPRFLAGS) -p -P "porion_server" $(MAKE_ARGS)
@@ -100,9 +104,9 @@ generate:: build-dynamo
 generate-model::
 	mkdir -p db agent/db
 	$(DYNAMO) generate $(DYNAMO_ARGS)
-	cd agent && $(DYNAMO) generate $(AGENT_DYNAMO_ARGS)
+	$(DYNAMO) -C agent generate $(AGENT_DYNAMO_ARGS)
 	cd agent && $(ARE) -o src/model --rule=are-package.xml --no-type-declaration --list-access --content-only --name-access .. .
-	cd server && $(DYNAMO) generate $(SERVER_DYNAMO_ARGS)
+	$(DYNAMO) -C server generate $(SERVER_DYNAMO_ARGS)
 	cd server && $(ARE) -o src/model --rule=are-package.xml --no-type-declaration \
           --list-access --content-only --name-access ../awa/awa .. .
 
@@ -143,7 +147,7 @@ awa/dynamo/config/uml/AWA.xmi: awa/awa/uml/awa.zargo
 build-dynamo: bin/dynamo awa/dynamo/config/uml/AWA.xmi
 
 bin/dynamo: setup
-	$(GNATMAKE) $(GPRFLAGS) -p -P "$(GPRPATH)" $(MAKE_ARGS)
+	$(BUILD_COMMAND) $(GPRFLAGS) $(MAKE_ARGS)
 else
 
 build-dynamo:

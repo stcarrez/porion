@@ -23,31 +23,6 @@ PORION_LIBDIR="lib"
 AC_SUBST(PORION_LIBDIR)
 
 AM_ADA_UTIL_HARDWARE()
-AM_ADA_UTIL_AWS_VERSION()
-
-case "${target_os}" in
-  mingw32*|cygwin*|mingw64*|msys)
-    HAVE_GETTEXT=False
-    GETTEXT_INTL=False
-    ;;
-
-  netbsd*|dragonfly*|openbsd*|freebsd*)
-    HAVE_GETTEXT=False
-    GETTEXT_INTL=False
-    ;;
-  
-  *)
-    AM_GNU_GETTEXT([external])
-    ;;
-
-esac
-
-if test T$HAVE_GETTEXT = TTrue; then
-  USE_NLS=yes
-else
-  USE_NLS=no
-fi
-AC_SUBST(USE_NLS)
 
 ac_enable_server=no
 AC_ARG_ENABLE(server,
@@ -60,17 +35,6 @@ AC_ARG_ENABLE(server,
 
 PORION_SERVER=${ac_enable_server}
 AC_SUBST(PORION_SERVER)
-
-if test T$GETTEXT_INTL = TTrue; then
-  USE_LIBINTL=yes
-else
-  USE_LIBINTL=no
-fi
-AC_SUBST(USE_LIBINTL)
-
-AC_CHECK_PROG(HAVE_PANDOC,pandoc,yes)
-AC_CHECK_PROG(HAVE_DYNAMO,dynamo,yes)
-AC_CHECK_PROG(HAVE_ARE,are,yes)
 
 AWA_DIR=""
 ADO_DIR=""
@@ -108,7 +72,6 @@ AC_SUBST(BUNDLE_DIR)
 DYNAMO_SEARCH_DIR="$ROOT_DIR/awa/awa/plugins"
 AC_SUBST(DYNAMO_SEARCH_DIR)
 
-AC_CONFIG_FILES([Makefile.conf agent/porion_agent.gpr server/porion_server.gpr porion_lib.gpr porion_tests.gpr
-awa/dynamo/config/generator.properties
+AC_CONFIG_FILES([Makefile.conf awa/dynamo/config/generator.properties
 ])
 AC_OUTPUT

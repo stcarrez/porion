@@ -15,6 +15,8 @@ AFLEX=aflex
 
 include Makefile.defaults
 
+UTIL_AWS_VERSION=3
+
 DIST_DIR=porion-$(VERSION)
 DIST_FILE=porion-$(VERSION).tar.gz
 ROOT_DIR=$(shell pwd)

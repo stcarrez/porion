@@ -1,6 +1,6 @@
 with "../porion_config";
-with "@UTIL_DIR@utilada_sys";
-with "@KEYSTOREADA_DIR@keystoreada";
+with "utilada_sys";
+with "keystoreada";
 
 with "../porion_lib";
 

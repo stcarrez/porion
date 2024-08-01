@@ -30,11 +30,11 @@ lib/
 obj/
 regtests/results
 regtests/files/many
-porion_lib.gpr
-agent/porion_agent.gpr
-server/porion_server.gpr
-porion.gpr
-porion_tests.gpr
+# porion_lib.gpr
+# agent/porion_agent.gpr
+# server/porion_server.gpr
+# porion.gpr
+# porion_tests.gpr
 .clang-format
 .clangd
 model.yaml

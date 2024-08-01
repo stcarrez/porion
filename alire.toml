@@ -27,6 +27,7 @@ aws = "~23.0"
 xmlada = "any"
 libgpr = "any"
 ansiada = "^1.0.0"
+intl = "^1.0.1"
 
 [configuration]
 disabled = true

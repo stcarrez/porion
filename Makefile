@@ -1,15 +1,20 @@
 NAME=porion
 GPRPATH=${NAME}.gpr
-VERSION=x.x.x
 UTIL_OS=linux64
 PACKAGE_XML=package.xml
 #GPRPATH_AGENT=porion_agent.gpr
 # BUILD_COMMAND=$(GNATMAKE) -m -p -Patlas $(MAKE_ARGS)
-ALIRE=alr --non-interactive
-BUILD_COMMAND=$(ALIRE) build -- $(MAKE_ARGS)
+VERSION=0.15.0
+
+DIST_DIR=porion-$(VERSION)
+DIST_FILE=porion-$(VERSION).tar.gz
+
+MAKE_ARGS += -XPORION_BUILD=$(BUILD) -XAWA_BUILD=$(BUILD) -XADO_BUILD=$(BUILD) -XOPENAPI_BUILD=$(BUILD)
+MAKE_ARGS += -XUTIL_BUILD=$(BUILD) -XEL_BUILD=$(BUILD)
 
 AYACC=ayacc
 AFLEX=aflex
+DYNAMO=$(ALR) exec -- dynamo
 
 -include Makefile.conf
 
@@ -17,14 +22,10 @@ include Makefile.defaults
 
 UTIL_AWS_VERSION=3
 
-DIST_DIR=porion-$(VERSION)
-DIST_FILE=porion-$(VERSION).tar.gz
 ROOT_DIR=$(shell pwd)
 
 GPRFLAGS += -j$(PROCESSORS) -XROOT_DIR=$(ROOT_DIR) -XUTIL_OS=$(UTIL_OS) -XUTIL_AWS_IMPL=$(UTIL_AWS_VERSION)
-GPRFLAGS += -XAWA_BUILD=$(BUILD) -XADO_BUILD=$(BUILD) -XOPENAPI_BUILD=$(BUILD)
 
-DYNAMO=$(ALIRE) exec -- dynamo
 ifeq (${HAVE_DYNAMO},yes)
 GPRFLAGS += -XBUILD_DYNAMO=no
 PRJ_PATH=$(ROOT_DIR)/ansi-ada
@@ -52,7 +53,8 @@ PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/openapi-ada/.alire/server
 PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/awa/.alire:$(ROOT_DIR)/awa/awa
 PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/resource-embedder
 PRJ_PATH:=$(PRJ_PATH):$(ROOT_DIR)/ansi-ada
-DYNAMO=env ADA_PROJECT_PATH="$(PRJ_PATH)" DYNAMO_SEARCH_PATH="$(ROOT_DIR)/awa/plugins" DYNAMO_UML_PATH="$(ROOT_DIR)/awa/uml" $(ROOT_DIR)/bin/dynamo
+# DYNAMO=env ADA_PROJECT_PATH="$(PRJ_PATH)" DYNAMO_SEARCH_PATH="$(ROOT_DIR)/awa/plugins" DYNAMO_UML_PATH="$(ROOT_DIR)/awa/uml" $(ROOT_DIR)/bin/dynamo
+# DYNAMO=env DYNAMO_SEARCH_PATH="$(ROOT_DIR)/awa/plugins" DYNAMO_UML_PATH="$(ROOT_DIR)/awa/uml" $(ROOT_DIR)/bin/dynamo
 endif
 
 ifeq (${HAVE_ARE},yes)
@@ -91,7 +93,7 @@ ROOTDIR=.
 # Build executables for all mains defined by the project.
 build-test::
 
-build:: setup
+build::
 	$(BUILD_COMMAND) $(GPRFLAGS) $(MAKE_ARGS)
 
 server build-server::

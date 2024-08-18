@@ -1,0 +1,55 @@
+description = "Porion Automation Build System Server"
+name = "porion_server"
+version = "0.15.0"
+authors = ["Stephane.Carrez@gmail.com"]
+licenses = "Apache-2.0"
+maintainers = ["Stephane.Carrez@gmail.com"]
+maintainers-logins = ["stcarrez"]
+project-files = ["porion_server.gpr"]
+tags = ["uml", "generator", "database"]
+website = "https://gitlab.com/stcarrez/porion"
+executables = ["porion-server"]
+
+[[depends-on]]
+porion = "*"
+aws = "~24.0"
+xmlada = "any"
+libgpr = "any"
+serverfaces = "*"
+ado = "*"
+ado_sqlite = "*"
+security = "*"
+keystoreada = "*"
+wikiada = "*"
+openapi = "*"
+openapi_server = "*"
+servletada_aws = "*"
+awa = "*"
+
+[configuration]
+disabled = true
+
+# [[actions]]
+# type = "post-fetch"
+# command = ["sh", "./alire-setup.sh"]
+
+[environment]
+PATH.prepend = "${CRATE_ROOT}/bin"
+MANPATH.prepend = "${CRATE_ROOT}/man"
+
+[[pins]]
+porion = { path = '..' }
+utilada = { path = '../awa/ada-util' }
+utilada_xml = { path = '../awa/ada-util/xml' }
+utilada_aws = { path = '../awa/ada-util/aws' }
+elada = { path = '../awa/ada-el' }
+serverfaces = { path = '../awa/ada-asf' }
+ado = { path = '../awa/ada-ado' }
+ado_sqlite = { path = '../awa/ada-ado/.alire/sqlite' }
+security = { path = '../awa/ada-security' }
+keystoreada = { path = '../awa/ada-keystore' }
+awa = { path = '../awa' }
+wikiada = { path = '../awa/ada-wiki' }
+openapi = { path = '../awa/openapi-ada' }
+openapi_server = { path = '../awa/openapi-ada/.alire/server' }
+servletada_aws = { path = '../awa/ada-servlet/.alire/aws' }

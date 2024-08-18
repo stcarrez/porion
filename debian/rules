@@ -43,12 +43,12 @@ override_dh_auto_install:
 	  dir=`dirname $$i`; \
 	  dh_install debian/tmp/usr/share/porion/rules/$$i usr/share/porion/rules/$$dir ; \
         done
-	files=`cd $(CURDIR)/debian/tmp/usr/share/locale && find . -type f`; \
-        for i in $$files; do \
-	  dir=`dirname $$i`; \
-	  dh_installdirs usr/share/locale/$$dir; \
-	  dh_install debian/tmp/usr/share/locale/$$i usr/share/locale/$$dir ; \
-        done
+	# files=`cd $(CURDIR)/debian/tmp/usr/share/locale && find . -type f`; \
+        # for i in $$files; do \
+	#  dir=`dirname $$i`; \
+	#  dh_installdirs usr/share/locale/$$dir; \
+	#  dh_install debian/tmp/usr/share/locale/$$i usr/share/locale/$$dir ; \
+        # done
 	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp/usr/share prefix=/usr DIST_DIR=/porion \
 	   PACKAGE_XML=$(CURDIR)/debian/package.xml server-package HAVE_DYNAMO=no
 	files=`cd $(CURDIR)/debian/tmp/usr/share/porion/web && find . -type f`; \

@@ -4,7 +4,7 @@ UTIL_OS=linux64
 PACKAGE_XML=package.xml
 #GPRPATH_AGENT=porion_agent.gpr
 # BUILD_COMMAND=$(GNATMAKE) -m -p -Patlas $(MAKE_ARGS)
-VERSION=0.15.0
+VERSION=0.16.0
 
 DIST_DIR=porion-$(VERSION)
 DIST_FILE=porion-$(VERSION).tar.gz

@@ -1,29 +1,7 @@
 with "porion_config";
 aggregate project Porion is
 
-   for Project_Path use ("awa/ada-util",
-                         "awa/ada-util/xml",
-                         "awa/ada-util/aws",
-                         "awa/ada-util/unit",
-                         "awa/ada-el",
-                         "awa/ada-keystore/akt",
-                         "awa/ada-keystore",
-                         "awa/ada-ado/sqlite",
-                         "awa/ada-ado/mysql",
-                         "awa/ada-ado/postgresql",
-                         "awa/ada-ado/drivers",
-                         "awa/ada-ado",
-                         "awa/ada-security",
-                         "awa/ada-servlet/aws",
-                         "awa/ada-servlet",
-                         "awa/ada-asf",
-                         "awa/ada-wiki",
-                         "awa/openapi-ada",
-                         "awa/openapi-ada/server",
-                         "awa/dynamo",
-                         "awa/awa",
-                         "resource-embedder",
-			 "ansi-ada");
+   for Project_Path use ("resource-embedder");
 
    for Create_Missing_Dirs use "True";
 

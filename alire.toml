@@ -56,6 +56,7 @@ MANPATH.prepend = "${CRATE_ROOT}/man"
 utilada = { path = 'awa/ada-util' }
 utilada_xml = { path = 'awa/ada-util/xml' }
 utilada_aws = { path = 'awa/ada-util/aws' }
+utilada_unit = { path = 'awa/ada-util/unit' }
 elada = { path = 'awa/ada-el' }
 serverfaces = { path = 'awa/ada-asf' }
 ado = { path = 'awa/ada-ado' }
@@ -66,3 +67,4 @@ keystoreada = { path = 'awa/ada-keystore' }
 awa = { path = 'awa' }
 openapi = { path = 'awa/openapi-ada' }
 openapi_server = { path = 'awa/openapi-ada/server' }
+servletada_aws = { path = 'awa/ada-servlet/aws' }

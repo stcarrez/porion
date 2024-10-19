@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-nodes-services -- Build node management operations
---  Copyright (C) 2021, 2022, 2023 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023, 2024 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -43,7 +43,7 @@ package body Porion.Nodes.Services is
             return SSH.Create (Listener, Node);
 
          when others =>
-            log.Error ("Node type {0} supported", Node.Get_Kind'Image);
+            Log.Error ("Node type {0} supported", Node.Get_Kind'Image);
             return null;
 
       end case;
@@ -84,7 +84,7 @@ package body Porion.Nodes.Services is
    begin
       Log.Debug ("Load default build node");
 
-      Query.Set_filter ("o.main_node AND o.deleted = 0");
+      Query.Set_Filter ("o.main_node AND o.deleted = 0");
       Service.Build_Node.Find (Service.DB, Query, Found);
       if not Found then
          Log.Warn ("Default build node does not exist");
@@ -123,7 +123,7 @@ package body Porion.Nodes.Services is
                               Done  : out Boolean);
 
          Uname  : constant String := Configs.Get (UNAME_COMMAND_NAME, UNAME_COMMAND);
-         Status : Natural;
+         Status : Integer;
          Tokens : Util.Strings.Vectors.Vector;
 
          procedure New_Token (Token : in String;
@@ -170,7 +170,7 @@ package body Porion.Nodes.Services is
                   exit;
                end if;
                if Ada.Strings.Fixed.Index (Token, "Debian") > 0 then
-                  Service.Build_Node.Set_Os_Name ("Debian");
+                  Service.Build_Node.Set_OS_Name ("Debian");
                   exit;
                end if;
             end loop;

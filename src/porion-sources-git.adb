@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-sources-git -- Source management with git
---  Copyright (C) 2021, 2022, 2023 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023, 2024 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");

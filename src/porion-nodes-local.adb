@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-nodes-local -- Local build node management
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2024 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -149,6 +149,7 @@ package body Porion.Nodes.Local is
 
          Controller.Set_Environment (Proc);
          Sys_Rusage (Start);
+         Util.Processes.Set_Allocate_TTY (Proc, Allocate => True);
          Util.Processes.Spawn (Proc      => Proc,
                                Arguments => Args,
                                Mode      => Util.Processes.READ_WRITE_ALL_SEPARATE);

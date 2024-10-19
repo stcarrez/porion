@@ -20,7 +20,7 @@ git -C #{path} config remote.origin.url
 git init --bare #{git_tmp_dir}
 
 [changes]
-git -C #{build_dir} log --max-count=1000 #{previous_tag}..
+git --no-pager -C #{build_dir} log --max-count=1000 #{previous_tag}..
 
 [log-ignore]
 Cloning into .*

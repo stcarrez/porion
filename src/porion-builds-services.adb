@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-builds-services -- build service to manage builds
---  Copyright (C) 2021, 2022, 2023 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023, 2024 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -587,8 +587,11 @@ package body Porion.Builds.Services is
 
       Now  : constant Ada.Calendar.Time := Ada.Calendar.Clock;
       Time : constant Duration := Now - Service.Build.Get_Create_Date;
+      Updated : Boolean;
    begin
       Service.DB.Begin_Transaction;
+      Service.Recipe.Reload (Service.DB, Updated);
+      Service.Build.Reload (Service.DB, Updated);
       Service.Build.Set_Status (Status);
       Service.Build.Set_Finish_Date ((Is_Null => False,
                                       Value   => Now));

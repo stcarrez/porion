@@ -52,6 +52,7 @@ Get information about a project or a build number:
 
 Version 0.16.0 - Under development
   - Run the build process with a pseudo TTY to solve output order issues
+  - Fix handling the recipe name in identification strings for some commands
 
 Version 0.15.0 - Jul 2024
   - Improvement of build environment configuration setup

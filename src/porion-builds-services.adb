@@ -1563,9 +1563,11 @@ package body Porion.Builds.Services is
       Query : ADO.Queries.Context;
       Found : Boolean;
       Has_Branch : Boolean;
+      Has_Recipe : Boolean;
    begin
       Service.Load_Project (To_String (Ident.Name));
 
+      Has_Recipe := Length (Ident.Recipe) > 0;
       Has_Branch := Length (Ident.Branch) > 0;
       if Has_Branch then
          Query.Set_Filter ("o.project_id = :project_id and o.name = :branch");
@@ -1582,22 +1584,24 @@ package body Porion.Builds.Services is
          Nodes.Services.Load_Node (Service, To_String (Ident.Node));
       end if;
 
-      if Service.Build_Node.Is_Null then
+      if not Has_Recipe and then Service.Build_Node.Is_Null then
          Nodes.Services.Load_Default_Node (Service);
       end if;
 
       Query.Clear;
       Query.Bind_Param ("project_id", Service.Project.Get_Id);
-      Query.Bind_Param ("node_id", Service.Build_Node.Get_Id);
-      if Has_Branch
-        and then not Service.Branch.Is_Null
-        and then not Service.Build_Node.Is_Null
-      then
-         Query.Set_Filter ("o.project_id = :project_id AND o.node_id = :node_id "
-                           & " AND o.branch_id = :branch_id");
+      Query.Set_Filter ("o.project_id = :project_id");
+      if not Service.Build_Node.Is_Null then
+         Query.Bind_Param ("node_id", Service.Build_Node.Get_Id);
+         ADO.SQL.Append (Query.Filter, " AND o.node_id = :node_id");
+      end if;
+      if Has_Branch and then not Service.Branch.Is_Null then
          Query.Bind_Param ("branch_id", Service.Branch.Get_Id);
-      else
-         Query.Set_Filter ("o.project_id = :project_id AND o.node_id = :node_id");
+         ADO.SQL.Append (Query.Filter, " AND o.branch_id = :branch_id");
+      end if;
+      if Has_Recipe then
+         Query.Bind_Param ("recipe_name", Ident.Recipe);
+         ADO.SQL.Append (Query.Filter, " AND o.name = :recipe_name");
       end if;
       Builds.Models.List (List, Service.DB, Query);
    end Load_Recipes;

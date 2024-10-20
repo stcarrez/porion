@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-commands-node -- Node command to add/remove/update build nodes
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2024 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -170,13 +170,29 @@ package body Porion.Commands.Node is
       end Get_Type;
 
    begin
+      Context.Open;
       if Count = 0 then
-         Porion.Commands.Error (-("missing node name"));
+         Porion.Reports.List_Nodes (Service => Context.Project_Service,
+                                    Printer => Context.Printer.all,
+                                    Styles  => Context.Styles);
          return;
       end if;
-      Context.Open;
 
       if Command.Remove then
+         for I in 1 .. Count loop
+            declare
+               Name  : constant String := Args.Get_Argument (I);
+            begin
+               Nodes.Services.Load_Node (Context.Project_Service, Name);
+               if Confirm (Format (-("remove build node '{0}'?"), Name)) then
+                  Nodes.Services.Remove_Node (Context.Project_Service, Name);
+                  Context.Notice (-("Node '{0}' is marked removed"), Name);
+               end if;
+            exception
+               when Porion.Nodes.Services.Not_Found =>
+                  Commands.Error (-("Node '{0}' not found"), Name);
+            end;
+         end loop;
          return;
       elsif Command.Probe then
          for I in 1 .. Count loop

@@ -94,7 +94,7 @@ ROOTDIR=.
 # Build executables for all mains defined by the project.
 build-test::
 
-build::
+build:: lib-setup
 	$(BUILD_COMMAND) $(GPRFLAGS) $(MAKE_ARGS)
 
 server build-server::
@@ -128,22 +128,15 @@ build-ts:
             server/web/js/activity.ts \
             server/web/js/notifications.ts
 
-setup:: src/porion-configs-setup.ads
+lib-setup:: src/porion-configs-setup.ads
 src/porion-configs-setup.ads:   Makefile.conf src/porion-configs-setup.gpb
 	gnatprep -DPREFIX='"${prefix}"' -DVERSION='"$(VERSION)"' \
 		  src/porion-configs-setup.gpb src/porion-configs-setup.ads
 
 ifneq (${HAVE_DYNAMO},yes)
-setup:: awa/dynamo/src/gen-configs.ads
+lib-setup:: awa/dynamo/src/gen-configs.ads
 awa/dynamo/src/gen-configs.ads:   Makefile.conf awa/dynamo/src/gen-configs.gpb
 	cd awa/dynamo && sh ./alire-setup.sh
-
-setup:: awa/ada-ado/src/drivers/ado-drivers-initialize.adb
-awa/ada-ado/src/drivers/ado-drivers-initialize.adb: awa/ada-ado/src/drivers/ado-drivers-initialize.gpb Makefile.conf
-	gnatprep -DHAVE_MYSQL=False \
-	          -DHAVE_SQLITE=True \
-	          -DHAVE_POSTGRESQL=False \
-		  awa/ada-ado/src/drivers/ado-drivers-initialize.gpb $@
 
 # Install the AWA UML model in Dynamo UML search path
 awa/dynamo/config/uml/AWA.xmi: awa/awa/uml/awa.zargo

@@ -69,3 +69,4 @@ openapi = { path = 'awa/openapi-ada' }
 openapi_server = { path = 'awa/openapi-ada/server' }
 servletada_aws = { path = 'awa/ada-servlet/aws' }
 dynamo = { path = 'awa/dynamo' }
+wikiada = { path = 'awa/ada-wiki' }

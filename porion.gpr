@@ -8,7 +8,10 @@ aggregate project Porion is
    Build_Are    : Porion_Config.Yes_No := external ("BUILD_ARE", "yes");
    Build_Dynamo : Porion_Config.Yes_No := external ("BUILD_DYNAMO", "yes");
 
-   for Project_Files use ("porion_lib.gpr", "agent/porion_agent.gpr", "porion_tests.gpr", "server/porion_server.gpr");
+   for Project_Files use ("porion_lib.gpr",
+                          "agent/porion_agent.gpr",
+			  "porion_tests.gpr",
+			  "server/porion_server.gpr");
 
    case Build_Are is
       when "yes" =>

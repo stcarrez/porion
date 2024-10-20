@@ -8,7 +8,7 @@ maintainers-logins = ["stcarrez"]
 project-files = ["porion.gpr"]
 tags = ["uml", "generator", "database"]
 website = "https://gitlab.com/stcarrez/porion"
-executables = ["dynamo"]
+executables = ["porion", "porion_server"]
 long-description = """
 
 [![License](http://img.shields.io/badge/license-APACHE2-blue.svg)](LICENSE)
@@ -68,3 +68,4 @@ awa = { path = 'awa' }
 openapi = { path = 'awa/openapi-ada' }
 openapi_server = { path = 'awa/openapi-ada/server' }
 servletada_aws = { path = 'awa/ada-servlet/aws' }
+dynamo = { path = 'awa/dynamo' }

@@ -12,7 +12,7 @@ project porion_Tests is
    Mains := ("porion_harness.adb");
    for Main use Mains;
    for Source_Dirs use ("regtests");
-   for Object_Dir use "./" & Porion_Config'Object_Dir & "/obj";
+   for Object_Dir use "./" & Porion_Config'Object_Dir & "/obj/regtests";
    for Exec_Dir use "./" & Porion_Config'Exec_Dir & "/bin";
 
    package Binder renames Porion_Config.Binder;

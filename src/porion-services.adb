@@ -239,7 +239,7 @@ package body Porion.Services is
       Config.Set (ADO.Configs.DYNAMIC_DRIVER_LOAD, "false");
       Config.Set (ADO.Configs.QUERY_LOAD_CONFIG, "true");
       Config.Set (ADO.Configs.NO_ENTITY_LOAD, (if Create then "true" else "false"));
-      ADO.SQLite.Initialize (Config);
+      ADO.Sqlite.Initialize (Config);
       Service.Factory.Set_Query_Loader (Resource.all'Access);
       Service.Factory.Create (Path);
       Service.DB := Service.Factory.Get_Master_Session;

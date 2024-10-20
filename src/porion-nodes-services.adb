@@ -488,6 +488,7 @@ package body Porion.Nodes.Services is
       Service.Build_Node.Save (Service.DB);
       Service.DB.Commit;
 
+      Service.Build_Node := Porion.Nodes.Models.Null_Node;
       Log.Info ("Build node {0} removed", Name);
    end Remove_Node;
 

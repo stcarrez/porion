@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-metrics-cloc -- Run cloc(1) and get various source code metrics
---  Copyright (C) 2021, 2023 Stephane Carrez
+--  Copyright (C) 2021, 2023, 2024 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -130,7 +130,7 @@ package body Porion.Metrics.Cloc is
       package CLoc_Mapper is
         new Util.Serialize.Mappers.Record_Mapper (Element_Type        => Cloc_Config,
                                                   Element_Type_Access => Cloc_Config_Access,
-                                                  Fields              => Cloc_Fields,
+                                                  Fields              => CLoc_Fields,
                                                   Set_Member          => Set_Member);
 
       Config : aliased Cloc_Config;
@@ -153,7 +153,7 @@ package body Porion.Metrics.Cloc is
       Mapper.Add_Mapping ("languages/total/@code", CLOC_TOTAL_CODE);
       Mapper.Add_Mapping ("languages/total", CLOC_TOTAL);
 
-      Cloc_Mapper.Set_Context (Parser, Config'Unchecked_Access);
+      CLoc_Mapper.Set_Context (Parser, Config'Unchecked_Access);
       Parser.Add_Mapping ("results", Mapper'Unchecked_Access);
       Reader.Parse_String (Content, Parser);
    end Scan;

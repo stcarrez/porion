@@ -62,9 +62,9 @@ package body Porion.Builds.Services is
       end if;
 
       Service.Ident.Name := To_UString (Service.Project.Get_Name);
-      Service.Ident.Branch := To_UString (Service.Branch.get_Name);
+      Service.Ident.Branch := To_UString (Service.Branch.Get_Name);
       Service.Ident.Recipe := To_UString (Service.Recipe.Get_Name);
-      Service.Ident.Node := To_UString (Service.Build_Node.get_Name);
+      Service.Ident.Node := To_UString (Service.Build_Node.Get_Name);
 
       Service.Build := Porion.Builds.Models.Null_Build;
       Service.Build.Set_Number (Service.Branch.Get_Last_Build_Number + 1);
@@ -77,14 +77,14 @@ package body Porion.Builds.Services is
       Service.Build.Set_Create_Date (Ada.Calendar.Clock);
       if not Executor.Is_Dry_Run then
          Service.Build.Save (Service.DB);
-         Service.Branch.Reload (Service.Db, Updated);
+         Service.Branch.Reload (Service.DB, Updated);
          Service.Branch.Set_Last_Build_Number (Service.Build.Get_Number);
          Service.Branch.Save (Service.DB);
 
          --  Get or create a build queue entry for the recipe.
          if Service.Queue.Is_Null then
             Query.Clear;
-            Query.Set_filter ("o.recipe_id = :recipe_id");
+            Query.Set_Filter ("o.recipe_id = :recipe_id");
             Query.Bind_Param ("recipe_id", Recipe.Get_Id);
             Service.Queue.Find (Service.DB, Query, Found);
             if not Found then
@@ -144,7 +144,7 @@ package body Porion.Builds.Services is
          Service.Build_Node := Nodes.Models.Node_Ref (Recipe.Get_Node);
 
       exception
-         when ADO.Objects.Not_Found =>
+         when ADO.Objects.NOT_FOUND =>
             Service.Queue.Delete (Service.DB);
             return;
       end;
@@ -461,7 +461,7 @@ package body Porion.Builds.Services is
          return Left.Get_Create_Date < Right.Get_Create_Date;
 
       exception
-         when ADO.Objects.Not_Found =>
+         when ADO.Objects.NOT_FOUND =>
             return Left.Get_Create_Date < Right.Get_Create_Date;
       end "<";
 
@@ -1642,7 +1642,6 @@ package body Porion.Builds.Services is
          if Count_Statement.Get_Result_Integer /= 0 then
             Log.Warn ("Recipe name {0} is already used", Name);
             raise Name_Used;
-            return;
          end if;
       end;
 

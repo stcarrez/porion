@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-sources-git -- Source management with git
---  Copyright (C) 2021, 2022, 2023 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023, 2024 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,11 +21,12 @@ private package Porion.Sources.Git is
 
    GIT_TEST_COMMAND        : constant String := "git ls-remote -h -- #{repository_url}";
    GIT_SHOW_REMOTE_COMMAND : constant String := "git remote show #{repository_url}";
-   GIT_CHECKOUT_COMMAND    : constant String := "git clone -q "
-     & "#{not empty branch ? '-b' : ''} #{branch} --recursive #{repository_url} #{build_dir}";
+   GIT_CHECKOUT_COMMAND    : constant String := "git clone -q"
+     & " #{not empty branch ? '-b' : ''} #{branch} --recursive #{repository_url} #{build_dir}";
    GIT_GUESS_COMMAND       : constant String := "git -C #{path} config remote.origin.url";
    GIT_INIT_COMMAND        : constant String := "git init --bare #{git_tmp_dir}";
-   GIT_LOG_COMMAND         : constant String := "git --no-pager -C #{build_dir} log #{previous_tag}..";
+   GIT_LOG_COMMAND         : constant String := "git --no-pager"
+     & " -C #{build_dir} log #{previous_tag}..";
 
    type Controller_Type is limited new Porion.Sources.Controller_Type with private;
 

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-reports -- Report generation
---  Copyright (C) 2021, 2022, 2023 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023, 2024 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -586,10 +586,10 @@ package body Porion.Reports is
          Writer.Put_Int (Fields (3), Node.Recipe_Count);
          Writer.Put_Int (Fields (4), Node.Build_Count);
          if Ada.Strings.Unbounded.Length (Node.Os_Version) > 0 then
-            Writer.Put (Fields (5), To_String (Node.OS_Name)
-                        & " " & To_String (Node.OS_Version));
+            Writer.Put (Fields (5), To_String (Node.Os_Name)
+                        & " " & To_String (Node.Os_Version));
          else
-            Writer.Put_UString (Fields (5), Node.OS_Name);
+            Writer.Put_UString (Fields (5), Node.Os_Name);
          end if;
          Writer.Put_UString (Fields (6), Node.Cpu_Type);
          Writer.Put_UString (Fields (7), Node.Name);

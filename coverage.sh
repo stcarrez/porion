@@ -1,6 +1,6 @@
 #!/bin/sh
 NAME=porion.cov
-lcov --quiet --base-directory . --directory obj \
+alr exec -- lcov --quiet --base-directory . --directory obj \
    --no-external \
    --exclude '*/awa/*' \
    --exclude '*/b__*.adb' \

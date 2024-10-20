@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-nodes-ssh -- SSH build node management
---  Copyright (C) 2021, 2022, 2023 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023, 2024 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,7 @@ private package Porion.Nodes.SSH is
    SSH_COMMAND_NAME : constant String := "command_ssh";
    SCP_COMMAND_NAME : constant String := "command_scp";
 
-   SSH_COMMAND      : constant String := "ssh -x "
+   SSH_COMMAND      : constant String := "ssh -x -T "
      & "#{not empty identity ? '-i ' : ''}#{identity} "
      & "#{not empty login ? '-l ' : ''}#{login} #{hostname}";
 

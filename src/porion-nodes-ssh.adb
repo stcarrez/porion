@@ -67,6 +67,7 @@ package body Porion.Nodes.SSH is
                        Line : in String);
       procedure Print (Kind : in Output_Type;
                        Line : in String) is
+         pragma Unreferenced (Kind);
       begin
          Log.Error ("{0}", Line);
       end Print;
@@ -158,8 +159,8 @@ package body Porion.Nodes.SSH is
       Controller.Send_Environment;
 
       declare
-         Start       : Usage_Type;
-         Usage       : Usage_Type;
+         --  Start       : Usage_Type;
+         --  Usage       : Usage_Type;
          Status_Line : UString;
       begin
          --  Sys_Rusage (Start);
@@ -173,7 +174,7 @@ package body Porion.Nodes.SSH is
             Log.Warn ("Remote execution terminated with status {0}", Status'Image);
             return;
          end if;
-         Controller.Err_Reader.Set_Boundary (Controller.Boundary & ASCII.LF);
+         Controller.Err_Reader.Set_Boundary (Controller.Boundary & ASCII.CR & ASCII.LF);
          Controller.Err_Reader.Read (Status_Line);
          begin
             Status := Natural'Value (To_String (Status_Line));
@@ -237,6 +238,7 @@ package body Porion.Nodes.SSH is
                        Line : in String);
       procedure Print (Kind : in Output_Type;
                        Line : in String) is
+         pragma Unreferenced (Kind);
       begin
          Log.Error ("{0}", Line);
       end Print;

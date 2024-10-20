@@ -136,6 +136,7 @@ package body Porion.Nodes.Services is
          procedure Process (Kind : in Output_Type;
                             Line : in String) is
          begin
+            --  Log.Info ("{0}", Line);
             if Kind = STDERR then
                Log.Error ("{0}", Line);
                return;
@@ -166,11 +167,11 @@ package body Porion.Nodes.Services is
             Tokens.Delete_Last;
             for Token of Tokens loop
                if Ada.Strings.Fixed.Index (Token, "Ubuntu") > 0 then
-                  Service.Build_Node.Set_OS_Name ("Ubuntu");
+                  Service.Build_Node.Set_Os_Name ("Ubuntu");
                   exit;
                end if;
                if Ada.Strings.Fixed.Index (Token, "Debian") > 0 then
-                  Service.Build_Node.Set_OS_Name ("Debian");
+                  Service.Build_Node.Set_Os_Name ("Debian");
                   exit;
                end if;
             end loop;

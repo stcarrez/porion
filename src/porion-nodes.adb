@@ -105,6 +105,7 @@ package body Porion.Nodes is
          begin
             Reader.Read_Line (Line, Strip_Crlf);
             exit when Reader.Is_Eof and then Length (Line) = 0;
+            --  Log.Debug ("Line: {0}: {1}", Kind'Image, To_String (Line));
             Report.Print (Kind, Ada.Strings.Unbounded.To_String (Line), Process);
          end;
       end loop;

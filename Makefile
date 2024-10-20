@@ -130,7 +130,7 @@ build-ts:
 
 lib-setup:: src/porion-configs-setup.ads
 src/porion-configs-setup.ads:   Makefile.conf src/porion-configs-setup.gpb
-	gnatprep -DPREFIX='"${prefix}"' -DVERSION='"$(VERSION)"' \
+	$(GNATPREP) -DPREFIX='"${prefix}"' -DVERSION='"$(VERSION)"' \
 		  src/porion-configs-setup.gpb src/porion-configs-setup.ads
 
 ifneq (${HAVE_DYNAMO},yes)

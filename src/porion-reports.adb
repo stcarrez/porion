@@ -358,7 +358,7 @@ package body Porion.Reports is
       List   : Porion.Queries.Project_Info_Vector;
       Query  : ADO.Queries.Context;
    begin
-      Query.Set_Query (Porion.Queries.Query_Project_List);
+      Query.Set_Query (Porion.Queries.Query_Project_Summary_List);
       Porion.Queries.List (List, Service.DB, Query);
 
       List_Projects (List, Printer, Styles, -("Identifier"));

@@ -136,7 +136,7 @@ package body Porion.Nodes.Services is
          procedure Process (Kind : in Output_Type;
                             Line : in String) is
          begin
-            --  Log.Info ("{0}", Line);
+            Log.Info ("{0}", Line);
             if Kind = STDERR then
                Log.Error ("{0}", Line);
                return;

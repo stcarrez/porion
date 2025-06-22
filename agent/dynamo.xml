@@ -1,17 +1,21 @@
 <project>
-     <name>porion_agent</name>
-     <property name="author_email">Stephane.Carrez@gmail.com</property>
-     <property name="search_dirs">.;../;/build/local-gnat-2021/share/dynamo/ado</property>
-     <property name="is_ado">FALSE</property>
-     <property name="license">apache</property>
-     <property name="is_gtk">FALSE</property>
-     <property name="use_postgresql">false</property>
-     <property name="use_mysql">false</property>
-     <property name="is_lib">FALSE</property>
-     <property name="author">Stephane Carrez</property>
-     <property name="is_web">FALSE</property>
-     <property name="is_tool">FALSE</property>
-     <depend name="ado"></depend>
-     <depend name="porion"></depend>
-     <depend name="porion_lib"></depend>
+    <name>porion_agent</name>
+    <property name="model_version">1</property>
+    <property name="author_email">Stephane.Carrez@gmail.com</property>
+    <property name="search_dirs">.;../;../awa/ada-security;../awa/ada-ado;../awa/ada-keystore;../awa/ada-util</property>
+    <property name="is_ado">FALSE</property>
+    <property name="license">apache</property>
+    <property name="is_gtk">FALSE</property>
+    <property name="use_postgresql">false</property>
+    <property name="use_mysql">false</property>
+    <property name="is_lib">FALSE</property>
+    <property name="author">Stephane Carrez</property>
+    <property name="is_web">FALSE</property>
+    <property name="is_tool">FALSE</property>
+    <depend name="ado"></depend>
+    <depend name="porion"></depend>
+    <depend name="porion_lib"></depend>
+    <depend name="util"></depend>
+    <depend name="keystore"></depend>
+    <depend name="security"></depend>
 </project>

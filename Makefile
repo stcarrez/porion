@@ -139,8 +139,8 @@ awa/dynamo/src/gen-configs.ads:   Makefile.conf awa/dynamo/src/gen-configs.gpb
 	cd awa/dynamo && sh ./alire-setup.sh
 
 # Install the AWA UML model in Dynamo UML search path
-awa/dynamo/config/uml/AWA.xmi: awa/awa/uml/awa.zargo
-	unzip -cq awa/awa/uml/awa.zargo awa.xmi > awa/dynamo/config/uml/AWA.xmi
+awa/dynamo/config/uml/AWA.xmi: awa/uml/awa.zargo
+	unzip -cq awa/uml/awa.zargo awa.xmi > awa/dynamo/config/uml/AWA.xmi
 
 build-dynamo: bin/dynamo awa/dynamo/config/uml/AWA.xmi
 

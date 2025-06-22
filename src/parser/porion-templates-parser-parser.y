@@ -384,7 +384,6 @@ with Porion.Templates.Parser.Lexer;
 with Ada.Text_IO;
 package body Porion.Templates.Parser.Parser is
 
-   use Ada;
    use Porion.Templates.Parser.Lexer;
 
    procedure YYParse (Repository  : in out Repository_Type;

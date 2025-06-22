@@ -34,23 +34,23 @@ package body Porion.Templates.Parser.Lexer is
       yy_cp    : Index renames Ctx.dfa.yy_cp;
       yy_bp    : Index renames Ctx.dfa.yy_bp;
       yytext_ptr   : Index renames Ctx.dfa.yytext_ptr;
-      yy_last_accepting_state : Lexer_DFA.yy_state_type renames Ctx.dfa.yy_last_accepting_state;
+      yy_last_accepting_state : Porion.Templates.Parser.Lexer_DFA.yy_state_type renames Ctx.dfa.yy_last_accepting_state;
       yy_last_accepting_cpos  : Index renames Ctx.dfa.yy_last_accepting_cpos;
       yy_hold_char  : Character renames Ctx.dfa.yy_hold_char;
-      yy_ch_buf     : Lexer_DFA.ch_buf_type renames Ctx.dfa.yy_ch_buf;
+      yy_ch_buf     : Porion.Templates.Parser.Lexer_DFA.ch_buf_type renames Ctx.dfa.yy_ch_buf;
       yy_n_chars    : Index renames Ctx.yy_n_chars;
       YYLVal : YYSType renames Ctx.YYLVal;
       YYVal  : YYSType renames Ctx.YYVal;
 
-      function yy_get_next_buffer return Lexer_IO.eob_action_type
-        is (Lexer_IO.yy_get_next_buffer (Ctx));
+      function yy_get_next_buffer return Porion.Templates.Parser.Lexer_IO.eob_action_type
+        is (Porion.Templates.Parser.Lexer_IO.yy_get_next_buffer (Ctx));
 
       function YYText return String
-        is (Lexer_DFA.YYText (Ctx.dfa));
+        is (Porion.Templates.Parser.Lexer_DFA.YYText (Ctx.dfa));
 
       procedure YY_DO_BEFORE_ACTION is
       begin
-        Lexer_DFA.YY_DO_BEFORE_ACTION (Ctx.dfa);
+        Porion.Templates.Parser.Lexer_DFA.YY_DO_BEFORE_ACTION (Ctx.dfa);
       end YY_DO_BEFORE_ACTION;
 
       YY_END_OF_BUFFER : constant := 35;

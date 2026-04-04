@@ -23,7 +23,7 @@ deployment of software development projects.
 """
 
 [[depends-on]]
-aws = "~24.0"
+aws = "^24.0|^25.0"
 xmlada = "any"
 libgpr = "any"
 ansiada = "^1.0.0"

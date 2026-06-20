@@ -120,7 +120,7 @@ package: server-package
 
 server-package:
 	cd server && rm -rf $(DESTDIR)$(DIST_DIR)
-	cd server && $(DYNAMO) dist $(DESTDIR)$(DIST_DIR) $(PACKAGE_XML)
+	$(DYNAMO) -C server dist $(DESTDIR)$(DIST_DIR) $(PACKAGE_XML)
 
 build-ts:
 	tsc server/web/js/projects.ts server/web/js/builds.ts server/web/js/xunits.ts \

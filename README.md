@@ -174,6 +174,35 @@ And install it:
 make install
 ```
 
+# Debian Packages for x86_64
+
+You can install Porion by using the Ubuntu 24.04 packages.
+First, setup to accept the signed packages:
+
+```
+wget -O - https://apt.vacs.fr/apt.vacs.fr.gpg.asc | sudo tee /etc/apt/trusted.gpg.d/apt-vacs-fr.asc
+```
+
+and add the source
+
+Ubuntu 24.04
+```
+echo "deb https://apt.vacs.fr/ubuntu-noble noble main" | sudo tee -a /etc/apt/sources.list.d/vacs.list
+```
+
+Then, launch the apt update command:
+
+```
+sudo apt-get update
+```
+
+and install the tool using:
+
+```
+sudo apt-get install -y porion porion-server
+```
+
+
 # Documents
 
 * Man page: [porion (1)](https://gitlab.com/stcarrez/porion/blob/master/docs/porion.md)

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-templates-tests -- Unit tests for porion templates
---  Copyright (C) 2022, 2023 Stephane Carrez
+--  Copyright (C) 2022, 2023, 2026 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,11 +16,8 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Util.Assertions;
 with Util.Test_Caller;
 
-with Porion.Configs;
-with Porion.Executors;
 with Porion.Sources;
 with Porion.Templates.Parser;
 with Porion.Services;

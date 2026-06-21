@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-nodes-tests -- Tests for build node management
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2026 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -68,7 +68,7 @@ package body Porion.Nodes.Tests is
       T.Assert (not Service.Build_Node.Is_Null, "build node is null");
       T.Assert_Equals ("poseidon", String '(Service.Build_Node.Get_Name),
                        "Invalid node name");
-      T.Assert (not Service.Build_Node.get_Main_Node, "was the main node");
+      T.Assert (not Service.Build_Node.Get_Main_Node, "was the main node");
 
    end Test_Add_Remove_Node;
 

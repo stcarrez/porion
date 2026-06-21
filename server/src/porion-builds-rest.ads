@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-builds-beans -- Beans for module builds
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2026 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Servlet.REST.Operation;
+with Servlet.Rest.Operation;
 with Security.Permissions;
 with OpenAPI.Servers;
 with Porion.Services;

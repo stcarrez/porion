@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-builds-beans -- Beans for module builds
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2026 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Directories;
-with Ada.Calendar.Conversions;
+with Ada.Calendar;
 with ADO.Queries;
 with ADO.Sessions;
 with ADO.Statements;
@@ -38,6 +38,7 @@ package body Porion.Builds.Rest is
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Builds.Rest");
 
+   use type Util.Dates.Nanosecond_Type;
    use type Porion.Builds.Models.Build_Status_Type;
    use type ADO.Identifier;
 
@@ -45,7 +46,7 @@ package body Porion.Builds.Rest is
      is (Util.Dates.ISO8601.Image (Date, Util.Dates.ISO8601.DAY));
 
    function To_Timestamp (Date : in Ada.Calendar.Time) return Long_Long_Integer
-     is (Long_Long_Integer (Ada.Calendar.Conversions.To_Unix_Time (Date)));
+     is (Long_Long_Integer (Util.Dates.To_Nanoseconds (Date) / 1_000_000_000));
 
    type Badge_Info is record
       Label   : UString;

@@ -15,6 +15,8 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Util.Log.Appenders.Factories;
+with Util.Log.Appenders.Rolling_Files.Lzma;
 private with Ada.Finalization;
 private with Ada.Text_IO;
 package Porion.Logs is
@@ -46,6 +48,12 @@ package Porion.Logs is
    procedure Write (Logger : in out Logger_Type;
                     Source : in Source_Type;
                     Line   : in String);
+
+   package Lzma_Rolling_Factory is
+     new Util.Log.Appenders.Factories
+       (Name   => "LzmaRollingFile",
+        Create => Util.Log.Appenders.Rolling_Files.Lzma.Create'Access)
+   with Unreferenced;
 
 private
 

@@ -3,8 +3,7 @@ Priority: optional
 Section: devel
 Maintainer: Stephane Carrez <Stephane.Carrez@gmail.com>
 Build-Depends: debhelper (>= 10), autotools-dev,
- dh-ada-library,
- gnat,
+ gnat-14,
 # This line is parsed by debian/rules.
  gprbuild (>= 2015-2),
  pkg-config,
@@ -12,7 +11,7 @@ Build-Depends: debhelper (>= 10), autotools-dev,
 # 2015-2 is compatible with gnat-7
 # dh-ada-library (>= 6.7)
 # pandoc requires texlive-fonts-extra for PDF
- pandoc, clojure, texlive-fonts-extra
+ pandoc, esbuild, texlive-fonts-extra
 Standards-Version: 4.1.4
 Homepage: https://gitlab.com/stcarrez/porion/
 Vcs-Git: https://gitlab.com/stcarrez/porion.git -b debian-gnat-9

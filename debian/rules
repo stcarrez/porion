@@ -17,11 +17,9 @@ ADAFLAGS += -gnatafno -gnatVa -gnatwa
 %:
 	dh $@
 
-override_dh_auto_configure:
-	dh_auto_configure -- --disable-distrib
-
 override_dh_auto_build:
-	$(MAKE) GNATMAKE="gprbuild -R -m -q" HAVE_DYNAMO=no
+	$(MAKE) setup UTIL_OS=linux64 UTIL_TIME_64=no BUILD=debug HAVE_ALIRE=yes
+	$(MAKE) GNATMAKE="gprbuild -R -m -q"
 
 override_dh_auto_test::
 

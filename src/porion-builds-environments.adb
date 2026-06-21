@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-builds-environments -- Environment variables to execute build recipes
---  Copyright (C) 2023, 2024 Stephane Carrez
+--  Copyright (C) 2023, 2024, 2026 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");

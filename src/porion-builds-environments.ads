@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-builds-environments -- Environment variables to execute build recipes
---  Copyright (C) 2023, 2024 Stephane Carrez
+--  Copyright (C) 2023, 2024, 2026 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,6 +48,8 @@ package Porion.Builds.Environments is
 
    --  Filter the line to hide the secrets which are used in the environment.
    function Filter (Env : in Environment_Type; Line : in String) return String;
+
+   function Has_Secrets (Env : in Environment_Type) return Boolean;
 
 private
 

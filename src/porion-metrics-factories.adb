@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-metrics-factories -- Factories for metric controllers
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2026 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -47,7 +47,7 @@ package body Porion.Metrics.Factories is
    begin
       case Metric is
          when METRIC_SPACE =>
-            return Diskusage.Create;
+            return DiskUsage.Create;
 
          when METRIC_CLOC =>
             return Cloc.Create;

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-templates-generator -- build recipe generator from a template
---  Copyright (C) 2023 Stephane Carrez
+--  Copyright (C) 2023, 2026 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,13 +23,19 @@ package body Porion.Templates.Generator is
    use Porion.Builds;
    use Porion.Builds.Services;
 
-   Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Porion.Templates.Generator");
+   Log : constant Util.Log.Loggers.Logger
+     := Util.Log.Loggers.Create ("Porion.Templates.Generator");
+
+   procedure Generate (Service : in out Porion.Services.Context_Type;
+                       Into    : in out Build_Config_Vector;
+                       Recipe  : in Recipe_Type);
 
    function Get_Timeout (Action : in Step_Action) return Natural
      is (if Action.Timeout.Is_Null then 0 else Action.Timeout.Value);
 
    function Get_Execution (Action : in Step_Action) return Execution_Type
-     is (if Action.Ignore.Is_Null or else not Action.Ignore.Value then EXEC_NO_ERROR else EXEC_IGNORE_ERROR);
+   is (if Action.Ignore.Is_Null
+       or else not Action.Ignore.Value then EXEC_NO_ERROR else EXEC_IGNORE_ERROR);
 
    procedure Generate (Service : in out Porion.Services.Context_Type;
                        Into    : in out Build_Config_Vector;
@@ -55,7 +61,7 @@ package body Porion.Templates.Generator is
       Config.Config.Set_Branch (Service.Branch);
       Config.Config.Set_Project (Service.Project);
       Config.Config.Set_Node (Service.Build_Node);
-      config.Config.Set_Status (Porion.Builds.Models.CONFIG_BUILD_REQUIRED);
+      Config.Config.Set_Status (Porion.Builds.Models.CONFIG_BUILD_REQUIRED);
       for Step of Recipe.Steps loop
          for Action of Step.Value.Actions loop
             declare
@@ -67,7 +73,8 @@ package body Porion.Templates.Generator is
                S.Step.Set_Timeout (Get_Timeout (Action));
                S.Step.Set_Execution (Get_Execution (Action));
                S.Step.Set_Builder (Action.Builder);
-               S.Step.Set_Parameters (Builders.Save_Configuration (Action.Builder, Service.DB, Action.Params));
+               S.Step.Set_Parameters (Builders.Save_Configuration
+                                      (Action.Builder, Service.DB, Action.Params));
                Config.Steps.Append (S);
             end;
          end loop;

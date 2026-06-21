@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-services-parsers -- Parse project configuration
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2026 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,6 @@ with Util.Serialize.IO.XML;
 with ADO.Utils;
 
 with Porion.Configs;
-with Porion.Sources;
 package body Porion.Services.Parsers is
 
    Log : aliased constant Util.Log.Loggers.Logger

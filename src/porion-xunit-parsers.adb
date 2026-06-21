@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-xunit-parsers -- Parse xunit like XML results
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2026 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -165,7 +165,7 @@ package body Porion.XUnit.Parsers is
             when TESTCASE_ERROR =>
                N.Error := Value;
 
-            when TESTCASE_ERROR_Type =>
+            when TESTCASE_ERROR_TYPE =>
                N.Error_Type := Value;
 
             when TESTCASE_ASSERTIONS =>

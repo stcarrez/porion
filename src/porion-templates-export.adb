@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-templates-export -- Export a project to generate a build template
---  Copyright (C) 2022 Stephane Carrez
+--  Copyright (C) 2022, 2026 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -159,7 +159,7 @@ package body Porion.Templates.Export is
          Ada.Text_IO.Put (File, To_String (Metric_Name));
          if Length (Metric_Value) > 0 then
             Ada.Text_IO.Put (File, " ");
-            Ada.Text_IO.Put (File, to_String (Metric_Value));
+            Ada.Text_IO.Put (File, To_String (Metric_Value));
          end if;
       end if;
       Ada.Text_IO.Put_Line (File, ";");

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-xunit-analysis -- Continuous integration controller
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2026 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -379,7 +379,7 @@ package body Porion.XUnit.Analysis is
                    Session : in out ADO.Sessions.Master_Session) is
       Known_Tests : Test_Results;
    begin
-      Load (Known_tests, Build.Get_Project.Get_Id, Session);
+      Load (Known_Tests, Build.Get_Project.Get_Id, Session);
 
       Save_Run_Tests (Results, Known_Tests, Build, Session);
    end Save;

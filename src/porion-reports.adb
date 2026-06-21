@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-reports -- Report generation
---  Copyright (C) 2021, 2022, 2023, 2024 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023, 2024, 2026 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -487,7 +487,7 @@ package body Porion.Reports is
             when Builds.EXEC_IGNORE_ERROR =>
                Writer.Copy_Style (To => Style1, From => Styles.Success);
 
-            when Builds.Exec_NO_ERROR =>
+            when Builds.EXEC_NO_ERROR =>
                Writer.Copy_Style (To => Style1, From => Styles.Default);
          end case;
 

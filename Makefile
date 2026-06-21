@@ -1,27 +1,39 @@
 NAME=porion
 GPRPATH=${NAME}.gpr
-UTIL_OS=linux64
 PACKAGE_XML=package.xml
-#GPRPATH_AGENT=porion_agent.gpr
-# BUILD_COMMAND=$(GNATMAKE) -m -p -Patlas $(MAKE_ARGS)
 VERSION=0.16.0
+
+-include Makefile.conf
 
 DIST_DIR=porion-$(VERSION)
 DIST_FILE=porion-$(VERSION).tar.gz
-
-MAKE_ARGS += -XPORION_BUILD=$(BUILD) -XAWA_BUILD=$(BUILD) -XADO_BUILD=$(BUILD) -XOPENAPI_BUILD=$(BUILD)
-MAKE_ARGS += -XUTIL_BUILD=$(BUILD) -XEL_BUILD=$(BUILD) -XDYNAMO_BUILD=$(BUILD) -XSERVLET_BUILD=$(BUILD)
-MAKE_ARGS += -XWIKI_BUILD=$(BUILD) -XSECURITY_BUILD=$(BUILD) -XARE_BUILD=$(BUILD)
 
 AYACC=ayacc
 AFLEX=aflex
 DYNAMO=$(ALR) exec -- dynamo
 
--include Makefile.conf
+BUILD?=debug
+UTIL_OS?=unknown
+UTIL_TIME_64?=yes
+UTIL_AWS_VERSION?=3
+
+MAKE_ARGS += -XPORION_BUILD=$(BUILD) -XAWA_BUILD=$(BUILD) -XADO_BUILD=$(BUILD) -XOPENAPI_BUILD=$(BUILD)
+MAKE_ARGS += -XUTIL_BUILD=$(BUILD) -XEL_BUILD=$(BUILD) -XDYNAMO_BUILD=$(BUILD) -XSERVLET_BUILD=$(BUILD)
+MAKE_ARGS += -XWIKI_BUILD=$(BUILD) -XSECURITY_BUILD=$(BUILD) -XARE_BUILD=$(BUILD)
+
+ifneq ($(HAVE_ALIRE),yes)
+MAKE_ARGS += -XUTIL_OS=$(UTIL_OS)
+else
+ifneq ($(UTIL_OS),unknown)
+MAKE_ARGS += -XUTIL_OS=$(UTIL_OS)
+endif
+endif
+
+ifneq ($(UTIL_TIME_64),yes)
+MAKE_ARGS += -XUTIL_TIME_64=$(UTIL_TIME_64)
+endif
 
 include Makefile.defaults
-
-UTIL_AWS_VERSION=3
 
 ROOT_DIR=$(shell pwd)
 
@@ -201,3 +213,8 @@ lexer:
 info:
 	$(DYNAMO) info
 	cd server && $(DYNAMO) info
+
+setup:: 
+	echo "BUILD=$(BUILD)" >> Makefile.conf
+	echo "UTIL_OS=$(UTIL_OS)" >> Makefile.conf
+	echo "UTIL_TIME_64=$(UTIL_TIME_64)" >> Makefile.conf

@@ -1,4 +1,4 @@
-Version 0.16.0 - Under development
+Version 0.16.0 - Jun 2026
   - Run the build process with a pseudo TTY to solve output order issues
   - Fix handling the recipe name in identification strings for some commands
 

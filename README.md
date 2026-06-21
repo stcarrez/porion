@@ -50,13 +50,9 @@ Get information about a project or a build number:
    porion info ada-util:2
 ```
 
-Version 0.16.0 - Under development
+Version 0.16.0 - Jun 2026
   - Run the build process with a pseudo TTY to solve output order issues
   - Fix handling the recipe name in identification strings for some commands
-
-Version 0.15.0 - Jul 2024
-  - Improvement of build environment configuration setup
-  - Preliminary support for per-project secret keys
 
 [List all versions](https://gitlab.com/stcarrez/porion/blob/master/NEWS.md)
 

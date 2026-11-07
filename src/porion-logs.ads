@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-logs -- Log build execution
---  Copyright (C) 2021, 2022, 2023 Stephane Carrez
+--  Copyright (C) 2021 - 2026 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,11 +23,19 @@ package Porion.Logs is
 
    type Source_Type is (LOG_INFO,
                         LOG_COMMAND,
+                        LOG_ENVIRONMENT,
                         LOG_EXECUTION,
                         LOG_EXECUTION_ERROR,
                         LOG_STEP_INFO,
                         LOG_RESULT,
                         LOG_FAILURE);
+
+   type Logger_Interface is limited interface;
+
+   --  Write the line on the logger.
+   procedure Log (Logger   : in out Logger_Interface;
+                  Source   : in Source_Type;
+                  Line     : in String) is abstract;
 
    type Logger_Type is tagged limited private;
 

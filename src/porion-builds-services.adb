@@ -286,9 +286,12 @@ package body Porion.Builds.Services is
                   Exec_Step.Set_Recipe_Step (Step.Step);
                   Exec_Step.Save (Service.DB);
                   Service.DB.Commit;
-                  Executor.Prepare_Step (Step.Step.Get_Number);
                end if;
                Executor.Set_Step (Step.Step.Get_Step, Step.Step.Get_Execution, Step.Step.Get_Id);
+               --  Prepare the step after announcing the step.
+               if not Executor.Is_Dry_Run then
+                  Executor.Prepare_Step (Step.Step.Get_Number);
+               end if;
                Executor.Set_Status (0);
                Builders.Run (Step.Step.Get_Builder, Service.DB, Step.Config,
                              Service.Build, Path, Executor);

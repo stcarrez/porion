@@ -47,7 +47,8 @@ package Porion.Executors is
    subtype Command_Cursor is Command_Vectors.Cursor;
 
    type Executor_Type is limited new Ada.Finalization.Limited_Controlled
-     and Porion.Nodes.Listener_Type with private;
+     and Porion.Nodes.Listener_Type
+     and Porion.Logs.Logger_Interface with private;
 
    --  Returns true if commands are not executed but collected.
    overriding
@@ -180,7 +181,8 @@ package Porion.Executors is
 private
 
    type Executor_Type is limited new Ada.Finalization.Limited_Controlled
-     and Porion.Nodes.Listener_Type with record
+     and Porion.Nodes.Listener_Type
+     and Porion.Logs.Logger_Interface with record
       Listener   : Nodes.Listener_Access;
       Dry_Run    : Boolean := False;
       Output_Log : Boolean := False;

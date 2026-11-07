@@ -54,9 +54,10 @@ package body Porion.Builds.Environments is
    --  ------------------------------
    --  Prepare the environment to execute the given step number.
    --  ------------------------------
-   procedure Prepare (Env  : in out Environment_Type;
-                      Step : in Positive;
-                      Node : in Porion.Nodes.Controller_Access) is
+   procedure Prepare (Env    : in out Environment_Type;
+                      Step   : in Positive;
+                      Node   : in Porion.Nodes.Controller_Access;
+                      Logger : in out Porion.Logs.Logger_Interface'Class) is
       Prev : Util.Strings.Sets.Set;
    begin
       Env.Env.Clear;
@@ -66,16 +67,19 @@ package body Porion.Builds.Environments is
          begin
             if not Prev.Contains (Name) then
                Prev.Insert (Name);
-               Env.Prepare (Node, Item);
+               Env.Prepare (Node, Item, Logger);
             end if;
          end;
       end loop;
       Node.Set_Environment (Env.Env);
    end Prepare;
 
-   procedure Prepare (Env  : in out Environment_Type;
-                      Node : in Porion.Nodes.Controller_Access;
-                      Var  : in Variable_Type) is
+   procedure Prepare (Env    : in out Environment_Type;
+                      Node   : in Porion.Nodes.Controller_Access;
+                      Var    : in Variable_Type;
+                      Logger : in out Porion.Logs.Logger_Interface'Class) is
+      Name  : constant String := To_String (Var.Var.Name);
+      Value : constant String := To_String (Var.Content);
    begin
       if Var.Var.Secret then
          null;
@@ -85,14 +89,14 @@ package body Porion.Builds.Environments is
             declare
                Path : constant String := Node.Create_Random_Path;
             begin
-               Node.Create_File (Path, To_String (Var.Content));
-               Env.Env.Include (To_String (Var.Var.Name),
-                                Path);
+               Node.Create_File (Path, Value);
+               Env.Env.Include (Name, Path);
+               Logger.Log (Porion.Logs.LOG_ENVIRONMENT, Name & "=" & Path);
             end;
 
          when Models.VAR_ENV | Models.VAR_SHELL =>
-            Env.Env.Include (To_String (Var.Var.Name),
-                             To_String (Var.Content));
+            Env.Env.Include (Name, Value);
+            Logger.Log (Porion.Logs.LOG_ENVIRONMENT, Name & "=" & Value);
       end case;
    end Prepare;
 

@@ -125,7 +125,7 @@ package body Porion.Executors is
    procedure Prepare_Step (Executor : in out Executor_Type;
                            Step     : in Positive) is
    begin
-      Executor.Env.Prepare (Step, Executor.Controller);
+      Executor.Env.Prepare (Step, Executor.Controller, Executor);
    end Prepare_Step;
 
    --  ------------------------------

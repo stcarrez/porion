@@ -19,6 +19,7 @@ with Ada.Containers.Vectors;
 with Porion.Nodes;
 with Porion.Builds.Models;
 with Porion.Services;
+with Porion.Logs;
 private with Util.Strings.Vectors;
 private with Util.Strings.Maps;
 package Porion.Builds.Environments is
@@ -38,9 +39,10 @@ package Porion.Builds.Environments is
      Pre => Service.Is_Open and Service.Has_Recipe;
 
    --  Prepare the environment to execute the given step number.
-   procedure Prepare (Env  : in out Environment_Type;
-                      Step : in Positive;
-                      Node : in Porion.Nodes.Controller_Access);
+   procedure Prepare (Env    : in out Environment_Type;
+                      Step   : in Positive;
+                      Node   : in Porion.Nodes.Controller_Access;
+                      Logger : in out Porion.Logs.Logger_Interface'Class);
 
    --  Cleanup after execution of all build steps.
    procedure Cleanup (Env  : in out Environment_Type;
@@ -69,8 +71,9 @@ private
       Secrets : Util.Strings.Vectors.Vector;
    end record;
 
-   procedure Prepare (Env  : in out Environment_Type;
-                      Node : in Porion.Nodes.Controller_Access;
-                      Var  : in Variable_Type);
+   procedure Prepare (Env    : in out Environment_Type;
+                      Node   : in Porion.Nodes.Controller_Access;
+                      Var    : in Variable_Type;
+                      Logger : in out Porion.Logs.Logger_Interface'Class);
 
 end Porion.Builds.Environments;

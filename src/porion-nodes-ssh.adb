@@ -195,6 +195,11 @@ package body Porion.Nodes.SSH is
          --  Sys_Rusage (Usage);
          --  Controller.Usage := Controller.Usage + (Usage - Start);
       end;
+   exception
+      when E : others =>
+         Status := 1;
+         Log.Error ("Exception raised while running command", E);
+
    end Execute;
 
    --  ------------------------------
@@ -338,6 +343,7 @@ package body Porion.Nodes.SSH is
          Porion.Nodes.Controller_Type (Controller).Expand (Ssh, ".",
                                                            Ignore_Working_Dir, Args);
          Util.Processes.Set_Allocate_TTY (Controller.Proc, Allocate => True);
+         Util.Processes.Set_Terminal_Size (Controller.Proc, Rows => 80, Cols => 120);
          Util.Processes.Spawn (Proc      => Controller.Proc,
                                Arguments => Args,
                                Mode      => Util.Processes.READ_WRITE_ALL_SEPARATE);

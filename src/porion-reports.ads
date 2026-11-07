@@ -55,26 +55,33 @@ package Porion.Reports is
 
    --  Create a report about the builds.  If the service is configured with
    --  a project, the report only indicates the builds of the project.
-   procedure List_Builds (Service : in out Porion.Services.Context_Type'Class;
-                          Printer : in out PT.Printer_Type'Class;
-                          Styles  : in Style_Configuration) with
+   --  The report is limited to Max_Count entries, or is not limited when
+   --  Max_Count is 0.
+   procedure List_Builds (Service   : in out Porion.Services.Context_Type'Class;
+                          Printer   : in out PT.Printer_Type'Class;
+                          Styles    : in Style_Configuration;
+                          Max_Count : in Natural := 0) with
       Pre => Service.Is_Open;
 
-   procedure List_Builds (List    : in Porion.Queries.Build_Info_Vector;
-                          Printer : in out PT.Printer_Type'Class;
-                          Styles  : in Style_Configuration;
-                          Label   : in String);
+   procedure List_Builds (List      : in Porion.Queries.Build_Info_Vector;
+                          Printer   : in out PT.Printer_Type'Class;
+                          Styles    : in Style_Configuration;
+                          Label     : in String;
+                          Max_Count : in Natural := 0);
 
-   --  Create a report about the projects.
-   procedure List_Projects (Service : in out Porion.Services.Context_Type'Class;
-                            Printer : in out PT.Printer_Type'Class;
-                            Styles  : in Style_Configuration) with
+   --  Create a report about the projects.  The report is limited to
+   --  Max_Count entries, or is not limited when Max_Count is 0.
+   procedure List_Projects (Service   : in out Porion.Services.Context_Type'Class;
+                            Printer   : in out PT.Printer_Type'Class;
+                            Styles    : in Style_Configuration;
+                            Max_Count : in Natural := 0) with
       Pre => Service.Is_Open;
 
-   procedure List_Projects (List    : in Porion.Queries.Project_Info_Vector;
-                            Printer : in out PT.Printer_Type'Class;
-                            Styles  : in Style_Configuration;
-                            Label   : in String);
+   procedure List_Projects (List      : in Porion.Queries.Project_Info_Vector;
+                            Printer   : in out PT.Printer_Type'Class;
+                            Styles    : in Style_Configuration;
+                            Label     : in String;
+                            Max_Count : in Natural := 0);
 
    --  Create a report with the list of commands to build the project.
    procedure List_Commands (Commands : in Porion.Executors.Command_Vector;
@@ -83,28 +90,36 @@ package Porion.Reports is
 
    --  Create a report about the build nodes.  If the service is configured with
    --  a project, the report only indicates the build nodes of the project.
-   procedure List_Nodes (Service : in out Porion.Services.Context_Type'Class;
-                         Printer : in out PT.Printer_Type'Class;
-                         Styles  : in Style_Configuration) with
+   --  The report is limited to Max_Count entries, or is not limited when
+   --  Max_Count is 0.
+   procedure List_Nodes (Service   : in out Porion.Services.Context_Type'Class;
+                         Printer   : in out PT.Printer_Type'Class;
+                         Styles    : in Style_Configuration;
+                         Max_Count : in Natural := 0) with
       Pre => Service.Is_Open;
 
-   procedure List_Nodes (List    : in Porion.Queries.Node_Info_Vector;
-                         Printer : in out PT.Printer_Type'Class;
-                         Styles  : in Style_Configuration;
-                         Label   : in String);
+   procedure List_Nodes (List      : in Porion.Queries.Node_Info_Vector;
+                         Printer   : in out PT.Printer_Type'Class;
+                         Styles    : in Style_Configuration;
+                         Label     : in String;
+                         Max_Count : in Natural := 0);
 
    --  Create a report about the build queues.  If the service is configured with
    --  a project, the report only indicates the build queued of the project.
-   procedure List_Queues (Service : in out Porion.Services.Context_Type'Class;
-                          Printer : in out PT.Printer_Type'Class;
-                          Styles  : in Style_Configuration) with
+   --  The report is limited to Max_Count entries, or is not limited when
+   --  Max_Count is 0.
+   procedure List_Queues (Service   : in out Porion.Services.Context_Type'Class;
+                          Printer   : in out PT.Printer_Type'Class;
+                          Styles    : in Style_Configuration;
+                          Max_Count : in Natural := 0) with
       Pre => Service.Is_Open;
 
-   procedure List_Queues (List    : in Porion.Queries.Queue_Info_Vector;
-                          Printer : in out PT.Printer_Type'Class;
-                          Styles  : in Style_Configuration;
-                          Label   : in String;
-                          Hide_Project : in Boolean := False);
+   procedure List_Queues (List         : in Porion.Queries.Queue_Info_Vector;
+                          Printer      : in out PT.Printer_Type'Class;
+                          Styles       : in Style_Configuration;
+                          Label        : in String;
+                          Hide_Project : in Boolean := False;
+                          Max_Count    : in Natural := 0);
 
    --  Create a report with the unit tests for the given build.
    procedure List_Tests (Service : in out Porion.Services.Context_Type'Class;
@@ -137,14 +152,17 @@ package Porion.Reports is
                            Fields   : in PT.Texts.Field_Array;
                            Styles   : in Style_Configuration);
 
-   --  Create a report with the build environment variables.
-   procedure List_Environment (Service : in out Porion.Services.Context_Type'Class;
-                               Printer : in out PT.Printer_Type'Class;
-                               Styles  : in Style_Configuration) with
+   --  Create a report with the build environment variables.  The report is
+   --  limited to Max_Count entries, or is not limited when Max_Count is 0.
+   procedure List_Environment (Service   : in out Porion.Services.Context_Type'Class;
+                               Printer   : in out PT.Printer_Type'Class;
+                               Styles    : in Style_Configuration;
+                               Max_Count : in Natural := 0) with
       Pre => Service.Is_Open;
 
-   procedure List_Environment (List     : in Porion.Queries.Environment_Info_Vector;
-                               Printer  : in out PT.Printer_Type'Class;
-                               Styles   : in Style_Configuration);
+   procedure List_Environment (List      : in Porion.Queries.Environment_Info_Vector;
+                               Printer   : in out PT.Printer_Type'Class;
+                               Styles    : in Style_Configuration;
+                               Max_Count : in Natural := 0);
 
 end Porion.Reports;

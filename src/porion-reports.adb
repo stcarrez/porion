@@ -239,12 +239,31 @@ package body Porion.Reports is
    end Get_Status;
 
    --  ------------------------------
+   --  Print a notice when a list report is truncated because of the Max_Count limit.
+   --  ------------------------------
+   procedure Print_Truncated_Notice (Writer    : in out PT.Texts.Printer_Type;
+                                     Styles    : in Style_Configuration;
+                                     Count     : in Natural;
+                                     List_Size : in Natural) is
+      Field : PT.Texts.Field_Type;
+      Style : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
+   begin
+      if Count < List_Size then
+         Writer.Create_Field (Field, Style, 0.0);
+         Writer.Put (Field, "... " & Util.Strings.Image (List_Size - Count)
+                     & (-(" more entries (use --all to display the complete list)")));
+         Writer.New_Line;
+      end if;
+   end Print_Truncated_Notice;
+
+   --  ------------------------------
    --  Create a report about the builds.  If the service is configured with
    --  a project, the report only indicates the builds of the project.
    --  ------------------------------
-   procedure List_Builds (Service : in out Porion.Services.Context_Type'Class;
-                          Printer : in out PT.Printer_Type'Class;
-                          Styles  : in Style_Configuration) is
+   procedure List_Builds (Service   : in out Porion.Services.Context_Type'Class;
+                          Printer   : in out PT.Printer_Type'Class;
+                          Styles    : in Style_Configuration;
+                          Max_Count : in Natural := 0) is
       List   : Porion.Queries.Build_Info_Vector;
       Query  : ADO.Queries.Context;
    begin
@@ -256,17 +275,18 @@ package body Porion.Reports is
       end if;
       Porion.Queries.List (List, Service.DB, Query);
 
-      List_Builds (List, Printer, Styles, -("Identifier"));
+      List_Builds (List, Printer, Styles, -("Identifier"), Max_Count);
    end List_Builds;
 
    --  ------------------------------
    --  Create a report about the builds.  If the service is configured with
    --  a project, the report only indicates the builds of the project.
    --  ------------------------------
-   procedure List_Builds (List    : in Porion.Queries.Build_Info_Vector;
-                          Printer : in out PT.Printer_Type'Class;
-                          Styles  : in Style_Configuration;
-                          Label   : in String) is
+   procedure List_Builds (List      : in Porion.Queries.Build_Info_Vector;
+                          Printer   : in out PT.Printer_Type'Class;
+                          Styles    : in Style_Configuration;
+                          Label     : in String;
+                          Max_Count : in Natural := 0) is
       use Porion.Builds.Models;
       use Porion.Projects.Models;
 
@@ -274,6 +294,7 @@ package body Porion.Reports is
       Fields : PT.Texts.Field_Array (1 .. 8);
       Style1 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
       Style2 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
+      Count  : Natural := 0;
    begin
       Writer.Set_Justify (Style2, PT.J_RIGHT);
       Writer.Create_Field (Fields (1), Style1, 40.0);
@@ -305,6 +326,7 @@ package body Porion.Reports is
       Writer.New_Line;
 
       for Build of List loop
+         exit when Max_Count > 0 and then Count >= Max_Count;
          if Build.Project_Status /= Projects.Models.PROJECT_ACTIVE then
             Writer.Copy_Style (To => Style1, From => Styles.Disabled);
             Writer.Copy_Style (To => Style2, From => Styles.Disabled);
@@ -346,31 +368,37 @@ package body Porion.Reports is
             Writer.Put (Fields (7), Format (Build.Build_Duration));
          end if;
          Writer.New_Line;
+         Count := Count + 1;
       end loop;
+      if Max_Count > 0 then
+         Print_Truncated_Notice (Writer, Styles, Count, Natural (List.Length));
+      end if;
    end List_Builds;
 
    --  ------------------------------
    --  Create a report about the projects.
    --  ------------------------------
-   procedure List_Projects (Service : in out Porion.Services.Context_Type'Class;
-                            Printer : in out PT.Printer_Type'Class;
-                            Styles  : in Style_Configuration) is
+   procedure List_Projects (Service   : in out Porion.Services.Context_Type'Class;
+                            Printer   : in out PT.Printer_Type'Class;
+                            Styles    : in Style_Configuration;
+                            Max_Count : in Natural := 0) is
       List   : Porion.Queries.Project_Info_Vector;
       Query  : ADO.Queries.Context;
    begin
       Query.Set_Query (Porion.Queries.Query_Project_Summary_List);
       Porion.Queries.List (List, Service.DB, Query);
 
-      List_Projects (List, Printer, Styles, -("Identifier"));
+      List_Projects (List, Printer, Styles, -("Identifier"), Max_Count);
    end List_Projects;
 
    --  ------------------------------
    --  Create a report about the projects.
    --  ------------------------------
-   procedure List_Projects (List    : in Porion.Queries.Project_Info_Vector;
-                            Printer : in out PT.Printer_Type'Class;
-                            Styles  : in Style_Configuration;
-                            Label   : in String) is
+   procedure List_Projects (List      : in Porion.Queries.Project_Info_Vector;
+                            Printer   : in out PT.Printer_Type'Class;
+                            Styles    : in Style_Configuration;
+                            Label     : in String;
+                            Max_Count : in Natural := 0) is
       use Porion.Builds.Models;
       use Porion.Projects.Models;
 
@@ -378,6 +406,7 @@ package body Porion.Reports is
       Fields : PT.Texts.Field_Array (1 .. 8);
       Style1 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
       Style2 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
+      Count  : Natural := 0;
    begin
       Writer.Set_Justify (Style2, PT.J_RIGHT);
       Writer.Create_Field (Fields (1), Style1, 30.0);
@@ -409,6 +438,7 @@ package body Porion.Reports is
       Writer.New_Line;
 
       for Project of List loop
+         exit when Max_Count > 0 and then Count >= Max_Count;
          if Project.Project_Status /= Projects.Models.PROJECT_ACTIVE then
             Writer.Copy_Style (To => Style1, From => Styles.Disabled);
             Writer.Copy_Style (To => Style2, From => Styles.Disabled);
@@ -444,7 +474,11 @@ package body Porion.Reports is
             Writer.Put (Fields (7), Format (Project.Build_Date.Value));
          end if;
          Writer.New_Line;
+         Count := Count + 1;
       end loop;
+      if Max_Count > 0 then
+         Print_Truncated_Notice (Writer, Styles, Count, Natural (List.Length));
+      end if;
    end List_Projects;
 
    --  ------------------------------
@@ -502,9 +536,10 @@ package body Porion.Reports is
    --  Create a report about the build nodes.  If the service is configured with
    --  a project, the report only indicates the build nodes of the project.
    --  ------------------------------
-   procedure List_Nodes (Service : in out Porion.Services.Context_Type'Class;
-                         Printer : in out PT.Printer_Type'Class;
-                         Styles  : in Style_Configuration) is
+   procedure List_Nodes (Service   : in out Porion.Services.Context_Type'Class;
+                         Printer   : in out PT.Printer_Type'Class;
+                         Styles    : in Style_Configuration;
+                         Max_Count : in Natural := 0) is
       List   : Porion.Queries.Node_Info_Vector;
       Query  : ADO.Queries.Context;
    begin
@@ -516,19 +551,21 @@ package body Porion.Reports is
       end if;
       Porion.Queries.List (List, Service.DB, Query);
 
-      List_Nodes (List, Printer, Styles, -("Kind"));
+      List_Nodes (List, Printer, Styles, -("Kind"), Max_Count);
    end List_Nodes;
 
-   procedure List_Nodes (List    : in Porion.Queries.Node_Info_Vector;
-                         Printer : in out PT.Printer_Type'Class;
-                         Styles  : in Style_Configuration;
-                         Label   : in String) is
+   procedure List_Nodes (List      : in Porion.Queries.Node_Info_Vector;
+                         Printer   : in out PT.Printer_Type'Class;
+                         Styles    : in Style_Configuration;
+                         Label     : in String;
+                         Max_Count : in Natural := 0) is
       use Porion.Nodes;
 
       Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
       Fields : PT.Texts.Field_Array (1 .. 9);
       Style1 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
       Style2 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
+      Count  : Natural := 0;
    begin
       Writer.Set_Justify (Style2, PT.J_RIGHT);
       Writer.Create_Field (Fields (1), Style1, 0.0);
@@ -566,6 +603,7 @@ package body Porion.Reports is
       Writer.New_Line;
 
       for Node of List loop
+         exit when Max_Count > 0 and then Count >= Max_Count;
          if Node.Status = Nodes.NODE_DISABLED then
             Writer.Copy_Style (To => Style1, From => Styles.Disabled);
             Writer.Copy_Style (To => Style2, From => Styles.Disabled);
@@ -596,16 +634,21 @@ package body Porion.Reports is
          Writer.Put_UString (Fields (8), Node.Login);
          Writer.Put_UString (Fields (9), Node.Repository_Dir);
          Writer.New_Line;
+         Count := Count + 1;
       end loop;
+      if Max_Count > 0 then
+         Print_Truncated_Notice (Writer, Styles, Count, Natural (List.Length));
+      end if;
    end List_Nodes;
 
    --  ------------------------------
    --  Create a report about the build queues.  If the service is configured with
    --  a project, the report only indicates the build queued of the project.
    --  ------------------------------
-   procedure List_Queues (Service : in out Porion.Services.Context_Type'Class;
-                          Printer : in out PT.Printer_Type'Class;
-                          Styles  : in Style_Configuration) is
+   procedure List_Queues (Service   : in out Porion.Services.Context_Type'Class;
+                          Printer   : in out PT.Printer_Type'Class;
+                          Styles    : in Style_Configuration;
+                          Max_Count : in Natural := 0) is
       List   : Porion.Queries.Queue_Info_Vector;
       Query  : ADO.Queries.Context;
    begin
@@ -617,17 +660,20 @@ package body Porion.Reports is
       end if;
       Porion.Queries.List (List, Service.DB, Query);
 
-      List_Queues (List, Printer, Styles, -("Create date"));
+      List_Queues (List, Printer, Styles, -("Create date"),
+                   Hide_Project => False, Max_Count => Max_Count);
    end List_Queues;
 
-   procedure List_Queues (List    : in Porion.Queries.Queue_Info_Vector;
-                          Printer : in out PT.Printer_Type'Class;
-                          Styles  : in Style_Configuration;
-                          Label   : in String;
-                          Hide_Project : in Boolean := False) is
+   procedure List_Queues (List         : in Porion.Queries.Queue_Info_Vector;
+                          Printer      : in out PT.Printer_Type'Class;
+                          Styles       : in Style_Configuration;
+                          Label        : in String;
+                          Hide_Project : in Boolean := False;
+                          Max_Count    : in Natural := 0) is
       Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
       Fields : PT.Texts.Field_Array (1 .. 7);
       Style1 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
+      Count  : Natural := 0;
    begin
       Writer.Create_Field (Fields (1), Style1, 20.0);
       Writer.Create_Field (Fields (2), Style1, 0.0);
@@ -662,6 +708,7 @@ package body Porion.Reports is
       Writer.New_Line;
 
       for Queue of List loop
+         exit when Max_Count > 0 and then Count >= Max_Count;
          if Queue.Building then
             Writer.Copy_Style (To => Style1, From => Styles.Success);
          else
@@ -677,7 +724,11 @@ package body Porion.Reports is
          Writer.Put_UString (Fields (6), Queue.Recipe_Name);
          Writer.Put_UString (Fields (7), Queue.Node_Name);
          Writer.New_Line;
+         Count := Count + 1;
       end loop;
+      if Max_Count > 0 then
+         Print_Truncated_Notice (Writer, Styles, Count, Natural (List.Length));
+      end if;
    end List_Queues;
 
    --  ------------------------------
@@ -818,26 +869,29 @@ package body Porion.Reports is
    --  ------------------------------
    --  Create a report with the build environment variables.
    --  ------------------------------
-   procedure List_Environment (Service : in out Porion.Services.Context_Type'Class;
-                               Printer : in out PT.Printer_Type'Class;
-                               Styles  : in Style_Configuration) is
+   procedure List_Environment (Service   : in out Porion.Services.Context_Type'Class;
+                               Printer   : in out PT.Printer_Type'Class;
+                               Styles    : in Style_Configuration;
+                               Max_Count : in Natural := 0) is
       List   : Porion.Queries.Environment_Info_Vector;
       Query  : ADO.Queries.Context;
    begin
       Query.Set_Query (Porion.Queries.Query_Environment_List);
       Porion.Queries.List (List, Service.DB, Query);
 
-      List_Environment (List, Printer, Styles);
+      List_Environment (List, Printer, Styles, Max_Count);
    end List_Environment;
 
-   procedure List_Environment (List     : in Porion.Queries.Environment_Info_Vector;
-                               Printer  : in out PT.Printer_Type'Class;
-                               Styles   : in Style_Configuration) is
+   procedure List_Environment (List      : in Porion.Queries.Environment_Info_Vector;
+                               Printer   : in out PT.Printer_Type'Class;
+                               Styles    : in Style_Configuration;
+                               Max_Count : in Natural := 0) is
       use Ada.Strings.Unbounded;
 
       Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
       Fields : PT.Texts.Field_Array (1 .. 2);
       Style1 : constant PT.Style_Type := Writer.Create_Style (Styles.Default);
+      Count  : Natural := 0;
    begin
       Writer.Create_Field (Fields (1), Style1, 30.0);
       Writer.Create_Field (Fields (2), Style1, 70.0);
@@ -851,6 +905,7 @@ package body Porion.Reports is
       Writer.New_Line;
 
       for Env of List loop
+         exit when Max_Count > 0 and then Count >= Max_Count;
          if Length (Env.Project_Name) = 0 and then Length (Env.Node_Name) = 0 then
             Writer.Put (Fields (1), "* GLOBAL *");
          elsif Length (Env.Project_Name) = 0 then
@@ -868,7 +923,11 @@ package body Porion.Reports is
          end if;
          Writer.Put_UString (Fields (2), Env.Name & "=" & Env.Value);
          Writer.New_Line;
+         Count := Count + 1;
       end loop;
+      if Max_Count > 0 then
+         Print_Truncated_Notice (Writer, Styles, Count, Natural (List.Length));
+      end if;
    end List_Environment;
 
 end Porion.Reports;

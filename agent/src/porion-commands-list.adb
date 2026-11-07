@@ -19,6 +19,9 @@
 with Porion.Reports;
 package body Porion.Commands.List is
 
+   --  The maximum number of entries displayed in a list unless --all is used.
+   MAX_LIST_COUNT : constant Natural := 100;
+
    --  Report the list of projects, nodes or builds.
    overriding
    procedure Execute (Command   : in out Command_Type;
@@ -26,6 +29,9 @@ package body Porion.Commands.List is
                       Args      : in Argument_List'Class;
                       Context   : in out Context_Type) is
       pragma Unreferenced (Name, Args);
+
+      --  Limit the number of entries unless --all is given (0 means no limit).
+      Max_Count : constant Natural := (if Command.List_All then 0 else MAX_LIST_COUNT);
    begin
       Context.Open;
 
@@ -36,33 +42,38 @@ package body Porion.Commands.List is
       end if;
 
       if Command.List_Projects then
-         Porion.Reports.List_Projects (Service => Context.Project_Service,
-                                       Printer => Context.Printer.all,
-                                       Styles  => Context.Styles);
+         Porion.Reports.List_Projects (Service   => Context.Project_Service,
+                                       Printer   => Context.Printer.all,
+                                       Styles    => Context.Styles,
+                                       Max_Count => Max_Count);
       end if;
 
       if Command.List_Nodes then
-         Porion.Reports.List_Nodes (Service => Context.Project_Service,
-                                    Printer => Context.Printer.all,
-                                    Styles  => Context.Styles);
+         Porion.Reports.List_Nodes (Service   => Context.Project_Service,
+                                    Printer   => Context.Printer.all,
+                                    Styles    => Context.Styles,
+                                    Max_Count => Max_Count);
       end if;
 
       if Command.List_Builds then
-         Porion.Reports.List_Builds (Service => Context.Project_Service,
-                                     Printer => Context.Printer.all,
-                                     Styles  => Context.Styles);
+         Porion.Reports.List_Builds (Service   => Context.Project_Service,
+                                     Printer   => Context.Printer.all,
+                                     Styles    => Context.Styles,
+                                     Max_Count => Max_Count);
       end if;
 
       if Command.List_Queues then
-         Porion.Reports.List_Queues (Service => Context.Project_Service,
-                                     Printer => Context.Printer.all,
-                                     Styles  => Context.Styles);
+         Porion.Reports.List_Queues (Service   => Context.Project_Service,
+                                     Printer   => Context.Printer.all,
+                                     Styles    => Context.Styles,
+                                     Max_Count => Max_Count);
       end if;
 
       if Command.List_Env then
-         Porion.Reports.List_Environment (Service => Context.Project_Service,
-                                          Printer => Context.Printer.all,
-                                          Styles  => Context.Styles);
+         Porion.Reports.List_Environment (Service   => Context.Project_Service,
+                                          Printer   => Context.Printer.all,
+                                          Styles    => Context.Styles,
+                                          Max_Count => Max_Count);
       end if;
    end Execute;
 
@@ -98,6 +109,12 @@ package body Porion.Commands.List is
                         Switch => "-E",
                         Long_Switch => "--env",
                         Help => -("List the environment variables"));
+      GC.Define_Switch (Config => Config,
+                        Output => Command.List_All'Access,
+                        Switch => "-a",
+                        Long_Switch => "--all",
+                        Help => -("Display the complete list without limiting"
+                          & " the number of entries"));
    end Setup;
 
 end Porion.Commands.List;

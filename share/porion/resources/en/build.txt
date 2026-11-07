@@ -10,3 +10,10 @@ Usage: porion build [-f|--force] [-n|--dry-run] [-c|--clean]
   executed to build the project.
 
   When --node option is given, run the build defined in the node build queue.
+
+Examples:
+  porion build ada-util
+  porion build --force ada-util
+  porion build --dry-run ada-util#master
+  porion build --clean --background ada-util awa
+  porion build --node local

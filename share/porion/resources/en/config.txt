@@ -1,0 +1,22 @@
+porion config: get or configure a global parameter
+
+Usage: porion config <name>
+       porion config <name> <value>
+
+  The porion global configuration file contains several properties that
+  customize the behavior of porion.  When only the parameter name is given,
+  the command reports the current value of the parameter.  When a value is
+  also given, the parameter is updated and the configuration file is saved.
+
+  The following parameters are recognized:
+
+workspace_dir   the absolute path of the porion workspace directory
+project_dir     the absolute path where project directories are stored
+                (default is workspace_dir/projects)
+rules_dir       the path of the rules directory that contains the filtering
+                rules used by the recipe log filters
+
+Examples:
+  porion config workspace_dir
+  porion config project_dir /home/porion/workspace/projects
+  porion config rules_dir /home/porion/workspace/rules

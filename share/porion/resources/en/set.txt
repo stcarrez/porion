@@ -1,10 +1,14 @@
 porion set: change a configuration variable for a project, branch, build recipe
 
-Usage: porion set <ident> <name> [args...]
+Usage: porion set <ident> <name>=<value> [args...]
 
   The `porion set` command changes a configuration variable for a project,
   a branch or a build recipe.  The identification string can reference a project,
-  a branch or a build recipe.  Some variables are specific to a project, others
+  a branch or a build recipe and is composed of:
+
+  <project-name>[#<branch-name>][~<recipe-name>][@<node-name>]
+
+  Some variables are specific to a project, others
   are specific to a branch or build recipes.  The variable identification is given
   with a single pre-defined name.  The value is composed of the concatenation of
   the program arguments which remain.  The following variables are recognized:
@@ -16,3 +20,12 @@ check_delay   the delay in seconds between source checks for changes
 status        enable or disable the project, branch, recipe
 rate_factor   the branch or recipe rate factor
 filter_rules  the recipe filtering rules for log reports
+
+  The `status` variable accepts the values 'enable', 'disabled' or 'hold'.
+
+Examples:
+  porion set ada-util description="Ada utility library"
+  porion set ada-util#master status=hold
+  porion set ada-util check_delay=3600
+  porion set ada-util~release filter_rules=error,warning
+  porion set ada-util#master rate_factor=2

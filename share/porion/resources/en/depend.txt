@@ -7,3 +7,7 @@ Usage: porion depend [-r|--remove] project dependency1 [dependency2 ...]
 
   The --remove option allows to remove one or several project dependencies.
 
+Examples:
+  porion depend ada-util ada-keystore
+  porion depend ada-util ada-keystore ada-aws
+  porion depend --remove ada-util ada-keystore

@@ -26,3 +26,9 @@ Usage: porion node {-P|--probe} {name}
   With the --probe option, probe the status of the build node to verify its
   status and get some system information about it.
 
+Examples:
+  porion node ssh://builder@build.example.com/var/porion
+  porion node docker:porion-builder
+  porion node --update ssh://builder@build.example.com/var/porion /var/porion
+  porion node --probe local
+  porion node --remove builder

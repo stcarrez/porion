@@ -1,6 +1,16 @@
 porion list: list the projects, nodes, builds and queues
 
-Usage: porion list [--projects] [--nodes] [--builds] [--queues]
+Usage: porion list [--projects] [--nodes] [--builds] [--queue] [--env]
 
   By default list the projects that are registered.
 
+  The --projects option lists the registered projects, the --nodes option
+  lists the build nodes, the --builds option lists the builds, the --queue
+  option lists the content of the build queue and the --env option lists
+  the environment variables.
+
+Examples:
+  porion list
+  porion list --nodes
+  porion list --builds --queue
+  porion list --env

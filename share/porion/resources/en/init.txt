@@ -7,3 +7,5 @@ Usage: porion init <directory>
   - the SQLite database that describes projects, builds, tests
   - the project directories where projects are built
 
+Examples:
+  porion init /home/porion/workspace

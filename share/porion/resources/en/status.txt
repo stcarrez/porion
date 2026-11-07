@@ -1,0 +1,21 @@
+porion status: status about the workspace or a project
+
+Usage: porion status
+       porion status [-j|--json|-x|--xml] <ident>...
+
+  Without argument, report the porion workspace directory used by the
+  build agent.
+
+  Otherwise, report the status of the projects, branches, recipes and
+  builds that match the given identification strings.  The report is
+  produced in XML format by default, the --json option selects a JSON
+  output and the --xml option selects the XML output.
+
+  The identification string is composed of:
+
+  <project-name>[#<branch-name>][~<recipe-name>][@<node-name>]
+
+Examples:
+  porion status
+  porion status ada-util
+  porion status --json ada-util awa

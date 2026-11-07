@@ -13,3 +13,8 @@ Usage: porion logs [--no-filter] <ident> ...
   Use 'porion set <recipe> filter_rules=<filter1,...,filterN>' to configure
   the recipe filtering rules.  The recipe filtering rules can be changed
   after a build.
+
+Examples:
+  porion logs ada-util:25
+  porion logs ada-util#master:25
+  porion logs --no-filter ada-util:25

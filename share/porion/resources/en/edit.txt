@@ -1,0 +1,22 @@
+porion edit: edit the project configuration
+
+Usage: porion edit [-e|--editor EDITOR] <ident>
+
+  The porion edit command exports the configuration of the project, branch
+  or recipe identified by the identification string into a temporary XML
+  file and launches an external editor on it.  When the editor terminates,
+  the modified file is imported back into the database.  The temporary
+  directory and file are removed when the editor terminates.
+
+  The identification string is composed of:
+
+  <project-name>[#<branch-name>][~<recipe-name>][@<node-name>]
+
+  The editor is selected with the --editor option, otherwise the EDITOR
+  environment variable is used, otherwise the system 'editor' alternative
+  is used (see update-alternatives(1)).
+
+Examples:
+  porion edit ada-util
+  porion edit ada-util#master~release
+  porion edit --editor=vim ada-util

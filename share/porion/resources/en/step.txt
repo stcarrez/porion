@@ -32,3 +32,10 @@ Usage: porion step --update <POS> [--quiet] [--ignore-error] [--timeout <N>]
 Usage: porion step --remove <POS> <ident>
 
   Remove the build step at the given position in the build recipe.
+
+Examples:
+  porion step ada-util~release make -j4
+  porion step --insert 1 ada-util~release ./configure --prefix=/usr
+  porion step --update 2 --timeout 600 ada-util~release make test
+  porion step --disable ada-util~release publish
+  porion step --remove 3 ada-util~release

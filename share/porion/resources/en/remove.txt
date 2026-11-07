@@ -13,4 +13,9 @@ Usage: porion remove [--force] [--interactive] <ident> [<ident2> ...]
   With the `--interactive` option, a confirmation is asked before removal.
 
   The `--force` option forces the removal and ignores any error.
-  
+
+Examples:
+  porion remove ada-util:25
+  porion remove ada-util~old-recipe
+  porion remove --interactive ada-util
+  porion remove --force ada-util awa

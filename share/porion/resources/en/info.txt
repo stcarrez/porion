@@ -12,3 +12,10 @@ Usage: porion info [--all] [--recipes] [--nodes] [--builds] ident...
 
   The --builds option gives the list of builds of the project.
 
+  The --all option activates all the reports.
+
+Examples:
+  porion info ada-util
+  porion info --all ada-util
+  porion info --recipes --builds ada-util
+  porion info ada-util:25

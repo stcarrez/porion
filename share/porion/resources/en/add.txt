@@ -20,3 +20,9 @@ Usage: porion add --recipe {<ident>} [<source-ident>]
   You may also specify a build number with the pattern:
 
   <project-name>:<build-number>
+
+Examples:
+  porion add https://gitlab.com/stcarrez/ada-util.git
+  porion add git@github.com:stcarrez/ada-util.git
+  porion add --recipe ada-util~release
+  porion add --recipe ada-util~release ada-util:25

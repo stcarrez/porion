@@ -1,0 +1,25 @@
+porion template: import, check or apply a project template
+
+Usage: porion template --import=<file>
+       porion template --check --import=<file>
+       porion template --apply <template> <ident>
+
+  A template describes a set of build recipes that can be applied on a
+  project.  Templates are searched in the template search path which
+  contains the porion workspace 'templates' directory and the
+  'share/porion/templates' installation directory.
+
+  With the --import option, the template file is loaded and its syntax
+  and validity are checked.  The --check option explicitly requests the
+  check of the template.
+
+  With the --apply option, the recipes described by the named template are
+  generated and applied on the project, branch or recipe identified by
+  the identification string:
+
+  <project-name>[#<branch-name>][~<recipe-name>][@<node-name>]
+
+Examples:
+  porion template --check --import=templates/gnu.porion
+  porion template --import=templates/ado.porion
+  porion template --apply ado ada-util

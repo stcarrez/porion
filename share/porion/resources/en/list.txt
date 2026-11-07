@@ -1,6 +1,6 @@
 porion list: list the projects, nodes, builds and queues
 
-Usage: porion list [--projects] [--nodes] [--builds] [--queue] [--env]
+Usage: porion list [-a|--all] [--projects] [--nodes] [--builds] [--queue] [--env]
 
   By default list the projects that are registered.
 
@@ -9,8 +9,13 @@ Usage: porion list [--projects] [--nodes] [--builds] [--queue] [--env]
   option lists the content of the build queue and the --env option lists
   the environment variables.
 
+  Each list is limited to 100 entries.  When a list is truncated, a notice
+  indicates the number of remaining entries.  The --all option allows to
+  display the complete list without this limit.
+
 Examples:
   porion list
   porion list --nodes
   porion list --builds --queue
   porion list --env
+  porion list --all --builds

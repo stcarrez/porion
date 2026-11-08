@@ -129,7 +129,8 @@ package body Porion.Logs.Analysis is
 
       procedure Process (Line  : in String;
                          Level : in Level_Type) is
-         Match : constant GNAT.Regpat.Pattern_Matcher := GNAT.Regpat.Compile (Line);
+         Match : constant GNAT.Regpat.Pattern_Matcher
+           := GNAT.Regpat.Compile (Line, GNAT.Regpat.Single_Line);
       begin
          Context.Rules.Append ((Size    => Match.Size,
                                 Pattern => Match,

@@ -309,7 +309,8 @@ package body Porion.Nodes.SSH is
       & "=/.+_abcdefghijklmnopqrstuvwxyz";
 
    overriding
-   procedure Start (Controller : in out Controller_Type) is
+   procedure Start (Controller : in out Controller_Type;
+                    Logger     : in out Porion.Logs.Logger_Interface'Class) is
       use Ada.Streams;
 
       Data    : Stream_Element_Array (1 .. BOUNDARY_LENGTH);
@@ -340,6 +341,7 @@ package body Porion.Nodes.SSH is
          Args  : Util.Strings.Vectors.Vector;
          Ignore_Working_Dir : Boolean;
       begin
+         Logger.Log (Porion.Logs.LOG_NODE, Ssh);
          Porion.Nodes.Controller_Type (Controller).Expand (Ssh, ".",
                                                            Ignore_Working_Dir, Args);
          Util.Processes.Set_Allocate_TTY (Controller.Proc, Allocate => True);
@@ -360,10 +362,11 @@ package body Porion.Nodes.SSH is
    end Start;
 
    overriding
-   procedure Stop (Controller : in out Controller_Type) is
+   procedure Stop (Controller : in out Controller_Type;
+                   Logger     : in out Porion.Logs.Logger_Interface'Class) is
    begin
       Controller.Cmd_Writer.Close;
-      null;
+      Logger.Log (Porion.Logs.LOG_NODE, "Stopping");
    end Stop;
 
    --  ------------------------------

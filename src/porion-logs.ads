@@ -22,6 +22,7 @@ private with Ada.Text_IO;
 package Porion.Logs is
 
    type Source_Type is (LOG_INFO,
+                        LOG_NODE,
                         LOG_COMMAND,
                         LOG_ENVIRONMENT,
                         LOG_EXECUTION,
@@ -62,6 +63,12 @@ package Porion.Logs is
        (Name   => "LzmaRollingFile",
         Create => Util.Log.Appenders.Rolling_Files.Lzma.Create'Access)
    with Unreferenced;
+
+   type Null_Logger is limited new Logger_Interface with null record;
+
+   procedure Log (L        : in out Null_Logger;
+                  Source   : in Source_Type;
+                  Line     : in String) is null;
 
 private
 

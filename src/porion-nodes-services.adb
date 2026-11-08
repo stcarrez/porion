@@ -22,6 +22,7 @@ with Util.Log.Loggers;
 with Util.Strings.Vectors;
 with Util.Strings.Tokenizers;
 with Porion.Configs;
+with Porion.Logs;
 with Porion.Nodes.Local;
 with Porion.Nodes.SSH;
 with ADO.SQL;
@@ -339,6 +340,7 @@ package body Porion.Nodes.Services is
          end if;
       end Read_Rules;
 
+      L : Porion.Logs.Null_Logger;
       Controller : Controller_Access;
    begin
       if Service.Build_Node.Get_Status = NODE_DISABLED then
@@ -350,7 +352,7 @@ package body Porion.Nodes.Services is
          return;
       end if;
 
-      Controller.Start;
+      Controller.Start (L);
       Probe_Uname (Controller);
 
       --  When some check rules are specified, update the build node to check these rules.

@@ -21,6 +21,7 @@ with Util.Strings.Sets;
 with Util.Streams.Buffered;
 with Util.Strings.Vectors;
 with Util.Beans.Objects.Enums;
+with Porion.Logs;
 private with Security.Random;
 package Porion.Nodes is
 
@@ -92,9 +93,11 @@ package Porion.Nodes is
    --  Return the usage identified when running commands on this build node.
    function Get_Usage (Controller : in Controller_Type'Class) return Usage_Type;
 
-   procedure Start (Controller : in out Controller_Type) is null;
+   procedure Start (Controller : in out Controller_Type;
+                    Logger     : in out Porion.Logs.Logger_Interface'Class) is null;
 
-   procedure Stop (Controller : in out Controller_Type) is null;
+   procedure Stop (Controller : in out Controller_Type;
+                   Logger     : in out Porion.Logs.Logger_Interface'Class) is null;
 
    --  Set the environment variables when running commands in the build node.
    procedure Set_Environment (Controller : in out Controller_Type;

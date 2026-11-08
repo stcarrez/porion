@@ -105,10 +105,12 @@ private package Porion.Nodes.SSH is
                           Content    : in String);
 
    overriding
-   procedure Start (Controller : in out Controller_Type);
+   procedure Start (Controller : in out Controller_Type;
+                    Logger     : in out Porion.Logs.Logger_Interface'Class);
 
    overriding
-   procedure Stop (Controller : in out Controller_Type);
+   procedure Stop (Controller : in out Controller_Type;
+                   Logger     : in out Porion.Logs.Logger_Interface'Class);
 
 private
 

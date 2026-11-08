@@ -115,7 +115,7 @@ package body Porion.Executors is
       Executor.Env.Load (Service);
       --  Executor.Controller.Set_Environment (Env);
       if not Executor.Dry_Run then
-         Executor.Controller.Start;
+         Executor.Controller.Start (Executor);
       end if;
    end Prepare_Build;
 

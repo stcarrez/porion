@@ -220,6 +220,8 @@ package body Porion.Builds.Services is
    begin
       Log.Info ("Build {0} in {1}", Ident, Path);
 
+      --  Create the build logger to record everything from the beginning.
+      Executor.Create_Logger (Log_Dir, "build.log");
       Executor.Prepare_Build (Service);
 
       Executor.Set_Step (Builds.STEP_CHECKOUT, Builds.EXEC_NO_ERROR, ADO.NO_IDENTIFIER);
@@ -231,7 +233,6 @@ package body Porion.Builds.Services is
       Config.Set ("repository_url", String '(Service.Project.Get_Scm_Url));
       Config.Set ("build_dir", Path);
 
-      Executor.Create_Logger (Log_Dir, "build.log");
       Executor.Log (Porion.Logs.LOG_INFO, "Build '" & Ident & "' in " & Path);
       Changes.Path := To_UString (Path);
       Last_Build_Tag (Service, Changes.Previous_Tag);

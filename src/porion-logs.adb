@@ -77,6 +77,9 @@ package body Porion.Logs is
             when LOG_INFO =>
                Ada.Text_IO.Put (Logger.File, "porion:inf: ");
 
+            when LOG_NODE =>
+               Ada.Text_IO.Put (Logger.File, "porion:node: ");
+
             when LOG_COMMAND =>
                Ada.Text_IO.Put (Logger.File, "porion:cmd: ");
 

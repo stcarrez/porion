@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-logs-analysis -- Log analysis
---  Copyright (C) 2021, 2022 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2026 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -90,7 +90,7 @@ private
    type Analyser_Type is limited record
       Count  : Natural := 0;
       Rules  : Match_Vector;
-      Levels : Level_Map := (others => True);
+      Levels : Level_Map := [others => True];
    end record;
 
 end Porion.Logs.Analysis;

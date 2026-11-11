@@ -225,9 +225,9 @@ package body Porion.Nodes.Local is
       pragma Unreferenced (Controller);
       use Ada.Directories;
 
-      Filter  : constant Filter_Type := (Ordinary_File => True,
+      Filter  : constant Filter_Type := [Ordinary_File => True,
                                          Directory     => True,
-                                         others        => False);
+                                         others        => False];
       Search  : Search_Type;
       Ent     : Ada.Directories.Directory_Entry_Type;
    begin

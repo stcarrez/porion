@@ -68,12 +68,12 @@ package body Porion.Logs.Analysis is
             if State.Level = LOG_UNKNOWN and then Level /= LOG_INFO then
                State.Level := Level;
             end if;
-            Result.Append ((Length  => Line'Length,
-                            Number  => Line_Num,
-                            Level   => State.Level,
-                            Step    => Step,
-                            Context => False,
-                            Content => Line));
+            Result.Append (Line_Type'(Length  => Line'Length,
+                                      Number  => Line_Num,
+                                      Level   => State.Level,
+                                      Step    => Step,
+                                      Context => False,
+                                      Content => Line));
          end if;
       end Analyze;
 
@@ -90,12 +90,12 @@ package body Porion.Logs.Analysis is
                return;
             end if;
             if Context.Levels (LOG_PORION) then
-               Result.Append ((Length  => Line'Length,
-                               Number  => Line_Num,
-                               Level   => LOG_PORION,
-                               Step    => Step,
-                               Context => False,
-                               Content => Line));
+               Result.Append (Line_Type'(Length  => Line'Length,
+                                         Number  => Line_Num,
+                                         Level   => LOG_PORION,
+                                         Step    => Step,
+                                         Context => False,
+                                         Content => Line));
             end if;
             return;
          end if;
@@ -132,9 +132,9 @@ package body Porion.Logs.Analysis is
          Match : constant GNAT.Regpat.Pattern_Matcher
            := GNAT.Regpat.Compile (Line, GNAT.Regpat.Single_Line);
       begin
-         Context.Rules.Append ((Size    => Match.Size,
-                                Pattern => Match,
-                                Kind    => (Level, False)));
+         Context.Rules.Append (Rule_Matcher'(Size    => Match.Size,
+                                             Pattern => Match,
+                                             Kind    => (Level, False)));
       end Process;
 
       procedure Read_Rules (Token : in String;

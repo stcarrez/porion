@@ -372,10 +372,10 @@ package body Porion.Executors is
                              Command  : in String) is
    begin
       Executor.Log (Logs.LOG_COMMAND, Command);
-      Executor.Commands.Append ((Len     => Command'Length,
-                                 Step    => Executor.Step,
-                                 Mode    => Executor.Mode,
-                                 Command => Command));
+      Executor.Commands.Append (Command_Type'(Len     => Command'Length,
+                                              Step    => Executor.Step,
+                                              Mode    => Executor.Mode,
+                                              Command => Command));
    end Record_Command;
 
    --  ------------------------------

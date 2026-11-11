@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  porion-nodes-services -- Build node management operations
---  Copyright (C) 2021, 2022, 2023, 2024 Stephane Carrez
+--  Copyright (C) 2021, 2022, 2023, 2024, 2026 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -334,7 +334,7 @@ package body Porion.Nodes.Services is
                R : constant Configs.Rules.Rule_Type := Configs.Rules.Get_Definition (Token);
             begin
                if not Configs.Rules.Is_Null (R) then
-                  Rules.Append ((Rule => R, others => <>));
+                  Rules.Append (Rule_Status_Type'(Rule => R, others => <>));
                end if;
             end;
          end if;

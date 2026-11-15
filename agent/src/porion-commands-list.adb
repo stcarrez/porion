@@ -17,23 +17,41 @@
 -----------------------------------------------------------------------
 
 with Porion.Reports;
+with Porion.Services;
 package body Porion.Commands.List is
 
    --  The maximum number of entries displayed in a list unless --all is used.
    MAX_LIST_COUNT : constant Natural := 100;
 
-   --  Report the list of projects, nodes or builds.
+   --  Report the list of projects, nodes or builds.  When a project name is given
+   --  as argument, the builds, nodes and queues are filtered by that project.
    overriding
    procedure Execute (Command   : in out Command_Type;
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Context   : in out Context_Type) is
-      pragma Unreferenced (Name, Args);
+      pragma Unreferenced (Name);
 
       --  Limit the number of entries unless --all is given (0 means no limit).
       Max_Count : constant Natural := (if Command.List_All then 0 else MAX_LIST_COUNT);
    begin
+      if Args.Get_Count > 1 then
+         Porion.Commands.Error (-("too many arguments"));
+         return;
+      end if;
       Context.Open;
+
+      if Args.Get_Count = 1 then
+         declare
+            Project_Name : constant String := Args.Get_Argument (1);
+         begin
+            Context.Project_Service.Load_Project (Project_Name);
+         exception
+            when Porion.Services.Not_Found =>
+               Porion.Commands.Error (-("project '{0}' not found"), Project_Name);
+               return;
+         end;
+      end if;
 
       if not Command.List_Projects and not Command.List_Nodes and not Command.List_Builds
         and not Command.List_Queues and not Command.List_Env
@@ -84,6 +102,9 @@ package body Porion.Commands.List is
                     Context : in out Context_Type) is
    begin
       Drivers.Command_Type (Command).Setup (Config, Context);
+      GC.Set_Usage (Config => Config,
+                    Usage  => Command.Get_Name & " [options] [project]",
+                    Help   => Command.Get_Description);
       GC.Define_Switch (Config => Config,
                         Output => Command.List_Projects'Access,
                         Switch => "-p",
@@ -98,7 +119,7 @@ package body Porion.Commands.List is
                         Output => Command.List_Builds'Access,
                         Switch => "-b",
                         Long_Switch => "--builds",
-                        Help => -("List the builds"));
+                        Help => -("List the builds, filtered by the project name when given"));
       GC.Define_Switch (Config => Config,
                         Output => Command.List_Queues'Access,
                         Switch => "-Q",

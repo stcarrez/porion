@@ -270,7 +270,7 @@ package body Porion.Reports is
       if Service.Project.Is_Null then
          Query.Set_Query (Porion.Queries.Query_Build_List);
       else
-         Query.Set_Query (Porion.Queries.Query_Project_Last_Build_List);
+         Query.Set_Query (Porion.Queries.Query_Project_Build_List);
          Query.Bind_Param ("project_id", Service.Project.Get_Id);
       end if;
       Porion.Queries.List (List, Service.DB, Query);

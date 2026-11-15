@@ -148,7 +148,7 @@ src/porion-configs-setup.ads:   Makefile.conf src/porion-configs-setup.gpb
 ifneq (${HAVE_DYNAMO},yes)
 lib-setup:: awa/dynamo/src/gen-configs.ads
 awa/dynamo/src/gen-configs.ads:   Makefile.conf awa/dynamo/src/gen-configs.gpb
-	cd awa/dynamo && sh ./alire-setup.sh
+	$(ALR) exec -- sh -c 'cd awa/dynamo && sh ./alire-setup.sh'
 
 # Install the AWA UML model in Dynamo UML search path
 awa/dynamo/config/uml/AWA.xmi: awa/uml/awa.zargo
